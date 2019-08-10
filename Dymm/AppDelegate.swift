@@ -15,7 +15,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        window = UIWindow(frame:UIScreen.main.bounds)
+        window?.rootViewController = UINavigationController(rootViewController: HomeViewController())
+        window?.makeKeyAndVisible()
+        setNavigationBar()
         return true
     }
 
@@ -44,3 +47,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
+extension AppDelegate {
+    
+    // MARK: Private Methods
+    
+    private func setNavigationBar() {
+        let navigationBarAppearance = UINavigationBar.appearance()
+        navigationBarAppearance.tintColor = UIColor.black
+        navigationBarAppearance.barTintColor = UIColor.white
+        // navigationBarAppearance.titleTextAttributes = [NSAttributedString.Key.font: UIFont(name: "System", size: 20)!]
+        navigationBarAppearance.backIndicatorImage = UIImage(named: "button-back")
+        navigationBarAppearance.backIndicatorTransitionMaskImage = UIImage(named: "button-back")
+        navigationBarAppearance.shadowImage = UIImage()
+        // navigationBarAppearance.setBackgroundImage(UIImage(), for: .default)
+    }
+}
