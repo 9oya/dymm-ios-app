@@ -52,6 +52,8 @@ class LangPack {
     var btnFold: String!
     var btnAll: String!
     var btnSendAgain: String!
+    var btnYes: String!
+    var btnNo: String!
     
     var msgNetworkFailure: String!
     var msgForbiddenInvalidEmail: String!
@@ -341,13 +343,25 @@ func getLanguagePack(_ currentLanguageId: Int) -> LangPack {
         case LanguageId.kor: return "다시 보내기"
         default: fatalError(lang.currentLangErrorMsg)}
     }()
+    lang.btnYes = {
+        switch currentLanguageId {
+        case LanguageId.eng: return "Yes"
+        case LanguageId.kor: return "그래"
+        default: fatalError(lang.currentLangErrorMsg)}
+    }()
+    lang.btnNo = {
+        switch currentLanguageId {
+        case LanguageId.eng: return "No"
+        case LanguageId.kor: return "아니"
+        default: fatalError(lang.currentLangErrorMsg)}
+    }()
     
     // MARK: Message
     
     lang.msgNetworkFailure = {
         switch currentLanguageId {
-        case LanguageId.eng: return "Unable to access the server,\nPleas check your Wi-Fi or mobile network.\n\nWant to try again?"
-        case LanguageId.kor: return "서버와의 통신이 원활하지 않습니다.\nWi-Fi 또는 휴대전화 통신상태를 확인해 주세요.\n\n다시 시도하시겠습니다?"
+        case LanguageId.eng: return "Unable to access the server.\n\nWant to try again?"
+        case LanguageId.kor: return "서버와의 통신이 원활하지 않습니다.\n\n다시 시도하시겠습니다?"
         default: fatalError(lang.currentLangErrorMsg)}
     }()
     lang.msgForbiddenInvalidEmail = {

@@ -337,9 +337,9 @@ struct CustomModel {
     
     struct GroupOfLogSet: Codable {
         let group_id: Int
-        let food_logs: [BaseModel.TagLog]?
-        let act_logs: [BaseModel.TagLog]?
-        let drug_logs: [BaseModel.TagLog]?
+        var food_logs: [BaseModel.TagLog]?
+        var act_logs: [BaseModel.TagLog]?
+        var drug_logs: [BaseModel.TagLog]?
         let cond_score: Int?
         
         enum CodingKeys: String, CodingKey {

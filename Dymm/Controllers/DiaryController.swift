@@ -58,7 +58,6 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         _button.setImage(UIImage(named: "button-maximize")!.withRenderingMode(.alwaysOriginal), for: .normal)
         _button.frame = CGRect(x: 0, y: 0, width: 25, height: 25)
         _button.showsTouchWhenHighlighted = true
-        _button.addTarget(self, action: #selector(toggleButtonTapped), for: .touchUpInside)
         _button.translatesAutoresizingMaskIntoConstraints = false
         return _button
     }()
@@ -81,6 +80,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     let pickerContainerView: UIView = {
         let _view = UIView()
         _view.backgroundColor = UIColor.white
+        _view.layer.cornerRadius = 10.0
         _view.isHidden = true
         _view.translatesAutoresizingMaskIntoConstraints = false
         return _view
@@ -151,8 +151,8 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var weekOfYear: Int?
     var dayOfYear: Int?
     var logType: Int?
-    var logNumber: Int?
-    var logFraction: Int?
+    var x_val: Int?
+    var y_val: Int?
     
     let defPickerCollectionHeightVal = 32
     let collectionCellHeightVal = 30
@@ -192,6 +192,22 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             selectedWeekOfYear = nil
             loadLogGroups()
         }
+    }
+    
+    @objc func pickerCancelButtonTapped() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
+            UIView.transition(with: self.blindView, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                self.blindView.isHidden = true
+            })
+        })
+    }
+    
+    @objc func pickerCheckButtonTapped() {
+        UIView.transition(with: pickerContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.pickerContainerView.isHidden = true
+            self.loadingImageView.isHidden = false
+        })
+        postAGroupOfLog()
     }
     
     @objc func homeButtonTapped() {
@@ -388,6 +404,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 guard let cell = tableView.cellForRow(at: indexPath) as? LogGroupTableCell else {
                     fatalError()
                 }
+                cell.selectedLogGroup = self.selectedLogGroup!
                 cell.groupOfLogSet = self.groupOfLogSet!
                 cell.groupOfLogsTableView.reloadData()
                 if indexPath == self.selectedOnceCellIdxPath {
@@ -531,38 +548,69 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: logCollectionCellId, for: indexPath) as? LogCollectionCell else {
             fatalError()
         }
-        var idx = 0
-        if (groupOfLogSet!.food_logs?.count) ?? 0 > indexPath.row {
-            let foodLog = groupOfLogSet!.food_logs![indexPath.row]
+        if ((groupOfLogSet!.food_logs?.count)!) > 0 {
+            let foodLog = groupOfLogSet!.food_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.tomato
-            cell.nameLabel.text = foodLog.eng_name
-            cell.quantityLabel.text = "\(foodLog.x_val!)\(foodLog.y_val!)"
-        } else if (groupOfLogSet!.act_logs?.count) ?? 0 > indexPath.row {
-            if (selectedLogGroup!.has_food) {
-                idx = indexPath.row - (groupOfLogSet!.food_logs!.count - 1)
-            } else {
-                idx = indexPath.row
+            switch lang.currentLanguageId {
+            case LanguageId.eng: cell.nameLabel.text = foodLog!.eng_name
+            case LanguageId.kor: cell.nameLabel.text = foodLog!.kor_name
+            case LanguageId.jpn: cell.nameLabel.text = foodLog!.jpn_name
+            default: fatalError()}
+            var x_val = ""
+            if foodLog!.x_val! > 0 {
+                x_val = "\(foodLog!.x_val!)"
             }
-            let actLog = groupOfLogSet!.act_logs![idx]
+            if foodLog!.y_val == 0 {
+                cell.quantityLabel.text = "\(x_val)"
+            } else if foodLog!.y_val == 1 {
+                cell.quantityLabel.text = "\(x_val)¼"
+            } else if foodLog!.y_val == 2 {
+                cell.quantityLabel.text = "\(x_val)½"
+            } else if foodLog!.y_val == 3 {
+                cell.quantityLabel.text = "\(x_val)¾"
+            }
+        } else if ((groupOfLogSet!.act_logs?.count)!) > 0 {
+            let actLog = groupOfLogSet!.act_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.yellowGreen
-            cell.nameLabel.text = actLog.eng_name
-            cell.quantityLabel.text = "\(actLog.x_val!)\(actLog.y_val!)"
-        } else if (groupOfLogSet!.drug_logs?.count) ?? 0 > indexPath.row {
-            if (selectedLogGroup!.has_food) {
-                idx = indexPath.row - (groupOfLogSet!.food_logs!.count - 1)
-                if (selectedLogGroup?.has_act)! {
-                    idx -= (groupOfLogSet!.act_logs!.count - 1)
-                }
+            switch lang.currentLanguageId {
+            case LanguageId.eng: cell.nameLabel.text = actLog!.eng_name
+            case LanguageId.kor: cell.nameLabel.text = actLog!.kor_name
+            case LanguageId.jpn: cell.nameLabel.text = actLog!.jpn_name
+            default: fatalError()}
+            var x_val = ""
+            if actLog!.x_val! > 0 {
+                x_val = "\(actLog!.x_val!)"
             }
-            if (selectedLogGroup?.has_act)! {
-                idx = indexPath.row - (groupOfLogSet!.act_logs!.count - 1)
-            } else {
-                idx = indexPath.row
+            if actLog!.y_val == 0 {
+                cell.quantityLabel.text = "\(x_val)"
+            } else if actLog!.y_val == 1 {
+                cell.quantityLabel.text = "\(x_val)¼"
+            } else if actLog!.y_val == 2 {
+                cell.quantityLabel.text = "\(x_val)½"
+            } else if actLog!.y_val == 3 {
+                cell.quantityLabel.text = "\(x_val)¾"
             }
-            let drugLog = groupOfLogSet!.drug_logs![idx]
+        } else if ((groupOfLogSet!.drug_logs?.count)!) > 0 {
+            let drugLog = groupOfLogSet!.drug_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.dodgerBlue
-            cell.nameLabel.text = drugLog.eng_name
-            cell.quantityLabel.text = "\(drugLog.x_val!)\(drugLog.y_val!)"
+            switch lang.currentLanguageId {
+            case LanguageId.eng: cell.nameLabel.text = drugLog!.eng_name
+            case LanguageId.kor: cell.nameLabel.text = drugLog!.kor_name
+            case LanguageId.jpn: cell.nameLabel.text = drugLog!.jpn_name
+            default: fatalError()}
+            var x_val = ""
+            if drugLog!.x_val! > 0 {
+                x_val = "\(drugLog!.x_val!)"
+            }
+            if drugLog!.y_val == 0 {
+                cell.quantityLabel.text = "\(x_val)"
+            } else if drugLog!.y_val == 1 {
+                cell.quantityLabel.text = "\(x_val)¼"
+            } else if drugLog!.y_val == 2 {
+                cell.quantityLabel.text = "\(x_val)½"
+            } else if drugLog!.y_val == 3 {
+                cell.quantityLabel.text = "\(x_val)¾"
+            }
         }
         return cell
     }
@@ -780,6 +828,10 @@ extension DiaryViewController {
     private func setupProperties() {
         lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
         navigationItem.title = lang.titleDiary
+        toggleButton.addTarget(self, action: #selector(toggleButtonTapped), for: .touchUpInside)
+        pickerCancelButton.addTarget(self, action: #selector(pickerCancelButtonTapped), for: .touchUpInside)
+        pickerCheckButton.addTarget(self, action: #selector(pickerCheckButtonTapped), for: .touchUpInside)
+        
         view.addGestureRecognizer(scopeGesture)
         logGroupTableView.panGestureRecognizer.require(toFail: scopeGesture)
         calendarView.clipsToBounds = true
@@ -787,7 +839,6 @@ extension DiaryViewController {
         calendarView.appearance.caseOptions = FSCalendarCaseOptions.weekdayUsesUpperCase
         calendarView.select(Date())
         calendarView.scope = .week
-        
         selectedWeekOfYear = Calendar.current.component(.weekOfYear, from: calendarView.today!)
         selectedCalScope = CalScope.week
         loadLogGroups()
@@ -816,29 +867,15 @@ extension DiaryViewController {
     
     private func alertCompl(_ message: String) {
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
+        let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
+            self.dismiss(animated: true, completion: nil)
+        }
+        let cancelAction = UIAlertAction(title: lang.btnNo, style: .cancel) { _ in
             _ = self.navigationController?.popViewController(animated: true)
         }
-        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
-        self.present(alertController, animated: true, completion: nil)
-    }
-    
-    private func alertPicker(_ message: String) {
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let controller = UIViewController()
-        let height: NSLayoutConstraint = NSLayoutConstraint(item: alertController.view, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: view.frame.height * 0.3)
-        alertController.view.addConstraint(height)
-        alertController.setValue(controller, forKey: "pickerController")
-        controller.view.addSubview(pickerContainerView)
-        
-        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
-            self.postAGroupOfLog()
-        }
-        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
-        alertController.addAction(confirmAction)
-        alertController.addAction(cancelAction)
+        alertController.view.tintColor = UIColor.tomato
         self.present(alertController, animated: true, completion: nil)
     }
     
@@ -848,45 +885,18 @@ extension DiaryViewController {
             fatalError()
         }
         var params = Parameters()
-        switch logType! {
-        case LogType.food:
-            params = [
-                "avatar_id": avatarId,
-                "food_id": selectedTag!.id,
-                "year_number": yearNumber!,
-                "month_number": monthNumber!,
-                "week_of_year": weekOfYear!,
-                "day_of_year": dayOfYear!,
-                "group_type": groupType!,
-                "log_number": logNumber!,
-                "log_fraction": logFraction!,
-            ]
-        case LogType.act:
-            params = [
-                "avatar_id": avatarId,
-                "act_id": selectedTag!.id, // TODO
-                "year_number": yearNumber!,
-                "month_number": monthNumber!,
-                "week_of_year": weekOfYear!,
-                "day_of_year": dayOfYear!,
-                "group_type": groupType!,
-                "co_x_val": logNumber!,
-                "co_y_val": logFraction!,
-            ]
-        case LogType.drug:
-            params = [
-                "avatar_id": avatarId,
-                "drug_id": selectedTag!.id, // TODO
-                "year_number": yearNumber!,
-                "month_number": monthNumber!,
-                "week_of_year": weekOfYear!,
-                "day_of_year": dayOfYear!,
-                "group_type": groupType!,
-                "log_number": logNumber!,
-                "log_fraction": logFraction!,
-            ]
-        default: fatalError()}
-        params["log_date"] = selectedDate!
+        params = [
+            "avatar_id": avatarId,
+            "tag_id": selectedTag!.id,
+            "year_number": yearNumber!,
+            "month_number": monthNumber!,
+            "week_of_year": weekOfYear!,
+            "day_of_year": dayOfYear!,
+            "group_type": groupType!,
+            "log_date": selectedDate!,
+            "x_val": x_val!,
+            "y_val": y_val!,
+        ]
         if let logGroupId = selectedLogGroupId {
             params["log_group_id"] = logGroupId
         }
@@ -984,7 +994,7 @@ extension DiaryViewController {
             return
         }
         let service = Service(lang: lang)
-        service.dispatchASingleLog(logType: self.logType!, params: params, popoverAlert: { (message) in
+        service.dispatchASingleLog(params: params, popoverAlert: { (message) in
             self.retryFunction = self.postAGroupOfLog
             self.pickerContainerView.isHidden = true
             self.alertError(message)
@@ -992,16 +1002,25 @@ extension DiaryViewController {
             self.postAGroupOfLog()
         }) {
             UIView.transition(with: self.complContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.blindView.isHidden = false
+//                self.blindView.isHidden = false
                 self.pickerContainerView.isHidden = true
                 self.loadingImageView.isHidden = true
-                self.complContainerView.isHidden = false
+//                self.complContainerView.isHidden = false
+                
+//                switch self.lang.currentLanguageId {
+//                case LanguageId.eng:
+//                    self.complMsgLabel.text = self.lang.msgIntakeLogComplete(self.selectedTag!.eng_name)
+//                case LanguageId.kor:
+//                    self.complMsgLabel.text = self.lang.msgIntakeLogComplete(self.selectedTag!.kor_name!)
+//                default: fatalError()}
+                var compleMessage = ""
                 switch self.lang.currentLanguageId {
                 case LanguageId.eng:
-                    self.complMsgLabel.text = self.lang.msgIntakeLogComplete(self.selectedTag!.eng_name)
+                    compleMessage = self.lang.msgIntakeLogComplete(self.selectedTag!.eng_name)
                 case LanguageId.kor:
-                    self.complMsgLabel.text = self.lang.msgIntakeLogComplete(self.selectedTag!.kor_name!)
+                    compleMessage = self.lang.msgIntakeLogComplete(self.selectedTag!.kor_name!)
                 default: fatalError()}
+                self.alertCompl(compleMessage)
             })
         }
     }

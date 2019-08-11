@@ -26,7 +26,7 @@ class HomeViewController: UIViewController {
         _collectionView.backgroundColor = UIColor.clear
         _collectionView.register(BannerCollectionCell.self, forCellWithReuseIdentifier: bannerCellId)
         _collectionView.isPagingEnabled = true
-        _collectionView.semanticContentAttribute = .forceRightToLeft
+        _collectionView.semanticContentAttribute = .forceLeftToRight
         _collectionView.showsHorizontalScrollIndicator = false
         _collectionView.translatesAutoresizingMaskIntoConstraints = false
         return _collectionView
@@ -99,6 +99,15 @@ class HomeViewController: UIViewController {
         }
     }
     
+    @objc private func handleNextBanner() {
+        var nextIndex = min(pageControl.currentPage + 1, banners!.count - 1)
+        if pageControl.currentPage == banners!.count - 1 {
+            nextIndex = 0
+        }
+        let indexPath = IndexPath(item: nextIndex, section: 0)
+        pageControl.currentPage = nextIndex
+        bannerCollectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+    }
 }
 
 extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
@@ -284,15 +293,16 @@ extension HomeViewController {
         loadBanners()
         loadCategories()
     }
-
+    
     private func alertError(_ message: String) {
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
+        let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
             self.retryFunction!()
         }
-        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
+        let cancelAction = UIAlertAction(title: lang.btnNo, style: .cancel) { _ in }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
+        alertController.view.tintColor = UIColor.tomato
         self.present(alertController, animated: true, completion: nil)
     }
     
@@ -321,6 +331,10 @@ extension HomeViewController {
         self.present(nc, animated: true, completion: nil)
     }
     
+    private func startTimer() {
+        let _ = Timer.scheduledTimer(timeInterval: 6.0, target: self, selector: #selector(handleNextBanner), userInfo: nil, repeats: true);
+    }
+    
     private func afterFetchCategoriesTransition(_ tags: [BaseModel.Tag]) {
         self.tags = tags
         let tagsCnt = tags.count
@@ -342,6 +356,7 @@ extension HomeViewController {
                 self.bannerCollectionView.reloadData()
             })
             self.pageControl.numberOfPages = banners.count
+            self.startTimer()
         }
     }
     

@@ -17,7 +17,7 @@ class BannerCollectionCell: UICollectionViewCell {
     }()
     let titleLabel: UILabel = {
         let _label = UILabel()
-        _label.font = .systemFont(ofSize: 20)
+        _label.font = .boldSystemFont(ofSize: 20)
         _label.textAlignment = .center
         _label.numberOfLines = 1
         _label.translatesAutoresizingMaskIntoConstraints = false
@@ -62,7 +62,7 @@ extension BannerCollectionCell {
         imageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0).isActive = true
         
         titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor, constant: 0).isActive = true
-        titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
+        titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -10).isActive = true
         
         subtitleLabel.centerXAnchor.constraint(equalTo: centerXAnchor, constant: 0).isActive = true
         subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2).isActive = true

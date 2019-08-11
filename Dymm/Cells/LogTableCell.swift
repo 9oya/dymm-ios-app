@@ -17,14 +17,15 @@ class LogTableCell: UITableViewCell {
     }()
     let nameLabel: UILabel = {
         let _label = UILabel()
-        _label.font = .systemFont(ofSize: 15)
+        _label.font = .systemFont(ofSize: 14)
         _label.textAlignment = .left
         _label.translatesAutoresizingMaskIntoConstraints = false
         return _label
     }()
     let quantityLabel: UILabel = {
         let _label = UILabel()
-        _label.font = .systemFont(ofSize: 15)
+        _label.font = .systemFont(ofSize: 14)
+        _label.textColor = UIColor(hex: "#9A9A9A")
         _label.textAlignment = .right
         _label.translatesAutoresizingMaskIntoConstraints = false
         return _label

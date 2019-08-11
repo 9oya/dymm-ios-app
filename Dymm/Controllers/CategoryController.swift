@@ -9,13 +9,24 @@
 import UIKit
 
 private let tagCellId = "TagCell"
+private let stepCellId = "StepCell"
 
 class CategoryViewController: UIViewController {
     
     // MARK: - Properties
     
     var loadingImageView: UIImageView!
-    var additionalTopBarView: UIView!
+    let stepCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
+        _collectionView.backgroundColor = UIColor.white
+        _collectionView.register(StepCollectionCell.self, forCellWithReuseIdentifier: stepCellId)
+        _collectionView.semanticContentAttribute = .forceLeftToRight
+        _collectionView.showsHorizontalScrollIndicator = false
+        _collectionView.translatesAutoresizingMaskIntoConstraints = false
+        return _collectionView
+    }()
     var scrollView: UIScrollView!
     var tagCollectionView: UICollectionView!
     var tagCollectionViewTop: NSLayoutConstraint!
@@ -48,7 +59,7 @@ class CategoryViewController: UIViewController {
     let targetButton: UIButton = {
         let _button = UIButton(type: .system)
         _button.setTitleColor(UIColor.tomato, for: .normal)
-        _button.titleLabel?.font = .systemFont(ofSize: 20)
+        _button.titleLabel?.font = .systemFont(ofSize: 25)
         _button.frame = CGRect(x: 0, y: 0, width: 59, height: 59)
         _button.showsTouchWhenHighlighted = true
         _button.translatesAutoresizingMaskIntoConstraints = false
@@ -56,14 +67,14 @@ class CategoryViewController: UIViewController {
     }()
     let fingerImageView: UIImageView = {
         let _imageView = UIImageView()
-        _imageView.image = #imageLiteral(resourceName: "item-finger-click")
+        _imageView.image = UIImage(named: "item-finger-click")
         _imageView.contentMode = .scaleAspectFit
         _imageView.translatesAutoresizingMaskIntoConstraints = false
         return _imageView
     }()
     let downArrowImageView: UIImageView = {
         let _imageView = UIImageView()
-        _imageView.image = #imageLiteral(resourceName: "item-arrow-down")
+        _imageView.image = UIImage(named: "item-arrow-down")
         _imageView.contentMode = .scaleAspectFit
         _imageView.translatesAutoresizingMaskIntoConstraints = false
         return _imageView
@@ -107,15 +118,22 @@ class CategoryViewController: UIViewController {
     var retryFunction: (() -> Void)?
     var superTag: BaseModel.Tag!
     var subTags: [BaseModel.Tag]!
-    var footstepTag: BaseModel.Tag?
+    var stepTags: [BaseModel.Tag] = []
     var selectedNumber: Int?
     var selectedFraction: Int?
     var selectedPickerRow: Int = 4
+    
+    var stepCollectionHeightVal: CGFloat = 40
+    var viewSpaceVal: CGFloat = 7
+    var detailContainerAHeightVal: CGFloat = 350
+    var detailContainerBHeightVal: CGFloat = 333
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayoutStyles()
         setupLayoutSubviews()
+        stepCollectionView.dataSource = self
+        stepCollectionView.delegate = self
         tagCollectionView.dataSource = self
         tagCollectionView.delegate = self
         pickerView.dataSource = self
@@ -130,18 +148,13 @@ class CategoryViewController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc func footstepButtonTapped() {
-        superTag = footstepTag
-        loadCategories()
-    }
-    
     @objc func targetButtonTapped() {
         let vc = DiaryViewController()
         vc.diaryStat = DiaryStat.log
         vc.logType = LogType.food
         vc.selectedTag = superTag!
-        vc.logNumber = selectedNumber!
-        vc.logFraction = selectedFraction!
+        vc.x_val = selectedNumber!
+        vc.y_val = selectedFraction!
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: UIBarButtonItem.Style.plain, target: self, action: nil)
         self.navigationController?.pushViewController(vc, animated: true)
     }
@@ -156,42 +169,62 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let number = subTags?.count else {
-            return 0
+        if collectionView == tagCollectionView {
+            guard let number = subTags?.count else {
+                return 0
+            }
+            return number
+        } else if collectionView == stepCollectionView {
+            return stepTags.count
+        } else {
+            fatalError()
         }
-        return number
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: tagCellId, for: indexPath) as? TagCollectionCell else {
+        if collectionView == tagCollectionView {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: tagCellId, for: indexPath) as? TagCollectionCell else {
+                fatalError()
+            }
+            let tag = subTags[indexPath.row]
+            switch lang.currentLanguageId {
+            case LanguageId.eng: cell.label.text = tag.eng_name
+            case LanguageId.kor: cell.label.text = tag.kor_name
+            default: fatalError()}
+            cell.imageView.image = UIImage(named: "tag-id-\(tag.id)")
+            return cell
+        } else if collectionView == stepCollectionView {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: stepCellId, for: indexPath) as? StepCollectionCell else {
+                fatalError()
+            }
+            let tag = stepTags[indexPath.row]
+            switch lang.currentLanguageId {
+            case LanguageId.eng: cell.label.text = tag.eng_name
+            case LanguageId.kor: cell.label.text = tag.kor_name
+            default: fatalError()}
+            return cell
+        } else {
             fatalError()
         }
-        let tag = subTags[indexPath.row]
-        switch lang.currentLanguageId {
-        case LanguageId.eng: cell.label.text = tag.eng_name
-        case LanguageId.kor: cell.label.text = tag.kor_name
-        default: fatalError()}
-        cell.imageView.image = UIImage(named: "tagId-\(tag.id)")
-        return cell
     }
     
     // MARK: - UICollectionViewDelegate
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selected_tag = subTags[indexPath.item]
-        let footstepButton = UIButton(frame: CGRect(x: 0, y: 0, width: 100, height: 35))
-        switch lang.currentLanguageId {
-        case LanguageId.eng: footstepButton.setTitle(superTag.eng_name, for: .normal)
-        case LanguageId.kor: footstepButton.setTitle(superTag.kor_name, for: .normal)
-        default: fatalError()}
-        footstepButton.setTitleColor(UIColor(hex: "Black"), for: .normal)
-        footstepButton.titleLabel?.font = .systemFont(ofSize: 14)
-        footstepButton.addTarget(self, action:#selector(footstepButtonTapped), for: .touchUpInside)
-        footstepButton.showsTouchWhenHighlighted = true
-        additionalTopBarView.addSubview(footstepButton)
-        footstepTag = superTag
-        superTag = selected_tag
-        loadCategories()
+        if collectionView == tagCollectionView {
+            let selected_tag = subTags[indexPath.item]
+            stepTags.append(superTag)
+            superTag = selected_tag
+            loadCategories()
+        } else if collectionView == stepCollectionView {
+            superTag = stepTags[indexPath.item]
+            while stepTags.count > indexPath.item {
+                stepTags.remove(at: indexPath.item)
+            }
+            loadCategories()
+        } else {
+            fatalError()
+        }
     }
     
     // MARK: - UICollectionView DelegateFlowLayout
@@ -202,15 +235,33 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenWidth = UIScreen.main.bounds.width
-        return CGSize(width: (screenWidth / 2) - 10.5, height: CGFloat(45))
+        if collectionView == tagCollectionView {
+            return CGSize(width: (screenWidth / 2) - 10.5, height: CGFloat(40))
+        } else if collectionView == stepCollectionView {
+            return CGSize(width: 100, height: CGFloat(40))
+        } else {
+            fatalError()
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 7
+        if collectionView == tagCollectionView {
+            return 7
+        } else if collectionView == stepCollectionView {
+            return 2
+        } else {
+            fatalError()
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 7
+        if collectionView == tagCollectionView {
+            return 7
+        } else if collectionView == stepCollectionView {
+            return 0
+        } else {
+            fatalError()
+        }
     }
 }
 
@@ -299,13 +350,12 @@ extension CategoryViewController {
     
     private func setupLayoutSubviews() {
         loadingImageView = getLoadingImageView(isHidden: false)
-        additionalTopBarView = getAddtionalTopBarView()
         scrollView = getScrollView()
         tagCollectionView = getCategoryCollectionView()
         
         view.addSubview(scrollView)
         view.addSubview(loadingImageView)
-        view.addSubview(additionalTopBarView)
+        view.addSubview(stepCollectionView)
         
         scrollView.addSubview(searchContainerView)
         scrollView.addSubview(sortContainerView)
@@ -332,10 +382,10 @@ extension CategoryViewController {
         loadingImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0).isActive = true
         
         // additionalTopBarView
-        additionalTopBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
-        additionalTopBarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
-        additionalTopBarView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
-        additionalTopBarView.heightAnchor.constraint(equalToConstant: 35).isActive = true
+        stepCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+        stepCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+        stepCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
+        stepCollectionView.heightAnchor.constraint(equalToConstant: stepCollectionHeightVal).isActive = true
         
         // scrollView
         scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
@@ -343,20 +393,20 @@ extension CategoryViewController {
         scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
         
-        searchContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 35 + 7).isActive = true
-        searchContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 7).isActive = true
-        searchContainerView.widthAnchor.constraint(equalToConstant: (UIScreen.main.bounds.width / 2) + 7).isActive = true
+        searchContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepCollectionHeightVal + viewSpaceVal).isActive = true
+        searchContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: viewSpaceVal).isActive = true
+        searchContainerView.widthAnchor.constraint(equalToConstant: (UIScreen.main.bounds.width / 2) + viewSpaceVal).isActive = true
         searchContainerView.heightAnchor.constraint(equalToConstant: 45).isActive = true
         
-        sortContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 35 + 7).isActive = true
-        sortContainerView.leadingAnchor.constraint(equalTo: searchContainerView.trailingAnchor, constant: 7).isActive = true
+        sortContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepCollectionHeightVal + viewSpaceVal).isActive = true
+        sortContainerView.leadingAnchor.constraint(equalTo: searchContainerView.trailingAnchor, constant: viewSpaceVal).isActive = true
         sortContainerView.widthAnchor.constraint(equalToConstant: (UIScreen.main.bounds.width / 2) - 28).isActive = true
         sortContainerView.heightAnchor.constraint(equalTo: searchContainerView.heightAnchor, constant: 0).isActive = true
         
-        detailContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 35 + 7).isActive = true
-        detailContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 7).isActive = true
-        detailContainerView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 7).isActive = true
-        detailContainerViewHeight = detailContainerView.heightAnchor.constraint(equalToConstant: 350)
+        detailContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepCollectionHeightVal + viewSpaceVal).isActive = true
+        detailContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: viewSpaceVal).isActive = true
+        detailContainerView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: viewSpaceVal).isActive = true
+        detailContainerViewHeight = detailContainerView.heightAnchor.constraint(equalToConstant: detailContainerAHeightVal)
         detailContainerViewHeight.priority = UILayoutPriority(rawValue: 999)
         detailContainerViewHeight.isActive = true
         
@@ -387,7 +437,7 @@ extension CategoryViewController {
         fingerImageView.leadingAnchor.constraint(equalTo: targetButton.trailingAnchor, constant: 8).isActive = true
         
         // addBar: 35, space: 7, searchBar: 45, space: 7
-        tagCollectionViewTop = tagCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 35 + 7 + 45 + 7)
+        tagCollectionViewTop = tagCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepCollectionHeightVal + 7 + 45 + 7)
         tagCollectionViewTop.priority = UILayoutPriority(rawValue: 999)
         tagCollectionViewTop.isActive = true
         tagCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 7).isActive = true
@@ -488,15 +538,15 @@ extension CategoryViewController {
     }
     
     private func afterFetchCategoriesTransition(_ superTag: BaseModel.Tag, _ subTags: [BaseModel.Tag]) {
+        self.stepCollectionView.reloadData()
         self.subTags = subTags
         let tagsCnt = subTags.count
-        
         if superTag.tag_type == TagType.category {
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = true
                 self.searchContainerView.isHidden = false
                 self.sortContainerView.isHidden = false
-                self.tagCollectionViewTop.constant = 35 + 7 + 45 + 7
+                self.tagCollectionViewTop.constant = self.stepCollectionHeightVal + 7 + 45 + 7
             }
         } else if superTag.tag_type == TagType.food || superTag.tag_type == TagType.drug {
             switch lang.currentLanguageId {
@@ -504,13 +554,14 @@ extension CategoryViewController {
             case LanguageId.kor: titleLabel.text = superTag.kor_name
             case LanguageId.jpn: titleLabel.text = superTag.jpn_name
             default: fatalError()}
+            pickerView.selectRow(4, inComponent: 0, animated: true)
             didSelectPickerViewRow(row: 4)
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = false
                 self.searchContainerView.isHidden = true
                 self.sortContainerView.isHidden = true
-                self.detailContainerViewHeight.constant = 350
-                self.tagCollectionViewTop.constant = 35 + 7 + 350 + 7
+                self.detailContainerViewHeight.constant = self.detailContainerAHeightVal
+                self.tagCollectionViewTop.constant = self.stepCollectionHeightVal + 7 + self.detailContainerAHeightVal + 7
             }
         } else if superTag.tag_type == TagType.activity {
             switch lang.currentLanguageId {
@@ -522,11 +573,10 @@ extension CategoryViewController {
                 self.detailContainerView.isHidden = false
                 self.searchContainerView.isHidden = true
                 self.sortContainerView.isHidden = true
-                self.detailContainerViewHeight.constant = 333
-                self.tagCollectionViewTop.constant = 35 + 7 + 333 + 7
+                self.detailContainerViewHeight.constant = self.detailContainerBHeightVal
+                self.tagCollectionViewTop.constant = self.stepCollectionHeightVal + 7 + self.detailContainerBHeightVal + 7
             }
         }
-        
         UIView.transition(with: self.tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.tagCollectionView.reloadData()
             self.tagCollectionViewHeight.constant = self.getCategoryCollectionViewHeight(tagsCnt)

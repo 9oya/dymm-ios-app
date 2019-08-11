@@ -19,7 +19,7 @@ class TagCollectionCell: UICollectionViewCell {
         let _label = UILabel()
         _label.font = .systemFont(ofSize: 14)
         _label.textAlignment = .center
-        _label.numberOfLines = 4
+        _label.numberOfLines = 3
         _label.adjustsFontSizeToFitWidth = true
         _label.minimumScaleFactor = 0.5
         _label.allowsDefaultTighteningForTruncation = true

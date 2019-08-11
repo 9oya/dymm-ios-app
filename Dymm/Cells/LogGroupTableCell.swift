@@ -86,9 +86,11 @@ class LogGroupTableCell: UITableViewCell {
     var selectedLogGroup: BaseModel.LogGroup?
     var selectedLogGroupId: Int?
     var groupOfLogSet: CustomModel.GroupOfLogSet?
+    var lang: LangPack!
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
         selectionStyle = .none
         setupLayoutStyles()
         groupOfLogsTableView.delegate = self
@@ -128,38 +130,69 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: logsTableCellId, for: indexPath) as? LogTableCell else {
             fatalError()
         }
-        var idx = 0
-        if (groupOfLogSet!.food_logs?.count) ?? 0 > indexPath.row {
-            let foodLog = groupOfLogSet!.food_logs![indexPath.row]
+        if ((groupOfLogSet!.food_logs?.count)!) > 0 {
+            let foodLog = groupOfLogSet!.food_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.tomato
-            cell.nameLabel.text = foodLog.eng_name
-            cell.quantityLabel.text = "\(foodLog.x_val!)\(foodLog.y_val!)"
-        } else if (groupOfLogSet!.act_logs?.count) ?? 0 > indexPath.row {
-            if (selectedLogGroup!.has_food) {
-                idx = indexPath.row - (groupOfLogSet!.food_logs!.count - 1)
-            } else {
-                idx = indexPath.row
+            switch lang.currentLanguageId {
+            case LanguageId.eng: cell.nameLabel.text = foodLog!.eng_name
+            case LanguageId.kor: cell.nameLabel.text = foodLog!.kor_name
+            case LanguageId.jpn: cell.nameLabel.text = foodLog!.jpn_name
+            default: fatalError()}
+            var x_val = ""
+            if foodLog!.x_val! > 0 {
+                x_val = "\(foodLog!.x_val!)"
             }
-            let actLog = groupOfLogSet!.act_logs![idx]
+            if foodLog!.y_val == 0 {
+                cell.quantityLabel.text = "\(x_val)"
+            } else if foodLog!.y_val == 1 {
+                cell.quantityLabel.text = "\(x_val)¼"
+            } else if foodLog!.y_val == 2 {
+                cell.quantityLabel.text = "\(x_val)½"
+            } else if foodLog!.y_val == 3 {
+                cell.quantityLabel.text = "\(x_val)¾"
+            }
+        } else if ((groupOfLogSet!.act_logs?.count)!) > 0 {
+            let actLog = groupOfLogSet!.act_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.yellowGreen
-            cell.nameLabel.text = actLog.eng_name
-            cell.quantityLabel.text = "\(actLog.x_val!)\(actLog.y_val!)"
-        } else if (groupOfLogSet!.drug_logs?.count) ?? 0 > indexPath.row {
-            if (selectedLogGroup!.has_food) {
-                idx = indexPath.row - (groupOfLogSet!.food_logs!.count - 1)
-                if (selectedLogGroup?.has_act)! {
-                    idx -= (groupOfLogSet!.act_logs!.count - 1)
-                }
+            switch lang.currentLanguageId {
+            case LanguageId.eng: cell.nameLabel.text = actLog!.eng_name
+            case LanguageId.kor: cell.nameLabel.text = actLog!.kor_name
+            case LanguageId.jpn: cell.nameLabel.text = actLog!.jpn_name
+            default: fatalError()}
+            var x_val = ""
+            if actLog!.x_val! > 0 {
+                x_val = "\(actLog!.x_val!)"
             }
-            if (selectedLogGroup?.has_act)! {
-                idx = indexPath.row - (groupOfLogSet!.act_logs!.count - 1)
-            } else {
-                idx = indexPath.row
+            if actLog!.y_val == 0 {
+                cell.quantityLabel.text = "\(x_val)"
+            } else if actLog!.y_val == 1 {
+                cell.quantityLabel.text = "\(x_val)¼"
+            } else if actLog!.y_val == 2 {
+                cell.quantityLabel.text = "\(x_val)½"
+            } else if actLog!.y_val == 3 {
+                cell.quantityLabel.text = "\(x_val)¾"
             }
-            let drugLog = groupOfLogSet!.drug_logs![idx]
+        } else if ((groupOfLogSet!.drug_logs?.count)!) > 0 {
+            let drugLog = groupOfLogSet!.drug_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.dodgerBlue
-            cell.nameLabel.text = drugLog.eng_name
-            cell.quantityLabel.text = "\(drugLog.x_val!)\(drugLog.y_val!)"
+            switch lang.currentLanguageId {
+            case LanguageId.eng: cell.nameLabel.text = drugLog!.eng_name
+            case LanguageId.kor: cell.nameLabel.text = drugLog!.kor_name
+            case LanguageId.jpn: cell.nameLabel.text = drugLog!.jpn_name
+            default: fatalError()}
+            var x_val = ""
+            if drugLog!.x_val! > 0 {
+                x_val = "\(drugLog!.x_val!)"
+            }
+            if drugLog!.y_val == 0 {
+                cell.quantityLabel.text = "\(x_val)"
+            } else if drugLog!.y_val == 1 {
+                cell.quantityLabel.text = "\(x_val)¼"
+            } else if drugLog!.y_val == 2 {
+                cell.quantityLabel.text = "\(x_val)½"
+            } else if drugLog!.y_val == 3 {
+                cell.quantityLabel.text = "\(x_val)¾"
+            }
         }
         return cell
     }
@@ -238,8 +271,8 @@ extension LogGroupTableCell {
         drugLogBulletView.heightAnchor.constraint(equalToConstant: 7).isActive = true
         
         groupOfLogsTableView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 45).isActive = true
-        groupOfLogsTableView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 0).isActive = true
-        groupOfLogsTableView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12).isActive = true
+        groupOfLogsTableView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 10).isActive = true
+        groupOfLogsTableView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -22).isActive = true
         groupOfLogsTableHeight = groupOfLogsTableView.heightAnchor.constraint(equalToConstant: 40)
         groupOfLogsTableHeight.priority = UILayoutPriority(rawValue: 999)
         groupOfLogsTableHeight.isActive = true
