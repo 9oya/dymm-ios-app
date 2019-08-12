@@ -11,11 +11,16 @@ import UIKit
 private let tagCellId = "TagCell"
 private let stepCellId = "StepCell"
 
+private let stepBarHeightVal: CGFloat = 40
+private let spaceVal: CGFloat = 7
+private let detailBoxAHeightVal: CGFloat = 350
+private let detailBoxBHeightVal: CGFloat = 333
+private let detailBoxCHeightVal: CGFloat = 265
+
 class CategoryViewController: UIViewController {
     
     // MARK: - Properties
     
-    var loadingImageView: UIImageView!
     let stepCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -56,10 +61,19 @@ class CategoryViewController: UIViewController {
         _button.translatesAutoresizingMaskIntoConstraints = false
         return _button
     }()
-    let targetButton: UIButton = {
+    let logSizeButton: UIButton = {
         let _button = UIButton(type: .system)
         _button.setTitleColor(UIColor.tomato, for: .normal)
         _button.titleLabel?.font = .systemFont(ofSize: 25)
+        _button.frame = CGRect(x: 0, y: 0, width: 59, height: 59)
+        _button.showsTouchWhenHighlighted = true
+        _button.translatesAutoresizingMaskIntoConstraints = false
+        return _button
+    }()
+    let logTimeButton: UIButton = {
+        let _button = UIButton(type: .system)
+        _button.setTitleColor(UIColor.tomato, for: .normal)
+        _button.titleLabel?.font = .systemFont(ofSize: 20)
         _button.frame = CGRect(x: 0, y: 0, width: 59, height: 59)
         _button.showsTouchWhenHighlighted = true
         _button.translatesAutoresizingMaskIntoConstraints = false
@@ -72,6 +86,7 @@ class CategoryViewController: UIViewController {
         _imageView.translatesAutoresizingMaskIntoConstraints = false
         return _imageView
     }()
+    var fingerImageBottom: NSLayoutConstraint!
     let downArrowImageView: UIImageView = {
         let _imageView = UIImageView()
         _imageView.image = UIImage(named: "item-arrow-down")
@@ -79,13 +94,18 @@ class CategoryViewController: UIViewController {
         _imageView.translatesAutoresizingMaskIntoConstraints = false
         return _imageView
     }()
-    let pickerContainerView: UIView = {
+    let timePickerView: UIPickerView = {
+        let _pickerView = UIPickerView()
+        _pickerView.translatesAutoresizingMaskIntoConstraints = false
+        return _pickerView
+    }()
+    let sizePickerContainerView: UIView = {
         let _view = UIView()
         _view.backgroundColor = UIColor.darkGray
         _view.translatesAutoresizingMaskIntoConstraints = false
         return _view
     }()
-    let pickerView: UIPickerView = {
+    let sizePickerView: UIPickerView = {
         let _pickerView = UIPickerView()
         _pickerView.transform = CGAffineTransform(rotationAngle: -(.pi / 2))
         _pickerView.translatesAutoresizingMaskIntoConstraints = false
@@ -116,17 +136,18 @@ class CategoryViewController: UIViewController {
     
     var lang: LangPack!
     var retryFunction: (() -> Void)?
+    var loadingImageView: UIImageView!
+    
     var superTag: BaseModel.Tag!
     var subTags: [BaseModel.Tag]!
     var stepTags: [BaseModel.Tag] = []
-    var selectedNumber: Int?
-    var selectedFraction: Int?
-    var selectedPickerRow: Int = 4
-    
-    var stepCollectionHeightVal: CGFloat = 40
-    var viewSpaceVal: CGFloat = 7
-    var detailContainerAHeightVal: CGFloat = 350
-    var detailContainerBHeightVal: CGFloat = 333
+    var selectedXVal: Int?
+    var selectedYVal: Int?
+    var selectedSizePickerRow: Int = 4
+    var selectedHourPickerRow: Int = 0
+    var selectedMinPickerRow: Int = 1
+    let hours: [Int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    let mins: [Int] = [0, 10, 20, 30, 40, 50]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -136,8 +157,10 @@ class CategoryViewController: UIViewController {
         stepCollectionView.delegate = self
         tagCollectionView.dataSource = self
         tagCollectionView.delegate = self
-        pickerView.dataSource = self
-        pickerView.delegate = self
+        sizePickerView.dataSource = self
+        sizePickerView.delegate = self
+        timePickerView.dataSource = self
+        timePickerView.delegate = self
         setupLayoutConstraints()
         setupProperties()
     }
@@ -148,13 +171,13 @@ class CategoryViewController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc func targetButtonTapped() {
+    @objc func logButtonTapped() {
         let vc = DiaryViewController()
-        vc.diaryStat = DiaryStat.log
+        vc.diaryMode = DiaryMode.logger
         vc.logType = LogType.food
         vc.selectedTag = superTag!
-        vc.x_val = selectedNumber!
-        vc.y_val = selectedFraction!
+        vc.x_val = selectedXVal!
+        vc.y_val = selectedYVal!
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: UIBarButtonItem.Style.plain, target: self, action: nil)
         self.navigationController?.pushViewController(vc, animated: true)
     }
@@ -270,20 +293,62 @@ extension CategoryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     // MARK: UIPickerViewDataSource
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
+        if pickerView == sizePickerView {
+            return 1
+        } else if pickerView == timePickerView {
+            return 2
+        } else {
+            fatalError()
+        }
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return 397  // 0~99
+        if pickerView == sizePickerView {
+            return 397  // 0~99
+        } else if pickerView == timePickerView {
+            if component == 0 {
+                return hours.count
+            } else {
+                return mins.count
+            }
+        } else {
+            fatalError()
+        }
     }
     
     func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
-        return 35
+        if pickerView == sizePickerView {
+            return 35
+        } else if pickerView == timePickerView {
+            return 40
+        } else {
+            fatalError()
+        }
     }
     
     // MARK: UIPickerViewDelegate
     
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
+        if pickerView == timePickerView {
+            let _containerView = UIView(frame: CGRect(x: 0, y: 0, width: pickerView.bounds.width, height: 60))
+            let _label = UILabel(frame: CGRect(x: 0, y: 0, width: pickerView.bounds.width, height: 60))
+            _label.textAlignment = .center
+            if component == 0 {
+                if row == selectedHourPickerRow {
+                    _label.text = "\(hours[row]) hours"
+                } else {
+                    _label.text = "\(hours[row])"
+                }
+            } else {
+                if row == selectedMinPickerRow {
+                    _label.text = "\(mins[row]) min"
+                } else {
+                    _label.text = "\(mins[row])"
+                }
+            }
+            _containerView.addSubview(_label)
+            return _containerView
+        }
         let containerView = UIView(frame: CGRect(x: 0, y: 0, width: 35, height: 58))
         let portion = row / 4
         let remainder = row % 4
@@ -296,7 +361,7 @@ extension CategoryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
             bottomImage.image = UIImage(named: "item-div-big")
             containerView.addSubview(numberLabel)
             containerView.addSubview(bottomImage)
-            if row == selectedPickerRow {
+            if row == selectedSizePickerRow {
                 numberLabel.textColor = UIColor.white
             } else {
                 numberLabel.textColor = UIColor.white
@@ -309,19 +374,19 @@ extension CategoryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
             containerView.addSubview(bottomImage)
             switch remainder {
             case 1:
-                if row == selectedPickerRow {
+                if row == selectedSizePickerRow {
                     midImage.image = UIImage(named: "item-quarter-filled")
                 } else {
                     midImage.image = UIImage(named: "item-quarter-empty")
                 }
             case 2:
-                if row == selectedPickerRow {
+                if row == selectedSizePickerRow {
                     midImage.image = UIImage(named: "item-half-filled")
                 } else {
                     midImage.image = UIImage(named: "item-half-empty")
                 }
             case 3:
-                if row == selectedPickerRow {
+                if row == selectedSizePickerRow {
                     midImage.image = UIImage(named: "item-almost-filled")
                 } else {
                     midImage.image = UIImage(named: "item-almost-empty")
@@ -335,8 +400,29 @@ extension CategoryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        didSelectPickerViewRow(row: row)
-        pickerView.reloadAllComponents()
+        if pickerView == sizePickerView {
+            didSelectSizePickerRow(row: row)
+            pickerView.reloadAllComponents()
+        } else if pickerView == timePickerView {
+            if component == 0 {
+                selectedHourPickerRow = row
+                selectedXVal = hours[row]
+            } else {
+                selectedMinPickerRow = row
+                selectedYVal = mins[row]
+            }
+            
+            var hr = ""
+            var min = ""
+            if selectedXVal != 0 {
+                hr = "\(selectedXVal!)hr"
+            }
+            if selectedYVal != 0 {
+                min = "\(selectedYVal!)min"
+            }
+            logTimeButton.setTitle("\(hr) \(min)", for: .normal)
+            pickerView.reloadAllComponents()
+        }
     }
 }
 
@@ -364,12 +450,14 @@ extension CategoryViewController {
         
         detailContainerView.addSubview(titleLabel)
         detailContainerView.addSubview(starButton)
-        detailContainerView.addSubview(targetButton)
+        detailContainerView.addSubview(logSizeButton)
+        detailContainerView.addSubview(logTimeButton)
         detailContainerView.addSubview(fingerImageView)
-        detailContainerView.addSubview(pickerContainerView)
+        detailContainerView.addSubview(sizePickerContainerView)
         detailContainerView.addSubview(downArrowImageView)
+        detailContainerView.addSubview(timePickerView)
         
-        pickerContainerView.addSubview(pickerView)
+        sizePickerContainerView.addSubview(sizePickerView)
     }
     
     // MARK: - SetupLayoutConstraints
@@ -385,7 +473,7 @@ extension CategoryViewController {
         stepCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         stepCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         stepCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
-        stepCollectionView.heightAnchor.constraint(equalToConstant: stepCollectionHeightVal).isActive = true
+        stepCollectionView.heightAnchor.constraint(equalToConstant: stepBarHeightVal).isActive = true
         
         // scrollView
         scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
@@ -393,22 +481,30 @@ extension CategoryViewController {
         scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
         
-        searchContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepCollectionHeightVal + viewSpaceVal).isActive = true
-        searchContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: viewSpaceVal).isActive = true
-        searchContainerView.widthAnchor.constraint(equalToConstant: (UIScreen.main.bounds.width / 2) + viewSpaceVal).isActive = true
+        searchContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + spaceVal).isActive = true
+        searchContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: spaceVal).isActive = true
+        searchContainerView.widthAnchor.constraint(equalToConstant: (UIScreen.main.bounds.width / 2) + spaceVal).isActive = true
         searchContainerView.heightAnchor.constraint(equalToConstant: 45).isActive = true
         
-        sortContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepCollectionHeightVal + viewSpaceVal).isActive = true
-        sortContainerView.leadingAnchor.constraint(equalTo: searchContainerView.trailingAnchor, constant: viewSpaceVal).isActive = true
+        sortContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + spaceVal).isActive = true
+        sortContainerView.leadingAnchor.constraint(equalTo: searchContainerView.trailingAnchor, constant: spaceVal).isActive = true
         sortContainerView.widthAnchor.constraint(equalToConstant: (UIScreen.main.bounds.width / 2) - 28).isActive = true
         sortContainerView.heightAnchor.constraint(equalTo: searchContainerView.heightAnchor, constant: 0).isActive = true
         
-        detailContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepCollectionHeightVal + viewSpaceVal).isActive = true
-        detailContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: viewSpaceVal).isActive = true
-        detailContainerView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: viewSpaceVal).isActive = true
-        detailContainerViewHeight = detailContainerView.heightAnchor.constraint(equalToConstant: detailContainerAHeightVal)
+        detailContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + spaceVal).isActive = true
+        detailContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: spaceVal).isActive = true
+        detailContainerView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: spaceVal).isActive = true
+        detailContainerViewHeight = detailContainerView.heightAnchor.constraint(equalToConstant: detailBoxAHeightVal)
         detailContainerViewHeight.priority = UILayoutPriority(rawValue: 999)
         detailContainerViewHeight.isActive = true
+        
+        timePickerView.leadingAnchor.constraint(equalTo: detailContainerView.leadingAnchor, constant: 0).isActive = true
+        timePickerView.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: 0).isActive = true
+        timePickerView.widthAnchor.constraint(equalToConstant: (UIScreen.main.bounds.width / 2) - 10).isActive = true
+        timePickerView.heightAnchor.constraint(equalToConstant: 125).isActive = true
+        
+        logTimeButton.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: -45).isActive = true
+        logTimeButton.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: -(view.frame.width / 7)).isActive = true
         
         titleLabel.topAnchor.constraint(equalTo: detailContainerView.topAnchor, constant: 10).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: detailContainerView.leadingAnchor, constant: 10).isActive = true
@@ -417,27 +513,29 @@ extension CategoryViewController {
         starButton.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: -7).isActive = true
         
         // pickerContainerView
-        pickerContainerView.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: 0).isActive = true
-        pickerContainerView.leadingAnchor.constraint(equalTo: detailContainerView.leadingAnchor, constant: 0).isActive = true
-        pickerContainerView.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: 0).isActive = true
-        pickerContainerView.heightAnchor.constraint(equalToConstant: 58).isActive = true
+        sizePickerContainerView.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: 0).isActive = true
+        sizePickerContainerView.leadingAnchor.constraint(equalTo: detailContainerView.leadingAnchor, constant: 0).isActive = true
+        sizePickerContainerView.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: 0).isActive = true
+        sizePickerContainerView.heightAnchor.constraint(equalToConstant: 58).isActive = true
         
-        pickerView.centerXAnchor.constraint(equalTo: pickerContainerView.centerXAnchor, constant: 0).isActive = true
-        pickerView.centerYAnchor.constraint(equalTo: pickerContainerView.centerYAnchor, constant: 0).isActive = true
-        pickerView.widthAnchor.constraint(equalToConstant: 58).isActive = true
-        pickerView.heightAnchor.constraint(equalToConstant: view.frame.width + 200).isActive = true
+        sizePickerView.centerXAnchor.constraint(equalTo: sizePickerContainerView.centerXAnchor, constant: 0).isActive = true
+        sizePickerView.centerYAnchor.constraint(equalTo: sizePickerContainerView.centerYAnchor, constant: 0).isActive = true
+        sizePickerView.widthAnchor.constraint(equalToConstant: 58).isActive = true
+        sizePickerView.heightAnchor.constraint(equalToConstant: view.frame.width + 200).isActive = true
         
         downArrowImageView.centerXAnchor.constraint(equalTo: detailContainerView.centerXAnchor, constant: 0).isActive = true
-        downArrowImageView.topAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: -1).isActive = true
+        downArrowImageView.topAnchor.constraint(equalTo: sizePickerContainerView.topAnchor, constant: -1).isActive = true
         
-        targetButton.bottomAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: -5).isActive = true
-        targetButton.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: -(view.frame.width / 5)).isActive = true
+        logSizeButton.bottomAnchor.constraint(equalTo: sizePickerContainerView.topAnchor, constant: -5).isActive = true
+        logSizeButton.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: -(view.frame.width / 5)).isActive = true
         
-        fingerImageView.bottomAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: -15).isActive = true
-        fingerImageView.leadingAnchor.constraint(equalTo: targetButton.trailingAnchor, constant: 8).isActive = true
+        fingerImageBottom = fingerImageView.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: -75)
+        fingerImageBottom.priority = UILayoutPriority(rawValue: 999)
+        fingerImageBottom.isActive = true
+        fingerImageView.leadingAnchor.constraint(equalTo: logSizeButton.trailingAnchor, constant: 8).isActive = true
         
         // addBar: 35, space: 7, searchBar: 45, space: 7
-        tagCollectionViewTop = tagCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepCollectionHeightVal + 7 + 45 + 7)
+        tagCollectionViewTop = tagCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + 7 + 45 + 7)
         tagCollectionViewTop.priority = UILayoutPriority(rawValue: 999)
         tagCollectionViewTop.isActive = true
         tagCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 7).isActive = true
@@ -455,7 +553,8 @@ extension CategoryViewController {
         lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
         homeButton.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
-        targetButton.addTarget(self, action: #selector(targetButtonTapped), for: .touchUpInside)
+        logSizeButton.addTarget(self, action: #selector(logButtonTapped), for: .touchUpInside)
+        logTimeButton.addTarget(self, action: #selector(logButtonTapped), for: .touchUpInside)
         loadCategories()
     }
     
@@ -470,60 +569,60 @@ extension CategoryViewController {
         self.present(alertController, animated: true, completion: nil)
     }
     
-    private func didSelectPickerViewRow(row: Int) {
+    private func didSelectSizePickerRow(row: Int) {
         let portion = row / 4
         let remainder = row % 4
-        selectedPickerRow = row
+        selectedSizePickerRow = row
         if portion <= 0 {
             switch remainder {
             case 0:
                 // Case select nothing
-                pickerView.selectRow(1, inComponent: 0, animated: true)
-                targetButton.setTitle("¼", for: .normal)
+                sizePickerView.selectRow(1, inComponent: 0, animated: true)
+                logSizeButton.setTitle("¼", for: .normal)
                 // "0 + 1/4"
-                selectedNumber = 0
-                selectedFraction = 1
-                selectedPickerRow = 1
+                selectedXVal = 0
+                selectedYVal = 1
+                selectedSizePickerRow = 1
             case 1:
-                targetButton.setTitle("¼", for: .normal)
+                logSizeButton.setTitle("¼", for: .normal)
                 // "0 + 1/4"
-                selectedNumber = 0
-                selectedFraction = 1
+                selectedXVal = 0
+                selectedYVal = 1
             case 2:
-                targetButton.setTitle("½", for: .normal)
+                logSizeButton.setTitle("½", for: .normal)
                 // "0 + 1/2"
-                selectedNumber = 0
-                selectedFraction = 2
+                selectedXVal = 0
+                selectedYVal = 2
             case 3:
-                targetButton.setTitle("¾", for: .normal)
+                logSizeButton.setTitle("¾", for: .normal)
                 // "0 + 3/4"
-                selectedNumber = 0
-                selectedFraction = 3
+                selectedXVal = 0
+                selectedYVal = 3
             default:
                 return
             }
         } else {
             switch remainder {
             case 0:
-                targetButton.setTitle("\(portion)", for: .normal)
+                logSizeButton.setTitle("\(portion)", for: .normal)
                 // "n + 0"
-                selectedNumber = portion
-                selectedFraction = 0
+                selectedXVal = portion
+                selectedYVal = 0
             case 1:
-                targetButton.setTitle("\(portion)¼", for: .normal)
+                logSizeButton.setTitle("\(portion)¼", for: .normal)
                 // "n + 1/4"
-                selectedNumber = portion
-                selectedFraction = 1
+                selectedXVal = portion
+                selectedYVal = 1
             case 2:
-                targetButton.setTitle("\(portion)½", for: .normal)
+                logSizeButton.setTitle("\(portion)½", for: .normal)
                 // "n + 1/2"
-                selectedNumber = portion
-                selectedFraction = 2
+                selectedXVal = portion
+                selectedYVal = 2
             case 3:
-                targetButton.setTitle("\(portion)¾", for: .normal)
+                logSizeButton.setTitle("\(portion)¾", for: .normal)
                 // "n + 3/4"
-                selectedNumber = portion
-                selectedFraction = 3
+                selectedXVal = portion
+                selectedYVal = 3
             default:
                 return
             }
@@ -538,15 +637,16 @@ extension CategoryViewController {
     }
     
     private func afterFetchCategoriesTransition(_ superTag: BaseModel.Tag, _ subTags: [BaseModel.Tag]) {
-        self.stepCollectionView.reloadData()
-        self.subTags = subTags
-        let tagsCnt = subTags.count
+        switch lang.currentLanguageId {
+        case LanguageId.eng: navigationItem.title = superTag.eng_name
+        case LanguageId.kor: navigationItem.title = superTag.kor_name!
+        default: fatalError()}
         if superTag.tag_type == TagType.category {
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = true
                 self.searchContainerView.isHidden = false
                 self.sortContainerView.isHidden = false
-                self.tagCollectionViewTop.constant = self.stepCollectionHeightVal + 7 + 45 + 7
+                self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + 45 + spaceVal
             }
         } else if superTag.tag_type == TagType.food || superTag.tag_type == TagType.drug {
             switch lang.currentLanguageId {
@@ -554,14 +654,20 @@ extension CategoryViewController {
             case LanguageId.kor: titleLabel.text = superTag.kor_name
             case LanguageId.jpn: titleLabel.text = superTag.jpn_name
             default: fatalError()}
-            pickerView.selectRow(4, inComponent: 0, animated: true)
-            didSelectPickerViewRow(row: 4)
+            sizePickerView.selectRow(4, inComponent: 0, animated: true)
+            didSelectSizePickerRow(row: 4)
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = false
                 self.searchContainerView.isHidden = true
                 self.sortContainerView.isHidden = true
-                self.detailContainerViewHeight.constant = self.detailContainerAHeightVal
-                self.tagCollectionViewTop.constant = self.stepCollectionHeightVal + 7 + self.detailContainerAHeightVal + 7
+                self.detailContainerViewHeight.constant = detailBoxAHeightVal
+                self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + detailBoxAHeightVal + spaceVal
+                
+                self.fingerImageBottom.constant = -75
+                self.logSizeButton.isHidden = false
+                self.sizePickerContainerView.isHidden = false
+                self.logTimeButton.isHidden = true
+                self.timePickerView.isHidden = true
             }
         } else if superTag.tag_type == TagType.activity {
             switch lang.currentLanguageId {
@@ -569,24 +675,35 @@ extension CategoryViewController {
             case LanguageId.kor: titleLabel.text = superTag.kor_name
             case LanguageId.jpn: titleLabel.text = superTag.jpn_name
             default: fatalError()}
+            timePickerView.selectRow(0, inComponent: 0, animated: true)
+            selectedXVal = 0
+            timePickerView.selectRow(1, inComponent: 1, animated: true)
+            selectedYVal = 10
+            logTimeButton.setTitle("10min", for: .normal)
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = false
                 self.searchContainerView.isHidden = true
                 self.sortContainerView.isHidden = true
-                self.detailContainerViewHeight.constant = self.detailContainerBHeightVal
-                self.tagCollectionViewTop.constant = self.stepCollectionHeightVal + 7 + self.detailContainerBHeightVal + 7
+                self.detailContainerViewHeight.constant = detailBoxBHeightVal
+                self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + detailBoxBHeightVal + spaceVal
+                
+                self.fingerImageBottom.constant = -30
+                self.logSizeButton.isHidden = true
+                self.sizePickerContainerView.isHidden = true
+                self.logTimeButton.isHidden = false
+                self.timePickerView.isHidden = false
             }
         }
+        
+        self.subTags = subTags
+        let tagsCnt = subTags.count
+        self.stepCollectionView.reloadData()
         UIView.transition(with: self.tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.tagCollectionView.reloadData()
             self.tagCollectionViewHeight.constant = self.getCategoryCollectionViewHeight(tagsCnt)
             self.loadingImageView.isHidden = true
             self.tagCollectionView.isHidden = false
         })
-        switch lang.currentLanguageId {
-        case LanguageId.eng: navigationItem.title = superTag.eng_name
-        case LanguageId.kor: navigationItem.title = superTag.kor_name!
-        default: fatalError()}
     }
     
     private func loadCategories() {
@@ -597,7 +714,6 @@ extension CategoryViewController {
             self.alertError(message)
         }) { (tagSet) in
             self.afterFetchCategoriesTransition(tagSet.tag, tagSet.sub_tags)
-            print("Load categories complete.")
         }
     }
 }

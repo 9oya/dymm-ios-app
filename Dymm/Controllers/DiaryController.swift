@@ -102,25 +102,6 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var pickerGrayLineView: UIView!
     var pickerCancelButton: UIButton!
     var pickerCheckButton: UIButton!
-    let complContainerView: UIView = {
-        let _view = UIView()
-        _view.backgroundColor = UIColor.white
-        _view.isHidden = true
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
-    let complMsgLabel: UILabel = {
-        let _label = UILabel()
-        _label.font = .systemFont(ofSize: 15, weight: .light)
-        _label.textColor = UIColor.black
-        _label.textAlignment = .center
-        _label.numberOfLines = 2
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
-    var complGrayLineView: UIView!
-    var complCancelButton: UIButton!
-    var complCheckButton: UIButton!
     let homeButton: UIButton = {
         let _button = UIButton(type: .system)
         _button.setImage(UIImage(named: "button-home")!.withRenderingMode(.alwaysOriginal), for: .normal)
@@ -129,7 +110,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         _button.translatesAutoresizingMaskIntoConstraints = false
         return _button
     }()
-    var diaryStat: Int = DiaryStat.edit
+    var diaryMode: Int = DiaryMode.editor
     
     // [dayOfyear:[groupType:IntakeLogGroup]]
     var logGroupDictTwoDimArr = [Int:[Int:BaseModel.LogGroup]]()
@@ -248,7 +229,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         if monthPosition == .next || monthPosition == .previous {
             calendar.setCurrentPage(date, animated: true)
         }
-        if diaryStat == DiaryStat.edit {
+        if diaryMode == DiaryMode.editor {
             return
         }
         let selectedDateArr = dateFormatter.string(from: date).components(separatedBy: "-")
@@ -314,7 +295,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let rowCnt = logGroupSectTwoDimArr[section].count
-        if diaryStat == DiaryStat.edit {
+        if diaryMode == DiaryMode.editor {
             return rowCnt
         }
         return rowCnt + 1  // Add +1 for 'Create new group' button
@@ -352,7 +333,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: logGroupTableCellId, for: indexPath) as? LogGroupTableCell else {
             fatalError()
         }
-        if diaryStat == DiaryStat.edit {
+        if diaryMode == DiaryMode.editor {
             let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
             let intakeGroupTitle = lang.getLogGroupTypeName(logGroup.group_type)
             cell.arrowImageView.isHidden = false
@@ -396,7 +377,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
     // MARK: - UITableViewDelegate
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if diaryStat == DiaryStat.edit {
+        if diaryMode == DiaryMode.editor {
             selectedLogGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
             groupType = selectedLogGroup!.group_type
             selectedLogGroupId = selectedLogGroup!.id
@@ -699,7 +680,7 @@ extension DiaryViewController {
     private func setupLayoutStyles() {
         view.backgroundColor = UIColor(hex: "WhiteSmoke")
         
-        if diaryStat == DiaryStat.edit {
+        if diaryMode == DiaryMode.editor {
             calendarView.appearance.titleDefaultColor = UIColor.black
         }
     }
@@ -712,10 +693,6 @@ extension DiaryViewController {
         pickerCancelButton = getCancelButton()
         pickerCheckButton = getCheckButton()
         
-        complGrayLineView = getGrayLineView()
-        complCancelButton = getCancelButton()
-        complCheckButton = getCheckButton()
-        
         view.addSubview(logGroupTableView)
         view.addSubview(calendarView)
         view.addSubview(toggleButton)
@@ -723,7 +700,6 @@ extension DiaryViewController {
         view.addSubview(blindView)
         
         blindView.addSubview(pickerContainerView)
-        blindView.addSubview(complContainerView)
         
         pickerContainerView.addSubview(pickerDateLabel)
         pickerContainerView.addSubview(groupTypePickerView)
@@ -731,11 +707,6 @@ extension DiaryViewController {
         pickerContainerView.addSubview(pickerGrayLineView)
         pickerContainerView.addSubview(pickerCancelButton)
         pickerContainerView.addSubview(pickerCheckButton)
-        
-        complContainerView.addSubview(complMsgLabel)
-        complContainerView.addSubview(complGrayLineView)
-        complContainerView.addSubview(complCancelButton)
-        complContainerView.addSubview(complCheckButton)
     }
     
     // MARK: - SetupLayoutConstraints
@@ -786,27 +757,6 @@ extension DiaryViewController {
         pickerCheckButton.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
         pickerCheckButton.bottomAnchor.constraint(equalTo: pickerContainerView.bottomAnchor, constant: -15).isActive = true
         
-        complContainerView.leadingAnchor.constraint(equalTo: blindView.leadingAnchor, constant: 7).isActive = true
-        complContainerView.trailingAnchor.constraint(equalTo: blindView.trailingAnchor, constant: -7).isActive = true
-        complContainerView.centerXAnchor.constraint(equalTo: blindView.centerXAnchor, constant: 0).isActive = true
-        complContainerView.centerYAnchor.constraint(equalTo: blindView.centerYAnchor, constant: 0).isActive = true
-        complContainerView.heightAnchor.constraint(equalToConstant: 200).isActive = true
-        
-        complMsgLabel.leadingAnchor.constraint(equalTo: complContainerView.leadingAnchor, constant: 20).isActive = true
-        complMsgLabel.trailingAnchor.constraint(equalTo: complContainerView.trailingAnchor, constant: -20).isActive = true
-        complMsgLabel.centerYAnchor.constraint(equalTo: complContainerView.centerYAnchor, constant: -20).isActive = true
-        
-        complGrayLineView.leadingAnchor.constraint(equalTo: complContainerView.leadingAnchor, constant: (view.frame.width / 13)).isActive = true
-        complGrayLineView.trailingAnchor.constraint(equalTo: complContainerView.trailingAnchor, constant: -(view.frame.width / 13)).isActive = true
-        complGrayLineView.bottomAnchor.constraint(equalTo: complContainerView.bottomAnchor, constant: -50).isActive = true
-        complGrayLineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
-        
-        complCancelButton.leadingAnchor.constraint(equalTo: complContainerView.leadingAnchor, constant: (view.frame.width / 10)).isActive = true
-        complCancelButton.bottomAnchor.constraint(equalTo: complContainerView.bottomAnchor, constant: -15).isActive = true
-        
-        complCheckButton.trailingAnchor.constraint(equalTo: complContainerView.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
-        complCheckButton.bottomAnchor.constraint(equalTo: complContainerView.bottomAnchor, constant: -15).isActive = true
-        
         calendarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         calendarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         calendarView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
@@ -844,7 +794,7 @@ extension DiaryViewController {
         loadLogGroups()
         groupType = LogGroupType.morning
         
-        if diaryStat == DiaryStat.edit {
+        if diaryMode == DiaryMode.editor {
             navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
             homeButton.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
         }
@@ -1001,26 +951,15 @@ extension DiaryViewController {
         }, tokenRefreshCompletion: {
             self.postAGroupOfLog()
         }) {
-            UIView.transition(with: self.complContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-//                self.blindView.isHidden = false
+            UIView.transition(with: self.loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.pickerContainerView.isHidden = true
                 self.loadingImageView.isHidden = true
-//                self.complContainerView.isHidden = false
-                
-//                switch self.lang.currentLanguageId {
-//                case LanguageId.eng:
-//                    self.complMsgLabel.text = self.lang.msgIntakeLogComplete(self.selectedTag!.eng_name)
-//                case LanguageId.kor:
-//                    self.complMsgLabel.text = self.lang.msgIntakeLogComplete(self.selectedTag!.kor_name!)
-//                default: fatalError()}
-                var compleMessage = ""
+            }, completion: { (_) in
                 switch self.lang.currentLanguageId {
-                case LanguageId.eng:
-                    compleMessage = self.lang.msgIntakeLogComplete(self.selectedTag!.eng_name)
-                case LanguageId.kor:
-                    compleMessage = self.lang.msgIntakeLogComplete(self.selectedTag!.kor_name!)
+                case LanguageId.eng: self.alertCompl(self.lang.msgIntakeLogComplete(self.selectedTag!.eng_name))
+                case LanguageId.kor: self.alertCompl(self.lang.msgIntakeLogComplete(self.selectedTag!.kor_name!))
+                case LanguageId.jpn: self.alertCompl(self.lang.msgIntakeLogComplete(self.selectedTag!.jpn_name!))
                 default: fatalError()}
-                self.alertCompl(compleMessage)
             })
         }
     }

@@ -91,9 +91,9 @@ struct TagId {
     static let bookmarks = 18
 }
 
-struct DiaryStat {
-    static let log = 1
-    static let edit = 2
+struct DiaryMode {
+    static let logger = 1
+    static let editor = 2
 }
 
 struct AvatarInfoTarget {

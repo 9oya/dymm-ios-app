@@ -159,19 +159,15 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
             case LanguageId.kor: cell.nameLabel.text = actLog!.kor_name
             case LanguageId.jpn: cell.nameLabel.text = actLog!.jpn_name
             default: fatalError()}
-            var x_val = ""
+            var hr = ""
+            var min = ""
             if actLog!.x_val! > 0 {
-                x_val = "\(actLog!.x_val!)"
+                hr = "\(actLog!.x_val!)hr"
             }
-            if actLog!.y_val == 0 {
-                cell.quantityLabel.text = "\(x_val)"
-            } else if actLog!.y_val == 1 {
-                cell.quantityLabel.text = "\(x_val)¼"
-            } else if actLog!.y_val == 2 {
-                cell.quantityLabel.text = "\(x_val)½"
-            } else if actLog!.y_val == 3 {
-                cell.quantityLabel.text = "\(x_val)¾"
+            if actLog!.y_val != 0 {
+                min = " \(actLog!.y_val!)min"
             }
+            cell.quantityLabel.text = "\(hr)\(min)"
         } else if ((groupOfLogSet!.drug_logs?.count)!) > 0 {
             let drugLog = groupOfLogSet!.drug_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.dodgerBlue
