@@ -54,6 +54,8 @@ class LangPack {
     var btnSendAgain: String!
     var btnYes: String!
     var btnNo: String!
+    var btnStartDate: String!
+    var btnEndDate: String!
     
     var msgNetworkFailure: String!
     var msgForbiddenInvalidEmail: String!
@@ -346,13 +348,25 @@ func getLanguagePack(_ currentLanguageId: Int) -> LangPack {
     lang.btnYes = {
         switch currentLanguageId {
         case LanguageId.eng: return "Yes"
-        case LanguageId.kor: return "그래"
+        case LanguageId.kor: return "예"
         default: fatalError(lang.currentLangErrorMsg)}
     }()
     lang.btnNo = {
         switch currentLanguageId {
         case LanguageId.eng: return "No"
-        case LanguageId.kor: return "아니"
+        case LanguageId.kor: return "아니오"
+        default: fatalError(lang.currentLangErrorMsg)}
+    }()
+    lang.btnStartDate = {
+        switch currentLanguageId {
+        case LanguageId.eng: return "Start date"
+        case LanguageId.kor: return "시작 일자"
+        default: fatalError(lang.currentLangErrorMsg)}
+    }()
+    lang.btnEndDate = {
+        switch currentLanguageId {
+        case LanguageId.eng: return "End date"
+        case LanguageId.kor: return "끝난 일자"
         default: fatalError(lang.currentLangErrorMsg)}
     }()
     
@@ -408,8 +422,8 @@ func getLanguagePack(_ currentLanguageId: Int) -> LangPack {
     }()
     func _intakeLogComplete(intake: String) -> String {
         switch currentLanguageId {
-        case LanguageId.eng: return "The \(intake) has been successfully recored!\nWant to back Home!"
-        case LanguageId.kor: return "\(intake)의 기록이 성공적으로 완료되었습니다!\n홈으로 이동하시겠습니까!"
+        case LanguageId.eng: return "The \(intake) has been successfully recored!\nWant to back Home?"
+        case LanguageId.kor: return "\(intake)의 기록이 성공적으로 완료되었습니다!\n홈으로 이동하시겠습니까?"
         default: fatalError(lang.currentLangErrorMsg)}
     }
     lang.msgIntakeLogComplete = _intakeLogComplete

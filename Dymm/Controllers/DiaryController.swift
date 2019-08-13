@@ -529,7 +529,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: logCollectionCellId, for: indexPath) as? LogCollectionCell else {
             fatalError()
         }
-        if ((groupOfLogSet!.food_logs?.count)!) > 0 {
+        if ((groupOfLogSet!.food_logs?.count) != nil && ((groupOfLogSet!.food_logs?.count)!) > 0) {
             let foodLog = groupOfLogSet!.food_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.tomato
             switch lang.currentLanguageId {
@@ -550,7 +550,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             } else if foodLog!.y_val == 3 {
                 cell.quantityLabel.text = "\(x_val)¾"
             }
-        } else if ((groupOfLogSet!.act_logs?.count)!) > 0 {
+        } else if ((groupOfLogSet!.act_logs?.count) != nil && ((groupOfLogSet!.act_logs?.count)!) > 0) {
             let actLog = groupOfLogSet!.act_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.yellowGreen
             switch lang.currentLanguageId {
@@ -558,20 +558,16 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             case LanguageId.kor: cell.nameLabel.text = actLog!.kor_name
             case LanguageId.jpn: cell.nameLabel.text = actLog!.jpn_name
             default: fatalError()}
-            var x_val = ""
+            var hr = ""
+            var min = ""
             if actLog!.x_val! > 0 {
-                x_val = "\(actLog!.x_val!)"
+                hr = "\(actLog!.x_val!)hr"
             }
-            if actLog!.y_val == 0 {
-                cell.quantityLabel.text = "\(x_val)"
-            } else if actLog!.y_val == 1 {
-                cell.quantityLabel.text = "\(x_val)¼"
-            } else if actLog!.y_val == 2 {
-                cell.quantityLabel.text = "\(x_val)½"
-            } else if actLog!.y_val == 3 {
-                cell.quantityLabel.text = "\(x_val)¾"
+            if actLog!.y_val != 0 {
+                min = " \(actLog!.y_val!)min"
             }
-        } else if ((groupOfLogSet!.drug_logs?.count)!) > 0 {
+            cell.quantityLabel.text = "\(hr)\(min)"
+        } else if ((groupOfLogSet!.drug_logs?.count) != nil && ((groupOfLogSet!.drug_logs?.count)!) > 0) {
             let drugLog = groupOfLogSet!.drug_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.dodgerBlue
             switch lang.currentLanguageId {

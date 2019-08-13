@@ -130,7 +130,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: logsTableCellId, for: indexPath) as? LogTableCell else {
             fatalError()
         }
-        if ((groupOfLogSet!.food_logs?.count)!) > 0 {
+        if ((groupOfLogSet!.food_logs?.count) != nil && ((groupOfLogSet!.food_logs?.count)!) > 0) {
             let foodLog = groupOfLogSet!.food_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.tomato
             switch lang.currentLanguageId {
@@ -151,7 +151,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
             } else if foodLog!.y_val == 3 {
                 cell.quantityLabel.text = "\(x_val)¾"
             }
-        } else if ((groupOfLogSet!.act_logs?.count)!) > 0 {
+        } else if ((groupOfLogSet!.act_logs?.count) != nil && ((groupOfLogSet!.act_logs?.count)!) > 0) {
             let actLog = groupOfLogSet!.act_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.yellowGreen
             switch lang.currentLanguageId {
@@ -168,7 +168,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
                 min = " \(actLog!.y_val!)min"
             }
             cell.quantityLabel.text = "\(hr)\(min)"
-        } else if ((groupOfLogSet!.drug_logs?.count)!) > 0 {
+        } else if ((groupOfLogSet!.drug_logs?.count) != nil && ((groupOfLogSet!.drug_logs?.count)!) > 0) {
             let drugLog = groupOfLogSet!.drug_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.dodgerBlue
             switch lang.currentLanguageId {

@@ -100,8 +100,9 @@ class HomeViewController: UIViewController {
     }
     
     @objc private func handleNextBanner() {
-        var nextIndex = min(pageControl.currentPage + 1, banners!.count - 1)
-        if pageControl.currentPage == banners!.count - 1 {
+        view.layoutIfNeeded()
+        var nextIndex = pageControl.currentPage + 1
+        if nextIndex == banners!.count {
             nextIndex = 0
         }
         let indexPath = IndexPath(item: nextIndex, section: 0)
@@ -345,10 +346,17 @@ extension HomeViewController {
         })
     }
     
+    private func retryFunctionSet() {
+        loadAvatar()
+        loadBanners()
+        loadCategories()
+    }
+    
     private func loadBanners() {
         let service = Service(lang: lang)
         service.fetchBanners(popoverAlert: { (message) in
-            self.retryFunction = self.loadBanners
+//            self.retryFunction = self.loadBanners
+            self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }) { (banners) in
             self.banners = banners
@@ -364,7 +372,8 @@ extension HomeViewController {
         let service = Service(lang: lang)
         let homeTagId = 16
         service.fetchTagSets(tagId: homeTagId, sortType: SortType.score, popoverAlert: { (message) in
-            self.retryFunction = self.loadCategories
+//            self.retryFunction = self.loadCategories
+            self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }) { (tagSet) in
             self.afterFetchCategoriesTransition(tagSet.sub_tags)
@@ -375,7 +384,8 @@ extension HomeViewController {
     private func loadAvatar() {
         let service = Service(lang: lang)
         service.fetchAvatar(popoverAlert: { (message) in
-            self.retryFunction = self.loadAvatar
+//            self.retryFunction = self.loadAvatar
+            self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }, tokenRefreshCompletion: {
             self.loadAvatar()

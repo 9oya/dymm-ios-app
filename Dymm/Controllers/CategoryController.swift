@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Alamofire
 
 private let tagCellId = "TagCell"
 private let stepCellId = "StepCell"
@@ -21,128 +22,62 @@ class CategoryViewController: UIViewController {
     
     // MARK: - Properties
     
-    let stepCollectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
-        _collectionView.backgroundColor = UIColor.white
-        _collectionView.register(StepCollectionCell.self, forCellWithReuseIdentifier: stepCellId)
-        _collectionView.semanticContentAttribute = .forceLeftToRight
-        _collectionView.showsHorizontalScrollIndicator = false
-        _collectionView.translatesAutoresizingMaskIntoConstraints = false
-        return _collectionView
-    }()
+    // UIViews
+    var detailContainerView: UIView!
+    var searchContainerView: UIView!
+    var sortContainerView: UIView!
+    var sizePickerContainerView: UIView!
+    
+    // UIScrollView
     var scrollView: UIScrollView!
+    
+    // UICollectionViews
+    var stepCollectionView: UICollectionView!
     var tagCollectionView: UICollectionView!
+    
+    // UIPickerViews
+    var timePicker: UIDatePicker!
+    var sizePickerView: UIPickerView!
+    
+    // UIImageViews
+    var loadingImageView: UIImageView!
+    var fingerImageView: UIImageView!
+    var downArrowImageView: UIImageView!
+    var photoImageView: UIImageView!
+    
+    // UILabels
+    var titleLabel: UILabel!
+    
+    // UIButtons
+    var homeButton: UIButton!
+    var starButton: UIButton!
+    var logSizeButton: UIButton!
+    var logTimeButton: UIButton!
+    var startDateButton: UIButton!
+    var endDateButton: UIButton!
+    
+    // NSLayoutConstraints
     var tagCollectionViewTop: NSLayoutConstraint!
     var tagCollectionViewHeight: NSLayoutConstraint!
-    let detailContainerView: UIView = {
-        let _view = UIView()
-        _view.backgroundColor = UIColor.white
-        _view.addShadowView()
-        _view.layer.cornerRadius = 10
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
     var detailContainerViewHeight: NSLayoutConstraint!
-    let titleLabel: UILabel = {
-        let _label = UILabel()
-        _label.font = .systemFont(ofSize: 20, weight: .regular)
-        _label.textColor = UIColor.black
-        _label.textAlignment = .left
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
-    let starButton: UIButton = {
-        let _button = UIButton(type: .system)
-        _button.setImage(UIImage(named: "button-star-empty")!.withRenderingMode(.alwaysOriginal), for: .normal)
-        _button.frame = CGRect(x: 0, y: 0, width: 27, height: 25)
-        _button.showsTouchWhenHighlighted = true
-        _button.translatesAutoresizingMaskIntoConstraints = false
-        return _button
-    }()
-    let logSizeButton: UIButton = {
-        let _button = UIButton(type: .system)
-        _button.setTitleColor(UIColor.tomato, for: .normal)
-        _button.titleLabel?.font = .systemFont(ofSize: 25)
-        _button.frame = CGRect(x: 0, y: 0, width: 59, height: 59)
-        _button.showsTouchWhenHighlighted = true
-        _button.translatesAutoresizingMaskIntoConstraints = false
-        return _button
-    }()
-    let logTimeButton: UIButton = {
-        let _button = UIButton(type: .system)
-        _button.setTitleColor(UIColor.tomato, for: .normal)
-        _button.titleLabel?.font = .systemFont(ofSize: 20)
-        _button.frame = CGRect(x: 0, y: 0, width: 59, height: 59)
-        _button.showsTouchWhenHighlighted = true
-        _button.translatesAutoresizingMaskIntoConstraints = false
-        return _button
-    }()
-    let fingerImageView: UIImageView = {
-        let _imageView = UIImageView()
-        _imageView.image = UIImage(named: "item-finger-click")
-        _imageView.contentMode = .scaleAspectFit
-        _imageView.translatesAutoresizingMaskIntoConstraints = false
-        return _imageView
-    }()
     var fingerImageBottom: NSLayoutConstraint!
-    let downArrowImageView: UIImageView = {
-        let _imageView = UIImageView()
-        _imageView.image = UIImage(named: "item-arrow-down")
-        _imageView.contentMode = .scaleAspectFit
-        _imageView.translatesAutoresizingMaskIntoConstraints = false
-        return _imageView
-    }()
-    let timePickerView: UIPickerView = {
-        let _pickerView = UIPickerView()
-        _pickerView.translatesAutoresizingMaskIntoConstraints = false
-        return _pickerView
-    }()
-    let sizePickerContainerView: UIView = {
-        let _view = UIView()
-        _view.backgroundColor = UIColor.darkGray
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
-    let sizePickerView: UIPickerView = {
-        let _pickerView = UIPickerView()
-        _pickerView.transform = CGAffineTransform(rotationAngle: -(.pi / 2))
-        _pickerView.translatesAutoresizingMaskIntoConstraints = false
-        return _pickerView
-    }()
-    let searchContainerView: UIView = {
-        let _view = UIView()
-        _view.backgroundColor = UIColor.white
-        _view.addShadowView()
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
-    let sortContainerView: UIView = {
-        let _view = UIView()
-        _view.backgroundColor = UIColor.white
-        _view.addShadowView()
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
-    let homeButton: UIButton = {
-        let _button = UIButton(type: .system)
-        _button.setImage(UIImage(named: "button-home")!.withRenderingMode(.alwaysOriginal), for: .normal)
-        _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
-        _button.showsTouchWhenHighlighted = true
-        _button.translatesAutoresizingMaskIntoConstraints = false
-        return _button
-    }()
     
+    // Non-view properties
     var lang: LangPack!
     var retryFunction: (() -> Void)?
-    var loadingImageView: UIImageView!
-    
+    private lazy var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: getUserCountryCode())  // TODO ko_kr
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
     var superTag: BaseModel.Tag!
     var subTags: [BaseModel.Tag]!
     var stepTags: [BaseModel.Tag] = []
     var selectedXVal: Int?
     var selectedYVal: Int?
+    var selectedDate: String?
+    var cond_log_type: Int?
     var selectedSizePickerRow: Int = 4
     var selectedHourPickerRow: Int = 0
     var selectedMinPickerRow: Int = 1
@@ -151,18 +86,8 @@ class CategoryViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupLayoutStyles()
-        setupLayoutSubviews()
-        stepCollectionView.dataSource = self
-        stepCollectionView.delegate = self
-        tagCollectionView.dataSource = self
-        tagCollectionView.delegate = self
-        sizePickerView.dataSource = self
-        sizePickerView.delegate = self
-        timePickerView.dataSource = self
-        timePickerView.delegate = self
-        setupLayoutConstraints()
-        setupProperties()
+        setupLayout()
+        loadCategories()
     }
     
     // MARK: - Actions
@@ -180,6 +105,86 @@ class CategoryViewController: UIViewController {
         vc.y_val = selectedYVal!
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: UIBarButtonItem.Style.plain, target: self, action: nil)
         self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc func timePickerChanged(_ sender: UIDatePicker){
+        let _formatter = DateFormatter()
+        _formatter.locale = Locale(identifier: getUserCountryCode())  // TODO ko_kr
+        _formatter.dateFormat = "HH:mm"
+        let selectedTimeArr = _formatter.string(from: sender.date).components(separatedBy: ":")
+        selectedXVal = Int(selectedTimeArr[0])
+        selectedYVal = Int(selectedTimeArr[1])
+        var hr = ""
+        var min = ""
+        if selectedXVal != 0 {
+            hr = "\(selectedXVal!)hr"
+        }
+        if selectedYVal != 0 {
+            min = "\(selectedYVal!)min"
+        }
+        logTimeButton.setTitle("\(hr) \(min)", for: .normal)
+        print(hr)
+    }
+    
+    @objc func startDateButtonTapped() {
+        alertDatePicker(cond_log_type: CondLogType.startDate)
+    }
+    
+    @objc func endDateButtonTapped() {
+        alertDatePicker(cond_log_type: CondLogType.endDate)
+    }
+    
+    @objc func alertError(_ message: String) {
+        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
+            self.retryFunction!()
+        }
+        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
+        alertController.addAction(confirmAction)
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    @objc func alertDatePicker(cond_log_type: Int) {
+        self.cond_log_type = cond_log_type
+        let datePicker: UIDatePicker = UIDatePicker()
+        datePicker.timeZone = NSTimeZone.local
+        datePicker.frame = CGRect(x: 0, y: 15, width: 270, height: 200)
+        datePicker.datePickerMode = .date
+        var _title = ""
+        if cond_log_type == CondLogType.startDate {
+            _title = "\(lang.btnStartDate!)\n\n\n\n\n\n\n\n"
+        } else {
+            _title = "\(lang.btnEndDate!)\n\n\n\n\n\n\n\n"
+        }
+        let alertController = UIAlertController(title: _title, message: nil, preferredStyle: UIAlertController.Style.alert)
+        alertController.view.addSubview(datePicker)
+        let selectAction = UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: { _ in
+            self.selectedDate = self.dateFormatter.string(from: datePicker.date)
+            UIView.transition(with: self.detailContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.detailContainerView.isHidden = true
+                self.loadingImageView.isHidden = false
+            })
+            self.postAConditionLog()
+        })
+        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil)
+        alertController.addAction(selectAction)
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true, completion:{})
+    }
+    
+    @objc func alertCompl(_ message: String) {
+        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
+            self.dismiss(animated: true, completion: nil)
+        }
+        let cancelAction = UIAlertAction(title: lang.btnNo, style: .cancel) { _ in
+            _ = self.navigationController?.popViewController(animated: true)
+        }
+        alertController.addAction(confirmAction)
+        alertController.addAction(cancelAction)
+        alertController.view.tintColor = UIColor.tomato
+        self.present(alertController, animated: true, completion: nil)
     }
 }
 
@@ -295,7 +300,7 @@ extension CategoryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         if pickerView == sizePickerView {
             return 1
-        } else if pickerView == timePickerView {
+        } else if pickerView == timePicker {
             return 2
         } else {
             fatalError()
@@ -303,52 +308,16 @@ extension CategoryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        if pickerView == sizePickerView {
-            return 397  // 0~99
-        } else if pickerView == timePickerView {
-            if component == 0 {
-                return hours.count
-            } else {
-                return mins.count
-            }
-        } else {
-            fatalError()
-        }
+        return 397  // 0~99
     }
     
     func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
-        if pickerView == sizePickerView {
-            return 35
-        } else if pickerView == timePickerView {
-            return 40
-        } else {
-            fatalError()
-        }
+        return 35
     }
     
     // MARK: UIPickerViewDelegate
     
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
-        if pickerView == timePickerView {
-            let _containerView = UIView(frame: CGRect(x: 0, y: 0, width: pickerView.bounds.width, height: 60))
-            let _label = UILabel(frame: CGRect(x: 0, y: 0, width: pickerView.bounds.width, height: 60))
-            _label.textAlignment = .center
-            if component == 0 {
-                if row == selectedHourPickerRow {
-                    _label.text = "\(hours[row]) hours"
-                } else {
-                    _label.text = "\(hours[row])"
-                }
-            } else {
-                if row == selectedMinPickerRow {
-                    _label.text = "\(mins[row]) min"
-                } else {
-                    _label.text = "\(mins[row])"
-                }
-            }
-            _containerView.addSubview(_label)
-            return _containerView
-        }
         let containerView = UIView(frame: CGRect(x: 0, y: 0, width: 35, height: 58))
         let portion = row / 4
         let remainder = row % 4
@@ -400,45 +369,178 @@ extension CategoryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        if pickerView == sizePickerView {
-            didSelectSizePickerRow(row: row)
-            pickerView.reloadAllComponents()
-        } else if pickerView == timePickerView {
-            if component == 0 {
-                selectedHourPickerRow = row
-                selectedXVal = hours[row]
-            } else {
-                selectedMinPickerRow = row
-                selectedYVal = mins[row]
-            }
-            
-            var hr = ""
-            var min = ""
-            if selectedXVal != 0 {
-                hr = "\(selectedXVal!)hr"
-            }
-            if selectedYVal != 0 {
-                min = "\(selectedYVal!)min"
-            }
-            logTimeButton.setTitle("\(hr) \(min)", for: .normal)
-            pickerView.reloadAllComponents()
-        }
+        didSelectSizePickerRow(row: row)
+        pickerView.reloadAllComponents()
     }
 }
 
 extension CategoryViewController {
     
     // MARK: Private methods
-    
-    private func setupLayoutStyles() {
+
+    private func setupLayout() {
+        // Initialize view
+        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = UIColor(hex: "WhiteSmoke")
-    }
-    
-    private func setupLayoutSubviews() {
-        loadingImageView = getLoadingImageView(isHidden: false)
-        scrollView = getScrollView()
-        tagCollectionView = getCategoryCollectionView()
         
+        // Initialize subveiw properties
+        detailContainerView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor.white
+            _view.addShadowView()
+            _view.layer.cornerRadius = 10
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        searchContainerView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor.white
+            _view.addShadowView()
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        sortContainerView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor.white
+            _view.addShadowView()
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        sizePickerContainerView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor.darkGray
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        scrollView = getScrollView()
+        stepCollectionView = {
+            let layout = UICollectionViewFlowLayout()
+            layout.scrollDirection = .horizontal
+            let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
+            _collectionView.backgroundColor = UIColor.white
+            _collectionView.register(StepCollectionCell.self, forCellWithReuseIdentifier: stepCellId)
+            _collectionView.semanticContentAttribute = .forceLeftToRight
+            _collectionView.showsHorizontalScrollIndicator = false
+            _collectionView.translatesAutoresizingMaskIntoConstraints = false
+            return _collectionView
+        }()
+        tagCollectionView = getCategoryCollectionView()
+        timePicker = {
+            let _datePicker = UIDatePicker()
+            _datePicker.datePickerMode = .countDownTimer
+            _datePicker.minuteInterval = 5
+            _datePicker.addTarget(self, action: #selector(timePickerChanged(_:)), for: .valueChanged)
+            _datePicker.translatesAutoresizingMaskIntoConstraints = false
+            return _datePicker
+        }()
+        sizePickerView = {
+            let _pickerView = UIPickerView()
+            _pickerView.transform = CGAffineTransform(rotationAngle: -(.pi / 2))
+            _pickerView.translatesAutoresizingMaskIntoConstraints = false
+            return _pickerView
+        }()
+        loadingImageView = getLoadingImageView(isHidden: false)
+        fingerImageView = {
+            let _imageView = UIImageView()
+            _imageView.image = UIImage(named: "item-finger-click")
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        downArrowImageView = {
+            let _imageView = UIImageView()
+            _imageView.image = UIImage(named: "item-arrow-down")
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        photoImageView = {
+            let _imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 290, height: 150))
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        titleLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 20, weight: .regular)
+            _label.textColor = UIColor.black
+            _label.textAlignment = .left
+            _label.numberOfLines = 2
+            _label.adjustsFontSizeToFitWidth = true
+            _label.minimumScaleFactor = 0.5
+            _label.allowsDefaultTighteningForTruncation = true
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        homeButton = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage(named: "button-home")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        starButton = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage(named: "button-star-empty")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 27, height: 25)
+            _button.showsTouchWhenHighlighted = true
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        logSizeButton = {
+            let _button = UIButton(type: .system)
+            _button.setTitleColor(UIColor.tomato, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 25)
+            _button.frame = CGRect(x: 0, y: 0, width: 59, height: 59)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(logButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        logTimeButton = {
+            let _button = UIButton(type: .system)
+            _button.setTitleColor(UIColor.tomato, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 23)
+            _button.frame = CGRect(x: 0, y: 0, width: 59, height: 59)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(logButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        startDateButton = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage(named: "button-circle-arrow")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 16, height: 17)
+            _button.setTitleColor(UIColor.dimGray, for: .normal)
+            _button.setTitle(lang.btnStartDate, for: .normal)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(startDateButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        endDateButton = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage(named: "button-thin-check")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 16, height: 17)
+            _button.setTitleColor(UIColor.dimGray, for: .normal)
+            _button.setTitle(lang.btnEndDate, for: .normal)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(endDateButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
+        stepCollectionView.dataSource = self
+        stepCollectionView.delegate = self
+        tagCollectionView.dataSource = self
+        tagCollectionView.delegate = self
+        sizePickerView.dataSource = self
+        sizePickerView.delegate = self
+        
+        // Setup subviews
         view.addSubview(scrollView)
         view.addSubview(loadingImageView)
         view.addSubview(stepCollectionView)
@@ -450,19 +552,19 @@ extension CategoryViewController {
         
         detailContainerView.addSubview(titleLabel)
         detailContainerView.addSubview(starButton)
+        detailContainerView.addSubview(photoImageView)
         detailContainerView.addSubview(logSizeButton)
         detailContainerView.addSubview(logTimeButton)
+        detailContainerView.addSubview(startDateButton)
+        detailContainerView.addSubview(endDateButton)
         detailContainerView.addSubview(fingerImageView)
         detailContainerView.addSubview(sizePickerContainerView)
         detailContainerView.addSubview(downArrowImageView)
-        detailContainerView.addSubview(timePickerView)
+        detailContainerView.addSubview(timePicker)
         
         sizePickerContainerView.addSubview(sizePickerView)
-    }
-    
-    // MARK: - SetupLayoutConstraints
-    
-    private func setupLayoutConstraints() {
+        
+        // Setup constraints
         // loadingImageView, alertBlindView
         loadingImageView.widthAnchor.constraint(equalToConstant: 62).isActive = true
         loadingImageView.heightAnchor.constraint(equalToConstant: 62).isActive = true
@@ -483,12 +585,12 @@ extension CategoryViewController {
         
         searchContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + spaceVal).isActive = true
         searchContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: spaceVal).isActive = true
-        searchContainerView.widthAnchor.constraint(equalToConstant: (UIScreen.main.bounds.width / 2) + spaceVal).isActive = true
+        searchContainerView.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) + spaceVal).isActive = true
         searchContainerView.heightAnchor.constraint(equalToConstant: 45).isActive = true
         
         sortContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + spaceVal).isActive = true
         sortContainerView.leadingAnchor.constraint(equalTo: searchContainerView.trailingAnchor, constant: spaceVal).isActive = true
-        sortContainerView.widthAnchor.constraint(equalToConstant: (UIScreen.main.bounds.width / 2) - 28).isActive = true
+        sortContainerView.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 28).isActive = true
         sortContainerView.heightAnchor.constraint(equalTo: searchContainerView.heightAnchor, constant: 0).isActive = true
         
         detailContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + spaceVal).isActive = true
@@ -498,16 +600,26 @@ extension CategoryViewController {
         detailContainerViewHeight.priority = UILayoutPriority(rawValue: 999)
         detailContainerViewHeight.isActive = true
         
-        timePickerView.leadingAnchor.constraint(equalTo: detailContainerView.leadingAnchor, constant: 0).isActive = true
-        timePickerView.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: 0).isActive = true
-        timePickerView.widthAnchor.constraint(equalToConstant: (UIScreen.main.bounds.width / 2) - 10).isActive = true
-        timePickerView.heightAnchor.constraint(equalToConstant: 125).isActive = true
+        photoImageView.topAnchor.constraint(equalTo: detailContainerView.topAnchor, constant: 65).isActive = true
+        photoImageView.centerXAnchor.constraint(equalTo: detailContainerView.centerXAnchor, constant: 0).isActive = true
+        
+        startDateButton.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: -10).isActive = true
+        startDateButton.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
+        
+        endDateButton.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: -10).isActive = true
+        endDateButton.leadingAnchor.constraint(equalTo: detailContainerView.leadingAnchor, constant: view.frame.width / 10).isActive = true
+        
+        timePicker.leadingAnchor.constraint(equalTo: detailContainerView.leadingAnchor, constant: 7).isActive = true
+        timePicker.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: 0).isActive = true
+        timePicker.widthAnchor.constraint(equalToConstant: (view.frame.width / 2)).isActive = true
+        timePicker.heightAnchor.constraint(equalToConstant: 125).isActive = true
         
         logTimeButton.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: -45).isActive = true
-        logTimeButton.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: -(view.frame.width / 7)).isActive = true
+        logTimeButton.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
         
         titleLabel.topAnchor.constraint(equalTo: detailContainerView.topAnchor, constant: 10).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: detailContainerView.leadingAnchor, constant: 10).isActive = true
+        titleLabel.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: -(27 + 7)).isActive = true
         
         starButton.topAnchor.constraint(equalTo: detailContainerView.topAnchor, constant: 7).isActive = true
         starButton.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: -7).isActive = true
@@ -545,28 +657,6 @@ extension CategoryViewController {
         tagCollectionViewHeight = tagCollectionView.heightAnchor.constraint(equalToConstant: 45 + 7)
         tagCollectionViewHeight.priority = UILayoutPriority(rawValue: 999)
         tagCollectionViewHeight.isActive = true
-    }
-    
-    // MARK: - SetupProperties
-    
-    private func setupProperties() {
-        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
-        homeButton.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
-        logSizeButton.addTarget(self, action: #selector(logButtonTapped), for: .touchUpInside)
-        logTimeButton.addTarget(self, action: #selector(logButtonTapped), for: .touchUpInside)
-        loadCategories()
-    }
-    
-    private func alertError(_ message: String) {
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
-            self.retryFunction!()
-        }
-        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
-        alertController.addAction(confirmAction)
-        alertController.addAction(cancelAction)
-        self.present(alertController, animated: true, completion: nil)
     }
     
     private func didSelectSizePickerRow(row: Int) {
@@ -629,31 +719,29 @@ extension CategoryViewController {
         }
     }
     
-    private func beforeFatchCategoriesTransition() {
-        UIView.transition(with: self.loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            self.tagCollectionView.isHidden = true
-            self.loadingImageView.isHidden = false
-        })
-    }
-    
     private func afterFetchCategoriesTransition(_ superTag: BaseModel.Tag, _ subTags: [BaseModel.Tag]) {
-        switch lang.currentLanguageId {
-        case LanguageId.eng: navigationItem.title = superTag.eng_name
-        case LanguageId.kor: navigationItem.title = superTag.kor_name!
-        default: fatalError()}
         if superTag.tag_type == TagType.category {
+            // Category type exclusive
+            switch lang.currentLanguageId {
+            case LanguageId.eng: navigationItem.title = superTag.eng_name
+            case LanguageId.kor: navigationItem.title = superTag.kor_name!
+            default: fatalError()}
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = true
                 self.searchContainerView.isHidden = false
                 self.sortContainerView.isHidden = false
                 self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + 45 + spaceVal
             }
-        } else if superTag.tag_type == TagType.food || superTag.tag_type == TagType.drug {
+        } else {
+            // For non-cateogry types
             switch lang.currentLanguageId {
             case LanguageId.eng: titleLabel.text = superTag.eng_name
             case LanguageId.kor: titleLabel.text = superTag.kor_name
             case LanguageId.jpn: titleLabel.text = superTag.jpn_name
             default: fatalError()}
+        }
+        if superTag.tag_type == TagType.food || superTag.tag_type == TagType.drug {
+            // Food and Drug type exclusive
             sizePickerView.selectRow(4, inComponent: 0, animated: true)
             didSelectSizePickerRow(row: 4)
             UIView.animate(withDuration: 0.5) {
@@ -664,22 +752,26 @@ extension CategoryViewController {
                 self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + detailBoxAHeightVal + spaceVal
                 
                 self.fingerImageBottom.constant = -75
+                self.downArrowImageView.isHidden = false
                 self.logSizeButton.isHidden = false
                 self.sizePickerContainerView.isHidden = false
                 self.logTimeButton.isHidden = true
-                self.timePickerView.isHidden = true
+                self.timePicker.isHidden = true
+                self.startDateButton.isHidden = true
+                self.endDateButton.isHidden = true
+                
+                self.photoImageView.image = UIImage(named: "photo-pills")
             }
         } else if superTag.tag_type == TagType.activity {
-            switch lang.currentLanguageId {
-            case LanguageId.eng: titleLabel.text = superTag.eng_name
-            case LanguageId.kor: titleLabel.text = superTag.kor_name
-            case LanguageId.jpn: titleLabel.text = superTag.jpn_name
-            default: fatalError()}
-            timePickerView.selectRow(0, inComponent: 0, animated: true)
+            // Activity type exclusive
             selectedXVal = 0
-            timePickerView.selectRow(1, inComponent: 1, animated: true)
-            selectedYVal = 10
-            logTimeButton.setTitle("10min", for: .normal)
+            selectedYVal = 5
+            let calendar = Calendar.current
+            var components = DateComponents()
+            components.hour = 0
+            components.minute = 5
+            self.timePicker.setDate(calendar.date(from: components)!, animated: true)
+            logTimeButton.setTitle("5min", for: .normal)
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = false
                 self.searchContainerView.isHidden = true
@@ -687,14 +779,40 @@ extension CategoryViewController {
                 self.detailContainerViewHeight.constant = detailBoxBHeightVal
                 self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + detailBoxBHeightVal + spaceVal
                 
-                self.fingerImageBottom.constant = -30
+                self.fingerImageBottom.constant = -20
+                self.downArrowImageView.isHidden = true
                 self.logSizeButton.isHidden = true
                 self.sizePickerContainerView.isHidden = true
                 self.logTimeButton.isHidden = false
-                self.timePickerView.isHidden = false
+                self.timePicker.isHidden = false
+                self.startDateButton.isHidden = true
+                self.endDateButton.isHidden = true
+                
+                self.photoImageView.image = UIImage(named: "photo-walking")
+            }
+        } else if superTag.tag_type == TagType.condition {
+            // Condition type exclusive
+            UIView.animate(withDuration: 0.5) {
+                self.detailContainerView.isHidden = false
+                self.searchContainerView.isHidden = true
+                self.sortContainerView.isHidden = true
+                self.detailContainerViewHeight.constant = detailBoxCHeightVal
+                self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + detailBoxCHeightVal + spaceVal
+                
+                self.fingerImageView.isHidden = true
+                self.downArrowImageView.isHidden = true
+                self.logSizeButton.isHidden = true
+                self.sizePickerContainerView.isHidden = true
+                self.logTimeButton.isHidden = true
+                self.timePicker.isHidden = true
+                self.startDateButton.isHidden = false
+                self.endDateButton.isHidden = false
+                
+                self.photoImageView.image = UIImage(named: "photo-walking")
             }
         }
         
+        // For all types
         self.subTags = subTags
         let tagsCnt = subTags.count
         self.stepCollectionView.reloadData()
@@ -707,13 +825,49 @@ extension CategoryViewController {
     }
     
     private func loadCategories() {
-        beforeFatchCategoriesTransition()
+        UIView.transition(with: self.loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.tagCollectionView.isHidden = true
+            self.loadingImageView.isHidden = false
+        })
         let service = Service(lang: lang)
         service.fetchTagSets(tagId: superTag.id, sortType: SortType.score, popoverAlert: { (message) in
             self.retryFunction = self.loadCategories
             self.alertError(message)
         }) { (tagSet) in
             self.afterFetchCategoriesTransition(tagSet.tag, tagSet.sub_tags)
+        }
+    }
+    
+    private func postAConditionLog() {
+        guard let avatarId = UserDefaults.standard.getAvatarId() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        var params = Parameters()
+        params = [
+            "avatar_id": avatarId,
+            "tag_id": superTag!.id,
+            "cond_log_type": cond_log_type!,
+            "log_date": selectedDate!
+        ]
+        let service = Service(lang: lang)
+        service.dispatchACondLog(params: params, popoverAlert: { (message) in
+            self.retryFunction = self.postAConditionLog
+            self.detailContainerView.isHidden = true
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.postAConditionLog()
+        }) {
+            UIView.transition(with: self.loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.detailContainerView.isHidden = false
+                self.loadingImageView.isHidden = true
+            }, completion: { (_) in
+                switch self.lang.currentLanguageId {
+                case LanguageId.eng: self.alertCompl(self.lang.msgIntakeLogComplete(self.superTag!.eng_name))
+                case LanguageId.kor: self.alertCompl(self.lang.msgIntakeLogComplete(self.superTag!.kor_name!))
+                case LanguageId.jpn: self.alertCompl(self.lang.msgIntakeLogComplete(self.superTag!.jpn_name!))
+                default: fatalError()}
+            })
         }
     }
 }

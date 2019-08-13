@@ -103,7 +103,7 @@ class AuthViewController: UIViewController {
     var formGrayLineView: UIView!
     let formSwapButton: UIButton = {
         let _button = UIButton(type: .system)
-        _button.setTitleColor(UIColor(hex: "Tomato"), for: .normal)
+        _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
         _button.titleLabel?.font = .systemFont(ofSize: 16)
         _button.showsTouchWhenHighlighted = true
         _button.addTarget(self, action: #selector(formSwapButtonTapped), for: .touchUpInside)
@@ -112,7 +112,7 @@ class AuthViewController: UIViewController {
     }()
     let submitButton: UIButton = {
         let _button = UIButton(type: .system)
-        _button.setTitleColor(UIColor(hex: "Tomato"), for: .normal)
+        _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
         _button.titleLabel?.font = .systemFont(ofSize: 16)
         _button.showsTouchWhenHighlighted = true
         _button.addTarget(self, action: #selector(submitButtonTapped), for: .touchUpInside)

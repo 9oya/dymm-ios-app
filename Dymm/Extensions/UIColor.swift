@@ -286,26 +286,33 @@ public extension UIColor {
 extension UIColor {
     // Cashed colors - black, darkGray, lightGray, white, gray, red, green, blue, cyan, yellow, magenta, orange, purple, brown, clear
     
-    // MARK: - X11 colors
+    // MARK: - X11 colors, Web-safe colors
     
-    static let dodgerBlue: UIColor = UIColor(hex: "DodgerBlue")
-    static let darkTurquoise: UIColor = UIColor(hex: "DarkTurquoise")
-    static let cadetBlue: UIColor = UIColor(hex: "CadetBlue")
-    static let yellowGreen: UIColor = UIColor(hex: "YellowGreen")
-    static let indianRed: UIColor = UIColor(hex: "IndianRed")
-    static let coral: UIColor = UIColor(hex: "Coral")
-    static let rosyBrown: UIColor = UIColor(hex: "RosyBrown")
-    static let darkGray = UIColor(hex: "DarkGray")
-    
+    // Red
+    static let hex_fe4c4c = UIColor(hex: "#FE4C4C")
     static let tomato = UIColor(hex: "Tomato")
+    static let coral = UIColor(hex: "Coral")
+    static let indianRed = UIColor(hex: "IndianRed")
+    static let rosyBrown: UIColor = UIColor(hex: "RosyBrown")
+    
+    // Blue
+    static let dodgerBlue = UIColor(hex: "DodgerBlue")
+    static let cornflowerBlue = UIColor(hex: "CornflowerBlue")
+    static let cadetBlue = UIColor(hex: "CadetBlue")
+    
+    // Green
+    static let darkTurquoise = UIColor(hex: "DarkTurquoise")
+    static let yellowGreen = UIColor(hex: "YellowGreen")
+    
+    // Gray
     static let lightGray = UIColor(hex: "LightGray")
     static let whiteSmoke = UIColor(hex: "WhiteSmoke")
+    static let darkGray = UIColor(hex: "DarkGray")
+    static let dimGray = UIColor(hex: "DimGray")
     
-    // MARK: - Web-safe colors
-    
-    static let hex_666699: UIColor = UIColor(hex: "#666699")
-    static let hex_6699cc: UIColor = UIColor(hex: "#6699cc")
-    static let hex_99cc99: UIColor = UIColor(hex: "#99cc99")
-    static let hex_9999ff: UIColor = UIColor(hex: "#9999ff")
-    static let hex_cccc66: UIColor = UIColor(hex: "#cccc66")
+    static let hex_666699 = UIColor(hex: "#666699")
+    static let hex_6699cc = UIColor(hex: "#6699cc")
+    static let hex_99cc99 = UIColor(hex: "#99cc99")
+    static let hex_9999ff = UIColor(hex: "#9999ff")
+    static let hex_cccc66 = UIColor(hex: "#cccc66")
 }

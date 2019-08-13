@@ -79,6 +79,11 @@ struct LogType {
     static let condScore = 1
 }
 
+struct CondLogType {
+    static let startDate = 1
+    static let endDate = 2
+}
+
 struct LogGroupType {
     static let morning = 1
     static let daytime = 2
