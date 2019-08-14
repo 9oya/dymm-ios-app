@@ -136,10 +136,10 @@ class CategoryViewController: UIViewController {
     
     @objc func alertError(_ message: String) {
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
+        let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
             self.retryFunction!()
         }
-        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
+        let cancelAction = UIAlertAction(title: lang.btnNo, style: .cancel) { _ in }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
         self.present(alertController, animated: true, completion: nil)
@@ -721,7 +721,7 @@ extension CategoryViewController {
     
     private func afterFetchCategoriesTransition(_ superTag: BaseModel.Tag, _ subTags: [BaseModel.Tag]) {
         if superTag.tag_type == TagType.category {
-            // Category type exclusive
+            // Execute category tag_type exclusive
             switch lang.currentLanguageId {
             case LanguageId.eng: navigationItem.title = superTag.eng_name
             case LanguageId.kor: navigationItem.title = superTag.kor_name!
@@ -733,7 +733,7 @@ extension CategoryViewController {
                 self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + 45 + spaceVal
             }
         } else {
-            // For non-cateogry types
+            // Lines for non-cateogry tag_types
             switch lang.currentLanguageId {
             case LanguageId.eng: titleLabel.text = superTag.eng_name
             case LanguageId.kor: titleLabel.text = superTag.kor_name
@@ -741,7 +741,7 @@ extension CategoryViewController {
             default: fatalError()}
         }
         if superTag.tag_type == TagType.food || superTag.tag_type == TagType.drug {
-            // Food and Drug type exclusive
+            // Execute food and drug tag_type exclusive
             sizePickerView.selectRow(4, inComponent: 0, animated: true)
             didSelectSizePickerRow(row: 4)
             UIView.animate(withDuration: 0.5) {
@@ -763,7 +763,7 @@ extension CategoryViewController {
                 self.photoImageView.image = UIImage(named: "photo-pills")
             }
         } else if superTag.tag_type == TagType.activity {
-            // Activity type exclusive
+            // Execute activity tag_type exclusive
             selectedXVal = 0
             selectedYVal = 5
             let calendar = Calendar.current
@@ -791,7 +791,7 @@ extension CategoryViewController {
                 self.photoImageView.image = UIImage(named: "photo-walking")
             }
         } else if superTag.tag_type == TagType.condition {
-            // Condition type exclusive
+            // Execute condition tag_type exclusive
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = false
                 self.searchContainerView.isHidden = true

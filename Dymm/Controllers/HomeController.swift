@@ -19,40 +19,10 @@ class HomeViewController: UIViewController {
     var scrollView: UIScrollView!
     var categoryCollectionView: UICollectionView!
     var categoryCollectionViewHeight: NSLayoutConstraint!
-    let bannerCollectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
-        _collectionView.backgroundColor = UIColor.clear
-        _collectionView.register(BannerCollectionCell.self, forCellWithReuseIdentifier: bannerCellId)
-        _collectionView.isPagingEnabled = true
-        _collectionView.semanticContentAttribute = .forceLeftToRight
-        _collectionView.showsHorizontalScrollIndicator = false
-        _collectionView.translatesAutoresizingMaskIntoConstraints = false
-        return _collectionView
-    }()
-    lazy var pageControl: UIPageControl = {
-        let _pageControl = UIPageControl()
-        _pageControl.currentPage = 0
-        _pageControl.currentPageIndicatorTintColor = UIColor.lightGray
-        _pageControl.pageIndicatorTintColor = UIColor.whiteSmoke
-        _pageControl.translatesAutoresizingMaskIntoConstraints = false
-        return _pageControl
-    }()
-    let titleImageView: UIImageView = {
-        let _imageView = UIImageView(image: UIImage(named: "symbol-logo-small"))
-        _imageView.frame = CGRect(x: 0, y: 0, width: 26, height: 26)
-        _imageView.contentMode = .scaleAspectFit
-        return _imageView
-    }()
-    let profileButton: UIButton = {
-        let _button = UIButton(type: .system)
-        _button.setImage(UIImage(named: "button-profile")!.withRenderingMode(.alwaysOriginal), for: .normal)
-        _button.frame = CGRect(x: 0, y: 0, width: 31, height: 31)
-        _button.showsTouchWhenHighlighted = true
-        _button.translatesAutoresizingMaskIntoConstraints = false
-        return _button
-    }()
+    var bannerCollectionView: UICollectionView!
+    var pageControl: UIPageControl!
+    var titleImageView: UIImageView!
+    var profileButton: UIButton!
     
     var lang: LangPack!
     var retryFunction: (() -> Void)?
@@ -62,14 +32,9 @@ class HomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupLayoutStyles()
-        setupLayoutSubviews()
-        bannerCollectionView.dataSource = self
-        bannerCollectionView.delegate = self
-        categoryCollectionView.dataSource = self
-        categoryCollectionView.delegate = self
-        setupLayoutConstraints()
-        setupProperties()
+        setupLayout()
+        loadBanners()
+        loadCategories()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -232,16 +197,58 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
 extension HomeViewController {
     
     // MARK: - Private methods
-    
-    private func setupLayoutStyles() {
+
+    private func setupLayout() {
+        // Initialize view
+        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = UIColor(hex: "WhiteSmoke")
-    }
-    
-    private func setupLayoutSubviews() {
-        loadingImageView = getLoadingImageView(isHidden: false)
         
+        // Initialize subveiw properties
         scrollView = getScrollView()
+        loadingImageView = getLoadingImageView()
         categoryCollectionView = getCategoryCollectionView()
+        bannerCollectionView = {
+            let layout = UICollectionViewFlowLayout()
+            layout.scrollDirection = .horizontal
+            let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
+            _collectionView.backgroundColor = UIColor.clear
+            _collectionView.register(BannerCollectionCell.self, forCellWithReuseIdentifier: bannerCellId)
+            _collectionView.isPagingEnabled = true
+            _collectionView.semanticContentAttribute = .forceLeftToRight
+            _collectionView.showsHorizontalScrollIndicator = false
+            _collectionView.translatesAutoresizingMaskIntoConstraints = false
+            return _collectionView
+        }()
+        pageControl = {
+            let _pageControl = UIPageControl()
+            _pageControl.currentPage = 0
+            _pageControl.currentPageIndicatorTintColor = UIColor.lightGray
+            _pageControl.pageIndicatorTintColor = UIColor.whiteSmoke
+            _pageControl.translatesAutoresizingMaskIntoConstraints = false
+            return _pageControl
+        }()
+        titleImageView = {
+            let _imageView = UIImageView(image: UIImage(named: "symbol-logo-small"))
+            _imageView.frame = CGRect(x: 0, y: 0, width: 26, height: 26)
+            _imageView.contentMode = .scaleAspectFit
+            return _imageView
+        }()
+        profileButton = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage(named: "button-profile")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 31, height: 31)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(profileButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        
+        navigationItem.titleView = titleImageView
+        navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: profileButton)]
+        bannerCollectionView.dataSource = self
+        bannerCollectionView.delegate = self
+        categoryCollectionView.dataSource = self
+        categoryCollectionView.delegate = self
         
         view.addSubview(scrollView)
         view.addSubview(loadingImageView)
@@ -249,11 +256,8 @@ extension HomeViewController {
         scrollView.addSubview(bannerCollectionView)
         scrollView.addSubview(categoryCollectionView)
         scrollView.addSubview(pageControl)
-    }
-    
-    // MARK: - SetupLayoutConstraints
-    
-    private func setupLayoutConstraints() {
+        
+        // Setup constraints
         // loadingImageView, alertBlindView
         loadingImageView.widthAnchor.constraint(equalToConstant: 62).isActive = true
         loadingImageView.heightAnchor.constraint(equalToConstant: 62).isActive = true
@@ -282,17 +286,6 @@ extension HomeViewController {
         categoryCollectionViewHeight = categoryCollectionView.heightAnchor.constraint(equalToConstant: 45 + 7)
         categoryCollectionViewHeight.priority = UILayoutPriority(rawValue: 999)
         categoryCollectionViewHeight.isActive = true
-    }
-    
-    // MARK: - SetupProperties
-    
-    private func setupProperties() {
-        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
-        navigationItem.titleView = titleImageView
-        navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: profileButton)]
-        profileButton.addTarget(self, action: #selector(profileButtonTapped), for: .touchUpInside)
-        loadBanners()
-        loadCategories()
     }
     
     private func alertError(_ message: String) {

@@ -9,78 +9,19 @@
 import UIKit
 
 private let logsTableCellId = "LogsTableCell"
+private let logTableCellHeightVal = 45
 
 class LogGroupTableCell: UITableViewCell {
-    let containerView: UIView = {
-        let _view = UIView()
-        _view.backgroundColor = UIColor.white
-        _view.addShadowView()
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
+    var containerView: UIView!
     var containerViewHight: NSLayoutConstraint!
-    let arrowImageView: UIImageView = {
-        let _imageView = UIImageView()
-        _imageView.image = UIImage(named: "item-poly-left")
-        _imageView.contentMode = .scaleAspectFit
-        _imageView.isHidden = true
-        _imageView.translatesAutoresizingMaskIntoConstraints = false
-        return _imageView
-    }()
-    let groupTypeImageView: UIImageView = {
-        let _imageView = UIImageView()
-        _imageView.contentMode = .scaleAspectFit
-        _imageView.translatesAutoresizingMaskIntoConstraints = false
-        return _imageView
-    }()
-    let nameLabel: UILabel = {
-        let _label = UILabel()
-        _label.font = .systemFont(ofSize: 15)
-        _label.textAlignment = .left
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
-    let condScoreLabel: UILabel = {
-        let _label = UILabel()
-        _label.font = .systemFont(ofSize: 15)
-        _label.textAlignment = .left
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
-    let foodLogBulletView: UIView = {
-        let _view = UIView(frame: CGRect(x: 0, y: 0, width: 7, height: 7))
-        _view.backgroundColor = UIColor.tomato
-        _view.layer.cornerRadius = 3.5
-        _view.isHidden = true
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
-    let actLogBulletView: UIView = {
-        let _view = UIView(frame: CGRect(x: 0, y: 0, width: 7, height: 7))
-        _view.backgroundColor = UIColor.yellowGreen
-        _view.layer.cornerRadius = 3.5
-        _view.isHidden = true
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
-    let drugLogBulletView: UIView = {
-        let _view = UIView(frame: CGRect(x: 0, y: 0, width: 7, height: 7))
-        _view.backgroundColor = UIColor.dodgerBlue
-        _view.layer.cornerRadius = 3.5
-        _view.isHidden = true
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
-    let groupOfLogsTableView: UITableView = {
-        let _tableView = UITableView(frame: CGRect.zero, style: .plain)
-        _tableView.register(LogTableCell.self, forCellReuseIdentifier: logsTableCellId)
-        _tableView.backgroundColor = UIColor.clear
-        _tableView.separatorStyle = .singleLine
-        _tableView.isScrollEnabled = false
-        _tableView.isHidden = true
-        _tableView.translatesAutoresizingMaskIntoConstraints = false
-        return _tableView
-    }()
+    var arrowImageView: UIImageView!
+    var groupTypeImageView: UIImageView!
+    var nameLabel: UILabel!
+    var condScoreLabel: UILabel!
+    var foodLogBulletView: UIView!
+    var actLogBulletView: UIView!
+    var drugLogBulletView: UIView!
+    var groupOfLogsTableView: UITableView!
     var groupOfLogsTableHeight: NSLayoutConstraint!
     
     var selectedLogGroup: BaseModel.LogGroup?
@@ -90,13 +31,7 @@ class LogGroupTableCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
-        selectionStyle = .none
-        setupLayoutStyles()
-        groupOfLogsTableView.delegate = self
-        groupOfLogsTableView.dataSource = self
-        setupLayoutSubviews()
-        setupLayoutConstraints()
+        setupLayout()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -153,7 +88,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
             }
         } else if ((groupOfLogSet!.act_logs?.count) != nil && ((groupOfLogSet!.act_logs?.count)!) > 0) {
             let actLog = groupOfLogSet!.act_logs!.popLast()
-            cell.bulletView.backgroundColor = UIColor.yellowGreen
+            cell.bulletView.backgroundColor = UIColor.cornflowerBlue
             switch lang.currentLanguageId {
             case LanguageId.eng: cell.nameLabel.text = actLog!.eng_name
             case LanguageId.kor: cell.nameLabel.text = actLog!.kor_name
@@ -170,7 +105,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
             cell.quantityLabel.text = "\(hr)\(min)"
         } else if ((groupOfLogSet!.drug_logs?.count) != nil && ((groupOfLogSet!.drug_logs?.count)!) > 0) {
             let drugLog = groupOfLogSet!.drug_logs!.popLast()
-            cell.bulletView.backgroundColor = UIColor.dodgerBlue
+            cell.bulletView.backgroundColor = UIColor.hex_72e5Ea
             switch lang.currentLanguageId {
             case LanguageId.eng: cell.nameLabel.text = drugLog!.eng_name
             case LanguageId.kor: cell.nameLabel.text = drugLog!.kor_name
@@ -196,7 +131,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
     // MARK: UITableView Delegate
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 40
+        return CGFloat(logTableCellHeightVal)
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -217,13 +152,90 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
 }
 
 extension LogGroupTableCell {
-    private func setupLayoutStyles() {
+    private func setupLayout() {
+        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
+        selectionStyle = .none
         backgroundColor = UIColor.clear
-    }
-    
-    private func setupLayoutSubviews() {
-        addSubview(containerView)
         
+        containerView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor.white
+            _view.addShadowView()
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        arrowImageView = {
+            let _imageView = UIImageView()
+            _imageView.image = UIImage(named: "item-poly-left")
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.isHidden = true
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        groupTypeImageView = {
+            let _imageView = UIImageView()
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.addShadowView()
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        nameLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 15)
+            _label.textAlignment = .left
+            _label.addShadowView()
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        condScoreLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 15)
+            _label.textAlignment = .left
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        foodLogBulletView = {
+            let _view = UIView(frame: CGRect(x: 0, y: 0, width: 7, height: 7))
+            _view.backgroundColor = UIColor.tomato
+            _view.layer.cornerRadius = 3.5
+            _view.isHidden = true
+            _view.addShadowView()
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        actLogBulletView = {
+            let _view = UIView(frame: CGRect(x: 0, y: 0, width: 7, height: 7))
+            _view.backgroundColor = UIColor.cornflowerBlue
+            _view.layer.cornerRadius = 3.5
+            _view.isHidden = true
+            _view.addShadowView()
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        drugLogBulletView = {
+            let _view = UIView(frame: CGRect(x: 0, y: 0, width: 7, height: 7))
+            _view.backgroundColor = UIColor.hex_72e5Ea
+            _view.layer.cornerRadius = 3.5
+            _view.isHidden = true
+            _view.addShadowView()
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        groupOfLogsTableView = {
+            let _tableView = UITableView(frame: CGRect.zero, style: .plain)
+            _tableView.register(LogTableCell.self, forCellReuseIdentifier: logsTableCellId)
+            _tableView.backgroundColor = UIColor.clear
+            _tableView.separatorStyle = .singleLine
+            _tableView.isScrollEnabled = false
+            _tableView.isHidden = true
+            _tableView.translatesAutoresizingMaskIntoConstraints = false
+            return _tableView
+        }()
+        
+        groupOfLogsTableView.delegate = self
+        groupOfLogsTableView.dataSource = self
+        
+        addSubview(containerView)
         containerView.addSubview(arrowImageView)
         containerView.addSubview(groupTypeImageView)
         containerView.addSubview(nameLabel)
@@ -232,9 +244,7 @@ extension LogGroupTableCell {
         containerView.addSubview(actLogBulletView)
         containerView.addSubview(drugLogBulletView)
         containerView.addSubview(groupOfLogsTableView)
-    }
-    
-    private func setupLayoutConstraints() {
+        
         containerView.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
         containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
         containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0).isActive = true
@@ -246,7 +256,7 @@ extension LogGroupTableCell {
         arrowImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20).isActive = true
         
         groupTypeImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 6).isActive = true
-        groupTypeImageView.leadingAnchor.constraint(equalTo: arrowImageView.trailingAnchor, constant: frame.width / 5).isActive = true
+        groupTypeImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: frame.width / 4).isActive = true
         
         nameLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 15).isActive = true
         nameLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor, constant: 0).isActive = true

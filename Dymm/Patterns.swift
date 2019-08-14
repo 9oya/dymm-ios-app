@@ -111,10 +111,10 @@ struct AvatarInfoTarget {
 
 func getLogGroupTypeImage(_ groupType: Int) -> UIImage? {
     switch groupType {
-    case LogGroupType.morning: return UIImage(named: "item-sunrise")
-    case LogGroupType.daytime: return UIImage(named: "item-sun")
-    case LogGroupType.evening: return UIImage(named: "item-sunset")
-    case LogGroupType.nighttime: return UIImage(named: "item-moon")
+    case LogGroupType.morning: return UIImage(named: "item-gt-sunrise")
+    case LogGroupType.daytime: return UIImage(named: "item-gt-sun")
+    case LogGroupType.evening: return UIImage(named: "item-gt-sunset")
+    case LogGroupType.nighttime: return UIImage(named: "item-gt-moon")
     default: return nil
     }
 }

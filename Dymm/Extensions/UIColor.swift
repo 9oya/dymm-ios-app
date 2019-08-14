@@ -303,6 +303,7 @@ extension UIColor {
     // Green
     static let darkTurquoise = UIColor(hex: "DarkTurquoise")
     static let yellowGreen = UIColor(hex: "YellowGreen")
+    static let hex_72e5Ea = UIColor(hex: "#72E5EA")
     
     // Gray
     static let lightGray = UIColor(hex: "LightGray")

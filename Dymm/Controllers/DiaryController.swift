@@ -13,103 +13,46 @@ import Alamofire
 private let logGroupTableCellId = "LogGroupTableCell"
 private let logCollectionCellId = "LogCollectionCell"
 
+private let logGroupCellHeightVal = 52
+private let logTableCellHeightVal = 45
+private let pickerCollectionHeightVal = 32
+private let logCollectionCellHeightVal = 30
+
+private let marginVal = 7
+
 class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDelegate, UIGestureRecognizerDelegate {
     
     // MARK: - Properties
     
     var blindView: UIView!
+    var pickerContainerView: UIView!
+    var pickerGrayLineView: UIView!
+    
+    var calendarView: FSCalendar!
+    var logGroupTableView: UITableView!
+    var pickerCollectionView: UICollectionView!
+    var groupTypePickerView: UIPickerView!
+    
     var loadingImageView: UIImageView!
+    var pickerDateLabel: UILabel!
+    
+    var toggleButton: UIButton!
+    var pickerCancelButton: UIButton!
+    var pickerCheckButton: UIButton!
+    var homeButton: UIButton!
+    var condButton: UIButton!
+    
+    var calendarViewHeight: NSLayoutConstraint!
+    var pickerContainerHeight: NSLayoutConstraint!
+    var pickerCollectionHeight: NSLayoutConstraint!
+    
+    var scopeGesture: UIPanGestureRecognizer!
+    var dateFormatter: DateFormatter!
     var lang: LangPack!
     var retryFunction: (() -> Void)?
     var retryFunctionName: String?
     var retryCompletion: ((CustomModel.GroupOfLogSet) -> Void)?
     
-    let calendarView: FSCalendar = {
-        let _calendar = FSCalendar()
-        _calendar.appearance.headerTitleColor = UIColor.black
-        _calendar.appearance.weekdayTextColor = UIColor.black
-        _calendar.appearance.titleDefaultColor = UIColor.tomato
-        _calendar.appearance.titlePlaceholderColor = UIColor.lightGray
-        _calendar.appearance.eventDefaultColor = UIColor.tomato
-        _calendar.appearance.eventSelectionColor = UIColor.tomato
-        _calendar.appearance.selectionColor = UIColor.tomato
-        _calendar.backgroundColor = UIColor.white
-        _calendar.addShadowView()
-        _calendar.translatesAutoresizingMaskIntoConstraints = false
-        return _calendar
-    }()
-    var calendarViewHeight: NSLayoutConstraint!
-    private lazy var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: getUserCountryCode())  // TODO ko_kr
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter
-    }()
-    private lazy var scopeGesture: UIPanGestureRecognizer = {
-        [unowned self] in
-        let panGesture = UIPanGestureRecognizer(target: self.calendarView, action: #selector(self.calendarView.handleScopeGesture(_:)))
-        panGesture.delegate = self
-        panGesture.minimumNumberOfTouches = 1
-        panGesture.maximumNumberOfTouches = 2
-        return panGesture
-        }()
-    let toggleButton: UIButton = {
-        let _button = UIButton(type: .system)
-        _button.setImage(UIImage(named: "button-maximize")!.withRenderingMode(.alwaysOriginal), for: .normal)
-        _button.frame = CGRect(x: 0, y: 0, width: 25, height: 25)
-        _button.showsTouchWhenHighlighted = true
-        _button.translatesAutoresizingMaskIntoConstraints = false
-        return _button
-    }()
-    let logGroupTableView: UITableView = {
-        let _tableView = UITableView(frame: CGRect.zero, style: .grouped)
-        _tableView.backgroundColor = UIColor.clear
-        _tableView.separatorStyle = .none
-        _tableView.register(LogGroupTableCell.self, forCellReuseIdentifier: logGroupTableCellId)
-        _tableView.translatesAutoresizingMaskIntoConstraints = false
-        return _tableView
-    }()
-    let pickerCollectionView: UICollectionView = {
-        let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
-        _collectionView.backgroundColor = UIColor.clear
-        _collectionView.register(LogCollectionCell.self, forCellWithReuseIdentifier: logCollectionCellId)
-        _collectionView.translatesAutoresizingMaskIntoConstraints = false
-        return _collectionView
-    }()
-    var pickerCollectionHeight: NSLayoutConstraint!
-    let pickerContainerView: UIView = {
-        let _view = UIView()
-        _view.backgroundColor = UIColor.white
-        _view.layer.cornerRadius = 10.0
-        _view.isHidden = true
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
-    var pickerContainerHeight: NSLayoutConstraint!
-    let groupTypePickerView: UIPickerView = {
-        let _pickerView = UIPickerView()
-        _pickerView.translatesAutoresizingMaskIntoConstraints = false
-        return _pickerView
-    }()
-    let pickerDateLabel: UILabel = {
-        let _label = UILabel()
-        _label.font = .systemFont(ofSize: 18, weight: .regular)
-        _label.textColor = UIColor.black
-        _label.textAlignment = .center
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
-    var pickerGrayLineView: UIView!
-    var pickerCancelButton: UIButton!
-    var pickerCheckButton: UIButton!
-    let homeButton: UIButton = {
-        let _button = UIButton(type: .system)
-        _button.setImage(UIImage(named: "button-home")!.withRenderingMode(.alwaysOriginal), for: .normal)
-        _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
-        _button.showsTouchWhenHighlighted = true
-        _button.translatesAutoresizingMaskIntoConstraints = false
-        return _button
-    }()
     var diaryMode: Int = DiaryMode.editor
     
     // [dayOfyear:[groupType:IntakeLogGroup]]
@@ -135,29 +78,42 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var x_val: Int?
     var y_val: Int?
     
-    let defPickerCollectionHeightVal = 32
-    let collectionCellHeightVal = 30
-    let subTableCellHeight = 40
-    let defLogGroupCellHeight = 52
-    let footerMargin = 7
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupLayoutStyles()
-        setupLayoutSubviews()
-        calendarView.dataSource = self
-        calendarView.delegate = self
-        logGroupTableView.dataSource = self
-        logGroupTableView.delegate = self
-        pickerCollectionView.dataSource = self
-        pickerCollectionView.delegate = self
-        groupTypePickerView.dataSource = self
-        groupTypePickerView.delegate = self
-        setupLayoutConstraints()
-        setupProperties()
+        setupLayout()
+        loadLogGroups()
     }
     
     // MARK: - Actions
+    
+    @objc func alertError(_ message: String) {
+        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
+            if self.retryFunctionName == "loadGroupOfLogs" {
+                self.loadGroupOfLogs(self.retryCompletion!)
+                return
+            }
+            self.retryFunction!()
+        }
+        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
+        alertController.addAction(confirmAction)
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    @objc func alertCompl(_ message: String) {
+        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
+            self.dismiss(animated: true, completion: nil)
+        }
+        let cancelAction = UIAlertAction(title: lang.btnNo, style: .cancel) { _ in
+            _ = self.navigationController?.popViewController(animated: true)
+        }
+        alertController.addAction(confirmAction)
+        alertController.addAction(cancelAction)
+        alertController.view.tintColor = UIColor.tomato
+        self.present(alertController, animated: true, completion: nil)
+    }
     
     @objc func toggleButtonTapped() {
         if calendarView.scope == .month {
@@ -193,6 +149,10 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     @objc func homeButtonTapped() {
         dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func condButtonTapped() {
+        print("")
     }
     
     // MARK: - UIGestureRecognizerDelegate
@@ -253,14 +213,14 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             selectedLogGroup = logGroup
             groupType = logGroup.group_type
             loadGroupOfLogs { (groupOfLogSet) in
-                let collectionViewHeight = self.collectionCellHeightVal * self.getGroupOfLogsTotalCnt(groupOfLogSet)
+                let collectionViewHeight = logCollectionCellHeightVal * self.getGroupOfLogsTotalCnt(groupOfLogSet)
                 self.afterLoadGroupOfLogs(collectionViewHeight)
             }
         } else {
             // Case any log group not existed in selected date section
             groupOfLogSet = nil
             groupType = LogGroupType.morning
-            pickerContainerTransition(defPickerCollectionHeightVal)
+            pickerContainerTransition(pickerCollectionHeightVal)
         }
         groupTypePickerView.selectRow(LogGroupType.nighttime - groupType!, inComponent: 0, animated: true)
         UIView.transition(with: self.pickerContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
@@ -414,8 +374,8 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     self.selectedOnceCellIdxPath = indexPath
                     let total = self.getGroupOfLogsTotalCnt(groupOfLogSet)
                     UIView.animate(withDuration: 0.5, animations: {
-                        cell.groupOfLogsTableHeight.constant = CGFloat((total * self.subTableCellHeight))
-                        cell.containerViewHight.constant = CGFloat((total * self.subTableCellHeight) + self.defLogGroupCellHeight + self.footerMargin)
+                        cell.groupOfLogsTableHeight.constant = CGFloat((total * logTableCellHeightVal))
+                        cell.containerViewHight.constant = CGFloat((total * logTableCellHeightVal) + logGroupCellHeightVal + marginVal)
                         cell.arrowImageView.transform = CGAffineTransform(rotationAngle: (.pi / 2))
                         self.view.layoutIfNeeded()
                     }, completion: { _ in
@@ -442,13 +402,13 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 groupType = lastLogGroup.group_type + 1
                 groupOfLogSet = nil
                 selectedLogGroupId = nil
-                afterLoadGroupOfLogs(defPickerCollectionHeightVal)
+                afterLoadGroupOfLogs(pickerCollectionHeightVal)
             } else {
                 // Case nighttime groupType already exist,
                 // Display last existing logGroup and set parameters.
                 selectedLogGroupId = lastLogGroup.id
                 loadGroupOfLogs { (groupOfLogSet) in
-                    let collectionViewHeight = self.collectionCellHeightVal * self.getGroupOfLogsTotalCnt(groupOfLogSet)
+                    let collectionViewHeight = logCollectionCellHeightVal * self.getGroupOfLogsTotalCnt(groupOfLogSet)
                     self.afterLoadGroupOfLogs(collectionViewHeight)
                 }
             }
@@ -458,7 +418,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             groupType = selectedLogGroup!.group_type
             selectedLogGroupId = selectedLogGroup!.id
             loadGroupOfLogs { (groupOfLogSet) in
-                let collectionViewHeight = self.collectionCellHeightVal * self.getGroupOfLogsTotalCnt(groupOfLogSet)
+                let collectionViewHeight = logCollectionCellHeightVal * self.getGroupOfLogsTotalCnt(groupOfLogSet)
                 self.afterLoadGroupOfLogs(collectionViewHeight)
             }
         }
@@ -479,10 +439,10 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath == selectedOnceCellIdxPath {
             let total = getGroupOfLogsTotalCnt(groupOfLogSet!)
-            return CGFloat((total * subTableCellHeight) + defLogGroupCellHeight + footerMargin + 7)
+            return CGFloat((total * logTableCellHeightVal) + logGroupCellHeightVal + marginVal + 7)
         } else {
             if let cell = tableView.cellForRow(at: indexPath) as? LogGroupTableCell {
-                cell.containerViewHight.constant = CGFloat(defLogGroupCellHeight - 7)
+                cell.containerViewHight.constant = CGFloat(logGroupCellHeightVal - 7)
                 cell.arrowImageView.transform = CGAffineTransform.identity
                 cell.groupOfLogsTableView.isHidden = true
                 let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
@@ -496,7 +456,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     cell.drugLogBulletView.isHidden = false
                 }
             }
-            return CGFloat(defLogGroupCellHeight)
+            return CGFloat(logGroupCellHeightVal)
         }
     }
 }
@@ -649,7 +609,7 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
                 selectedLogGroupId = logGroup.id
                 selectedLogGroup = logGroup
                 loadGroupOfLogs { (groupOfLogSet) in
-                    let collectionViewHeight = self.collectionCellHeightVal * self.getGroupOfLogsTotalCnt(groupOfLogSet)
+                    let collectionViewHeight = logCollectionCellHeightVal * self.getGroupOfLogsTotalCnt(groupOfLogSet)
                     self.afterLoadGroupOfLogs(collectionViewHeight)
                 }
             } else {
@@ -657,14 +617,14 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
                 groupOfLogSet = nil
                 selectedLogGroupId = nil
                 selectedLogGroup = nil
-                pickerContainerTransition(defPickerCollectionHeightVal)
+                pickerContainerTransition(pickerCollectionHeightVal)
             }
         } else {
             // Case there is any logGroup in section(date).
             groupOfLogSet = nil
             selectedLogGroupId = nil
             selectedLogGroup = nil
-            pickerContainerTransition(defPickerCollectionHeightVal)
+            pickerContainerTransition(pickerCollectionHeightVal)
         }
     }
 }
@@ -672,28 +632,142 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
 extension DiaryViewController {
     
     // MARK: Private methods
-    
-    private func setupLayoutStyles() {
+
+    private func setupLayout() {
+        // Initialize view
+        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
+        navigationItem.title = lang.titleDiary
         view.backgroundColor = UIColor(hex: "WhiteSmoke")
         
-        if diaryMode == DiaryMode.editor {
-            calendarView.appearance.titleDefaultColor = UIColor.black
-        }
-    }
-    
-    private func setupLayoutSubviews() {
+        // Initialize subveiw properties
         blindView = getAlertBlindView()
         loadingImageView = getLoadingImageView(isHidden: false)
-        
         pickerGrayLineView = getGrayLineView()
+        calendarView = {
+            let _calendar = FSCalendar()
+            _calendar.appearance.headerTitleColor = UIColor.black
+            _calendar.appearance.weekdayTextColor = UIColor.black
+            _calendar.appearance.titleDefaultColor = UIColor.hex_fe4c4c
+            _calendar.appearance.titlePlaceholderColor = UIColor.lightGray
+            _calendar.appearance.eventDefaultColor = UIColor.tomato
+            _calendar.appearance.eventSelectionColor = UIColor.hex_fe4c4c
+            _calendar.appearance.selectionColor = UIColor.hex_fe4c4c
+            _calendar.backgroundColor = UIColor.white
+            _calendar.addShadowView()
+            
+            _calendar.clipsToBounds = true
+            _calendar.appearance.headerDateFormat = lang.calendarHeaderDateFormat
+            _calendar.appearance.caseOptions = FSCalendarCaseOptions.weekdayUsesUpperCase
+            _calendar.select(Date())
+            _calendar.scope = .week
+            
+            _calendar.translatesAutoresizingMaskIntoConstraints = false
+            return _calendar
+        }()
+        dateFormatter = {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: getUserCountryCode())  // TODO ko_kr
+            formatter.dateFormat = "yyyy-MM-dd"
+            return formatter
+        }()
+        scopeGesture = {
+            [unowned self] in
+            let panGesture = UIPanGestureRecognizer(target: self.calendarView, action: #selector(self.calendarView.handleScopeGesture(_:)))
+            panGesture.delegate = self
+            panGesture.minimumNumberOfTouches = 1
+            panGesture.maximumNumberOfTouches = 2
+            return panGesture
+            }()
+        logGroupTableView = {
+            let _tableView = UITableView(frame: CGRect.zero, style: .grouped)
+            _tableView.backgroundColor = UIColor.clear
+            _tableView.separatorStyle = .none
+            _tableView.register(LogGroupTableCell.self, forCellReuseIdentifier: logGroupTableCellId)
+            _tableView.translatesAutoresizingMaskIntoConstraints = false
+            return _tableView
+        }()
+        pickerCollectionView = {
+            let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
+            _collectionView.backgroundColor = UIColor.clear
+            _collectionView.register(LogCollectionCell.self, forCellWithReuseIdentifier: logCollectionCellId)
+            _collectionView.translatesAutoresizingMaskIntoConstraints = false
+            return _collectionView
+        }()
+        pickerContainerView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor.white
+            _view.layer.cornerRadius = 10.0
+            _view.isHidden = true
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        groupTypePickerView = {
+            let _pickerView = UIPickerView()
+            _pickerView.translatesAutoresizingMaskIntoConstraints = false
+            return _pickerView
+        }()
+        pickerDateLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 18, weight: .regular)
+            _label.textColor = UIColor.black
+            _label.textAlignment = .center
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
         pickerCancelButton = getCancelButton()
+        pickerCancelButton.addTarget(self, action: #selector(pickerCancelButtonTapped), for: .touchUpInside)
         pickerCheckButton = getCheckButton()
+        pickerCheckButton.addTarget(self, action: #selector(pickerCheckButtonTapped), for: .touchUpInside)
+        toggleButton = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage(named: "button-maximize")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 25, height: 25)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(toggleButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        homeButton = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage(named: "button-home")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        condButton = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage(named: "button-heartbeat")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 27, height: 25)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action:#selector(condButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
         
+        if diaryMode == DiaryMode.editor {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
+            calendarView.appearance.titleDefaultColor = UIColor.black
+        }
+        
+        calendarView.dataSource = self
+        calendarView.delegate = self
+        logGroupTableView.dataSource = self
+        logGroupTableView.delegate = self
+        pickerCollectionView.dataSource = self
+        pickerCollectionView.delegate = self
+        groupTypePickerView.dataSource = self
+        groupTypePickerView.delegate = self
+        
+        // Setup subviews
         view.addSubview(logGroupTableView)
         view.addSubview(calendarView)
+        view.addSubview(condButton)
         view.addSubview(toggleButton)
         view.addSubview(loadingImageView)
         view.addSubview(blindView)
+        view.addGestureRecognizer(scopeGesture)
         
         blindView.addSubview(pickerContainerView)
         
@@ -703,12 +777,9 @@ extension DiaryViewController {
         pickerContainerView.addSubview(pickerGrayLineView)
         pickerContainerView.addSubview(pickerCancelButton)
         pickerContainerView.addSubview(pickerCheckButton)
-    }
-    
-    // MARK: - SetupLayoutConstraints
-    
-    private func setupLayoutConstraints() {
-        // loadingImageView, alertBlindView
+        
+        // Setup constraints
+        // loadingImageView, blindView
         loadingImageView.widthAnchor.constraint(equalToConstant: 62).isActive = true
         loadingImageView.heightAnchor.constraint(equalToConstant: 62).isActive = true
         loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
@@ -760,6 +831,9 @@ extension DiaryViewController {
         calendarViewHeight.priority = UILayoutPriority(rawValue: 999)
         calendarViewHeight.isActive = true
         
+        condButton.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 8).isActive = true
+        condButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
+        
         toggleButton.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 8).isActive = true
         toggleButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
         
@@ -767,86 +841,60 @@ extension DiaryViewController {
         logGroupTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
         logGroupTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
         logGroupTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
-    }
-    
-    // MARK: - SetupProperties
-    
-    private func setupProperties() {
-        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
-        navigationItem.title = lang.titleDiary
-        toggleButton.addTarget(self, action: #selector(toggleButtonTapped), for: .touchUpInside)
-        pickerCancelButton.addTarget(self, action: #selector(pickerCancelButtonTapped), for: .touchUpInside)
-        pickerCheckButton.addTarget(self, action: #selector(pickerCheckButtonTapped), for: .touchUpInside)
-        
-        view.addGestureRecognizer(scopeGesture)
         logGroupTableView.panGestureRecognizer.require(toFail: scopeGesture)
-        calendarView.clipsToBounds = true
-        calendarView.appearance.headerDateFormat = lang.calendarHeaderDateFormat
-        calendarView.appearance.caseOptions = FSCalendarCaseOptions.weekdayUsesUpperCase
-        calendarView.select(Date())
-        calendarView.scope = .week
+        
+//        calendarView.clipsToBounds = true
+//        calendarView.appearance.headerDateFormat = lang.calendarHeaderDateFormat
+//        calendarView.appearance.caseOptions = FSCalendarCaseOptions.weekdayUsesUpperCase
+//        calendarView.select(Date())
+//        calendarView.scope = .week
+        
         selectedWeekOfYear = Calendar.current.component(.weekOfYear, from: calendarView.today!)
         selectedCalScope = CalScope.week
-        loadLogGroups()
         groupType = LogGroupType.morning
-        
-        if diaryMode == DiaryMode.editor {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
-            homeButton.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
+    }
+    
+    private func pickerContainerTransition(_ collectionViewHeightVal: Int) {
+        pickerCollectionView.reloadData()
+        UIView.animate(withDuration: 0.5) {
+            self.pickerCollectionHeight.constant = CGFloat(collectionViewHeightVal)
+            self.pickerContainerHeight.constant = CGFloat(collectionViewHeightVal + 220)
+            self.view.layoutIfNeeded()
         }
     }
     
-    private func alertError(_ message: String) {
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
-            if self.retryFunctionName == "loadGroupOfLogs" {
-                self.loadGroupOfLogs(self.retryCompletion!)
-                return
-            }
-            self.retryFunction!()
+    private func getGroupOfLogsTotalCnt(_ groupOfLogSet: CustomModel.GroupOfLogSet) -> Int {
+        self.groupOfLogSet = groupOfLogSet
+        var total = 0
+        if let foodLogs = groupOfLogSet.food_logs {
+            total += (foodLogs.count)
         }
-        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
-        alertController.addAction(confirmAction)
-        alertController.addAction(cancelAction)
-        self.present(alertController, animated: true, completion: nil)
+        if let actLogs = groupOfLogSet.act_logs {
+            total += (actLogs.count)
+        }
+        if let drugLogs = groupOfLogSet.drug_logs {
+            total += (drugLogs.count)
+        }
+        return total
     }
     
-    private func alertCompl(_ message: String) {
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
-            self.dismiss(animated: true, completion: nil)
+    private func afterLoadGroupOfLogs(_ collectionViewHeightVal: Int) {
+        let logGroup = selectedLogGroup!
+        yearNumber = logGroup.year_number
+        monthNumber = logGroup.month_number
+        dayNumber = logGroup.day_number
+        weekOfYear = logGroup.week_of_year
+        dayOfYear = logGroup.day_of_year
+        selectedDate = "\(logGroup.year_number)-\(logGroup.month_number)-\(logGroup.day_number)"
+        pickerContainerTransition(collectionViewHeightVal)
+        if blindView.isHidden {
+            groupTypePickerView.selectRow(LogGroupType.nighttime - (groupType!), inComponent: 0, animated: true)
+            UIView.transition(with: blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.pickerDateLabel.text = self.lang.calendarSection!(logGroup.month_number, logGroup.day_number)
+                self.pickerContainerView.isHidden = false
+                self.blindView.isHidden = false
+            })
         }
-        let cancelAction = UIAlertAction(title: lang.btnNo, style: .cancel) { _ in
-            _ = self.navigationController?.popViewController(animated: true)
-        }
-        alertController.addAction(confirmAction)
-        alertController.addAction(cancelAction)
-        alertController.view.tintColor = UIColor.tomato
-        self.present(alertController, animated: true, completion: nil)
-    }
-    
-    private func validateLogParameters() -> Parameters? {
-        guard let avatarId = UserDefaults.standard.getAvatarId() else {
-            UserDefaults.standard.setIsSignIn(value: false)
-            fatalError()
-        }
-        var params = Parameters()
-        params = [
-            "avatar_id": avatarId,
-            "tag_id": selectedTag!.id,
-            "year_number": yearNumber!,
-            "month_number": monthNumber!,
-            "week_of_year": weekOfYear!,
-            "day_of_year": dayOfYear!,
-            "group_type": groupType!,
-            "log_date": selectedDate!,
-            "x_val": x_val!,
-            "y_val": y_val!,
-        ]
-        if let logGroupId = selectedLogGroupId {
-            params["log_group_id"] = logGroupId
-        }
-        return params
     }
     
     private func loadLogGroups() {
@@ -877,49 +925,6 @@ extension DiaryViewController {
         }
     }
     
-    private func pickerContainerTransition(_ collectionViewHeightVal: Int) {
-        pickerCollectionView.reloadData()
-        UIView.animate(withDuration: 0.5) {
-            self.pickerCollectionHeight.constant = CGFloat(collectionViewHeightVal)
-            self.pickerContainerHeight.constant = CGFloat(collectionViewHeightVal + 220)
-            self.view.layoutIfNeeded()
-        }
-    }
-    
-    private func afterLoadGroupOfLogs(_ collectionViewHeightVal: Int) {
-        let logGroup = selectedLogGroup!
-        yearNumber = logGroup.year_number
-        monthNumber = logGroup.month_number
-        dayNumber = logGroup.day_number
-        weekOfYear = logGroup.week_of_year
-        dayOfYear = logGroup.day_of_year
-        selectedDate = "\(logGroup.year_number)-\(logGroup.month_number)-\(logGroup.day_number)"
-        pickerContainerTransition(collectionViewHeightVal)
-        if blindView.isHidden {
-            groupTypePickerView.selectRow(LogGroupType.nighttime - (groupType!), inComponent: 0, animated: true)
-            UIView.transition(with: blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.pickerDateLabel.text = self.lang.calendarSection!(logGroup.month_number, logGroup.day_number)
-                self.pickerContainerView.isHidden = false
-                self.blindView.isHidden = false
-            })
-        }
-    }
-    
-    private func getGroupOfLogsTotalCnt(_ groupOfLogSet: CustomModel.GroupOfLogSet) -> Int {
-        self.groupOfLogSet = groupOfLogSet
-        var total = 0
-        if let foodLogs = groupOfLogSet.food_logs {
-            total += (foodLogs.count)
-        }
-        if let actLogs = groupOfLogSet.act_logs {
-            total += (actLogs.count)
-        }
-        if let drugLogs = groupOfLogSet.drug_logs {
-            total += (drugLogs.count)
-        }
-        return total
-    }
-    
     private func loadGroupOfLogs(_ completion: @escaping (CustomModel.GroupOfLogSet) -> Void) {
         let service = Service(lang: lang)
         service.fetchGroupOfLogs(self.selectedLogGroupId!, popoverAlert: { (message) in
@@ -936,8 +941,25 @@ extension DiaryViewController {
     }
     
     private func postAGroupOfLog() {
-        guard let params = validateLogParameters() else {
-            return
+        guard let avatarId = UserDefaults.standard.getAvatarId() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        var params = Parameters()
+        params = [
+            "avatar_id": avatarId,
+            "tag_id": selectedTag!.id,
+            "year_number": yearNumber!,
+            "month_number": monthNumber!,
+            "week_of_year": weekOfYear!,
+            "day_of_year": dayOfYear!,
+            "group_type": groupType!,
+            "log_date": selectedDate!,
+            "x_val": x_val!,
+            "y_val": y_val!,
+        ]
+        if let logGroupId = selectedLogGroupId {
+            params["log_group_id"] = logGroupId
         }
         let service = Service(lang: lang)
         service.dispatchASingleLog(params: params, popoverAlert: { (message) in
