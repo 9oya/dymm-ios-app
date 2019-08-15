@@ -18,6 +18,7 @@ class LangPack {
     var titleGuest: String!
     var titleLogGroup: [String]!
     var titleWeekday: [String]!
+    var titleMyAvtCond: String!
     
     var txtFieldFirstName: String!
     var txtFieldLastName: String!
@@ -56,6 +57,8 @@ class LangPack {
     var btnNo: String!
     var btnStartDate: String!
     var btnEndDate: String!
+    var btnEdit: String!
+    var btnClose: String!
     
     var msgNetworkFailure: String!
     var msgForbiddenInvalidEmail: String!
@@ -149,6 +152,12 @@ func getLanguagePack(_ currentLanguageId: Int) -> LangPack {
         case LanguageId.kor:
             return ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"]
         default: fatalError("")}
+    }()
+    lang.titleMyAvtCond = {
+        switch currentLanguageId {
+        case LanguageId.eng: return "My Condtion History"
+        case LanguageId.kor: return "나의 컨디션 히스토리"
+        default: fatalError(lang.currentLangErrorMsg)}
     }()
     
     // MARK: TextField
@@ -367,6 +376,18 @@ func getLanguagePack(_ currentLanguageId: Int) -> LangPack {
         switch currentLanguageId {
         case LanguageId.eng: return "End date"
         case LanguageId.kor: return "끝난 일자"
+        default: fatalError(lang.currentLangErrorMsg)}
+    }()
+    lang.btnEdit = {
+        switch currentLanguageId {
+        case LanguageId.eng: return "Edit"
+        case LanguageId.kor: return "편집"
+        default: fatalError(lang.currentLangErrorMsg)}
+    }()
+    lang.btnClose = {
+        switch currentLanguageId {
+        case LanguageId.eng: return "Close"
+        case LanguageId.kor: return "닫기"
         default: fatalError(lang.currentLangErrorMsg)}
     }()
     

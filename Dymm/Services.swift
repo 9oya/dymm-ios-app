@@ -354,6 +354,48 @@ struct Service {
         }
     }
     
+    func fetchAvatarCondList(popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ data: [BaseModel.AvatarCond]) -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        guard let avatarId = UserDefaults.standard.getAvatarId() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)"
+        ]
+        Alamofire.request("\(URI.host)\(URI.avatar)/\(avatarId)/cond", method: .get, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<[BaseModel.AvatarCond]>.self, from: responseData) else {
+                        fatalError("jsonDecoder.decode(Ok<[UserModel.Avatar]>.self, from: responseData)")
+                    }
+                    guard let data = decodedData.data else {
+                        fatalError("decodedData.data")
+                    }
+                    completion(data)
+                case 400:
+                    self.badRequest(responseData)
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.upexpectedResponse(statusCode, responseData, "validateUser()")
+                    return
+                }
+        }
+    }
+    
     func updateProfileTag(profile_tag_id: Int, new_tag_id: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)

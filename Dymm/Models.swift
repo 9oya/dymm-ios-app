@@ -125,6 +125,40 @@ struct BaseModel {
         }
     }
     
+    struct AvatarCond: Codable {
+        let id: Int
+        let avatar_id: Int
+        let tag_id: Int
+        let start_date: String?
+        let end_date: String?
+        let eng_name: String
+        let kor_name: String?
+        let jpn_name: String?
+        
+        enum CodingKeys: String, CodingKey {
+            case id
+            case avatar_id
+            case tag_id
+            case start_date
+            case end_date
+            case eng_name
+            case kor_name
+            case jpn_name
+        }
+        
+        init(from decoder: Decoder) throws {
+            let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
+            self.id = try valueContainer.decode(Int.self, forKey: CodingKeys.id)
+            self.avatar_id = try valueContainer.decode(Int.self, forKey: CodingKeys.avatar_id)
+            self.tag_id = try valueContainer.decode(Int.self, forKey: CodingKeys.tag_id)
+            self.start_date = try? valueContainer.decode(String.self, forKey: CodingKeys.start_date)
+            self.end_date = try? valueContainer.decode(String.self, forKey: CodingKeys.end_date)
+            self.eng_name = try valueContainer.decode(String.self, forKey: CodingKeys.eng_name)
+            self.kor_name = try? valueContainer.decode(String.self, forKey: CodingKeys.kor_name)
+            self.jpn_name = try? valueContainer.decode(String.self, forKey: CodingKeys.jpn_name)
+        }
+    }
+    
     struct Banner: Codable {
         let id: Int
         let img_name: String?

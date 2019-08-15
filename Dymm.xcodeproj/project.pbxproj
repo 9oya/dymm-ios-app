@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		6A4B8EE222FB2290009810A5 /* BannerCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A4B8EE122FB2290009810A5 /* BannerCollectionCell.swift */; };
 		6A665F4623005C960065DC79 /* StepCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A665F4523005C960065DC79 /* StepCollectionCell.swift */; };
+		6A6AFEC023055BC200435954 /* CondCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A6AFEBF23055BC200435954 /* CondCollectionCell.swift */; };
 		6A8D896322F8874000A7F333 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D896222F8874000A7F333 /* AppDelegate.swift */; };
 		6A8D896522F8874000A7F333 /* HomeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D896422F8874000A7F333 /* HomeController.swift */; };
 		6A8D896A22F8874100A7F333 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A8D896922F8874100A7F333 /* Assets.xcassets */; };
@@ -42,6 +43,7 @@
 		2B1A7076BF279D0EE2C9E7DA /* Pods-Dymm.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Dymm.release.xcconfig"; path = "Target Support Files/Pods-Dymm/Pods-Dymm.release.xcconfig"; sourceTree = "<group>"; };
 		6A4B8EE122FB2290009810A5 /* BannerCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerCollectionCell.swift; sourceTree = "<group>"; };
 		6A665F4523005C960065DC79 /* StepCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepCollectionCell.swift; sourceTree = "<group>"; };
+		6A6AFEBF23055BC200435954 /* CondCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CondCollectionCell.swift; sourceTree = "<group>"; };
 		6A8D895F22F8874000A7F333 /* Dymm.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dymm.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A8D896222F8874000A7F333 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6A8D896422F8874000A7F333 /* HomeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeController.swift; sourceTree = "<group>"; };
@@ -142,11 +144,12 @@
 			isa = PBXGroup;
 			children = (
 				6A4B8EE122FB2290009810A5 /* BannerCollectionCell.swift */,
-				6A8D897D22F8890900A7F333 /* TagCollectionCell.swift */,
+				6A6AFEBF23055BC200435954 /* CondCollectionCell.swift */,
 				6A8D897F22F8891E00A7F333 /* LogGroupTableCell.swift */,
 				6A8D898122F8892400A7F333 /* LogTableCell.swift */,
 				6A8D898322F8892D00A7F333 /* LogCollectionCell.swift */,
 				6A665F4523005C960065DC79 /* StepCollectionCell.swift */,
+				6A8D897D22F8890900A7F333 /* TagCollectionCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -306,6 +309,7 @@
 				6A8D897A22F888A400A7F333 /* ProfileController.swift in Sources */,
 				6A8D89AE22F895F000A7F333 /* AuthController.swift in Sources */,
 				6A8D89AB22F88A3B00A7F333 /* Patterns.swift in Sources */,
+				6A6AFEC023055BC200435954 /* CondCollectionCell.swift in Sources */,
 				6A8D89A422F8898B00A7F333 /* UIView.swift in Sources */,
 				6A8D89AA22F88A3B00A7F333 /* Models.swift in Sources */,
 				6A665F4623005C960065DC79 /* StepCollectionCell.swift in Sources */,

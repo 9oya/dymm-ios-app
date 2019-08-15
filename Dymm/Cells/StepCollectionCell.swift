@@ -20,9 +20,7 @@ class StepCollectionCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupLayoutStyles()
-        setupLayoutSubviews()
-        setupLayoutConstraints()
+        setupLayout()
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -30,15 +28,11 @@ class StepCollectionCell: UICollectionViewCell {
 }
 
 extension StepCollectionCell {
-    private func setupLayoutStyles() {
+    private func setupLayout() {
         backgroundColor = UIColor.white
-    }
-    
-    private func setupLayoutSubviews() {
+        
         addSubview(label)
-    }
-    
-    private func setupLayoutConstraints() {
+        
         label.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
         label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
         label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0).isActive = true

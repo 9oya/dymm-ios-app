@@ -266,6 +266,17 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         if collectionView == tagCollectionView {
             return CGSize(width: (screenWidth / 2) - 10.5, height: CGFloat(40))
         } else if collectionView == stepCollectionView {
+            let tag = stepTags[indexPath.row]
+            var txtCnt = 0
+            switch lang.currentLanguageId {
+            case LanguageId.eng: txtCnt = tag.eng_name.count
+            case LanguageId.kor: txtCnt = tag.kor_name!.count
+            case LanguageId.jpn: txtCnt = tag.jpn_name!.count
+            default: fatalError()}
+            if txtCnt <= 6 {
+                // Set minimum size
+                return CGSize(width: 60, height: CGFloat(40))
+            }
             return CGSize(width: 100, height: CGFloat(40))
         } else {
             fatalError()

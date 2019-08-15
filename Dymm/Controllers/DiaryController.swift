@@ -12,6 +12,7 @@ import Alamofire
 
 private let logGroupTableCellId = "LogGroupTableCell"
 private let logCollectionCellId = "LogCollectionCell"
+private let condCollectionCellId = "CondCollectionCell"
 
 private let logGroupCellHeightVal = 52
 private let logTableCellHeightVal = 45
@@ -27,24 +28,31 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var blindView: UIView!
     var pickerContainerView: UIView!
     var pickerGrayLineView: UIView!
+    var condContainerView: UIView!
     
     var calendarView: FSCalendar!
     var logGroupTableView: UITableView!
+    var condCollectionView: UICollectionView!
     var pickerCollectionView: UICollectionView!
     var groupTypePickerView: UIPickerView!
     
     var loadingImageView: UIImageView!
     var pickerDateLabel: UILabel!
+    var condTitleLabel: UILabel!
     
     var toggleButton: UIButton!
     var pickerCancelButton: UIButton!
     var pickerCheckButton: UIButton!
     var homeButton: UIButton!
     var condButton: UIButton!
+    var condLeftButton: UIButton!
+    var condRightButton: UIButton!
     
     var calendarViewHeight: NSLayoutConstraint!
     var pickerContainerHeight: NSLayoutConstraint!
     var pickerCollectionHeight: NSLayoutConstraint!
+    var condContainerHeight: NSLayoutConstraint!
+    var condCollectionHeight: NSLayoutConstraint!
     
     var scopeGesture: UIPanGestureRecognizer!
     var dateFormatter: DateFormatter!
@@ -59,6 +67,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var logGroupDictTwoDimArr = [Int:[Int:BaseModel.LogGroup]]()
     var logGroupSectTwoDimArr = [[CustomModel.LogGroupSection]]()
     var logGroups: [BaseModel.LogGroup]? // For event marking
+    var avtCondList: [BaseModel.AvatarCond]?
     var selectedLogGroup: BaseModel.LogGroup?
     var groupOfLogSet: CustomModel.GroupOfLogSet?
     
@@ -147,12 +156,25 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         postAGroupOfLog()
     }
     
+    @objc func condRightButtonTapped() {
+        print("")
+    }
+    
+    @objc func condLeftButtonTapped() {
+        UIView.transition(with: self.blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.blindView.isHidden = true
+            self.condLeftButton.setTitleColor(UIColor.clear, for: .normal)
+        }, completion: { (_) in
+            self.condLeftButton.isHidden = true
+        })
+    }
+    
     @objc func homeButtonTapped() {
         dismiss(animated: true, completion: nil)
     }
     
     @objc func condButtonTapped() {
-        print("")
+        loadAvatarCondList()
     }
     
     // MARK: - UIGestureRecognizerDelegate
@@ -470,22 +492,46 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        var total = 0
-        if let foodLogs = groupOfLogSet?.food_logs {
-            total += (foodLogs.count)
+        if collectionView == pickerCollectionView {
+            var total = 0
+            if let foodLogs = groupOfLogSet?.food_logs {
+                total += (foodLogs.count)
+            }
+            if let actLogs = groupOfLogSet?.act_logs {
+                total += (actLogs.count)
+            }
+            if let drugLogs = groupOfLogSet?.drug_logs {
+                total += (drugLogs.count)
+            }
+            return total
+        } else if collectionView == condCollectionView {
+            return avtCondList?.count ?? 0
+        } else {
+            fatalError()
         }
-        if let actLogs = groupOfLogSet?.act_logs {
-            total += (actLogs.count)
-        }
-        if let drugLogs = groupOfLogSet?.drug_logs {
-            total += (drugLogs.count)
-        }
-        return total
     }
     
     // MARK: - UICollectionViewDelegate
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if collectionView == condCollectionView {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: condCollectionCellId, for: indexPath) as? CondCollectionCell else {
+                fatalError()
+            }
+            let avtCond = avtCondList![indexPath.item]
+            switch lang.currentLanguageId {
+            case LanguageId.eng: cell.titleLabel.text = avtCond.eng_name
+            case LanguageId.kor: cell.titleLabel.text = avtCond.kor_name
+            case LanguageId.jpn: cell.titleLabel.text = avtCond.jpn_name
+            default: fatalError()}
+            if let start_date = avtCond.start_date {
+                cell.startDateLabel.text = "\u{021E2}\(start_date)"
+            }
+            if let end_date = avtCond.end_date {
+                cell.endDateLabel.text = "\u{2713}\(end_date)"
+            }
+            return cell
+        }
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: logCollectionCellId, for: indexPath) as? LogCollectionCell else {
             fatalError()
         }
@@ -560,6 +606,9 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenWidth = UIScreen.main.bounds.width
+        if collectionView == condCollectionView {
+            return CGSize(width: screenWidth - (screenWidth / 7), height: CGFloat(45))
+        }
         return CGSize(width: screenWidth - (screenWidth / 5), height: CGFloat(30))
     }
     
@@ -643,6 +692,22 @@ extension DiaryViewController {
         blindView = getAlertBlindView()
         loadingImageView = getLoadingImageView(isHidden: false)
         pickerGrayLineView = getGrayLineView()
+        pickerContainerView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor.white
+            _view.layer.cornerRadius = 10.0
+            _view.isHidden = true
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        condContainerView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor.white
+            _view.layer.cornerRadius = 10.0
+            _view.isHidden = true
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
         calendarView = {
             let _calendar = FSCalendar()
             _calendar.appearance.headerTitleColor = UIColor.black
@@ -693,13 +758,12 @@ extension DiaryViewController {
             _collectionView.translatesAutoresizingMaskIntoConstraints = false
             return _collectionView
         }()
-        pickerContainerView = {
-            let _view = UIView()
-            _view.backgroundColor = UIColor.white
-            _view.layer.cornerRadius = 10.0
-            _view.isHidden = true
-            _view.translatesAutoresizingMaskIntoConstraints = false
-            return _view
+        condCollectionView = {
+            let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
+            _collectionView.backgroundColor = UIColor.clear
+            _collectionView.register(CondCollectionCell.self, forCellWithReuseIdentifier: condCollectionCellId)
+            _collectionView.translatesAutoresizingMaskIntoConstraints = false
+            return _collectionView
         }()
         groupTypePickerView = {
             let _pickerView = UIPickerView()
@@ -711,6 +775,15 @@ extension DiaryViewController {
             _label.font = .systemFont(ofSize: 18, weight: .regular)
             _label.textColor = UIColor.black
             _label.textAlignment = .center
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        condTitleLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 18, weight: .regular)
+            _label.textColor = UIColor.black
+            _label.textAlignment = .left
+            _label.text = lang.titleMyAvtCond
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -745,6 +818,26 @@ extension DiaryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
+        condLeftButton = {
+            let _button = UIButton(type: .system)
+            _button.setTitle(lang.btnClose, for: .normal)
+            _button.setTitleColor(UIColor.clear, for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 21, height: 21)
+            _button.showsTouchWhenHighlighted = true
+            _button.isHidden = true
+            _button.addTarget(self, action:#selector(condLeftButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        condRightButton = {
+            let _button = UIButton(type: .system)
+            _button.setTitle(lang.btnEdit, for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 21, height: 21)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(condRightButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
         
         if diaryMode == DiaryMode.editor {
             navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
@@ -757,6 +850,8 @@ extension DiaryViewController {
         logGroupTableView.delegate = self
         pickerCollectionView.dataSource = self
         pickerCollectionView.delegate = self
+        condCollectionView.dataSource = self
+        condCollectionView.delegate = self
         groupTypePickerView.dataSource = self
         groupTypePickerView.delegate = self
         
@@ -767,9 +862,11 @@ extension DiaryViewController {
         view.addSubview(toggleButton)
         view.addSubview(loadingImageView)
         view.addSubview(blindView)
+        view.addSubview(condLeftButton)
         view.addGestureRecognizer(scopeGesture)
         
         blindView.addSubview(pickerContainerView)
+        blindView.addSubview(condContainerView)
         
         pickerContainerView.addSubview(pickerDateLabel)
         pickerContainerView.addSubview(groupTypePickerView)
@@ -777,6 +874,10 @@ extension DiaryViewController {
         pickerContainerView.addSubview(pickerGrayLineView)
         pickerContainerView.addSubview(pickerCancelButton)
         pickerContainerView.addSubview(pickerCheckButton)
+        
+        condContainerView.addSubview(condTitleLabel)
+        condContainerView.addSubview(condCollectionView)
+        condContainerView.addSubview(condRightButton)
         
         // Setup constraints
         // loadingImageView, blindView
@@ -798,8 +899,19 @@ extension DiaryViewController {
         pickerContainerHeight.priority = UILayoutPriority(rawValue: 999)
         pickerContainerHeight.isActive = true
         
+        condContainerView.leadingAnchor.constraint(equalTo: blindView.leadingAnchor, constant: 7).isActive = true
+        condContainerView.trailingAnchor.constraint(equalTo: blindView.trailingAnchor, constant: -7).isActive = true
+        condContainerView.centerXAnchor.constraint(equalTo: blindView.centerXAnchor, constant: 0).isActive = true
+        condContainerView.centerYAnchor.constraint(equalTo: blindView.centerYAnchor, constant: 0).isActive = true
+        condContainerHeight = condContainerView.heightAnchor.constraint(equalToConstant: 105 + 45)
+        condContainerHeight.priority = UILayoutPriority(rawValue: 999)
+        condContainerHeight.isActive = true
+        
         pickerDateLabel.topAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: 10).isActive = true
         pickerDateLabel.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: 20).isActive = true
+        
+        condTitleLabel.topAnchor.constraint(equalTo: condContainerView.topAnchor, constant: 10).isActive = true
+        condTitleLabel.leadingAnchor.constraint(equalTo: condContainerView.leadingAnchor, constant: 20).isActive = true
         
         groupTypePickerView.topAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: 0).isActive = true
         groupTypePickerView.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: 0).isActive = true
@@ -813,6 +925,13 @@ extension DiaryViewController {
         pickerCollectionHeight.priority = UILayoutPriority(rawValue: 999)
         pickerCollectionHeight.isActive = true
         
+        condCollectionView.topAnchor.constraint(equalTo: condContainerView.topAnchor, constant: 45).isActive = true
+        condCollectionView.leadingAnchor.constraint(equalTo: condContainerView.leadingAnchor, constant: 0).isActive = true
+        condCollectionView.trailingAnchor.constraint(equalTo: condContainerView.trailingAnchor, constant: 0).isActive = true
+        condCollectionHeight = condCollectionView.heightAnchor.constraint(equalToConstant: 45)
+        condCollectionHeight.priority = UILayoutPriority(rawValue: 999)
+        condCollectionHeight.isActive = true
+        
         pickerGrayLineView.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: (view.frame.width / 13)).isActive = true
         pickerGrayLineView.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: -(view.frame.width / 13)).isActive = true
         pickerGrayLineView.bottomAnchor.constraint(equalTo: pickerContainerView.bottomAnchor, constant: -50).isActive = true
@@ -823,6 +942,12 @@ extension DiaryViewController {
         
         pickerCheckButton.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
         pickerCheckButton.bottomAnchor.constraint(equalTo: pickerContainerView.bottomAnchor, constant: -15).isActive = true
+        
+        condLeftButton.leadingAnchor.constraint(equalTo: condContainerView.leadingAnchor, constant: (view.frame.width / 10)).isActive = true
+        condLeftButton.bottomAnchor.constraint(equalTo: condContainerView.bottomAnchor, constant: -15).isActive = true
+        
+        condRightButton.trailingAnchor.constraint(equalTo: condContainerView.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
+        condRightButton.bottomAnchor.constraint(equalTo: condContainerView.bottomAnchor, constant: -15).isActive = true
         
         calendarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         calendarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
@@ -842,12 +967,6 @@ extension DiaryViewController {
         logGroupTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
         logGroupTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
         logGroupTableView.panGestureRecognizer.require(toFail: scopeGesture)
-        
-//        calendarView.clipsToBounds = true
-//        calendarView.appearance.headerDateFormat = lang.calendarHeaderDateFormat
-//        calendarView.appearance.caseOptions = FSCalendarCaseOptions.weekdayUsesUpperCase
-//        calendarView.select(Date())
-//        calendarView.scope = .week
         
         selectedWeekOfYear = Calendar.current.component(.weekOfYear, from: calendarView.today!)
         selectedCalScope = CalScope.week
@@ -892,6 +1011,7 @@ extension DiaryViewController {
             UIView.transition(with: blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.pickerDateLabel.text = self.lang.calendarSection!(logGroup.month_number, logGroup.day_number)
                 self.pickerContainerView.isHidden = false
+                self.condContainerView.isHidden = true
                 self.blindView.isHidden = false
             })
         }
@@ -937,6 +1057,35 @@ extension DiaryViewController {
         }) { (groupOfLogSet) in
             self.groupOfLogSet = groupOfLogSet
             completion(groupOfLogSet)
+        }
+    }
+    
+    private func loadAvatarCondList() {
+        let service = Service(lang: lang)
+        service.fetchAvatarCondList(popoverAlert: { (message) in
+            self.retryFunction = self.loadAvatarCondList
+            self.pickerContainerView.isHidden = true
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.loadAvatarCondList()
+        }) { (avtCondList) in
+            self.avtCondList = avtCondList
+            self.condCollectionView.reloadData()
+            self.condLeftButton.setTitleColor(UIColor.tomato, for: .normal)
+            UIView.transition(with: self.condLeftButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
+                self.condLeftButton.isHidden = false
+            })
+            UIView.transition(with: self.blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.pickerContainerView.isHidden = true
+                self.condContainerView.isHidden = false
+                self.blindView.isHidden = false
+            }, completion: { (_) in
+                UIView.animate(withDuration: 0.5) {
+                    self.condCollectionHeight.constant = CGFloat(45 * self.avtCondList!.count)
+                    self.condContainerHeight.constant = CGFloat(45 * self.avtCondList!.count + 105)
+                    self.view.layoutIfNeeded()
+                }
+            })
         }
     }
     
