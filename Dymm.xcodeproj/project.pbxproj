@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6A4B8EE222FB2290009810A5 /* BannerCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A4B8EE122FB2290009810A5 /* BannerCollectionCell.swift */; };
+		6A62B3692306A6130012C83D /* TestTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A62B3682306A6130012C83D /* TestTableViewCell.swift */; };
 		6A665F4623005C960065DC79 /* StepCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A665F4523005C960065DC79 /* StepCollectionCell.swift */; };
 		6A6AFEC023055BC200435954 /* CondCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A6AFEBF23055BC200435954 /* CondCollectionCell.swift */; };
 		6A8D896322F8874000A7F333 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D896222F8874000A7F333 /* AppDelegate.swift */; };
@@ -42,6 +43,7 @@
 		186AB4BB5141940DAA4A5647 /* Pods_Dymm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Dymm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B1A7076BF279D0EE2C9E7DA /* Pods-Dymm.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Dymm.release.xcconfig"; path = "Target Support Files/Pods-Dymm/Pods-Dymm.release.xcconfig"; sourceTree = "<group>"; };
 		6A4B8EE122FB2290009810A5 /* BannerCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerCollectionCell.swift; sourceTree = "<group>"; };
+		6A62B3682306A6130012C83D /* TestTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTableViewCell.swift; sourceTree = "<group>"; };
 		6A665F4523005C960065DC79 /* StepCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepCollectionCell.swift; sourceTree = "<group>"; };
 		6A6AFEBF23055BC200435954 /* CondCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CondCollectionCell.swift; sourceTree = "<group>"; };
 		6A8D895F22F8874000A7F333 /* Dymm.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dymm.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -150,6 +152,7 @@
 				6A8D898322F8892D00A7F333 /* LogCollectionCell.swift */,
 				6A665F4523005C960065DC79 /* StepCollectionCell.swift */,
 				6A8D897D22F8890900A7F333 /* TagCollectionCell.swift */,
+				6A62B3682306A6130012C83D /* TestTableViewCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -299,6 +302,7 @@
 				6A8D898022F8891E00A7F333 /* LogGroupTableCell.swift in Sources */,
 				6A8D89A322F8898B00A7F333 /* UserDefaults.swift in Sources */,
 				6A8D89A122F8898B00A7F333 /* String.swift in Sources */,
+				6A62B3692306A6130012C83D /* TestTableViewCell.swift in Sources */,
 				6A8D896322F8874000A7F333 /* AppDelegate.swift in Sources */,
 				6A8D89AC22F88A3B00A7F333 /* Services.swift in Sources */,
 				6A8D89A022F8898B00A7F333 /* UITextField.swift in Sources */,

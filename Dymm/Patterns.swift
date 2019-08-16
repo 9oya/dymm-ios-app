@@ -101,6 +101,11 @@ struct DiaryMode {
     static let editor = 2
 }
 
+struct ButtonType {
+    static let home = 1
+    static let close = 2
+}
+
 struct AvatarInfoTarget {
     static let firstName = "first-name"
     static let lastName = "last-name"

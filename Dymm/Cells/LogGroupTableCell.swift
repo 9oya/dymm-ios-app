@@ -8,7 +8,7 @@
 
 import UIKit
 
-private let logsTableCellId = "LogsTableCell"
+private let logTableCellId = "LogTableCell"
 private let logTableCellHeightVal = 45
 
 class LogGroupTableCell: UITableViewCell {
@@ -28,7 +28,7 @@ class LogGroupTableCell: UITableViewCell {
     var selectedLogGroupId: Int?
     var groupOfLogSet: CustomModel.GroupOfLogSet?
     var lang: LangPack!
-    
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupLayout()
@@ -62,7 +62,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: logsTableCellId, for: indexPath) as? LogTableCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: logTableCellId, for: indexPath) as? LogTableCell else {
             fatalError()
         }
         if ((groupOfLogSet!.food_logs?.count) != nil && ((groupOfLogSet!.food_logs?.count)!) > 0) {
@@ -223,11 +223,11 @@ extension LogGroupTableCell {
         }()
         groupOfLogsTableView = {
             let _tableView = UITableView(frame: CGRect.zero, style: .plain)
-            _tableView.register(LogTableCell.self, forCellReuseIdentifier: logsTableCellId)
+            _tableView.register(LogTableCell.self, forCellReuseIdentifier: logTableCellId)
             _tableView.backgroundColor = UIColor.clear
             _tableView.separatorStyle = .singleLine
             _tableView.isScrollEnabled = false
-            _tableView.isHidden = true
+//            _tableView.isHidden = true
             _tableView.translatesAutoresizingMaskIntoConstraints = false
             return _tableView
         }()

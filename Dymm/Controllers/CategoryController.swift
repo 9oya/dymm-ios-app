@@ -71,7 +71,8 @@ class CategoryViewController: UIViewController {
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
-    var superTag: BaseModel.Tag!
+    var superTag: BaseModel.Tag?
+    var superTagId: Int?
     var subTags: [BaseModel.Tag]!
     var stepTags: [BaseModel.Tag] = []
     var selectedXVal: Int?
@@ -83,6 +84,7 @@ class CategoryViewController: UIViewController {
     var selectedMinPickerRow: Int = 1
     let hours: [Int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     let mins: [Int] = [0, 10, 20, 30, 40, 50]
+    var topLeftButtonType = ButtonType.home
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -241,7 +243,7 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == tagCollectionView {
             let selected_tag = subTags[indexPath.item]
-            stepTags.append(superTag)
+            stepTags.append(superTag!)
             superTag = selected_tag
             loadCategories()
         } else if collectionView == stepCollectionView {
@@ -255,7 +257,7 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         }
     }
     
-    // MARK: - UICollectionView DelegateFlowLayout
+    // MARK: - UICollectionViewDelegateFlowLayout
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
@@ -485,7 +487,12 @@ extension CategoryViewController {
         }()
         homeButton = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage(named: "button-home")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            switch topLeftButtonType {
+            case ButtonType.home:
+                _button.setImage(UIImage(named: "button-home")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            case ButtonType.close:
+                _button.setImage(UIImage(named: "button-close")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            default: fatalError()}
             _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
@@ -731,6 +738,7 @@ extension CategoryViewController {
     }
     
     private func afterFetchCategoriesTransition(_ superTag: BaseModel.Tag, _ subTags: [BaseModel.Tag]) {
+        self.superTag = superTag
         if superTag.tag_type == TagType.category {
             // Execute category tag_type exclusive
             switch lang.currentLanguageId {
@@ -840,8 +848,11 @@ extension CategoryViewController {
             self.tagCollectionView.isHidden = true
             self.loadingImageView.isHidden = false
         })
+        if let _superTag = superTag {
+            superTagId = _superTag.id
+        }
         let service = Service(lang: lang)
-        service.fetchTagSets(tagId: superTag.id, sortType: SortType.score, popoverAlert: { (message) in
+        service.fetchTagSets(tagId: superTagId!, sortType: SortType.score, popoverAlert: { (message) in
             self.retryFunction = self.loadCategories
             self.alertError(message)
         }) { (tagSet) in
