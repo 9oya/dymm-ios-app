@@ -16,18 +16,22 @@ class LogGroupTableCell: UITableViewCell {
     var containerViewHight: NSLayoutConstraint!
     var arrowImageView: UIImageView!
     var groupTypeImageView: UIImageView!
+    var condScoreImageView: UIImageView!
     var nameLabel: UILabel!
-    var condScoreLabel: UILabel!
     var foodLogBulletView: UIView!
     var actLogBulletView: UIView!
     var drugLogBulletView: UIView!
     var groupOfLogsTableView: UITableView!
     var groupOfLogsTableHeight: NSLayoutConstraint!
+    var condScoreButton: UIButton!
+    var editButton: UIButton!
     
+    var lang: LangPack!
     var selectedLogGroup: BaseModel.LogGroup?
     var selectedLogGroupId: Int?
     var groupOfLogSet: CustomModel.GroupOfLogSet?
-    var lang: LangPack!
+    var isEditBtnTapped: Bool = false
+    var isDoneBtnTapped: Bool = false
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -125,6 +129,15 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
                 cell.quantityLabel.text = "\(x_val)¾"
             }
         }
+        if self.isEditBtnTapped {
+            cell.nameLabel.textColor = UIColor.lightGray
+            cell.quantityLabel.isHidden = true
+            cell.removeButton.isHidden = false
+        } else {
+            cell.nameLabel.textColor = UIColor.black
+            cell.quantityLabel.isHidden = false
+            cell.removeButton.isHidden = true
+        }
         return cell
     }
     
@@ -179,18 +192,39 @@ extension LogGroupTableCell {
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
+        condScoreImageView = {
+            let _imageView = UIImageView()
+            _imageView.frame = CGRect(x: 0, y: 0, width: 21, height: 21)
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.addShadowView()
+            _imageView.isHidden = true
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        condScoreButton = {
+            let _button = UIButton(frame: CGRect(x: 0, y: 0, width: 21, height: 21))
+            _button.addShadowView()
+            _button.showsTouchWhenHighlighted = true
+            _button.isHidden = true
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        editButton = {
+            let _button = UIButton()
+            _button.setTitle(lang.btnEdit, for: .normal)
+            _button.setTitleColor(UIColor.lightGray, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 15)
+//            _button.addShadowView()
+            _button.showsTouchWhenHighlighted = true
+            _button.isHidden = true
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
         nameLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 15)
             _label.textAlignment = .left
             _label.addShadowView()
-            _label.translatesAutoresizingMaskIntoConstraints = false
-            return _label
-        }()
-        condScoreLabel = {
-            let _label = UILabel()
-            _label.font = .systemFont(ofSize: 15)
-            _label.textAlignment = .left
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -227,7 +261,7 @@ extension LogGroupTableCell {
             _tableView.backgroundColor = UIColor.clear
             _tableView.separatorStyle = .singleLine
             _tableView.isScrollEnabled = false
-//            _tableView.isHidden = true
+            _tableView.isHidden = true
             _tableView.translatesAutoresizingMaskIntoConstraints = false
             return _tableView
         }()
@@ -239,11 +273,13 @@ extension LogGroupTableCell {
         containerView.addSubview(arrowImageView)
         containerView.addSubview(groupTypeImageView)
         containerView.addSubview(nameLabel)
-        containerView.addSubview(condScoreLabel)
+        containerView.addSubview(condScoreImageView)
         containerView.addSubview(foodLogBulletView)
         containerView.addSubview(actLogBulletView)
         containerView.addSubview(drugLogBulletView)
         containerView.addSubview(groupOfLogsTableView)
+        containerView.addSubview(condScoreButton)
+        containerView.addSubview(editButton)
         
         containerView.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
         containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
@@ -260,6 +296,12 @@ extension LogGroupTableCell {
         
         nameLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 15).isActive = true
         nameLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor, constant: 0).isActive = true
+        
+        condScoreImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12).isActive = true
+        condScoreImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -((frame.width / 4) + 10)).isActive = true
+        
+        editButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 10).isActive = true
+        editButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20).isActive = true
         
         foodLogBulletView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 20).isActive = true
         foodLogBulletView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20).isActive = true
@@ -282,5 +324,28 @@ extension LogGroupTableCell {
         groupOfLogsTableHeight = groupOfLogsTableView.heightAnchor.constraint(equalToConstant: 40)
         groupOfLogsTableHeight.priority = UILayoutPriority(rawValue: 999)
         groupOfLogsTableHeight.isActive = true
+        
+        condScoreButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor, constant: 0).isActive = true
+        condScoreButton.topAnchor.constraint(equalTo: groupOfLogsTableView.bottomAnchor, constant: 15).isActive = true
+    }
+    
+    func editButtonTapped() {
+        editButton.setTitle(lang.btnDone, for: .normal)
+        editButton.setTitleColor(UIColor.tomato, for: .normal)
+        isEditBtnTapped = true
+        isDoneBtnTapped = false
+        groupOfLogsTableView.reloadData()
+        groupOfLogsTableView.beginUpdates()
+        groupOfLogsTableView.endUpdates()
+    }
+    
+    func doneButtonTapped() {
+        editButton.setTitle(lang.btnEdit, for: .normal)
+        editButton.setTitleColor(UIColor.lightGray, for: .normal)
+        isEditBtnTapped = false
+        isDoneBtnTapped = true
+        groupOfLogsTableView.reloadData()
+        groupOfLogsTableView.beginUpdates()
+        groupOfLogsTableView.endUpdates()
     }
 }

@@ -19,6 +19,7 @@ class LangPack {
     var titleLogGroup: [String]!
     var titleWeekday: [String]!
     var titleMyAvtCond: String!
+    var titleCondScore: String!
     
     var txtFieldFirstName: String!
     var txtFieldLastName: String!
@@ -36,6 +37,7 @@ class LangPack {
     var labelUserPhoneNum: String!
     var labelAvatarIntroduction: String!
     var labelToday: String!
+    var labelCondScores: [String]!
     
     var btnSignOut: String!
     var btnForgotPassword: String!
@@ -101,6 +103,20 @@ class LangPack {
         return titleLogGroup[idx]
     }
     
+    func getCondScoreName(_ key: Int) -> String {
+        var idx = 0
+        if key < 4 {
+            idx = 0
+        } else if key < 7 {
+            idx = 1
+        } else if key < 9 {
+            idx = 2
+        } else {
+            idx = 3
+        }
+        return labelCondScores[idx]
+    }
+    
     func getWeekdayName(_ key: Int) -> String {
         let idx = key - 1
         return titleWeekday[idx]
@@ -157,6 +173,12 @@ func getLanguagePack(_ currentLanguageId: Int) -> LangPack {
         switch currentLanguageId {
         case LanguageId.eng: return "My Condtion History"
         case LanguageId.kor: return "나의 컨디션 히스토리"
+        default: fatalError(lang.currentLangErrorMsg)}
+    }()
+    lang.titleCondScore = {
+        switch currentLanguageId {
+        case LanguageId.eng: return "Condition score"
+        case LanguageId.kor: return "컨디션 점수"
         default: fatalError(lang.currentLangErrorMsg)}
     }()
     
@@ -253,6 +275,12 @@ func getLanguagePack(_ currentLanguageId: Int) -> LangPack {
         switch currentLanguageId {
         case LanguageId.eng: return "Today"
         case LanguageId.kor: return "오늘"
+        default: fatalError(lang.currentLangErrorMsg)}
+    }()
+    lang.labelCondScores = {
+        switch currentLanguageId {
+        case LanguageId.eng: return ["Bad", "Soso", "Good", "Awesome!"]
+        case LanguageId.kor: return ["나쁨", "보통", "좋음", "최고!"]
         default: fatalError(lang.currentLangErrorMsg)}
     }()
     
@@ -443,8 +471,8 @@ func getLanguagePack(_ currentLanguageId: Int) -> LangPack {
     }()
     func _intakeLogComplete(intake: String) -> String {
         switch currentLanguageId {
-        case LanguageId.eng: return "The \(intake) has been successfully recored!\nWant to back Home?"
-        case LanguageId.kor: return "\(intake)의 기록이 성공적으로 완료되었습니다!\n홈으로 이동하시겠습니까?"
+        case LanguageId.eng: return "The \(intake) has been successfully recored!\n\nWant to back Home?"
+        case LanguageId.kor: return "\(intake) 성공적으로 기록되었습니다!\n\n홈으로 이동하시겠습니까?"
         default: fatalError(lang.currentLangErrorMsg)}
     }
     lang.msgIntakeLogComplete = _intakeLogComplete

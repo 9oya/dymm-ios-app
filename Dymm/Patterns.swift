@@ -124,6 +124,18 @@ func getLogGroupTypeImage(_ groupType: Int) -> UIImage? {
     }
 }
 
+func getCondScoreImage(_ condScore: Int) -> UIImage? {
+    if condScore < 4 {
+        return UIImage(named: "item-score-bad")
+    } else if condScore < 7 {
+        return UIImage(named: "item-score-soso")
+    } else if condScore < 9 {
+        return UIImage(named: "item-score-good")
+    } else {
+        return UIImage(named: "item-score-awesome")
+    }
+}
+
 func getLanguageId(alpha2: String) -> Int {
     switch alpha2 {
     case "en": return LanguageId.eng

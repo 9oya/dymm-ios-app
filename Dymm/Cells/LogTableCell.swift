@@ -12,6 +12,7 @@ class LogTableCell: UITableViewCell {
     var bulletView: UIView!
     var nameLabel: UILabel!
     var quantityLabel: UILabel!
+    var removeButton: UIButton!
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -52,10 +53,21 @@ extension LogTableCell {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
+        removeButton = {
+            let _button = UIButton(type: .system)
+//            _button.titleLabel?.font = .systemFont(ofSize: 15)
+            _button.setImage(UIImage(named: "btn-remove"), for: .normal)
+            _button.showsTouchWhenHighlighted = true
+            _button.isHidden = true
+            _button.adjustsImageSizeForAccessibilityContentSizeCategory = true
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
         
         addSubview(bulletView)
         addSubview(nameLabel)
         addSubview(quantityLabel)
+        addSubview(removeButton)
         
         bulletView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
         bulletView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15).isActive = true
@@ -67,6 +79,9 @@ extension LogTableCell {
         
         quantityLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
         quantityLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15).isActive = true
+        
+        removeButton.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
+        removeButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15).isActive = true
     }
 }
 

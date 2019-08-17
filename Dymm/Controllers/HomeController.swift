@@ -56,6 +56,18 @@ class HomeViewController: UIViewController {
     
     // MARK: - Actions
     
+    @objc func alertError(_ message: String) {
+        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
+            self.retryFunction!()
+        }
+        let cancelAction = UIAlertAction(title: lang.btnClose, style: .cancel) { _ in }
+        alertController.addAction(confirmAction)
+        alertController.addAction(cancelAction)
+        alertController.view.tintColor = UIColor.cornflowerBlue
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
     @objc func profileButtonTapped() {
         if UserDefaults.standard.isSignIn() {
             presentProfileNavigation()
@@ -286,18 +298,6 @@ extension HomeViewController {
         categoryCollectionViewHeight = categoryCollectionView.heightAnchor.constraint(equalToConstant: 45 + 7)
         categoryCollectionViewHeight.priority = UILayoutPriority(rawValue: 999)
         categoryCollectionViewHeight.isActive = true
-    }
-    
-    private func alertError(_ message: String) {
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
-            self.retryFunction!()
-        }
-        let cancelAction = UIAlertAction(title: lang.btnNo, style: .cancel) { _ in }
-        alertController.addAction(confirmAction)
-        alertController.addAction(cancelAction)
-        alertController.view.tintColor = UIColor.tomato
-        self.present(alertController, animated: true, completion: nil)
     }
     
     private func presentDiaryNavigation() {
