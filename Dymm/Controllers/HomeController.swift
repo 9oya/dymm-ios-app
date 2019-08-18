@@ -29,6 +29,7 @@ class HomeViewController: UIViewController {
     var banners: [BaseModel.Banner]?
     var tags: [BaseModel.Tag]?
     var avatar: BaseModel.Avatar?
+    var selectedTag: BaseModel.Tag?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,6 +67,31 @@ class HomeViewController: UIViewController {
         alertController.addAction(cancelAction)
         alertController.view.tintColor = UIColor.cornflowerBlue
         self.present(alertController, animated: true, completion: nil)
+    }
+    
+    @objc func presentDiaryNavigation() {
+        let vc = DiaryViewController()
+        let nc = UINavigationController(rootViewController: vc)
+        self.present(nc, animated: true, completion: nil)
+    }
+    
+    @objc func presentCategoryNavigation() {
+        let vc = CategoryViewController()
+        vc.superTag = self.selectedTag!
+        let nc = UINavigationController(rootViewController: vc)
+        self.present(nc, animated: true, completion: nil)
+    }
+    
+    @objc func presentAuthNavigation() {
+        let vc = AuthViewController()
+        let nc = UINavigationController(rootViewController: vc)
+        self.present(nc, animated: true, completion: nil)
+    }
+    
+    @objc func presentProfileNavigation() {
+        let vc = ProfileViewController()
+        let nc = UINavigationController(rootViewController: vc)
+        self.present(nc, animated: true, completion: nil)
     }
     
     @objc func profileButtonTapped() {
@@ -165,7 +191,8 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
                     presentAuthNavigation()
                 }
             }
-            presentCategoryNavigation(tag: tag)
+            self.selectedTag = tag
+            presentCategoryNavigation()
         }
     }
     
@@ -299,32 +326,7 @@ extension HomeViewController {
         categoryCollectionViewHeight.priority = UILayoutPriority(rawValue: 999)
         categoryCollectionViewHeight.isActive = true
     }
-    
-    private func presentDiaryNavigation() {
-        let vc = DiaryViewController()
-        let nc = UINavigationController(rootViewController: vc)
-        self.present(nc, animated: true, completion: nil)
-    }
-    
-    private func presentCategoryNavigation(tag: BaseModel.Tag) {
-        let vc = CategoryViewController()
-        vc.superTag = tag
-        let nc = UINavigationController(rootViewController: vc)
-        self.present(nc, animated: true, completion: nil)
-    }
-    
-    private func presentAuthNavigation() {
-        let vc = AuthViewController()
-        let nc = UINavigationController(rootViewController: vc)
-        self.present(nc, animated: true, completion: nil)
-    }
-    
-    private func presentProfileNavigation() {
-        let vc = ProfileViewController()
-        let nc = UINavigationController(rootViewController: vc)
-        self.present(nc, animated: true, completion: nil)
-    }
-    
+
     private func startTimer() {
         let _ = Timer.scheduledTimer(timeInterval: 6.0, target: self, selector: #selector(handleNextBanner), userInfo: nil, repeats: true);
     }
@@ -348,7 +350,6 @@ extension HomeViewController {
     private func loadBanners() {
         let service = Service(lang: lang)
         service.fetchBanners(popoverAlert: { (message) in
-//            self.retryFunction = self.loadBanners
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }) { (banners) in
@@ -364,8 +365,7 @@ extension HomeViewController {
     private func loadCategories() {
         let service = Service(lang: lang)
         let homeTagId = 16
-        service.fetchTagSets(tagId: homeTagId, sortType: SortType.score, popoverAlert: { (message) in
-//            self.retryFunction = self.loadCategories
+        service.fetchTagSets(tagId: homeTagId, sortType: SortType.priority, popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }) { (tagSet) in
@@ -377,7 +377,6 @@ extension HomeViewController {
     private func loadAvatar() {
         let service = Service(lang: lang)
         service.fetchAvatar(popoverAlert: { (message) in
-//            self.retryFunction = self.loadAvatar
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }, tokenRefreshCompletion: {

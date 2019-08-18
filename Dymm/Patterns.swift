@@ -61,7 +61,7 @@ struct LanguageId {
 }
 
 struct SortType {
-    static let score = "score"
+    static let priority = "priority"
     static let eng = "eng"
     static let kor = "kor"
     static let jpn = "jpn"

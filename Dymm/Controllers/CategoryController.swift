@@ -852,7 +852,7 @@ extension CategoryViewController {
             superTagId = _superTag.id
         }
         let service = Service(lang: lang)
-        service.fetchTagSets(tagId: superTagId!, sortType: SortType.score, popoverAlert: { (message) in
+        service.fetchTagSets(tagId: superTagId!, sortType: SortType.priority, popoverAlert: { (message) in
             self.retryFunction = self.loadCategories
             self.alertError(message)
         }) { (tagSet) in

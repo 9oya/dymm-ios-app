@@ -28,7 +28,7 @@ class LogGroupTableCell: UITableViewCell {
     
     var lang: LangPack!
     var selectedLogGroup: BaseModel.LogGroup?
-    var groupOfLogSet: CustomModel.GroupOfLogSet?
+    var groupOfLogSetForCnt: CustomModel.GroupOfLogSet?
     var groupOfLogSetForPop: CustomModel.GroupOfLogSet?
     var logsArray: [BaseModel.TagLog] = []
 
@@ -52,13 +52,13 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var total = 0
-        if let foodLogs = groupOfLogSet?.food_logs {
+        if let foodLogs = groupOfLogSetForCnt?.food_logs {
             total += (foodLogs.count)
         }
-        if let actLogs = groupOfLogSet?.act_logs {
+        if let actLogs = groupOfLogSetForCnt?.act_logs {
             total += (actLogs.count)
         }
-        if let drugLogs = groupOfLogSet?.drug_logs {
+        if let drugLogs = groupOfLogSetForCnt?.drug_logs {
             total += (drugLogs.count)
         }
         return total
@@ -134,6 +134,37 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let selectedLogId = logsArray[indexPath.row].id
+            let _ = {
+                let service = Service(lang: lang)
+                service.updateGroupOfALog(selectedLogId, popoverAlert: { (message) in
+                    print(message)
+                }, tokenRefreshCompletion: {
+                    print("")
+                }) {
+                    let _ = {
+                        let service = Service(lang: self.lang)
+                        service.getGroupOfLogs(self.selectedLogGroup!.id, popoverAlert: { (message) in
+                            print(message)
+                        }, tokenRefreshCompletion: {
+                            print("")
+                        }) { (groupOfLogSet) in
+                            self.groupOfLogSetForCnt = groupOfLogSet
+                            self.groupOfLogSetForPop = groupOfLogSet
+                            tableView.deleteRows(at: [indexPath], with: .fade)
+                        }
+                    }()
+                }
+            }()
+        }
+    }
+    
     // MARK: UITableView Delegate
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -154,50 +185,6 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         return nil
-    }
-    
-    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            let selectedLogId = logsArray[indexPath.row].id
-            let _ = {
-                let service = Service(lang: lang)
-                service.updateGroupOfALog(selectedLogId, popoverAlert: { (message) in
-                    print(message)
-                }, tokenRefreshCompletion: {
-                    print("")
-                }) {
-                    let _ = {
-                        let service = Service(lang: self.lang)
-                        service.fetchGroupOfLogs(self.selectedLogGroup!.id, popoverAlert: { (message) in
-                            print(message)
-                        }, tokenRefreshCompletion: {
-                            print("")
-                        }) { (groupOfLogSet) in
-                            self.groupOfLogSet = groupOfLogSet
-                            self.groupOfLogSetForPop = groupOfLogSet
-                            tableView.deleteRows(at: [indexPath], with: .fade)
-                        }
-                    }()
-                }
-            }()
-            
-//            let _ = {
-//                let service = Service(lang: lang)
-//                service.fetchGroupOfLogs(self.selectedLogGroup!.id, popoverAlert: { (message) in
-//                    print(message)
-//                }, tokenRefreshCompletion: {
-//                    print("")
-//                }) { (groupOfLogSet) in
-//                    self.groupOfLogSet = groupOfLogSet
-//                    self.groupOfLogSetForPop = groupOfLogSet
-//                    tableView.deleteRows(at: [indexPath], with: .fade)
-//                }
-//            }()
-        }
     }
 }
 

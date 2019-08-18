@@ -428,7 +428,7 @@ struct Service {
         }
     }
     
-    func updateAvatarInfo(target: String, newInfoStr: String, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ firstName: String) -> Void) {
+    func putAvatarInfo(target: String, newInfoStr: String, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ firstName: String) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -469,7 +469,7 @@ struct Service {
         }
     }
     
-    func fetchLogGroups(yearNumber: String, monthNumber: Int, weekOfYear: Int?, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping ([BaseModel.LogGroup]) -> Void) {
+    func getLogGroups(yearNumber: String, monthNumber: Int, weekOfYear: Int?, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping ([BaseModel.LogGroup]) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -515,7 +515,7 @@ struct Service {
         }
     }
     
-    func fetchGroupOfLogs(_ logGroupId: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.GroupOfLogSet) -> Void) {
+    func getGroupOfLogs(_ logGroupId: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.GroupOfLogSet) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -553,7 +553,7 @@ struct Service {
         }
     }
     
-    func updateLogGroupCondScore(_ logGroupId: Int, params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+    func putLogGroupCondScore(_ logGroupId: Int, params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -562,6 +562,42 @@ struct Service {
             "Authorization": "Bearer \(accessToken)",
         ]
         Alamofire.request("\(URI.host)\(URI.log)/group/\(logGroupId)/cond-score", method: .put, parameters: params, encoding: JSONEncoding.default, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<String>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    print(decodedData.message)
+                    completion()
+                case 400:
+                    self.badRequest(responseData)
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.upexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    return
+                }
+        }
+    }
+    
+    func putLogGroupRemove(_ logGroupId: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)",
+        ]
+        Alamofire.request("\(URI.host)\(URI.log)/group/\(logGroupId)/remove", method: .put, encoding: JSONEncoding.default, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {

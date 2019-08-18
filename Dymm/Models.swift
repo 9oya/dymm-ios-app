@@ -206,9 +206,9 @@ struct BaseModel {
         let week_of_year: Int
         let day_of_year: Int
         let group_type: Int
-        let has_act: Bool
-        let has_drug: Bool
-        let has_food: Bool
+        let food_cnt: Int
+        let act_cnt: Int
+        let drug_cnt: Int
         let has_cond_score: Bool
         let cond_score: Int?
         let day_number: Int
@@ -220,9 +220,9 @@ struct BaseModel {
             case week_of_year
             case day_of_year
             case group_type
-            case has_food
-            case has_drug
-            case has_act
+            case food_cnt
+            case act_cnt
+            case drug_cnt
             case has_cond_score
             case cond_score
             case day_number
@@ -236,9 +236,9 @@ struct BaseModel {
             self.week_of_year = try valueContainer.decode(Int.self, forKey: CodingKeys.week_of_year)
             self.day_of_year = try valueContainer.decode(Int.self, forKey: CodingKeys.day_of_year)
             self.group_type = try valueContainer.decode(Int.self, forKey: CodingKeys.group_type)
-            self.has_act = try valueContainer.decode(Bool.self, forKey: CodingKeys.has_act)
-            self.has_drug = try valueContainer.decode(Bool.self, forKey: CodingKeys.has_drug)
-            self.has_food = try valueContainer.decode(Bool.self, forKey: CodingKeys.has_food)
+            self.food_cnt = try valueContainer.decode(Int.self, forKey: CodingKeys.food_cnt)
+            self.act_cnt = try valueContainer.decode(Int.self, forKey: CodingKeys.act_cnt)
+            self.drug_cnt = try valueContainer.decode(Int.self, forKey: CodingKeys.drug_cnt)
             self.has_cond_score = try valueContainer.decode(Bool.self, forKey: CodingKeys.has_cond_score)
             self.cond_score = try? valueContainer.decode(Int.self, forKey: CodingKeys.cond_score)
             self.day_number = try valueContainer.decode(Int.self, forKey: CodingKeys.day_number)

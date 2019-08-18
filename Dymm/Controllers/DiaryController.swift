@@ -108,6 +108,9 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var selectedCondPickerIdx: Int = 3
     var selectedCondScore: Int = 7
     var isToggleBtnTapped: Bool = false
+    var isPullToRefresh: Bool = false
+    var isLogGroupTableEdited: Bool = false
+    var editedCellIdxPath: IndexPath?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -185,8 +188,13 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         selectedOnceCellIdxPath = nil
         selectedTableSection = nil
         selectedTableRow = nil
-        updateLogGroupTable()
-        refreshControler.endRefreshing()
+        if diaryMode == DiaryMode.logger {
+            refreshControler.endRefreshing()
+        } else {
+            isPullToRefresh = true
+            loadLogGroups()
+            refreshControler.endRefreshing()
+        }
     }
     
     @objc func pickerCancelButtonTapped() {
@@ -351,7 +359,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             let _monthNumber = Int(strTodayDateArr[1])
             let _dayNumber = Int(strTodayDateArr[2])
             if _monthNumber == logGroup.month_number && _dayNumber == logGroup.day_number {
-                // When section is today
+                // When current day is today add a ✨ emoji on section label
                 weekday = "\u{2728}\(lang.getWeekdayName(Calendar.current.component(.weekday, from: date!)))"
             }
             
@@ -377,13 +385,13 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             cell.nameLabel.text = intakeGroupTitle
             cell.groupTypeImageView.image = getLogGroupTypeImage(logGroup.group_type)
             cell.nameLabel.textColor = UIColor.black
-            if logGroup.has_food {
+            if logGroup.food_cnt > 0 {
                 cell.foodLogBulletView.isHidden = false
             }
-            if logGroup.has_act {
+            if logGroup.act_cnt > 0 {
                 cell.actLogBulletView.isHidden = false
             }
-            if logGroup.has_drug {
+            if logGroup.drug_cnt > 0 {
                 cell.drugLogBulletView.isHidden = false
             }
             if let condScore = logGroup.cond_score {
@@ -409,22 +417,25 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row - 1].logGroup
                 let intakeGroupTitle = lang.getLogGroupTypeName(logGroup.group_type)
                 cell.nameLabel.text = intakeGroupTitle
-                cell.groupTypeImageView.image = getLogGroupTypeImage(logGroup.group_type)
+                cell.groupTypeImageView.image = nil
                 cell.nameLabel.textColor = UIColor.cornflowerBlue
-                if logGroup.has_food {
-                    cell.foodLogBulletView.isHidden = false
-                }
-                if logGroup.has_act {
-                    cell.actLogBulletView.isHidden = false
-                }
-                if logGroup.has_drug {
-                    cell.drugLogBulletView.isHidden = false
-                }
                 return cell
             }
         } else {
             fatalError()
         }
+    }
+    
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        selectedOnceCellIdxPath = nil
+        selectedTableSection = nil
+        selectedTableRow = nil
+        editedCellIdxPath = indexPath
+        updateLogGroupRemove()
     }
     
     // MARK: - UITableViewDelegate
@@ -441,7 +452,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     fatalError()
                 }
                 cell.selectedLogGroup = self.selectedLogGroup!
-                cell.groupOfLogSet = self.groupOfLogSet!
+                cell.groupOfLogSetForCnt = self.groupOfLogSet!
                 cell.groupOfLogSetForPop = self.groupOfLogSet!
                 cell.groupOfLogsTableView.reloadData()
                 if indexPath == self.selectedOnceCellIdxPath {
@@ -460,17 +471,18 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                         self.view.layoutIfNeeded()
                     }, completion: { _ in
                         UIView.transition(with: cell.foodLogBulletView, duration: 0.1, options: .transitionCrossDissolve, animations: {
-                            if self.selectedLogGroup!.has_food {
+                            if self.selectedLogGroup!.food_cnt > 0 {
                                 cell.foodLogBulletView.isHidden = false
                             }
-                            if self.selectedLogGroup!.has_act {
+                            if self.selectedLogGroup!.act_cnt > 0 {
                                 cell.actLogBulletView.isHidden = false
                             }
-                            if self.selectedLogGroup!.has_drug {
+                            if self.selectedLogGroup!.drug_cnt > 0 {
                                 cell.drugLogBulletView.isHidden = false
                             }
                         })
                     })
+                    self.updateLogGroupTable()
                 } else {
                     // Case select cell tapped at first time
                     self.selectedOnceCellIdxPath = indexPath
@@ -491,10 +503,10 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                             cell.drugLogBulletView.isHidden = true
                         })
                     })
+                    self.updateLogGroupTable(completion: {
+                        tableView.scrollToRow(at: indexPath, at: .middle, animated: true)
+                    })
                 }
-                self.updateLogGroupTable(completion: {
-                    tableView.scrollToRow(at: indexPath, at: .middle, animated: true)
-                })
             }
         } else if diaryMode == DiaryMode.logger {
             if indexPath.row <= 0 {
@@ -557,21 +569,23 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.groupOfLogsTableView.isHidden = true
                 cell.condScoreImageView.isHidden = false
                 cell.condScoreButton.isHidden = true
-                let logGroup = self.logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
-                if logGroup.has_food {
-                    cell.foodLogBulletView.isHidden = false
-                } else {
-                    cell.foodLogBulletView.isHidden = true
-                }
-                if logGroup.has_act {
-                    cell.actLogBulletView.isHidden = false
-                } else {
-                    cell.actLogBulletView.isHidden = true
-                }
-                if logGroup.has_drug {
-                    cell.drugLogBulletView.isHidden = false
-                } else {
-                    cell.drugLogBulletView.isHidden = true
+                if diaryMode == DiaryMode.editor {
+                    let logGroup = self.logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
+                    if logGroup.food_cnt > 0 {
+                        cell.foodLogBulletView.isHidden = false
+                    } else {
+                        cell.foodLogBulletView.isHidden = true
+                    }
+                    if logGroup.act_cnt > 0 {
+                        cell.actLogBulletView.isHidden = false
+                    } else {
+                        cell.actLogBulletView.isHidden = true
+                    }
+                    if logGroup.drug_cnt > 0 {
+                        cell.drugLogBulletView.isHidden = false
+                    } else {
+                        cell.drugLogBulletView.isHidden = true
+                    }
                 }
             }
             return CGFloat(logGroupCellHeightVal)
@@ -589,7 +603,8 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
         }
         if indexPath == selectedOnceCellIdxPath {
             cell.selectedLogGroup = selectedLogGroup!
-            cell.groupOfLogSet = groupOfLogSet!
+            cell.groupOfLogSetForCnt = groupOfLogSet!
+            cell.groupOfLogSetForPop = groupOfLogSet!
             cell.groupOfLogsTableView.reloadData()
             let total = getGroupOfLogsTotalCnt(groupOfLogSet!)
             cell.groupOfLogsTableHeight.constant = CGFloat((total * logTableCellHeightVal))
@@ -608,30 +623,24 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             cell.condScoreImageView.isHidden = false
             cell.condScoreButton.isHidden = true
             let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
-            if logGroup.has_food {
-                cell.foodLogBulletView.isHidden = false
-            } else {
-                cell.foodLogBulletView.isHidden = true
-            }
-            if logGroup.has_act {
-                cell.actLogBulletView.isHidden = false
-            } else {
-                cell.actLogBulletView.isHidden = true
-            }
-            if logGroup.has_drug {
-                cell.drugLogBulletView.isHidden = false
-            } else {
-                cell.drugLogBulletView.isHidden = true
+            if diaryMode == DiaryMode.editor {
+                if logGroup.food_cnt > 0 {
+                    cell.foodLogBulletView.isHidden = false
+                } else {
+                    cell.foodLogBulletView.isHidden = true
+                }
+                if logGroup.act_cnt > 0 {
+                    cell.actLogBulletView.isHidden = false
+                } else {
+                    cell.actLogBulletView.isHidden = true
+                }
+                if logGroup.drug_cnt > 0 {
+                    cell.drugLogBulletView.isHidden = false
+                } else {
+                    cell.drugLogBulletView.isHidden = true
+                }
             }
         }
-    }
-    
-    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        print("")
     }
     
 //    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
@@ -717,7 +726,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             }
         } else if ((groupOfLogSet!.act_logs?.count) != nil && ((groupOfLogSet!.act_logs?.count)!) > 0) {
             let actLog = groupOfLogSet!.act_logs!.popLast()
-            cell.bulletView.backgroundColor = UIColor.yellowGreen
+            cell.bulletView.backgroundColor = UIColor.cornflowerBlue
             switch lang.currentLanguageId {
             case LanguageId.eng: cell.nameLabel.text = actLog!.eng_name
             case LanguageId.kor: cell.nameLabel.text = actLog!.kor_name
@@ -734,7 +743,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             cell.quantityLabel.text = "\(hr)\(min)"
         } else if ((groupOfLogSet!.drug_logs?.count) != nil && ((groupOfLogSet!.drug_logs?.count)!) > 0) {
             let drugLog = groupOfLogSet!.drug_logs!.popLast()
-            cell.bulletView.backgroundColor = UIColor.dodgerBlue
+            cell.bulletView.backgroundColor = UIColor.hex_72e5Ea
             switch lang.currentLanguageId {
             case LanguageId.eng: cell.nameLabel.text = drugLog!.eng_name
             case LanguageId.kor: cell.nameLabel.text = drugLog!.kor_name
@@ -1248,7 +1257,7 @@ extension DiaryViewController {
         let yearNumber = selectedDateArr[0]
         let monthNumber = Int(selectedDateArr[1])!
         let service = Service(lang: lang)
-        service.fetchLogGroups(yearNumber: yearNumber, monthNumber: monthNumber, weekOfYear: selectedWeekOfYear, popoverAlert: { message in
+        service.getLogGroups(yearNumber: yearNumber, monthNumber: monthNumber, weekOfYear: selectedWeekOfYear, popoverAlert: { message in
             self.retryFunction = self.loadLogGroups
             self.alertError(message)
         }, tokenRefreshCompletion: {
@@ -1272,12 +1281,24 @@ extension DiaryViewController {
                     self.logGroupTableView.scrollToRow(at: indexPath, at: .top, animated: true)
                 })
             }
+            
+            if self.isPullToRefresh && logGroups.count > 0 {
+                self.isPullToRefresh = false
+                self.updateLogGroupTable()
+            }
+            
+            if self.isLogGroupTableEdited {
+                self.isLogGroupTableEdited = false
+                self.updateLogGroupTable(completion: {
+                    self.editedCellIdxPath = nil
+                })
+            }
         }
     }
     
     private func loadGroupOfLogs(_ completion: @escaping (CustomModel.GroupOfLogSet) -> Void) {
         let service = Service(lang: lang)
-        service.fetchGroupOfLogs(self.selectedLogGroupId!, popoverAlert: { (message) in
+        service.getGroupOfLogs(self.selectedLogGroupId!, popoverAlert: { (message) in
             self.retryFunctionName = "loadGroupOfLogs"
             self.retryCompletion = completion
             self.pickerContainerView.isHidden = true
@@ -1363,7 +1384,7 @@ extension DiaryViewController {
             "cond_score": selectedCondScore,
         ]
         let service = Service(lang: lang)
-        service.updateLogGroupCondScore(selectedLogGroupId!, params: params, popoverAlert: { (message) in
+        service.putLogGroupCondScore(selectedLogGroupId!, params: params, popoverAlert: { (message) in
             self.retryFunction = self.updateLogGroupCondScore
             self.alertError(message)
         }, tokenRefreshCompletion: {
@@ -1373,15 +1394,22 @@ extension DiaryViewController {
         }
     }
     
-//    private func updateGroupOfLog() {
-//        let service = Service(lang: lang)
-//        service.updateGroupOfALog(selectedLogId, popoverAlert: { (message) in
-//            self.retryFunction = self.updateGroupOfALog
-//            self.alertError(message)
-//        }, tokenRefreshCompletion: {
-//            self.updateGroupOfLog()
-//        }) {
-//            <#code#>
-//        }
-//    }
+    private func updateLogGroupRemove() {
+        var _logGroupId = 0
+        if diaryMode == DiaryMode.logger {
+            _logGroupId = self.logGroupSectTwoDimArr[editedCellIdxPath!.section][editedCellIdxPath!.row - 1].logGroup.id
+        } else {
+            _logGroupId = self.logGroupSectTwoDimArr[editedCellIdxPath!.section][editedCellIdxPath!.row].logGroup.id
+        }
+        let service = Service(lang: lang)
+        service.putLogGroupRemove(_logGroupId, popoverAlert: { (message) in
+            self.retryFunction = self.updateLogGroupRemove
+            self.alertError(message)
+        }, tokenRefreshCompletion: { 
+            self.updateLogGroupRemove()
+        }) {
+            self.isLogGroupTableEdited = true
+            self.loadLogGroups()
+        }
+    }
 }

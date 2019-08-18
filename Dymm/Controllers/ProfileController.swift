@@ -822,7 +822,7 @@ extension ProfileViewController {
             self.loadingImageView.isHidden = false
         })
         let service = Service(lang: lang)
-        service.updateAvatarInfo(target: self.updateTarget!, newInfoStr: self.newInfoStr!, popoverAlert: { (message) in
+        service.putAvatarInfo(target: self.updateTarget!, newInfoStr: self.newInfoStr!, popoverAlert: { (message) in
             self.retryFunction = self.updateAvatarInfo
             self.alertError(message)
         }, tokenRefreshCompletion: {
