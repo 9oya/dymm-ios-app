@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Alamofire
 
 private let logTableCellId = "LogTableCell"
 private let logTableCellHeightVal = 45
@@ -24,14 +25,12 @@ class LogGroupTableCell: UITableViewCell {
     var groupOfLogsTableView: UITableView!
     var groupOfLogsTableHeight: NSLayoutConstraint!
     var condScoreButton: UIButton!
-    var editButton: UIButton!
     
     var lang: LangPack!
     var selectedLogGroup: BaseModel.LogGroup?
-    var selectedLogGroupId: Int?
     var groupOfLogSet: CustomModel.GroupOfLogSet?
-    var isEditBtnTapped: Bool = false
-    var isDoneBtnTapped: Bool = false
+    var groupOfLogSetForPop: CustomModel.GroupOfLogSet?
+    var logsArray: [BaseModel.TagLog] = []
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -69,8 +68,8 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: logTableCellId, for: indexPath) as? LogTableCell else {
             fatalError()
         }
-        if ((groupOfLogSet!.food_logs?.count) != nil && ((groupOfLogSet!.food_logs?.count)!) > 0) {
-            let foodLog = groupOfLogSet!.food_logs!.popLast()
+        if ((groupOfLogSetForPop!.food_logs?.count) != nil && ((groupOfLogSetForPop!.food_logs?.count)!) > 0) {
+            let foodLog = groupOfLogSetForPop!.food_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.tomato
             switch lang.currentLanguageId {
             case LanguageId.eng: cell.nameLabel.text = foodLog!.eng_name
@@ -90,8 +89,9 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
             } else if foodLog!.y_val == 3 {
                 cell.quantityLabel.text = "\(x_val)¾"
             }
-        } else if ((groupOfLogSet!.act_logs?.count) != nil && ((groupOfLogSet!.act_logs?.count)!) > 0) {
-            let actLog = groupOfLogSet!.act_logs!.popLast()
+            logsArray.append(foodLog!)
+        } else if ((groupOfLogSetForPop!.act_logs?.count) != nil && ((groupOfLogSetForPop!.act_logs?.count)!) > 0) {
+            let actLog = groupOfLogSetForPop!.act_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.cornflowerBlue
             switch lang.currentLanguageId {
             case LanguageId.eng: cell.nameLabel.text = actLog!.eng_name
@@ -107,8 +107,9 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
                 min = " \(actLog!.y_val!)min"
             }
             cell.quantityLabel.text = "\(hr)\(min)"
-        } else if ((groupOfLogSet!.drug_logs?.count) != nil && ((groupOfLogSet!.drug_logs?.count)!) > 0) {
-            let drugLog = groupOfLogSet!.drug_logs!.popLast()
+            logsArray.append(actLog!)
+        } else if ((groupOfLogSetForPop!.drug_logs?.count) != nil && ((groupOfLogSetForPop!.drug_logs?.count)!) > 0) {
+            let drugLog = groupOfLogSetForPop!.drug_logs!.popLast()
             cell.bulletView.backgroundColor = UIColor.hex_72e5Ea
             switch lang.currentLanguageId {
             case LanguageId.eng: cell.nameLabel.text = drugLog!.eng_name
@@ -128,15 +129,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
             } else if drugLog!.y_val == 3 {
                 cell.quantityLabel.text = "\(x_val)¾"
             }
-        }
-        if self.isEditBtnTapped {
-            cell.nameLabel.textColor = UIColor.lightGray
-            cell.quantityLabel.isHidden = true
-            cell.removeButton.isHidden = false
-        } else {
-            cell.nameLabel.textColor = UIColor.black
-            cell.quantityLabel.isHidden = false
-            cell.removeButton.isHidden = true
+            logsArray.append(drugLog!)
         }
         return cell
     }
@@ -161,6 +154,50 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         return nil
+    }
+    
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let selectedLogId = logsArray[indexPath.row].id
+            let _ = {
+                let service = Service(lang: lang)
+                service.updateGroupOfALog(selectedLogId, popoverAlert: { (message) in
+                    print(message)
+                }, tokenRefreshCompletion: {
+                    print("")
+                }) {
+                    let _ = {
+                        let service = Service(lang: self.lang)
+                        service.fetchGroupOfLogs(self.selectedLogGroup!.id, popoverAlert: { (message) in
+                            print(message)
+                        }, tokenRefreshCompletion: {
+                            print("")
+                        }) { (groupOfLogSet) in
+                            self.groupOfLogSet = groupOfLogSet
+                            self.groupOfLogSetForPop = groupOfLogSet
+                            tableView.deleteRows(at: [indexPath], with: .fade)
+                        }
+                    }()
+                }
+            }()
+            
+//            let _ = {
+//                let service = Service(lang: lang)
+//                service.fetchGroupOfLogs(self.selectedLogGroup!.id, popoverAlert: { (message) in
+//                    print(message)
+//                }, tokenRefreshCompletion: {
+//                    print("")
+//                }) { (groupOfLogSet) in
+//                    self.groupOfLogSet = groupOfLogSet
+//                    self.groupOfLogSetForPop = groupOfLogSet
+//                    tableView.deleteRows(at: [indexPath], with: .fade)
+//                }
+//            }()
+        }
     }
 }
 
@@ -204,17 +241,6 @@ extension LogGroupTableCell {
         condScoreButton = {
             let _button = UIButton(frame: CGRect(x: 0, y: 0, width: 21, height: 21))
             _button.addShadowView()
-            _button.showsTouchWhenHighlighted = true
-            _button.isHidden = true
-            _button.translatesAutoresizingMaskIntoConstraints = false
-            return _button
-        }()
-        editButton = {
-            let _button = UIButton()
-            _button.setTitle(lang.btnEdit, for: .normal)
-            _button.setTitleColor(UIColor.lightGray, for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 15)
-//            _button.addShadowView()
             _button.showsTouchWhenHighlighted = true
             _button.isHidden = true
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -279,7 +305,6 @@ extension LogGroupTableCell {
         containerView.addSubview(drugLogBulletView)
         containerView.addSubview(groupOfLogsTableView)
         containerView.addSubview(condScoreButton)
-        containerView.addSubview(editButton)
         
         containerView.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
         containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
@@ -299,9 +324,6 @@ extension LogGroupTableCell {
         
         condScoreImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12).isActive = true
         condScoreImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -((frame.width / 4) + 10)).isActive = true
-        
-        editButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 10).isActive = true
-        editButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20).isActive = true
         
         foodLogBulletView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 20).isActive = true
         foodLogBulletView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20).isActive = true
@@ -327,25 +349,5 @@ extension LogGroupTableCell {
         
         condScoreButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor, constant: 0).isActive = true
         condScoreButton.topAnchor.constraint(equalTo: groupOfLogsTableView.bottomAnchor, constant: 15).isActive = true
-    }
-    
-    func editButtonTapped() {
-        editButton.setTitle(lang.btnDone, for: .normal)
-        editButton.setTitleColor(UIColor.tomato, for: .normal)
-        isEditBtnTapped = true
-        isDoneBtnTapped = false
-        groupOfLogsTableView.reloadData()
-        groupOfLogsTableView.beginUpdates()
-        groupOfLogsTableView.endUpdates()
-    }
-    
-    func doneButtonTapped() {
-        editButton.setTitle(lang.btnEdit, for: .normal)
-        editButton.setTitleColor(UIColor.lightGray, for: .normal)
-        isEditBtnTapped = false
-        isDoneBtnTapped = true
-        groupOfLogsTableView.reloadData()
-        groupOfLogsTableView.beginUpdates()
-        groupOfLogsTableView.endUpdates()
     }
 }

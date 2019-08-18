@@ -108,8 +108,6 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var selectedCondPickerIdx: Int = 3
     var selectedCondScore: Int = 7
     var isToggleBtnTapped: Bool = false
-    var isEditBtnTapped: Bool = false
-    var isDoneBtnTapped: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -226,18 +224,6 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     @objc func condButtonTapped() {
         loadAvatarCondList()
-    }
-    
-    @objc func logGroupEditBtnTapped() {
-        if isEditBtnTapped {
-            isEditBtnTapped = false
-            isDoneBtnTapped = true
-        } else {
-            isEditBtnTapped = true
-            isDoneBtnTapped = false
-        }
-        logGroupTableView.reloadData()
-//        updateLogGroupTable()
     }
     
     // MARK: - UIGestureRecognizerDelegate
@@ -408,7 +394,6 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.condScoreButton.setImage(UIImage.btnDottedCircle, for: .normal)
             }
             cell.condScoreButton.addTarget(self, action: #selector(alertCondScorePicker), for: .touchUpInside)
-            cell.editButton.addTarget(self, action: #selector(logGroupEditBtnTapped), for: .touchUpInside)
             return cell
         } else if diaryMode == DiaryMode.logger {
             if indexPath.row == 0 {
@@ -457,6 +442,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 }
                 cell.selectedLogGroup = self.selectedLogGroup!
                 cell.groupOfLogSet = self.groupOfLogSet!
+                cell.groupOfLogSetForPop = self.groupOfLogSet!
                 cell.groupOfLogsTableView.reloadData()
                 if indexPath == self.selectedOnceCellIdxPath {
                     // Case select already selected cell
@@ -471,7 +457,6 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                         cell.arrowImageView.transform = CGAffineTransform.identity
                         cell.condScoreImageView.isHidden = false
                         cell.condScoreButton.isHidden = true
-                        cell.editButton.isHidden = true
                         self.view.layoutIfNeeded()
                     }, completion: { _ in
                         UIView.transition(with: cell.foodLogBulletView, duration: 0.1, options: .transitionCrossDissolve, animations: {
@@ -501,7 +486,6 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                             cell.groupOfLogsTableView.isHidden = false
                             cell.condScoreImageView.isHidden = true
                             cell.condScoreButton.isHidden = false
-                            cell.editButton.isHidden = false
                             cell.foodLogBulletView.isHidden = true
                             cell.actLogBulletView.isHidden = true
                             cell.drugLogBulletView.isHidden = true
@@ -573,7 +557,6 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.groupOfLogsTableView.isHidden = true
                 cell.condScoreImageView.isHidden = false
                 cell.condScoreButton.isHidden = true
-                cell.editButton.isHidden = true
                 let logGroup = self.logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
                 if logGroup.has_food {
                     cell.foodLogBulletView.isHidden = false
@@ -618,27 +601,12 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             cell.actLogBulletView.isHidden = true
             cell.drugLogBulletView.isHidden = true
             cell.condScoreButton.isHidden = false
-            cell.editButton.isHidden = false
-            
-            // TODO
-//            cell.editButton.setTitle(lang.btnDone, for: .normal)
-//            cell.editButton.setTitleColor(UIColor.tomato, for: .normal)
-//            cell.isEditBtnTapped = true
-//            cell.groupOfLogsTableView.reloadData()
-//            cell.groupOfLogsTableView.beginUpdates()
-//            cell.groupOfLogsTableView.endUpdates()
-            if isEditBtnTapped {
-                cell.editButtonTapped()
-            } else if isDoneBtnTapped {
-                cell.doneButtonTapped()
-            }
         } else {
             cell.containerViewHight.constant = CGFloat(logGroupCellHeightVal - 7)
             cell.arrowImageView.transform = CGAffineTransform.identity
             cell.groupOfLogsTableView.isHidden = true
             cell.condScoreImageView.isHidden = false
             cell.condScoreButton.isHidden = true
-            cell.editButton.isHidden = true
             let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
             if logGroup.has_food {
                 cell.foodLogBulletView.isHidden = false
@@ -657,6 +625,23 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             }
         }
     }
+    
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        print("")
+    }
+    
+//    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+//        let deleteButton = UITableViewRowAction(style: .destructive, title: "Delete") { (action, indexPath) in
+//            self.logGroupTableView.dataSource?.tableView!(self.logGroupTableView, commit: .delete, forRowAt: indexPath)
+//            return
+//        }
+//        deleteButton.backgroundColor = UIColor.cornflowerBlue
+//        return [deleteButton]
+//    }
 }
 
 extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -1387,4 +1372,16 @@ extension DiaryViewController {
             self.loadLogGroups()
         }
     }
+    
+//    private func updateGroupOfLog() {
+//        let service = Service(lang: lang)
+//        service.updateGroupOfALog(selectedLogId, popoverAlert: { (message) in
+//            self.retryFunction = self.updateGroupOfALog
+//            self.alertError(message)
+//        }, tokenRefreshCompletion: {
+//            self.updateGroupOfLog()
+//        }) {
+//            <#code#>
+//        }
+//    }
 }
