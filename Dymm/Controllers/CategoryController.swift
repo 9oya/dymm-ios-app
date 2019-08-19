@@ -749,7 +749,7 @@ extension CategoryViewController {
     
     private func afterFetchCategoriesTransition(_ superTag: BaseModel.Tag, _ subTags: [BaseModel.Tag]) {
         self.superTag = superTag
-        if superTag.tag_type == TagType.category || superTag.tag_type == TagType.bookmark {
+        if superTag.tag_type == TagType.category || superTag.tag_type == TagType.bookmark || superTag.tag_type == TagType.history {
             // Execute category tag_type exclusive
             switch lang.currentLanguageId {
             case LanguageId.eng: navigationItem.title = superTag.eng_name
@@ -768,10 +768,6 @@ extension CategoryViewController {
             case LanguageId.kor: titleLabel.text = superTag.kor_name
             case LanguageId.jpn: titleLabel.text = superTag.jpn_name
             default: fatalError()}
-        }
-        if superTag.tag_type == TagType.bookmark {
-            // Execute bookmark tag_type exclusive
-            // TODO: Add "Edit" uibutton
         }
         if superTag.tag_type == TagType.food || superTag.tag_type == TagType.drug {
             // Execute food and drug tag_types exclusive

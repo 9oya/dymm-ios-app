@@ -488,7 +488,12 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     self.selectedTableSection = nil
                     self.selectedTableRow = nil
                     let total = self.getGroupOfLogsTotalCnt(groupOfLogSet)
-                    let duration = Double(total) * 0.04
+                    var duration = Double(total) * 0.05
+                    if total < 3 {
+                        duration = Double(total) * 0.12
+                    } else if total < 5 {
+                        duration = Double(total) * 0.1
+                    }
                     UIView.animate(withDuration: duration, animations: {
                         cell.containerViewHight.constant = 45
                         cell.groupOfLogsTableView.isHidden = true
