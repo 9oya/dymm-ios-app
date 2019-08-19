@@ -36,12 +36,6 @@ struct UnauthType {
     static let passwordInvalid = 33
 }
 
-struct AvatarType {
-    static let human = 1576
-    static let cat = 1577
-    static let dog = 1578
-}
-
 struct TagType {
     static let activity = 7
     static let condition = 8
@@ -107,11 +101,12 @@ struct ButtonType {
 }
 
 struct AvatarInfoTarget {
-    static let firstName = "first-name"
-    static let lastName = "last-name"
-    static let email = "email"
-    static let phNumber = "ph-number"
-    static let intro = "intro"
+    static let firstName = 11
+    static let lastName = 12
+    static let email = 13
+    static let phNumber = 14
+    static let intro = 15
+    static let profile_type = 16
 }
 
 func getLogGroupTypeImage(_ groupType: Int) -> UIImage? {

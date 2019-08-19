@@ -14,130 +14,61 @@ class AuthViewController: UIViewController {
     
     // MARK: - Properties
     
-    var loadingImageView: UIImageView!
-    var scrollView: UIScrollView!
+    // UIView
     var additionalTopBarView: UIView!
+    var formContainerView: UIView!
+    var formGrayLineView: UIView!
+    
+    // UIScrollView
+    var scrollView: UIScrollView!
+    
+    // UIImageView
+    var loadingImageView: UIImageView!
+    
+    // UITextField
+    var firstNameTextField: SkyFloatingLabelTextField!
+    var lastNameTextField: SkyFloatingLabelTextField!
+    var emailTextField: SkyFloatingLabelTextField!
+    var passwordTextField: SkyFloatingLabelTextField!
+    var confirmPassTextField: SkyFloatingLabelTextField!
+    
+    // UIButton
     var forgotButton: UIButton!
     var closeButton: UIButton!
-    let formContainerView: UIView = {
-        let _view = UIView()
-        _view.backgroundColor = UIColor.white
-        _view.addShadowView()
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
-    var formContainerHeight: NSLayoutConstraint!
-    let titleLabel: UILabel = {
-        let _label = UILabel()
-        _label.font = .systemFont(ofSize: 20, weight: .light)
-        _label.textColor = UIColor.black
-        _label.textAlignment = .center
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
-    let firstNameTextField: SkyFloatingLabelTextField = {
-        let _textField = SkyFloatingLabelTextField()
-        _textField.font = .systemFont(ofSize: 15, weight: .light)
-        _textField.selectedTitleColor = UIColor.black
-        _textField.selectedLineColor = UIColor.black
-        _textField.selectedLineHeight = 1
-        _textField.textContentType = .namePrefix
-        _textField.autocapitalizationType = .words
-        _textField.isHidden = true
-        _textField.translatesAutoresizingMaskIntoConstraints = false
-        return _textField
-    }()
-    let lastNameTextField: SkyFloatingLabelTextField = {
-        let _textField = SkyFloatingLabelTextField()
-        _textField.font = .systemFont(ofSize: 15, weight: .light)
-        _textField.selectedTitleColor = UIColor.black
-        _textField.selectedLineColor = UIColor.black
-        _textField.textContentType = .namePrefix
-        _textField.autocapitalizationType = .words
-        _textField.isHidden = true
-        _textField.translatesAutoresizingMaskIntoConstraints = false
-        return _textField
-    }()
-    let emailTextField: SkyFloatingLabelTextField = {
-        let _textField = SkyFloatingLabelTextField(frame: CGRect.zero)
-        _textField.font = .systemFont(ofSize: 15, weight: .light)
-        _textField.selectedTitleColor = UIColor.black
-        _textField.selectedLineColor = UIColor.black
-        _textField.textContentType = .emailAddress
-        _textField.keyboardType = .emailAddress
-        _textField.autocapitalizationType = .none
-        _textField.translatesAutoresizingMaskIntoConstraints = false
-        return _textField
-    }()
-    var emailTextFieldTop: NSLayoutConstraint!
-    let passwordTextField: SkyFloatingLabelTextField = {
-        let _textField = SkyFloatingLabelTextField(frame: CGRect.zero)
-        _textField.font = .systemFont(ofSize: 15, weight: .light)
-        _textField.selectedTitleColor = UIColor.black
-        _textField.selectedLineColor = UIColor.black
-        _textField.textContentType = .password
-        _textField.isSecureTextEntry = true
-        _textField.translatesAutoresizingMaskIntoConstraints = false
-        return _textField
-    }()
-    let confirmPassTextField: SkyFloatingLabelTextField = {
-        let _textField = SkyFloatingLabelTextField(frame: CGRect.zero)
-        _textField.font = .systemFont(ofSize: 15, weight: .light)
-        _textField.selectedTitleColor = UIColor.black
-        _textField.selectedLineColor = UIColor.black
-        _textField.textContentType = .password
-        _textField.isSecureTextEntry = true
-        _textField.isHidden = true
-        _textField.translatesAutoresizingMaskIntoConstraints = false
-        return _textField
-    }()
-    let messageLabel: UILabel = {
-        let _label = UILabel()
-        _label.font = .systemFont(ofSize: 14)
-        _label.textColor = UIColor(hex: "DarkOrange")
-        _label.textAlignment = .center
-        _label.numberOfLines = 2
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
-    var formGrayLineView: UIView!
-    let formSwapButton: UIButton = {
-        let _button = UIButton(type: .system)
-        _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
-        _button.titleLabel?.font = .systemFont(ofSize: 16)
-        _button.showsTouchWhenHighlighted = true
-        _button.addTarget(self, action: #selector(formSwapButtonTapped), for: .touchUpInside)
-        _button.translatesAutoresizingMaskIntoConstraints = false
-        return _button
-    }()
-    let submitButton: UIButton = {
-        let _button = UIButton(type: .system)
-        _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
-        _button.titleLabel?.font = .systemFont(ofSize: 16)
-        _button.showsTouchWhenHighlighted = true
-        _button.addTarget(self, action: #selector(submitButtonTapped), for: .touchUpInside)
-        _button.translatesAutoresizingMaskIntoConstraints = false
-        return _button
-    }()
+    var formSwapButton: UIButton!
+    var submitButton: UIButton!
     
+    // UILabel
+    var titleLabel: UILabel!
+    var messageLabel: UILabel!
+    
+    // NSLayoutConstraint
+    var formContainerHeight: NSLayoutConstraint!
+    var emailTextFieldTop: NSLayoutConstraint!
+
+    // Non-view properties
     var lang: LangPack!
     var retryFunction: (() -> Void)?
     var isSignUpForm: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupLayoutStyles()
-        setupLayoutSubviews()
-        firstNameTextField.delegate = self
-        lastNameTextField.delegate = self
-        emailTextField.delegate = self
-        passwordTextField.delegate = self
-        confirmPassTextField.delegate = self
-        setupLayoutConstraints()
-        setupProperties()
+        setupLayout()
     }
     
     // MARK: - Actions
+    
+    @objc func alertError(_ message: String) {
+        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
+            self.retryFunction!()
+        }
+        let cancelAction = UIAlertAction(title: lang.btnClose, style: .cancel) { _ in }
+        alertController.addAction(confirmAction)
+        alertController.addAction(cancelAction)
+        alertController.view.tintColor = UIColor.cornflowerBlue
+        present(alertController, animated: true, completion: nil)
+    }
     
     @objc func closeButtonTapped() {
         dismiss(animated: true, completion: nil)
@@ -214,19 +145,131 @@ extension AuthViewController {
     
     // MARK: Private methods
     
-    private func setupLayoutStyles() {
+    private func setupLayout() {
+        // Initialize view
+        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = UIColor(hex: "WhiteSmoke")
-    }
-    
-    private func setupLayoutSubviews() {
-        loadingImageView = getLoadingImageView(isHidden: true)
         
+        // Initialize subveiw properties
+        loadingImageView = getLoadingImageView(isHidden: true)
         scrollView = getScrollView()
         additionalTopBarView = getAddtionalTopBarView()
         forgotButton = getBasicTextButton()
+        forgotButton.setTitle(lang.btnForgotPassword, for: .normal)
         closeButton = getCloseButton()
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         formGrayLineView = getGrayLineView()
+        formContainerView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor.white
+            _view.addShadowView()
+            _view.layer.cornerRadius = 10.0
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        titleLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 20, weight: .light)
+            _label.textColor = UIColor.black
+            _label.textAlignment = .center
+            _label.text = lang.labelSignIn
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        firstNameTextField = {
+            let _textField = SkyFloatingLabelTextField()
+            _textField.font = .systemFont(ofSize: 15, weight: .light)
+            _textField.selectedTitleColor = UIColor.black
+            _textField.selectedLineColor = UIColor.black
+            _textField.selectedLineHeight = 1
+            _textField.placeholder = lang.txtFieldFirstName
+            _textField.title = lang.txtFieldFirstName
+            _textField.textContentType = .namePrefix
+            _textField.autocapitalizationType = .words
+            _textField.isHidden = true
+            _textField.translatesAutoresizingMaskIntoConstraints = false
+            return _textField
+        }()
+        lastNameTextField = {
+            let _textField = SkyFloatingLabelTextField()
+            _textField.font = .systemFont(ofSize: 15, weight: .light)
+            _textField.selectedTitleColor = UIColor.black
+            _textField.selectedLineColor = UIColor.black
+            _textField.placeholder = lang.txtFieldLastName
+            _textField.title = lang.txtFieldLastName
+            _textField.textContentType = .namePrefix
+            _textField.autocapitalizationType = .words
+            _textField.isHidden = true
+            _textField.translatesAutoresizingMaskIntoConstraints = false
+            return _textField
+        }()
+        emailTextField = {
+            let _textField = SkyFloatingLabelTextField(frame: CGRect.zero)
+            _textField.font = .systemFont(ofSize: 15, weight: .light)
+            _textField.selectedTitleColor = UIColor.black
+            _textField.selectedLineColor = UIColor.black
+            _textField.placeholder = lang.txtFieldEmail
+            _textField.title = lang.txtFieldEmail
+            _textField.textContentType = .emailAddress
+            _textField.keyboardType = .emailAddress
+            _textField.autocapitalizationType = .none
+            _textField.translatesAutoresizingMaskIntoConstraints = false
+            return _textField
+        }()
+        passwordTextField = {
+            let _textField = SkyFloatingLabelTextField(frame: CGRect.zero)
+            _textField.font = .systemFont(ofSize: 15, weight: .light)
+            _textField.selectedTitleColor = UIColor.black
+            _textField.selectedLineColor = UIColor.black
+            _textField.placeholder = lang.txtFieldPassword
+            _textField.title = lang.txtFieldPassword
+            _textField.isSecureTextEntry = true
+            _textField.textContentType = .password
+            _textField.translatesAutoresizingMaskIntoConstraints = false
+            return _textField
+        }()
+        confirmPassTextField = {
+            let _textField = SkyFloatingLabelTextField(frame: CGRect.zero)
+            _textField.font = .systemFont(ofSize: 15, weight: .light)
+            _textField.selectedTitleColor = UIColor.black
+            _textField.selectedLineColor = UIColor.black
+            _textField.placeholder = lang.txtFieldConfirmPassword
+            _textField.title = lang.txtFieldConfirmPassword
+            _textField.isSecureTextEntry = true
+            _textField.textContentType = .password
+            _textField.isHidden = true
+            _textField.translatesAutoresizingMaskIntoConstraints = false
+            return _textField
+        }()
+        messageLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 14)
+            _label.textColor = UIColor(hex: "DarkOrange")
+            _label.textAlignment = .center
+            _label.numberOfLines = 2
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        formSwapButton = {
+            let _button = UIButton(type: .system)
+            _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 16)
+            _button.setTitle(lang.btnSignUp, for: .normal)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(formSwapButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        submitButton = {
+            let _button = UIButton(type: .system)
+            _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
+            _button.setTitle(lang.btnSubmit, for: .normal)
+            _button.addTarget(self, action: #selector(submitButtonTapped), for: .touchUpInside)
+            _button.titleLabel?.font = .systemFont(ofSize: 16)
+            _button.showsTouchWhenHighlighted = true
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
         
         view.addSubview(scrollView)
         view.addSubview(loadingImageView)
@@ -245,12 +288,16 @@ extension AuthViewController {
         formContainerView.addSubview(formSwapButton)
         formContainerView.addSubview(submitButton)
         formContainerView.addSubview(formGrayLineView)
-    }
-    
-    // MARK: - SetupLayoutConstraints
-    
-    private func setupLayoutConstraints() {
-        // loadingImageView, alertBlindView
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
+        firstNameTextField.delegate = self
+        lastNameTextField.delegate = self
+        emailTextField.delegate = self
+        passwordTextField.delegate = self
+        confirmPassTextField.delegate = self
+        
+        // Setup constraints
+        // loadingImageView
         loadingImageView.widthAnchor.constraint(equalToConstant: 62).isActive = true
         loadingImageView.heightAnchor.constraint(equalToConstant: 62).isActive = true
         loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
@@ -275,7 +322,7 @@ extension AuthViewController {
         formContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 35 + 7).isActive = true
         formContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 7).isActive = true
         formContainerView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 7).isActive = true
-        formContainerView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: 7).isActive = true
+//        formContainerView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: 7).isActive = true
         formContainerView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor, constant: 0).isActive = true
         formContainerHeight = formContainerView.heightAnchor.constraint(equalToConstant: 260)
         formContainerHeight.priority = UILayoutPriority(rawValue: 999)
@@ -326,37 +373,6 @@ extension AuthViewController {
         
         submitButton.trailingAnchor.constraint(equalTo: formContainerView.trailingAnchor, constant: -(view.frame.width / 8)).isActive = true
         submitButton.bottomAnchor.constraint(equalTo: formContainerView.bottomAnchor, constant: -10).isActive = true
-    }
-    
-    private func setupProperties() {
-        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
-        
-        titleLabel.text = lang.labelSignIn
-        firstNameTextField.placeholder = lang.txtFieldFirstName
-        firstNameTextField.title = lang.txtFieldFirstName
-        lastNameTextField.placeholder = lang.txtFieldLastName
-        lastNameTextField.title = lang.txtFieldLastName
-        emailTextField.placeholder = lang.txtFieldEmail
-        emailTextField.title = lang.txtFieldEmail
-        passwordTextField.placeholder = lang.txtFieldPassword
-        passwordTextField.title = lang.txtFieldPassword
-        confirmPassTextField.placeholder = lang.txtFieldConfirmPassword
-        confirmPassTextField.title = lang.txtFieldConfirmPassword
-        forgotButton.setTitle(lang.btnForgotPassword, for: .normal)
-        formSwapButton.setTitle(lang.btnSignUp, for: .normal)
-        submitButton.setTitle(lang.btnSubmit, for: .normal)
-    }
-    
-    private func alertError(_ message: String) {
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
-            self.retryFunction!()
-        }
-        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
-        alertController.addAction(confirmAction)
-        alertController.addAction(cancelAction)
-        self.present(alertController, animated: true, completion: nil)
     }
     
     private func transitionAuthForm() {

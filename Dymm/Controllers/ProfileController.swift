@@ -14,117 +14,46 @@ class ProfileViewController: UIViewController {
     
     // MARK: - Properties
     
-    var loadingImageView: UIImageView!
+    // UIView
     var additionalTopBarView: UIView!
-    var scrollView: UIScrollView!
-    var signOutButton: UIButton!
-    var closeButton: UIButton!
-    let pickerCancelButton: UIButton = {
-        let _button = UIButton(type: .system)
-        _button.setTitleColor(UIColor.clear, for: .normal)
-        _button.titleLabel?.font = .systemFont(ofSize: 16)
-        _button.showsTouchWhenHighlighted = true
-        _button.isEnabled = false
-        _button.translatesAutoresizingMaskIntoConstraints = false
-        return _button
-    }()
-    let pickerDoneButton: UIButton = {
-        let _button = UIButton(type: .system)
-        _button.setTitleColor(UIColor.clear, for: .normal)
-        _button.titleLabel?.font = .systemFont(ofSize: 16)
-        _button.showsTouchWhenHighlighted = true
-        _button.isEnabled = false
-        _button.translatesAutoresizingMaskIntoConstraints = false
-        return _button
-    }()
-    let mailConfContainerView: UIView = {
-        let _view = UIView()
-        _view.backgroundColor = UIColor.white
-        _view.addShadowView()
-        _view.isHidden = true
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
-    let mailConfMsgLabel: UILabel = {
-        let _label = UILabel()
-        _label.font = .systemFont(ofSize: 15, weight: .regular)
-        _label.textColor = UIColor(hex: "LightSteelBlue")
-        _label.textAlignment = .center
-        _label.numberOfLines = 2
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
-    var mailConfAddressButton: UIButton!
-    var sendAgainButton: UIButton!
-    let pencilImageView: UIImageView = {
-        let _imageView = UIImageView()
-        _imageView.image = UIImage(named: "button-pencil")
-        _imageView.contentMode = .scaleAspectFit
-        _imageView.translatesAutoresizingMaskIntoConstraints = false
-        return _imageView
-    }()
-    let infoContainerView: UIView = {
-        let _view = UIView()
-        _view.backgroundColor = UIColor.white
-        _view.layer.cornerRadius = 10
-        _view.addShadowView()
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
-    let tagCollectionView: UICollectionView = {
-        let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
-        _collectionView.backgroundColor = UIColor.clear
-        _collectionView.register(TagCollectionCell.self, forCellWithReuseIdentifier: tagCellId)
-        _collectionView.translatesAutoresizingMaskIntoConstraints = false
-        return _collectionView
-    }()
-    var tagCollectionHeight: NSLayoutConstraint!
-    let pickerContainerView: UIView = {
-        let _view = UIView()
-        _view.backgroundColor = UIColor.black.withAlphaComponent(0.3)
-        _view.layer.cornerRadius = 10
-        _view.isHidden = true
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
-    let pickerView: UIPickerView = {
-        let _pickerView = UIPickerView()
-        _pickerView.translatesAutoresizingMaskIntoConstraints = false
-        return _pickerView
-    }()
-    let infoImageContainerView: UIView = {
-        let _view = UIView()
-        _view.backgroundColor = UIColor.white
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
-    let infoImageView: UIImageView = {
-        let _imageView = UIImageView()
-        _imageView.layer.cornerRadius = 70 / 2
-        _imageView.translatesAutoresizingMaskIntoConstraints = false
-        return _imageView
-    }()
-    let infoImageLabel: UILabel = {
-        let _label = UILabel()
-        _label.font = .systemFont(ofSize: 35, weight: .medium)
-        _label.textColor = UIColor.white
-        _label.textAlignment = .center
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
+    var mailConfContainerView: UIView!
+    var infoContainerView: UIView!
+    var pickerContainerView: UIView!
+    var infoImageContainerView: UIView!
     var firstNameContainerView: UIView!
     var lastNameContainerView: UIView!
     var emailContainerView: UIView!
     var phNumberContainerView: UIView!
     var introContainerView: UIView!
-    let introTextView: UITextView = {
-        let _textView = UITextView()
-        _textView.backgroundColor = UIColor.white
-        _textView.font = .systemFont(ofSize: 14, weight: .regular)
-        _textView.translatesAutoresizingMaskIntoConstraints = false
-        return _textView
-    }()
     
+    // UIScrollView
+    var scrollView: UIScrollView!
+    
+    // UICollectionView
+    var tagCollectionView: UICollectionView!
+    
+    // UIPickerView
+    var pickerView: UIPickerView!
+    
+    // UIImageView
+    var loadingImageView: UIImageView!
+    var infoImageView: UIImageView!
+    var pencilImageView: UIImageView!
+    
+    // UITextView
+    var introTextView: UITextView!
+    
+    // UIButton
+    var signOutButton: UIButton!
+    var closeButton: UIButton!
+    var pickerCancelButton: UIButton!
+    var pickerDoneButton: UIButton!
+    var mailConfAddressButton: UIButton!
+    var sendAgainButton: UIButton!
+    
+    // UILabel
+    var infoImageLabel: UILabel!
+    var mailConfMsgLabel: UILabel!
     var firstNameGuideLabel: UILabel!
     var firstNameLabel: UILabel!
     var lastNameGuideLabel: UILabel!
@@ -135,43 +64,44 @@ class ProfileViewController: UIViewController {
     var phNumberLabel: UILabel!
     var phNumberPlaceHolderLabel: UILabel!
     var introGuideLabel: UILabel!
-    let introLabel: UILabel = {
-        let _label = UILabel()
-        _label.font = .systemFont(ofSize: 15, weight: .regular)
-        _label.textColor = UIColor.black
-        _label.textAlignment = .left
-        _label.numberOfLines = 4
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
+    var introLabel: UILabel!
     var introPlaceHolderLabel: UILabel!
     
+    // NSLayoutConstraint
+    var tagCollectionHeight: NSLayoutConstraint!
+    
+    // Non-view properties
     var lang: LangPack!
     var retryFunction: (() -> Void)?
-    
     var mailMessage: String?
     var newMailAddress: String?
-    
     var profile: CustomModel.Profile?
     var selectedCollectionItem: Int?
     var tags: [BaseModel.Tag]?
     var profileTags: [BaseModel.ProfileTag]?
     var pickedTag: BaseModel.Tag?
     var newInfoStr: String?
-    var updateTarget: String?
+    var avatarInfoTarget: Int?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupLayoutStyles()
-        setupLayoutSubviews()
-        tagCollectionView.dataSource = self
-        tagCollectionView.delegate = self
-        pickerView.delegate = self
-        setupLayoutConstraints()
-        setupProperties()
+        setupLayout()
+        loadProfile()
     }
     
     // MARK: - Actions
+    
+    @objc func alertError(_ message: String) {
+        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
+            self.retryFunction!()
+        }
+        let cancelAction = UIAlertAction(title: lang.btnClose, style: .cancel) { _ in }
+        alertController.addAction(confirmAction)
+        alertController.addAction(cancelAction)
+        alertController.view.tintColor = UIColor.cornflowerBlue
+        present(alertController, animated: true, completion: nil)
+    }
     
     @objc func closeButtonTapped() {
         dismiss(animated: true, completion: nil)
@@ -208,7 +138,7 @@ class ProfileViewController: UIViewController {
         let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
             if let txtField = alertController.textFields?.first, let text = txtField.text {
                 self.newInfoStr = text
-                self.updateTarget = AvatarInfoTarget.firstName
+                self.avatarInfoTarget = AvatarInfoTarget.firstName
                 self.updateAvatarInfo()
             }
         }
@@ -216,6 +146,7 @@ class ProfileViewController: UIViewController {
         alertController.addTextField { textField in
             textField.autocapitalizationType = UITextAutocapitalizationType.words
             textField.placeholder = self.lang.alertEditFirstNamePlaceholder
+            textField.text = self.profile!.avatar.first_name
         }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
@@ -227,7 +158,7 @@ class ProfileViewController: UIViewController {
         let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
             if let txtField = alertController.textFields?.first, let text = txtField.text {
                 self.newInfoStr = text
-                self.updateTarget = AvatarInfoTarget.lastName
+                self.avatarInfoTarget = AvatarInfoTarget.lastName
                 self.updateAvatarInfo()
             }
         }
@@ -235,6 +166,7 @@ class ProfileViewController: UIViewController {
         alertController.addTextField { textField in
             textField.autocapitalizationType = UITextAutocapitalizationType.words
             textField.placeholder = self.lang.alertEditLastNamePlaceholder
+            textField.text = self.profile!.avatar.last_name
         }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
@@ -246,7 +178,7 @@ class ProfileViewController: UIViewController {
         let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
             if let txtField = alertController.textFields?.first, let text = txtField.text {
                 self.newInfoStr = text
-                self.updateTarget = AvatarInfoTarget.email
+                self.avatarInfoTarget = AvatarInfoTarget.email
                 self.updateAvatarInfo()
             }
         }
@@ -254,6 +186,7 @@ class ProfileViewController: UIViewController {
         alertController.addTextField { textField in
             textField.autocapitalizationType = UITextAutocapitalizationType.words
             textField.placeholder = self.lang.alertEditEmailPlaceholder
+            textField.text = self.profile!.avatar.email
         }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
@@ -265,7 +198,7 @@ class ProfileViewController: UIViewController {
         let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
             if let txtField = alertController.textFields?.first, let text = txtField.text {
                 self.newInfoStr = text
-                self.updateTarget = AvatarInfoTarget.phNumber
+                self.avatarInfoTarget = AvatarInfoTarget.phNumber
                 self.updateAvatarInfo()
             }
         }
@@ -273,6 +206,7 @@ class ProfileViewController: UIViewController {
         alertController.addTextField { textField in
             textField.autocapitalizationType = UITextAutocapitalizationType.words
             textField.placeholder = self.lang.alertEditPhNumPlaceholder
+            textField.text = self.profile!.avatar.ph_number ?? nil
         }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
@@ -294,7 +228,7 @@ class ProfileViewController: UIViewController {
         let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
             if let text = self.introTextView.text {
                 self.newInfoStr = text
-                self.updateTarget = AvatarInfoTarget.intro
+                self.avatarInfoTarget = AvatarInfoTarget.intro
                 self.updateAvatarInfo()
             }
         }
@@ -324,7 +258,7 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: tagCellId, for: indexPath) as? TagCollectionCell else {
             fatalError()
         }
-        let avatar_fact: BaseModel.ProfileTag = profile!.profile_tags[indexPath.row]
+        let avatar_fact: BaseModel.ProfileTag = profile!.profile_tags[indexPath.item]
         switch lang.currentLanguageId {
         case LanguageId.eng: cell.label.text = avatar_fact.eng_name
         case LanguageId.kor: cell.label.text = avatar_fact.kor_name
@@ -407,10 +341,6 @@ extension ProfileViewController {
     
     // MARK: Private methods
     
-    private func setupLayoutStyles() {
-        view.backgroundColor = UIColor(hex: "WhiteSmoke")
-    }
-    
     private func getProfileLabelContainerView() -> UIView {
         let _view = UIView()
         _view.backgroundColor = UIColor(hex: "WhiteSmoke")
@@ -445,20 +375,31 @@ extension ProfileViewController {
         return _label
     }
     
-    private func setupLayoutSubviews() {
-        loadingImageView = getLoadingImageView(isHidden: true)
+    private func setupLayout() {
+        // Initialize super view
+        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
+        view.backgroundColor = UIColor(hex: "WhiteSmoke")
         
+        // Initialize subveiw properties
+        loadingImageView = getLoadingImageView(isHidden: true)
         additionalTopBarView = getAddtionalTopBarView()
         signOutButton = getBasicTextButton()
+        signOutButton.addTarget(self, action: #selector(signOutButtonTapped), for: .touchUpInside)
         closeButton = getCloseButton()
+        closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         mailConfAddressButton = getBasicTextButton()
         sendAgainButton = getBasicTextButton()
         scrollView = getScrollView(isHidden: true)
         firstNameContainerView = getProfileLabelContainerView()
+        firstNameContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.firstNameContainerTapped(_:))))
         lastNameContainerView = getProfileLabelContainerView()
+        lastNameContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.lastNameContainerTapped(_:))))
         emailContainerView = getProfileLabelContainerView()
+        emailContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.emailContainerTapped(_:))))
         phNumberContainerView = getProfileLabelContainerView()
+        phNumberContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.phNumContainerTapped(_:))))
         introContainerView = getProfileLabelContainerView()
+        introContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.introContainerTapped(_:))))
         firstNameGuideLabel = getProfileGuideLabel()
         lastNameGuideLabel = getProfileGuideLabel()
         emailGuideLabel = getProfileGuideLabel()
@@ -471,6 +412,116 @@ extension ProfileViewController {
         phNumberPlaceHolderLabel = getProfilePlaceHolderLabel()
         introPlaceHolderLabel = getProfilePlaceHolderLabel()
         
+        pickerCancelButton = {
+            let _button = UIButton(type: .system)
+            _button.setTitleColor(UIColor.clear, for: .normal)
+            _button.addTarget(self, action: #selector(pickerCancelButtonTapped), for: .touchUpInside)
+            _button.titleLabel?.font = .systemFont(ofSize: 16)
+            _button.showsTouchWhenHighlighted = true
+            _button.isEnabled = false
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        pickerDoneButton = {
+            let _button = UIButton(type: .system)
+            _button.setTitleColor(UIColor.clear, for: .normal)
+            _button.addTarget(self, action: #selector(pickerDoneButtonTapped), for: .touchUpInside)
+            _button.titleLabel?.font = .systemFont(ofSize: 16)
+            _button.showsTouchWhenHighlighted = true
+            _button.isEnabled = false
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        mailConfContainerView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor.white
+            _view.addShadowView()
+            _view.isHidden = true
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        mailConfMsgLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 15, weight: .regular)
+            _label.textColor = UIColor(hex: "LightSteelBlue")
+            _label.textAlignment = .center
+            _label.numberOfLines = 2
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        pencilImageView = {
+            let _imageView = UIImageView()
+            _imageView.image = UIImage(named: "button-pencil")
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        infoContainerView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor.white
+            _view.layer.cornerRadius = 10
+            _view.addShadowView()
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        tagCollectionView = {
+            let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
+            _collectionView.backgroundColor = UIColor.clear
+            _collectionView.register(TagCollectionCell.self, forCellWithReuseIdentifier: tagCellId)
+            _collectionView.translatesAutoresizingMaskIntoConstraints = false
+            return _collectionView
+        }()
+        pickerContainerView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor.black.withAlphaComponent(0.3)
+            _view.layer.cornerRadius = 10
+            _view.isHidden = true
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        pickerView = {
+            let _pickerView = UIPickerView()
+            _pickerView.translatesAutoresizingMaskIntoConstraints = false
+            return _pickerView
+        }()
+        infoImageContainerView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor.white
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        infoImageView = {
+            let _imageView = UIImageView()
+            _imageView.layer.cornerRadius = 70 / 2
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        infoImageLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 35, weight: .medium)
+            _label.textColor = UIColor.white
+            _label.textAlignment = .center
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        introTextView = {
+            let _textView = UITextView()
+            _textView.backgroundColor = UIColor.white
+            _textView.font = .systemFont(ofSize: 14, weight: .regular)
+            _textView.translatesAutoresizingMaskIntoConstraints = false
+            return _textView
+        }()
+        introLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 15, weight: .regular)
+            _label.textColor = UIColor.black
+            _label.textAlignment = .left
+            _label.numberOfLines = 4
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        
+        // Setup subviews
         view.addSubview(scrollView)
         view.addSubview(loadingImageView)
         view.addSubview(additionalTopBarView)
@@ -509,9 +560,14 @@ extension ProfileViewController {
         introContainerView.addSubview(introGuideLabel)
         introContainerView.addSubview(introLabel)
         introContainerView.addSubview(introPlaceHolderLabel)
-    }
-    
-    private func setupLayoutConstraints() {
+        
+        setupLangProperties()
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
+        tagCollectionView.dataSource = self
+        tagCollectionView.delegate = self
+        pickerView.delegate = self
+        
+        // Setup constraints
         // loadingImageView, alertBlindView
         loadingImageView.widthAnchor.constraint(equalToConstant: 62).isActive = true
         loadingImageView.heightAnchor.constraint(equalToConstant: 62).isActive = true
@@ -676,31 +732,8 @@ extension ProfileViewController {
         pickerDoneButton.topAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: 10).isActive = true
     }
     
-    private func setupProperties() {
-        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
+    private func setupLangProperties() {
         navigationItem.title = lang.titleProfile
-        
-        closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
-        signOutButton.addTarget(self, action: #selector(signOutButtonTapped), for: .touchUpInside)
-        pickerCancelButton.addTarget(self, action: #selector(pickerCancelButtonTapped), for: .touchUpInside)
-        pickerDoneButton.addTarget(self, action: #selector(pickerDoneButtonTapped), for: .touchUpInside)
-        signOutButton.setTitle(lang.btnSignOut, for: .normal)
-        sendAgainButton.setTitle(lang.btnSendAgain, for: .normal)
-        pickerCancelButton.setTitle(lang.btnCancel, for: .normal)
-        pickerDoneButton.setTitle(lang.btnDone, for: .normal)
-        
-        let firstNameTap = UITapGestureRecognizer(target: self, action: #selector(self.firstNameContainerTapped(_:)))
-        let lastNameTap = UITapGestureRecognizer(target: self, action: #selector(self.lastNameContainerTapped(_:)))
-        let emailTap = UITapGestureRecognizer(target: self, action: #selector(self.emailContainerTapped(_:)))
-        let phNumTap = UITapGestureRecognizer(target: self, action: #selector(self.phNumContainerTapped(_:)))
-        let introTap = UITapGestureRecognizer(target: self, action: #selector(self.introContainerTapped(_:)))
-        firstNameContainerView.addGestureRecognizer(firstNameTap)
-        lastNameContainerView.addGestureRecognizer(lastNameTap)
-        emailContainerView.addGestureRecognizer(emailTap)
-        phNumberContainerView.addGestureRecognizer(phNumTap)
-        introContainerView.addGestureRecognizer(introTap)
-        
         mailConfMsgLabel.text = lang.msgMailNotConfirmedYet
         firstNameGuideLabel.text = lang.labelAvatarFirstName
         lastNameGuideLabel.text = lang.labelAvatarLastName
@@ -709,19 +742,10 @@ extension ProfileViewController {
         introGuideLabel.text = lang.labelAvatarIntroduction
         phNumberPlaceHolderLabel.text = lang.labelUserPhoneNum
         introPlaceHolderLabel.text = lang.labelAvatarIntroduction
-        
-        loadProfile()
-    }
-    
-    private func alertError(_ message: String) {
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
-            self.retryFunction!()
-        }
-        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
-        alertController.addAction(confirmAction)
-        alertController.addAction(cancelAction)
-        self.present(alertController, animated: true, completion: nil)
+        signOutButton.setTitle(lang.btnSignOut, for: .normal)
+        sendAgainButton.setTitle(lang.btnSendAgain, for: .normal)
+        pickerCancelButton.setTitle(lang.btnCancel, for: .normal)
+        pickerDoneButton.setTitle(lang.btnDone, for: .normal)
     }
     
     private func loadProfile() {
@@ -811,7 +835,7 @@ extension ProfileViewController {
         }) {
             if self.selectedCollectionItem == 0 {
                 UserDefaults.standard.setCurrentLanguageId(value: pickedProfileTagId)
-                self.setupProperties()
+                self.setupLangProperties()
             }
             self.loadProfile()
         }
@@ -822,21 +846,27 @@ extension ProfileViewController {
             self.loadingImageView.isHidden = false
         })
         let service = Service(lang: lang)
-        service.putAvatarInfo(target: self.updateTarget!, newInfoStr: self.newInfoStr!, popoverAlert: { (message) in
+        service.putAvatarInfo(target: self.avatarInfoTarget!, newInfoTxt: self.newInfoStr!, popoverAlert: { (message) in
             self.retryFunction = self.updateAvatarInfo
             self.alertError(message)
         }, tokenRefreshCompletion: {
             self.updateAvatarInfo()
-        }) { (newInfoStr) in
-            switch self.updateTarget! {
+        }) { (newInfoTxt) in
+            switch self.avatarInfoTarget! {
             case AvatarInfoTarget.firstName:
-                self.firstNameLabel.text = newInfoStr
-                let firstLetterIdx = newInfoStr.index(newInfoStr.startIndex, offsetBy: 0)
-                self.infoImageLabel.text = String(newInfoStr[firstLetterIdx])
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.firstNameLabel.text = newInfoTxt
+                    let firstLetterIdx = newInfoTxt.index(newInfoTxt.startIndex, offsetBy: 0)
+                    self.infoImageLabel.text = String(newInfoTxt[firstLetterIdx])
+                })
             case AvatarInfoTarget.lastName:
-                self.lastNameLabel.text = newInfoStr
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.lastNameLabel.text = newInfoTxt
+                })
             case AvatarInfoTarget.intro:
-                self.introLabel.text = newInfoStr
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.introLabel.text = newInfoTxt
+                })
             default:
                 fatalError()
             }

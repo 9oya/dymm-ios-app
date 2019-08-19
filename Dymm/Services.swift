@@ -428,7 +428,7 @@ struct Service {
         }
     }
     
-    func putAvatarInfo(target: String, newInfoStr: String, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ firstName: String) -> Void) {
+    func putAvatarInfo(target: Int, newInfoTxt: String, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ newInfoTxt: String) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -440,7 +440,7 @@ struct Service {
         let params: Parameters = [
             "avatar_id": avatarId,
             "target": target,
-            "new_info": newInfoStr
+            "new_info": newInfoTxt
             ]
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)"
@@ -454,7 +454,7 @@ struct Service {
                 }
                 switch statusCode {
                 case 200:
-                    completion(newInfoStr)
+                    completion(newInfoTxt)
                 case 400:
                     self.badRequest(responseData)
                 case 403:
