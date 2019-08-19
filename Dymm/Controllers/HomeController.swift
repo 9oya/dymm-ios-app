@@ -103,14 +103,15 @@ class HomeViewController: UIViewController {
     }
     
     @objc private func handleNextBanner() {
-        view.layoutIfNeeded()
         var nextIndex = pageControl.currentPage + 1
         if nextIndex == banners!.count {
             nextIndex = 0
         }
         let indexPath = IndexPath(item: nextIndex, section: 0)
         pageControl.currentPage = nextIndex
-        bannerCollectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+        DispatchQueue.main.async {
+            self.bannerCollectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+        }
     }
 }
 
@@ -188,6 +189,10 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
                 if UserDefaults.standard.isSignIn() {
                     presentDiaryNavigation()
                 } else {
+                    presentAuthNavigation()
+                }
+            } else if tag.id == TagId.bookmarks {
+                if UserDefaults.standard.isSignIn() == false {
                     presentAuthNavigation()
                 }
             }
@@ -328,7 +333,7 @@ extension HomeViewController {
     }
 
     private func startTimer() {
-        let _ = Timer.scheduledTimer(timeInterval: 6.0, target: self, selector: #selector(handleNextBanner), userInfo: nil, repeats: true);
+        Timer.scheduledTimer(timeInterval: 6.0, target: self, selector: #selector(handleNextBanner), userInfo: nil, repeats: true)
     }
     
     private func afterFetchCategoriesTransition(_ tags: [BaseModel.Tag]) {

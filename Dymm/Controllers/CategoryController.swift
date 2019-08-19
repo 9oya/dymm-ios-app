@@ -85,6 +85,7 @@ class CategoryViewController: UIViewController {
     let hours: [Int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     let mins: [Int] = [0, 10, 20, 30, 40, 50]
     var topLeftButtonType = ButtonType.home
+    var bookmark_id: Int?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -188,6 +189,14 @@ class CategoryViewController: UIViewController {
         alertController.view.tintColor = UIColor.cornflowerBlue
         self.present(alertController, animated: true, completion: nil)
     }
+    
+    @objc func starButtonTapped() {
+        if bookmark_id != nil {
+            updateABookmark()
+        } else {
+            createABookmark()
+        }
+    }
 }
 
 extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
@@ -221,7 +230,7 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
             case LanguageId.eng: cell.label.text = tag.eng_name
             case LanguageId.kor: cell.label.text = tag.kor_name
             default: fatalError()}
-            cell.imageView.image = UIImage(named: "tag-id-\(tag.id)")
+            cell.imageView.image = UIImage(named: "tagId-\(tag.id)")
             return cell
         } else if collectionView == stepCollectionView {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: stepCellId, for: indexPath) as? StepCollectionCell else {
@@ -502,6 +511,7 @@ extension CategoryViewController {
         starButton = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage(named: "button-star-empty")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.addTarget(self, action:#selector(starButtonTapped), for: .touchUpInside)
             _button.frame = CGRect(x: 0, y: 0, width: 27, height: 25)
             _button.showsTouchWhenHighlighted = true
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -739,7 +749,7 @@ extension CategoryViewController {
     
     private func afterFetchCategoriesTransition(_ superTag: BaseModel.Tag, _ subTags: [BaseModel.Tag]) {
         self.superTag = superTag
-        if superTag.tag_type == TagType.category {
+        if superTag.tag_type == TagType.category || superTag.tag_type == TagType.bookmark {
             // Execute category tag_type exclusive
             switch lang.currentLanguageId {
             case LanguageId.eng: navigationItem.title = superTag.eng_name
@@ -752,15 +762,19 @@ extension CategoryViewController {
                 self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + 45 + spaceVal
             }
         } else {
-            // Lines for non-cateogry tag_types
+            // Case non-cateogry tag_types
             switch lang.currentLanguageId {
             case LanguageId.eng: titleLabel.text = superTag.eng_name
             case LanguageId.kor: titleLabel.text = superTag.kor_name
             case LanguageId.jpn: titleLabel.text = superTag.jpn_name
             default: fatalError()}
         }
+        if superTag.tag_type == TagType.bookmark {
+            // Execute bookmark tag_type exclusive
+            // TODO: Add "Edit" uibutton
+        }
         if superTag.tag_type == TagType.food || superTag.tag_type == TagType.drug {
-            // Execute food and drug tag_type exclusive
+            // Execute food and drug tag_types exclusive
             sizePickerView.selectRow(4, inComponent: 0, animated: true)
             didSelectSizePickerRow(row: 4)
             UIView.animate(withDuration: 0.5) {
@@ -856,6 +870,13 @@ extension CategoryViewController {
             self.retryFunction = self.loadCategories
             self.alertError(message)
         }) { (tagSet) in
+            if tagSet.bookmark_id != nil {
+                self.bookmark_id = tagSet.bookmark_id
+                self.starButton.setImage(UIImage.btnStarFilled.withRenderingMode(.alwaysOriginal), for: .normal)
+            } else {
+                self.bookmark_id = nil
+                self.starButton.setImage(UIImage.btnStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
+            }
             self.afterFetchCategoriesTransition(tagSet.tag, tagSet.sub_tags)
         }
     }
@@ -889,6 +910,34 @@ extension CategoryViewController {
                 case LanguageId.kor: self.alertCompl(self.lang.msgIntakeLogComplete(self.superTag!.kor_name!))
                 case LanguageId.jpn: self.alertCompl(self.lang.msgIntakeLogComplete(self.superTag!.jpn_name!))
                 default: fatalError()}
+            })
+        }
+    }
+    
+    private func createABookmark() {
+        let service = Service(lang: lang)
+        service.postABookmark(tag_type: superTag!.tag_type!, sub_tag_id: superTag!.id, popoverAlert: { (message) in
+            self.retryFunction = self.createABookmark
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.createABookmark()
+        }) {
+            UIView.animate(withDuration: 0.5, animations: {
+                self.starButton.setImage(UIImage.btnStarFilled.withRenderingMode(.alwaysOriginal), for: .normal)
+            })
+        }
+    }
+    
+    private func updateABookmark() {
+        let service = Service(lang: lang)
+        service.putABookmark(bookmark_id: self.bookmark_id!, popoverAlert: { (message) in
+            self.retryFunction = self.updateABookmark
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.updateABookmark()
+        }) {
+            UIView.animate(withDuration: 0.5, animations: {
+                self.starButton.setImage(UIImage.btnStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
             })
         }
     }

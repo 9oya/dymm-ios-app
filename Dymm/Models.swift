@@ -199,6 +199,31 @@ struct BaseModel {
         }
     }
     
+    struct Bookmark: Codable {
+        let id: Int
+        let tag_id: Int
+        let eng_name: String
+        let kor_name: String?
+        let jpn_name: String?
+        
+        enum CodingKeys: String, CodingKey {
+            case id
+            case tag_id
+            case eng_name
+            case kor_name
+            case jpn_name
+        }
+        
+        init(from decoder: Decoder) throws {
+            let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
+            self.id = try valueContainer.decode(Int.self, forKey: CodingKeys.id)
+            self.tag_id = try valueContainer.decode(Int.self, forKey: CodingKeys.tag_id)
+            self.eng_name = try valueContainer.decode(String.self, forKey: CodingKeys.eng_name)
+            self.kor_name = try? valueContainer.decode(String.self, forKey: CodingKeys.kor_name)
+            self.jpn_name = try? valueContainer.decode(String.self, forKey: CodingKeys.jpn_name)
+        }
+    }
+    
     struct LogGroup: Codable {
         let id: Int
         let year_number: Int
@@ -280,6 +305,7 @@ struct BaseModel {
         let eng_name: String
         let kor_name: String?
         let jpn_name: String?
+        let bookmark_id: Int?
         
         enum CodingKeys: String, CodingKey {
             case id
@@ -288,6 +314,7 @@ struct BaseModel {
             case eng_name
             case kor_name
             case jpn_name
+            case bookmark_id
         }
         
         init(from decoder: Decoder) throws {
@@ -298,6 +325,7 @@ struct BaseModel {
             self.eng_name = try valueContainer.decode(String.self, forKey: CodingKeys.eng_name)
             self.kor_name = try? valueContainer.decode(String.self, forKey: CodingKeys.kor_name)
             self.jpn_name = try? valueContainer.decode(String.self, forKey: CodingKeys.jpn_name)
+            self.bookmark_id = try? valueContainer.decode(Int.self, forKey: CodingKeys.bookmark_id)
         }
     }
     
@@ -418,16 +446,19 @@ struct CustomModel {
     struct TagSet: Codable {
         let tag: BaseModel.Tag
         let sub_tags: [BaseModel.Tag]
+        let bookmark_id: Int?
         
         enum CodingKeys: String, CodingKey {
             case tag
             case sub_tags
+            case bookmark_id
         }
         
         init(from decoder: Decoder) throws {
             let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
             self.tag = try valueContainer.decode(BaseModel.Tag.self, forKey: CodingKeys.tag)
             self.sub_tags = try valueContainer.decode([BaseModel.Tag].self, forKey: CodingKeys.sub_tags)
+            self.bookmark_id = try? valueContainer.decode(Int.self, forKey: CodingKeys.bookmark_id)
         }
     }
 }

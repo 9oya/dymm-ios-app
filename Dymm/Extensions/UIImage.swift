@@ -10,6 +10,8 @@ import UIKit
 
 extension UIImage {
     // Button images
-    static let btnDottedCircle = UIImage(named: "btn-dotted-circle")
-    static let btnRemove = UIImage(named: "btn-remove")
+    static let btnDottedCircle = UIImage(named: "button-dotted-circle")!
+    static let btnRemove = UIImage(named: "button-remove")!
+    static let btnStarEmpty = UIImage(named: "button-star-empty")!
+    static let btnStarFilled = UIImage(named: "button-star-filled")!
 }
