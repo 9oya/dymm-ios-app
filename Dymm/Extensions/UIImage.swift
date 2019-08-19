@@ -11,4 +11,5 @@ import UIKit
 extension UIImage {
     // Button images
     static let btnDottedCircle = UIImage(named: "btn-dotted-circle")
+    static let btnRemove = UIImage(named: "btn-remove")
 }

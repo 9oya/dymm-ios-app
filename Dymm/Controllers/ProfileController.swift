@@ -726,7 +726,7 @@ extension ProfileViewController {
     
     private func loadProfile() {
         let service = Service(lang: lang)
-        service.fetchProfile(popoverAlert: { (message) in
+        service.getProfile(popoverAlert: { (message) in
             self.retryFunction = self.loadProfile
             self.alertError(message)
         }, emailNotConfirmed: { (email) in
@@ -773,7 +773,7 @@ extension ProfileViewController {
     private func loadProfileTags() {
         let profile_tag = profile!.profile_tags[selectedCollectionItem!]
         let service = Service(lang: lang)
-        service.fetchProfileTagSets(tagId: profile_tag.tag_id, isSelected: profile_tag.is_selected, popoverAlert: { (message) in
+        service.getProfileTagSets(tagId: profile_tag.tag_id, isSelected: profile_tag.is_selected, popoverAlert: { (message) in
             self.retryFunction = self.loadProfileTags
             self.alertError(message)
         }, tokenRefreshCompletion: {
@@ -803,7 +803,7 @@ extension ProfileViewController {
         }
         let profile_tag = profile!.profile_tags[selectedCollectionItem!]
         let service = Service(lang: lang)
-        service.updateProfileTag(profile_tag_id: profile_tag.id, new_tag_id: pickedProfileTagId, popoverAlert: { (message) in
+        service.putProfileTag(profile_tag_id: profile_tag.id, new_tag_id: pickedProfileTagId, popoverAlert: { (message) in
             self.retryFunction = self.updateProfileTag
             self.alertError(message)
         }, tokenRefreshCompletion: {

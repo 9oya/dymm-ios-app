@@ -24,7 +24,7 @@ struct Service {
         fatalError("\(decodedData.message)")
     }
     
-    func upexpectedResponse(_ statusCode: Int, _ data: Data, _ name: String) {
+    func unexpectedResponse(_ statusCode: Int, _ data: Data, _ name: String) {
         print("Request \(name) failed \nStatus Code: \(statusCode)")
         guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
             fatalError("Decode error message failed")
@@ -106,13 +106,13 @@ struct Service {
                 case 400:
                     self.badRequest(responseData)
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "refreshAccessToken()")
+                    self.unexpectedResponse(statusCode, responseData, "refreshAccessToken()")
                     return
                 }
         }
     }
     
-    func fetchBanners(popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ banners: [BaseModel.Banner]) -> Void) {
+    func getBannerList(popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ banners: [BaseModel.Banner]) -> Void) {
         Alamofire.request("\(URI.host)\(URI.banner)")
             .validate(contentType: ["application/json"])
             .responseData { response in
@@ -132,13 +132,13 @@ struct Service {
                 case 400:
                     self.badRequest(responseData)
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "fetchTagSets()")
+                    self.unexpectedResponse(statusCode, responseData, "fetchTagSets()")
                     return
                 }
         }
     }
     
-    func fetchTagSets(tagId: Int, sortType:String, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
+    func getTagSetList(tagId: Int, sortType:String, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
         Alamofire.request("\(URI.host)\(URI.tag)/\(tagId)/set/\(sortType)")
             .validate(contentType: ["application/json"])
             .responseData { response in
@@ -158,7 +158,7 @@ struct Service {
                 case 400:
                     self.badRequest(responseData)
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "fetchTagSets()")
+                    self.unexpectedResponse(statusCode, responseData, "fetchTagSets()")
                     return
                 }
         }
@@ -189,7 +189,7 @@ struct Service {
                     }
                     unauthorized(decodedData.pattern)
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "authExistedAccount()")
+                    self.unexpectedResponse(statusCode, responseData, "authExistedAccount()")
                     return
                 }
         }
@@ -220,13 +220,13 @@ struct Service {
                     }
                     unauthorized(decodedData.pattern)
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "createNewAccount()")
+                    self.unexpectedResponse(statusCode, responseData, "createNewAccount()")
                     return
                 }
         }
     }
     
-    func fetchProfile(popoverAlert: @escaping (_ message: String) -> Void, emailNotConfirmed: @escaping (_ email: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ avatarAndFacts: CustomModel.Profile) -> Void) {
+    func getProfile(popoverAlert: @escaping (_ message: String) -> Void, emailNotConfirmed: @escaping (_ email: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ avatarAndFacts: CustomModel.Profile) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError("UserDefaults.standard.getAccessToken()")
@@ -268,13 +268,13 @@ struct Service {
                     }
                     return
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "fetchProfile()")
+                    self.unexpectedResponse(statusCode, responseData, "fetchProfile()")
                     return
                 }
         }
     }
     
-    func fetchProfileTagSets(tagId: Int, isSelected: Bool, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ profileTagSet: CustomModel.ProfileTagSet) -> Void) {
+    func getProfileTagSets(tagId: Int, isSelected: Bool, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ profileTagSet: CustomModel.ProfileTagSet) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -306,13 +306,13 @@ struct Service {
                     }
                     return
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "fetchSetOfFacts()")
+                    self.unexpectedResponse(statusCode, responseData, "fetchSetOfFacts()")
                     return
                 }
         }
     }
     
-    func fetchAvatar(popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ data: BaseModel.Avatar) -> Void) {
+    func getAvatar(popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ data: BaseModel.Avatar) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -348,13 +348,13 @@ struct Service {
                     }
                     return
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "validateUser()")
+                    self.unexpectedResponse(statusCode, responseData, "validateUser()")
                     return
                 }
         }
     }
     
-    func fetchAvatarCondList(popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ data: [BaseModel.AvatarCond]) -> Void) {
+    func getAvatarCondList(popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ data: [BaseModel.AvatarCond]) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -390,13 +390,13 @@ struct Service {
                     }
                     return
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "validateUser()")
+                    self.unexpectedResponse(statusCode, responseData, "validateUser()")
                     return
                 }
         }
     }
     
-    func updateProfileTag(profile_tag_id: Int, new_tag_id: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+    func putProfileTag(profile_tag_id: Int, new_tag_id: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -422,7 +422,7 @@ struct Service {
                     }
                     return
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "validateUser()")
+                    self.unexpectedResponse(statusCode, responseData, "validateUser()")
                     return
                 }
         }
@@ -463,7 +463,7 @@ struct Service {
                     }
                     return
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
                     return
                 }
         }
@@ -509,7 +509,7 @@ struct Service {
                     }
                     return
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "fetchLogGroups()")
+                    self.unexpectedResponse(statusCode, responseData, "fetchLogGroups()")
                     return
                 }
         }
@@ -547,7 +547,7 @@ struct Service {
                     }
                     return
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
                     return
                 }
         }
@@ -583,7 +583,7 @@ struct Service {
                     }
                     return
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
                     return
                 }
         }
@@ -619,13 +619,13 @@ struct Service {
                     }
                     return
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
                     return
                 }
         }
     }
     
-    func dispatchASingleLog(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+    func postASingleLog(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             print("Load UserDefaults.standard.getAccessToken() failed")
             return
@@ -655,13 +655,13 @@ struct Service {
                     }
                     return
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
                     return
                 }
         }
     }
     
-    func dispatchACondLog(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+    func postACondLog(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             print("Load UserDefaults.standard.getAccessToken() failed")
             return
@@ -691,13 +691,13 @@ struct Service {
                     }
                     return
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
                     return
                 }
         }
     }
     
-    func updateGroupOfALog(_ tagLogId: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+    func putGroupOfALog(_ tagLogId: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -727,7 +727,43 @@ struct Service {
                     }
                     return
                 default:
-                    self.upexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    return
+                }
+        }
+    }
+    
+    func putAvatarCond(_ avatarCondId: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)",
+        ]
+        Alamofire.request("\(URI.host)\(URI.avatar)/cond/\(avatarCondId)", method: .put, encoding: JSONEncoding.default, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<String>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    print(decodedData.message)
+                    completion()
+                case 400:
+                    self.badRequest(responseData)
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
                     return
                 }
         }

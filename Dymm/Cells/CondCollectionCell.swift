@@ -13,6 +13,7 @@ class CondCollectionCell: UICollectionViewCell {
     var stackView: UIStackView!
     var startDateLabel: UILabel!
     var endDateLabel: UILabel!
+    var removeImageView: UIImageView!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -60,10 +61,20 @@ extension CondCollectionCell {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
+        removeImageView = {
+            let _imageView = UIImageView()
+            _imageView.image = UIImage.btnRemove
+            _imageView.isHidden = true
+            _imageView.contentMode = .scaleAspectFit
+//            _imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
         
         
         addSubview(stackView)
         addSubview(titleLabel)
+        addSubview(removeImageView)
         stackView.addArrangedSubview(startDateLabel)
         stackView.addArrangedSubview(endDateLabel)
         
@@ -75,5 +86,8 @@ extension CondCollectionCell {
         titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
         titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -110).isActive = true
         titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0).isActive = true
+        
+        removeImageView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
+        removeImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20).isActive = true
     }
 }

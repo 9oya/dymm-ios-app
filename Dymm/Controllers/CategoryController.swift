@@ -185,7 +185,7 @@ class CategoryViewController: UIViewController {
         }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
-        alertController.view.tintColor = UIColor.tomato
+        alertController.view.tintColor = UIColor.cornflowerBlue
         self.present(alertController, animated: true, completion: nil)
     }
 }
@@ -852,7 +852,7 @@ extension CategoryViewController {
             superTagId = _superTag.id
         }
         let service = Service(lang: lang)
-        service.fetchTagSets(tagId: superTagId!, sortType: SortType.priority, popoverAlert: { (message) in
+        service.getTagSetList(tagId: superTagId!, sortType: SortType.priority, popoverAlert: { (message) in
             self.retryFunction = self.loadCategories
             self.alertError(message)
         }) { (tagSet) in
@@ -873,7 +873,7 @@ extension CategoryViewController {
             "log_date": selectedDate!
         ]
         let service = Service(lang: lang)
-        service.dispatchACondLog(params: params, popoverAlert: { (message) in
+        service.postACondLog(params: params, popoverAlert: { (message) in
             self.retryFunction = self.postAConditionLog
             self.detailContainerView.isHidden = true
             self.alertError(message)

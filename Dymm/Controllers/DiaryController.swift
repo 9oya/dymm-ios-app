@@ -111,6 +111,8 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var isPullToRefresh: Bool = false
     var isLogGroupTableEdited: Bool = false
     var editedCellIdxPath: IndexPath?
+    var isCondEditBtnTapped: Bool = false
+    var selectedAvatarCondId: Int?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -214,10 +216,25 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     @objc func condRightButtonTapped() {
-        print("")
+        if isCondEditBtnTapped {
+            isCondEditBtnTapped = false
+            condRightButton.setTitle(lang.btnEdit, for: .normal)
+            condRightButton.setTitleColor(UIColor.cornflowerBlue, for: .normal)
+            condCollectionView.reloadData()
+        } else {
+            isCondEditBtnTapped = true
+            condRightButton.setTitle(lang.btnDone, for: .normal)
+            condRightButton.setTitleColor(UIColor.tomato, for: .normal)
+            UIView.animate(withDuration: 0.5) {
+                self.condCollectionView.reloadData()
+            }
+        }
     }
     
     @objc func condLeftButtonTapped() {
+        isCondEditBtnTapped = false
+        condRightButton.setTitle(lang.btnEdit, for: .normal)
+        condRightButton.setTitleColor(UIColor.cornflowerBlue, for: .normal)
         UIView.transition(with: self.blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.blindView.isHidden = true
             self.condLeftButton.setTitleColor(UIColor.clear, for: .normal)
@@ -232,6 +249,10 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     @objc func condButtonTapped() {
         loadAvatarCondList()
+    }
+    
+    @objc func removeAvatarCondBtnTapped() {
+        updateAvatarCondRemove()
     }
     
     // MARK: - UIGestureRecognizerDelegate
@@ -431,6 +452,12 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if diaryMode == DiaryMode.logger {
+            if indexPath.row == 0 {
+                // "Create new" cell can't swipe to delete.
+                return
+            }
+        }
         selectedOnceCellIdxPath = nil
         selectedTableSection = nil
         selectedTableRow = nil
@@ -642,15 +669,6 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             }
         }
     }
-    
-//    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-//        let deleteButton = UITableViewRowAction(style: .destructive, title: "Delete") { (action, indexPath) in
-//            self.logGroupTableView.dataSource?.tableView!(self.logGroupTableView, commit: .delete, forRowAt: indexPath)
-//            return
-//        }
-//        deleteButton.backgroundColor = UIColor.cornflowerBlue
-//        return [deleteButton]
-//    }
 }
 
 extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -697,6 +715,15 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             }
             if let end_date = avtCond.end_date {
                 cell.endDateLabel.text = "\u{2713}\(end_date)"
+            }
+            if self.isCondEditBtnTapped {
+                cell.titleLabel.textColor = UIColor.lightGray
+                cell.stackView.isHidden = true
+                cell.removeImageView.isHidden = false
+            } else {
+                cell.titleLabel.textColor = UIColor.black
+                cell.stackView.isHidden = false
+                cell.removeImageView.isHidden = true
             }
             return cell
         }
@@ -770,6 +797,11 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == condCollectionView {
+            if isCondEditBtnTapped {
+                selectedAvatarCondId = self.avtCondList![indexPath.item].id
+                updateAvatarCondRemove()
+                return
+            }
             condLeftButtonTapped()
             let vc = CategoryViewController()
             vc.topLeftButtonType = ButtonType.close
@@ -970,6 +1002,7 @@ extension DiaryViewController {
             let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
             _collectionView.backgroundColor = UIColor.clear
             _collectionView.register(CondCollectionCell.self, forCellWithReuseIdentifier: condCollectionCellId)
+            _collectionView.dragInteractionEnabled = true
             _collectionView.translatesAutoresizingMaskIntoConstraints = false
             return _collectionView
         }()
@@ -1313,7 +1346,7 @@ extension DiaryViewController {
     
     private func loadAvatarCondList() {
         let service = Service(lang: lang)
-        service.fetchAvatarCondList(popoverAlert: { (message) in
+        service.getAvatarCondList(popoverAlert: { (message) in
             self.retryFunction = self.loadAvatarCondList
             self.pickerContainerView.isHidden = true
             self.alertError(message)
@@ -1322,7 +1355,7 @@ extension DiaryViewController {
         }) { (avtCondList) in
             self.avtCondList = avtCondList
             self.condCollectionView.reloadData()
-            self.condLeftButton.setTitleColor(UIColor.tomato, for: .normal)
+            self.condLeftButton.setTitleColor(UIColor.cornflowerBlue, for: .normal)
             UIView.transition(with: self.condLeftButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.condLeftButton.isHidden = false
                 self.condCollectionHeight.constant = CGFloat(45 * self.avtCondList!.count)
@@ -1358,7 +1391,7 @@ extension DiaryViewController {
             params["log_group_id"] = logGroupId
         }
         let service = Service(lang: lang)
-        service.dispatchASingleLog(params: params, popoverAlert: { (message) in
+        service.postASingleLog(params: params, popoverAlert: { (message) in
             self.retryFunction = self.postAGroupOfLog
             self.pickerContainerView.isHidden = true
             self.alertError(message)
@@ -1410,6 +1443,18 @@ extension DiaryViewController {
         }) {
             self.isLogGroupTableEdited = true
             self.loadLogGroups()
+        }
+    }
+    
+    private func updateAvatarCondRemove() {
+        let service = Service(lang: lang)
+        service.putAvatarCond(self.selectedAvatarCondId!, popoverAlert: { (message) in
+            self.retryFunction = self.updateAvatarCondRemove
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.updateAvatarCondRemove()
+        }) {
+            self.loadAvatarCondList()
         }
     }
 }

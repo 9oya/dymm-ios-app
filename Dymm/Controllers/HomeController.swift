@@ -66,32 +66,32 @@ class HomeViewController: UIViewController {
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
         alertController.view.tintColor = UIColor.cornflowerBlue
-        self.present(alertController, animated: true, completion: nil)
+        present(alertController, animated: true, completion: nil)
     }
     
     @objc func presentDiaryNavigation() {
         let vc = DiaryViewController()
         let nc = UINavigationController(rootViewController: vc)
-        self.present(nc, animated: true, completion: nil)
+        present(nc, animated: true, completion: nil)
     }
     
     @objc func presentCategoryNavigation() {
         let vc = CategoryViewController()
         vc.superTag = self.selectedTag!
         let nc = UINavigationController(rootViewController: vc)
-        self.present(nc, animated: true, completion: nil)
+        present(nc, animated: true, completion: nil)
     }
     
     @objc func presentAuthNavigation() {
         let vc = AuthViewController()
         let nc = UINavigationController(rootViewController: vc)
-        self.present(nc, animated: true, completion: nil)
+        present(nc, animated: true, completion: nil)
     }
     
     @objc func presentProfileNavigation() {
         let vc = ProfileViewController()
         let nc = UINavigationController(rootViewController: vc)
-        self.present(nc, animated: true, completion: nil)
+        present(nc, animated: true, completion: nil)
     }
     
     @objc func profileButtonTapped() {
@@ -349,7 +349,7 @@ extension HomeViewController {
     
     private func loadBanners() {
         let service = Service(lang: lang)
-        service.fetchBanners(popoverAlert: { (message) in
+        service.getBannerList(popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }) { (banners) in
@@ -365,7 +365,7 @@ extension HomeViewController {
     private func loadCategories() {
         let service = Service(lang: lang)
         let homeTagId = 16
-        service.fetchTagSets(tagId: homeTagId, sortType: SortType.priority, popoverAlert: { (message) in
+        service.getTagSetList(tagId: homeTagId, sortType: SortType.priority, popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }) { (tagSet) in
@@ -376,7 +376,7 @@ extension HomeViewController {
     
     private func loadAvatar() {
         let service = Service(lang: lang)
-        service.fetchAvatar(popoverAlert: { (message) in
+        service.getAvatar(popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }, tokenRefreshCompletion: {

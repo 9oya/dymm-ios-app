@@ -143,7 +143,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
             let selectedLogId = logsArray[indexPath.row].id
             let _ = {
                 let service = Service(lang: lang)
-                service.updateGroupOfALog(selectedLogId, popoverAlert: { (message) in
+                service.putGroupOfALog(selectedLogId, popoverAlert: { (message) in
                     print(message)
                 }, tokenRefreshCompletion: {
                     print("")
