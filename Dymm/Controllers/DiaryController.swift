@@ -478,10 +478,6 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 guard let cell = tableView.cellForRow(at: indexPath) as? LogGroupTableCell else {
                     fatalError()
                 }
-                cell.selectedLogGroup = self.selectedLogGroup!
-                cell.groupOfLogSetForCnt = self.groupOfLogSet!
-                cell.groupOfLogSetForPop = self.groupOfLogSet!
-                cell.groupOfLogsTableView.reloadData()
                 if indexPath == self.selectedOnceCellIdxPath {
                     // Case select already selected cell
                     self.selectedOnceCellIdxPath = nil
@@ -496,13 +492,13 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     }
                     UIView.animate(withDuration: duration, animations: {
                         cell.containerViewHight.constant = 45
-                        cell.groupOfLogsTableView.isHidden = true
                         cell.arrowImageView.transform = CGAffineTransform.identity
-                        cell.condScoreImageView.isHidden = false
-                        cell.condScoreButton.isHidden = true
                         self.view.layoutIfNeeded()
                     }, completion: { _ in
-                        UIView.transition(with: cell.foodLogBulletView, duration: 0.1, options: .transitionCrossDissolve, animations: {
+                        UIView.transition(with: cell.groupOfLogsTableView, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                            cell.groupOfLogsTableView.isHidden = true
+                            cell.condScoreImageView.isHidden = false
+                            cell.condScoreButton.isHidden = true
                             if self.selectedLogGroup!.food_cnt > 0 {
                                 cell.foodLogBulletView.isHidden = false
                             }
@@ -517,6 +513,10 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     self.updateLogGroupTable()
                 } else {
                     // Case select cell tapped at first time
+                    cell.selectedLogGroup = self.selectedLogGroup!
+                    cell.groupOfLogSetForCnt = self.groupOfLogSet!
+                    cell.groupOfLogSetForPop = self.groupOfLogSet!
+                    cell.groupOfLogsTableView.reloadData()
                     self.selectedOnceCellIdxPath = indexPath
                     let total = self.getGroupOfLogsTotalCnt(groupOfLogSet)
                     let duration = Double(total) * 0.04
@@ -1093,7 +1093,7 @@ extension DiaryViewController {
         }()
         refreshControler = {
             let _refresh = UIRefreshControl()
-            _refresh.tintColor = UIColor.cornflowerBlue
+            _refresh.tintColor = UIColor.lightSteelBlue
 //            _refresh.attributedTitle = NSAttributedString(string: "Pull to refresh")
             _refresh.addTarget(self, action: #selector(refreshLogGroupTableView(sender:)), for: UIControl.Event.valueChanged)
             return _refresh

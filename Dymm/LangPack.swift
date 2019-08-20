@@ -26,6 +26,7 @@ class LangPack {
     var txtFieldEmail: String!
     var txtFieldPassword: String!
     var txtFieldConfirmPassword: String!
+    var txtFieldSearch: String!
     
     var labelSignIn: String!
     var labelSignUp: String!
@@ -212,6 +213,12 @@ func getLanguagePack(_ currentLanguageId: Int) -> LangPack {
         switch currentLanguageId {
         case LanguageId.eng: return "Confirm Password"
         case LanguageId.kor: return "패스워드 확인"
+        default: fatalError(lang.currentLangErrorMsg)}
+    }()
+    lang.txtFieldSearch = {
+        switch currentLanguageId {
+        case LanguageId.eng: return "Search"
+        case LanguageId.kor: return "검색"
         default: fatalError(lang.currentLangErrorMsg)}
     }()
     

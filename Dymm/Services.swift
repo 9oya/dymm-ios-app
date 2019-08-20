@@ -172,6 +172,33 @@ struct Service {
         }
     }
     
+    func searchTags(tagId: Int, keyWord:String, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
+        let url = "\(URI.host)\(URI.tag)/\(tagId)/search/\(keyWord)"
+        Alamofire.request(url)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? JSONDecoder().decode(Ok<CustomModel.TagSet>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    guard let data = decodedData.data else {
+                        fatalError()
+                    }
+                    completion(data)
+                case 400:
+                    self.badRequest(responseData)
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "fetchTagSets()")
+                    return
+                }
+        }
+    }
+    
     func getProfile(popoverAlert: @escaping (_ message: String) -> Void, emailNotConfirmed: @escaping (_ email: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ avatarAndFacts: CustomModel.Profile) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)

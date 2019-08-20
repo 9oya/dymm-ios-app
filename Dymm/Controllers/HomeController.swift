@@ -11,14 +11,14 @@ import UIKit
 private let bannerCellId = "BannerCell"
 private let tagCellId = "TagCell"
 
+private let tagCellHeight: CGFloat = 45
+private let bannerHeight: CGFloat = 160
+
 class HomeViewController: UIViewController {
     
     // MARK: - Properties
     
-    var loadingImageView: UIImageView!
-    var scrollView: UIScrollView!
-    var categoryCollectionView: UICollectionView!
-    var categoryCollectionViewHeight: NSLayoutConstraint!
+    var tagCollectionView: UICollectionView!
     var bannerCollectionView: UICollectionView!
     var pageControl: UIPageControl!
     var titleImageView: UIImageView!
@@ -40,10 +40,6 @@ class HomeViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
-        UIView.transition(with: categoryCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            self.bannerCollectionView.reloadData()
-            self.categoryCollectionView.reloadData()
-        })
         if UserDefaults.standard.isSignIn() {
             loadAvatar()
         } else {
@@ -103,15 +99,15 @@ class HomeViewController: UIViewController {
     }
     
     @objc private func handleNextBanner() {
-        var nextIndex = pageControl.currentPage + 1
-        if nextIndex == banners!.count {
-            nextIndex = 0
+        var nextIdx = pageControl.currentPage + 1
+        if nextIdx == banners!.count {
+            nextIdx = 0
         }
-        let indexPath = IndexPath(item: nextIndex, section: 0)
-        pageControl.currentPage = nextIndex
-        DispatchQueue.main.async {
-            self.bannerCollectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
-        }
+        let indexPath = IndexPath(item: (banners!.count - 1) - nextIdx, section: 0)
+        bannerCollectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+        UIView.transition(with: self.pageControl, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.pageControl.currentPage = nextIdx
+        })
     }
 }
 
@@ -129,7 +125,7 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
                 return 0
             }
             return number
-        } else if collectionView == self.categoryCollectionView {
+        } else if collectionView == self.tagCollectionView {
             guard let number = tags?.count else {
                 return 0
             }
@@ -210,9 +206,9 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenWidth = UIScreen.main.bounds.width
         if collectionView == bannerCollectionView {
-            return CGSize(width: screenWidth, height: 160)
+            return CGSize(width: screenWidth, height: bannerHeight)
         } else {
-            return CGSize(width: (screenWidth / 2) - 10.5, height: CGFloat(45))
+            return CGSize(width: (screenWidth / 2) - 10.5, height: tagCellHeight)
         }
     }
     
@@ -248,9 +244,7 @@ extension HomeViewController {
         view.backgroundColor = UIColor(hex: "WhiteSmoke")
         
         // Initialize subveiw properties
-        scrollView = getScrollView()
-        loadingImageView = getLoadingImageView()
-        categoryCollectionView = getCategoryCollectionView()
+        tagCollectionView = getCategoryCollectionView()
         bannerCollectionView = {
             let layout = UICollectionViewFlowLayout()
             layout.scrollDirection = .horizontal
@@ -258,8 +252,9 @@ extension HomeViewController {
             _collectionView.backgroundColor = UIColor.clear
             _collectionView.register(BannerCollectionCell.self, forCellWithReuseIdentifier: bannerCellId)
             _collectionView.isPagingEnabled = true
-            _collectionView.semanticContentAttribute = .forceLeftToRight
+            _collectionView.semanticContentAttribute = .forceRightToLeft
             _collectionView.showsHorizontalScrollIndicator = false
+            _collectionView.decelerationRate = .fast
             _collectionView.translatesAutoresizingMaskIntoConstraints = false
             return _collectionView
         }()
@@ -291,59 +286,30 @@ extension HomeViewController {
         navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: profileButton)]
         bannerCollectionView.dataSource = self
         bannerCollectionView.delegate = self
-        categoryCollectionView.dataSource = self
-        categoryCollectionView.delegate = self
+        tagCollectionView.dataSource = self
+        tagCollectionView.delegate = self
         
-        view.addSubview(scrollView)
-        view.addSubview(loadingImageView)
-        
-        scrollView.addSubview(bannerCollectionView)
-        scrollView.addSubview(categoryCollectionView)
-        scrollView.addSubview(pageControl)
+        view.addSubview(bannerCollectionView)
+        view.addSubview(tagCollectionView)
+        view.addSubview(pageControl)
         
         // Setup constraints
-        // loadingImageView, alertBlindView
-        loadingImageView.widthAnchor.constraint(equalToConstant: 62).isActive = true
-        loadingImageView.heightAnchor.constraint(equalToConstant: 62).isActive = true
-        loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
-        loadingImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0).isActive = true
-        
-        // scrollView
-        scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
-        scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
-        scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
-        
-        bannerCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 1).isActive = true
-        bannerCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 0).isActive = true
-        bannerCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 0).isActive = true
-        bannerCollectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor, constant: 0).isActive = true
+        bannerCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 1).isActive = true
+        bannerCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+        bannerCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
         bannerCollectionView.heightAnchor.constraint(equalToConstant: 160).isActive = true
         
-        pageControl.centerXAnchor.constraint(equalTo: bannerCollectionView.centerXAnchor, constant: 0).isActive = true
+        pageControl.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
         pageControl.bottomAnchor.constraint(equalTo: bannerCollectionView.bottomAnchor, constant: 3).isActive = true
         
-        categoryCollectionView.topAnchor.constraint(equalTo: bannerCollectionView.bottomAnchor, constant: 7).isActive = true
-        categoryCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 7).isActive = true
-        categoryCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -7).isActive = true
-        categoryCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: 0).isActive = true
-        categoryCollectionViewHeight = categoryCollectionView.heightAnchor.constraint(equalToConstant: 45 + 7)
-        categoryCollectionViewHeight.priority = UILayoutPriority(rawValue: 999)
-        categoryCollectionViewHeight.isActive = true
+        tagCollectionView.topAnchor.constraint(equalTo: bannerCollectionView.bottomAnchor, constant: 7).isActive = true
+        tagCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
+        tagCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
+        tagCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
     }
 
     private func startTimer() {
         Timer.scheduledTimer(timeInterval: 6.0, target: self, selector: #selector(handleNextBanner), userInfo: nil, repeats: true)
-    }
-    
-    private func afterFetchCategoriesTransition(_ tags: [BaseModel.Tag]) {
-        self.tags = tags
-        let tagsCnt = tags.count
-        UIView.transition(with: self.categoryCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            self.categoryCollectionView.reloadData()
-            self.categoryCollectionViewHeight.constant = self.getCategoryCollectionViewHeight(tagsCnt)
-            self.loadingImageView.isHidden = true
-        })
     }
     
     private func retryFunctionSet() {
@@ -359,9 +325,7 @@ extension HomeViewController {
             self.alertError(message)
         }) { (banners) in
             self.banners = banners
-            UIView.transition(with: self.bannerCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.bannerCollectionView.reloadData()
-            })
+            self.bannerCollectionView.reloadData()
             self.pageControl.numberOfPages = banners.count
             self.startTimer()
         }
@@ -374,8 +338,10 @@ extension HomeViewController {
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }) { (tagSet) in
-            self.afterFetchCategoriesTransition(tagSet.sub_tags)
-            print("Load home categories complete.")
+            self.tags = tagSet.sub_tags
+            UIView.transition(with: self.tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.tagCollectionView.reloadData()
+            })
         }
     }
     

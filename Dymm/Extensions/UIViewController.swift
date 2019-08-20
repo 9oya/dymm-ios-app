@@ -30,7 +30,7 @@ extension UIViewController {
     }
     
     func getCategoryCollectionViewHeight(_ numberOfItems: Int) -> CGFloat {
-        let cellHeight = 52
+        let cellHeight = 45 + 7
         let lineNumber = (numberOfItems / 2) + (numberOfItems % 2 > 0 ? 1:0)
         return CGFloat(cellHeight * lineNumber)
     }

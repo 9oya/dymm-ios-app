@@ -13,6 +13,8 @@ private let tagCellId = "TagCell"
 private let stepCellId = "StepCell"
 
 private let stepBarHeightVal: CGFloat = 40
+private let searchBarHeightVal: CGFloat = 40
+private let tagCellHeight: CGFloat = 45
 private let spaceVal: CGFloat = 7
 private let detailBoxAHeightVal: CGFloat = 350
 private let detailBoxBHeightVal: CGFloat = 333
@@ -24,7 +26,7 @@ class CategoryViewController: UIViewController {
     
     // UIViews
     var detailContainerView: UIView!
-    var searchContainerView: UIView!
+    var searchTextField: UITextField!
     var sortContainerView: UIView!
     var sizePickerContainerView: UIView!
     
@@ -86,6 +88,7 @@ class CategoryViewController: UIViewController {
     let mins: [Int] = [0, 10, 20, 30, 40, 50]
     var topLeftButtonType = ButtonType.home
     var bookmark_id: Int?
+    var typedKeyword: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -94,48 +97,6 @@ class CategoryViewController: UIViewController {
     }
     
     // MARK: - Actions
-    
-    @objc func homeButtonTapped() {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    @objc func logButtonTapped() {
-        let vc = DiaryViewController()
-        vc.diaryMode = DiaryMode.logger
-        vc.logType = LogType.food
-        vc.selectedTag = superTag!
-        vc.x_val = selectedXVal!
-        vc.y_val = selectedYVal!
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: UIBarButtonItem.Style.plain, target: self, action: nil)
-        self.navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    @objc func timePickerChanged(_ sender: UIDatePicker){
-        let _formatter = DateFormatter()
-        _formatter.locale = Locale(identifier: getUserCountryCode())  // TODO ko_kr
-        _formatter.dateFormat = "HH:mm"
-        let selectedTimeArr = _formatter.string(from: sender.date).components(separatedBy: ":")
-        selectedXVal = Int(selectedTimeArr[0])
-        selectedYVal = Int(selectedTimeArr[1])
-        var hr = ""
-        var min = ""
-        if selectedXVal != 0 {
-            hr = "\(selectedXVal!)hr"
-        }
-        if selectedYVal != 0 {
-            min = "\(selectedYVal!)min"
-        }
-        logTimeButton.setTitle("\(hr) \(min)", for: .normal)
-        print(hr)
-    }
-    
-    @objc func startDateButtonTapped() {
-        alertDatePicker(cond_log_type: CondLogType.startDate)
-    }
-    
-    @objc func endDateButtonTapped() {
-        alertDatePicker(cond_log_type: CondLogType.endDate)
-    }
     
     @objc func alertError(_ message: String) {
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
@@ -190,6 +151,65 @@ class CategoryViewController: UIViewController {
         self.present(alertController, animated: true, completion: nil)
     }
     
+    @objc func homeButtonTapped() {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func logButtonTapped() {
+        let vc = DiaryViewController()
+        vc.diaryMode = DiaryMode.logger
+        vc.logType = LogType.food
+        vc.selectedTag = superTag!
+        vc.x_val = selectedXVal!
+        vc.y_val = selectedYVal!
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: UIBarButtonItem.Style.plain, target: self, action: nil)
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc func timePickerChanged(_ sender: UIDatePicker){
+        let _formatter = DateFormatter()
+        _formatter.locale = Locale(identifier: getUserCountryCode())  // TODO ko_kr
+        _formatter.dateFormat = "HH:mm"
+        let selectedTimeArr = _formatter.string(from: sender.date).components(separatedBy: ":")
+        selectedXVal = Int(selectedTimeArr[0])
+        selectedYVal = Int(selectedTimeArr[1])
+        var hr = ""
+        var min = ""
+        if selectedXVal != 0 {
+            hr = "\(selectedXVal!)hr"
+        }
+        if selectedYVal != 0 {
+            min = "\(selectedYVal!)min"
+        }
+        logTimeButton.setTitle("\(hr) \(min)", for: .normal)
+        print(hr)
+    }
+    
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        if textField.text == "" {
+            typedKeyword = nil
+            loadCategories()
+            return
+        } else if textField.text!.first == " " {
+            textField.text = ""
+            typedKeyword = nil
+            return
+        } else if textField.text!.count < 2 {
+            typedKeyword = nil
+            return
+        }
+        typedKeyword = textField.text!
+        searchTagsByKeyword()
+    }
+    
+    @objc func startDateButtonTapped() {
+        alertDatePicker(cond_log_type: CondLogType.startDate)
+    }
+    
+    @objc func endDateButtonTapped() {
+        alertDatePicker(cond_log_type: CondLogType.endDate)
+    }
+    
     @objc func starButtonTapped() {
         if bookmark_id != nil {
             updateABookmark()
@@ -226,10 +246,18 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
                 fatalError()
             }
             let tag = subTags[indexPath.row]
+            var _text = ""
             switch lang.currentLanguageId {
-            case LanguageId.eng: cell.label.text = tag.eng_name
-            case LanguageId.kor: cell.label.text = tag.kor_name
+            case LanguageId.eng: _text = tag.eng_name
+            case LanguageId.kor: _text = tag.kor_name!
             default: fatalError()}
+            if typedKeyword != nil {
+                let attributedString: NSMutableAttributedString = NSMutableAttributedString(string: _text)
+                attributedString.setColorForText(textForAttribute: typedKeyword!, withColor: UIColor.orange)
+                cell.label.attributedText = attributedString
+            } else {
+                cell.label.text = _text
+            }
             cell.imageView.image = UIImage(named: "tagId-\(tag.id)")
             return cell
         } else if collectionView == stepCollectionView {
@@ -250,6 +278,9 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
     // MARK: - UICollectionViewDelegate
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        view.endEditing(true)
+        searchTextField.text = nil
+        typedKeyword = nil
         if collectionView == tagCollectionView {
             let selected_tag = subTags[indexPath.item]
             stepTags.append(superTag!)
@@ -275,7 +306,7 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenWidth = UIScreen.main.bounds.width
         if collectionView == tagCollectionView {
-            return CGSize(width: (screenWidth / 2) - 10.5, height: CGFloat(40))
+            return CGSize(width: (screenWidth / 2) - 10.5, height: tagCellHeight)
         } else if collectionView == stepCollectionView {
             let tag = stepTags[indexPath.row]
             var txtCnt = 0
@@ -396,6 +427,21 @@ extension CategoryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     }
 }
 
+extension CategoryViewController: UITextFieldDelegate {
+    
+    // MARK: - UITextFieldDelegate
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        print("After keyboard return tapped")
+        textField.endEditing(true)
+        return false
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        print("After keyboard end editing")
+    }
+}
+
 extension CategoryViewController {
     
     // MARK: Private methods
@@ -414,12 +460,21 @@ extension CategoryViewController {
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
-        searchContainerView = {
-            let _view = UIView()
-            _view.backgroundColor = UIColor.white
-            _view.addShadowView()
-            _view.translatesAutoresizingMaskIntoConstraints = false
-            return _view
+        searchTextField = {
+            let _textField = UITextField()
+            _textField.font = .systemFont(ofSize: 15, weight: .light)
+            _textField.textColor = UIColor.dimGray
+            _textField.backgroundColor = UIColor.white
+            _textField.textAlignment = .center
+            _textField.textContentType = .namePrefix
+            _textField.autocapitalizationType = .words
+            _textField.borderStyle = .none
+            _textField.layer.cornerRadius = 10.0
+            _textField.placeholder = lang.txtFieldSearch
+            _textField.addShadowView()
+            _textField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+            _textField.translatesAutoresizingMaskIntoConstraints = false
+            return _textField
         }()
         sortContainerView = {
             let _view = UIView()
@@ -567,13 +622,14 @@ extension CategoryViewController {
         tagCollectionView.delegate = self
         sizePickerView.dataSource = self
         sizePickerView.delegate = self
+        searchTextField.delegate = self
         
         // Setup subviews
         view.addSubview(scrollView)
         view.addSubview(loadingImageView)
         view.addSubview(stepCollectionView)
         
-        scrollView.addSubview(searchContainerView)
+        scrollView.addSubview(searchTextField)
         scrollView.addSubview(sortContainerView)
         scrollView.addSubview(detailContainerView)
         scrollView.addSubview(tagCollectionView)
@@ -611,15 +667,15 @@ extension CategoryViewController {
         scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
         
-        searchContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + spaceVal).isActive = true
-        searchContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: spaceVal).isActive = true
-        searchContainerView.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) + spaceVal).isActive = true
-        searchContainerView.heightAnchor.constraint(equalToConstant: 45).isActive = true
+        searchTextField.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + spaceVal).isActive = true
+        searchTextField.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: spaceVal).isActive = true
+        searchTextField.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) + spaceVal).isActive = true
+        searchTextField.heightAnchor.constraint(equalToConstant: searchBarHeightVal).isActive = true
         
         sortContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + spaceVal).isActive = true
-        sortContainerView.leadingAnchor.constraint(equalTo: searchContainerView.trailingAnchor, constant: spaceVal).isActive = true
+        sortContainerView.leadingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: spaceVal).isActive = true
         sortContainerView.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 28).isActive = true
-        sortContainerView.heightAnchor.constraint(equalTo: searchContainerView.heightAnchor, constant: 0).isActive = true
+        sortContainerView.heightAnchor.constraint(equalTo: searchTextField.heightAnchor, constant: 0).isActive = true
         
         detailContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + spaceVal).isActive = true
         detailContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: spaceVal).isActive = true
@@ -674,15 +730,15 @@ extension CategoryViewController {
         fingerImageBottom.isActive = true
         fingerImageView.leadingAnchor.constraint(equalTo: logSizeButton.trailingAnchor, constant: 8).isActive = true
         
-        // addBar: 35, space: 7, searchBar: 45, space: 7
-        tagCollectionViewTop = tagCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + 7 + 45 + 7)
+        // addBar: 35, space: 7, searchBar: 40, space: 7
+        tagCollectionViewTop = tagCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + 7 + searchBarHeightVal + 7)
         tagCollectionViewTop.priority = UILayoutPriority(rawValue: 999)
         tagCollectionViewTop.isActive = true
         tagCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 7).isActive = true
         tagCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 7).isActive = true
         tagCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: 0).isActive = true
         tagCollectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor, constant: 0).isActive = true
-        tagCollectionViewHeight = tagCollectionView.heightAnchor.constraint(equalToConstant: 45 + 7)
+        tagCollectionViewHeight = tagCollectionView.heightAnchor.constraint(equalToConstant: searchBarHeightVal + 7)
         tagCollectionViewHeight.priority = UILayoutPriority(rawValue: 999)
         tagCollectionViewHeight.isActive = true
     }
@@ -757,12 +813,12 @@ extension CategoryViewController {
             default: fatalError()}
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = true
-                self.searchContainerView.isHidden = false
+                self.searchTextField.isHidden = false
                 self.sortContainerView.isHidden = false
-                self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + 45 + spaceVal
+                self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + searchBarHeightVal + spaceVal
             }
         } else {
-            // Case non-cateogry tag_types
+            // Case all non-cateogry tag_types
             switch lang.currentLanguageId {
             case LanguageId.eng: titleLabel.text = superTag.eng_name
             case LanguageId.kor: titleLabel.text = superTag.kor_name
@@ -775,7 +831,7 @@ extension CategoryViewController {
             didSelectSizePickerRow(row: 4)
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = false
-                self.searchContainerView.isHidden = true
+                self.searchTextField.isHidden = true
                 self.sortContainerView.isHidden = true
                 self.detailContainerViewHeight.constant = detailBoxAHeightVal
                 self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + detailBoxAHeightVal + spaceVal
@@ -803,7 +859,7 @@ extension CategoryViewController {
             logTimeButton.setTitle("5min", for: .normal)
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = false
-                self.searchContainerView.isHidden = true
+                self.searchTextField.isHidden = true
                 self.sortContainerView.isHidden = true
                 self.detailContainerViewHeight.constant = detailBoxBHeightVal
                 self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + detailBoxBHeightVal + spaceVal
@@ -823,7 +879,7 @@ extension CategoryViewController {
             // Execute condition tag_type exclusive
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = false
-                self.searchContainerView.isHidden = true
+                self.searchTextField.isHidden = true
                 self.sortContainerView.isHidden = true
                 self.detailContainerViewHeight.constant = detailBoxCHeightVal
                 self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + detailBoxCHeightVal + spaceVal
@@ -845,8 +901,8 @@ extension CategoryViewController {
         self.subTags = subTags
         let tagsCnt = subTags.count
         self.stepCollectionView.reloadData()
+        self.tagCollectionView.reloadData()
         UIView.transition(with: self.tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            self.tagCollectionView.reloadData()
             self.tagCollectionViewHeight.constant = self.getCategoryCollectionViewHeight(tagsCnt)
             self.loadingImageView.isHidden = true
             self.tagCollectionView.isHidden = false
@@ -858,11 +914,8 @@ extension CategoryViewController {
             self.tagCollectionView.isHidden = true
             self.loadingImageView.isHidden = false
         })
-        if let _superTag = superTag {
-            superTagId = _superTag.id
-        }
         let service = Service(lang: lang)
-        service.getTagSetList(tagId: superTagId!, sortType: SortType.priority, popoverAlert: { (message) in
+        service.getTagSetList(tagId: superTag!.id, sortType: SortType.priority, popoverAlert: { (message) in
             self.retryFunction = self.loadCategories
             self.alertError(message)
         }) { (tagSet) in
@@ -873,6 +926,16 @@ extension CategoryViewController {
                 self.bookmark_id = nil
                 self.starButton.setImage(UIImage.btnStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
             }
+            self.afterFetchCategoriesTransition(tagSet.tag, tagSet.sub_tags)
+        }
+    }
+    
+    private func searchTagsByKeyword() {
+        let service = Service(lang: lang)
+        service.searchTags(tagId: superTag!.id, keyWord: typedKeyword!, popoverAlert: { (message) in
+            self.retryFunction = self.searchTagsByKeyword
+            self.alertError(message)
+        }) { (tagSet) in
             self.afterFetchCategoriesTransition(tagSet.tag, tagSet.sub_tags)
         }
     }

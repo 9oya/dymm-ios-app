@@ -299,6 +299,7 @@ extension UIColor {
     static let dodgerBlue = UIColor(hex: "DodgerBlue")
     static let cornflowerBlue = UIColor(hex: "CornflowerBlue")
     static let cadetBlue = UIColor(hex: "CadetBlue")
+    static let lightSteelBlue = UIColor(hex: "LightSteelBlue")
     
     // Green
     static let darkTurquoise = UIColor(hex: "DarkTurquoise")
