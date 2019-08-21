@@ -9,16 +9,13 @@
 import UIKit
 import Alamofire
 
-private let tagCellId = "TagCell"
 private let stepCellId = "StepCell"
 
-private let stepBarHeightVal: CGFloat = 40
-private let searchBarHeightVal: CGFloat = 40
-private let tagCellHeight: CGFloat = 45
-private let spaceVal: CGFloat = 7
-private let detailBoxAHeightVal: CGFloat = 350
-private let detailBoxBHeightVal: CGFloat = 333
-private let detailBoxCHeightVal: CGFloat = 265
+private let stepBarHeightInt = 40
+private let searchBarHeightInt = 40
+private let detailBoxAHeightInt = 350
+private let detailBoxBHeightInt = 333
+private let detailBoxCHeightInt = 265
 
 class CategoryViewController: UIViewController {
     
@@ -185,7 +182,7 @@ class CategoryViewController: UIViewController {
         print(hr)
     }
     
-    @objc func textFieldDidChange(_ textField: UITextField) {
+    @objc func textFieldDidChanged(_ textField: UITextField) {
         if textField.text == "" {
             typedKeyword = nil
             loadCategories()
@@ -197,6 +194,12 @@ class CategoryViewController: UIViewController {
         } else if textField.text!.count < 2 {
             typedKeyword = nil
             return
+        }
+        if superTag!.id == TagId.condition {
+            if textField.text!.count < 3 {
+                typedKeyword = nil
+                return
+            }
         }
         typedKeyword = textField.text!
         searchTagsByKeyword()
@@ -306,7 +309,7 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenWidth = UIScreen.main.bounds.width
         if collectionView == tagCollectionView {
-            return CGSize(width: (screenWidth / 2) - 10.5, height: tagCellHeight)
+            return CGSize(width: (screenWidth / 2) - 10.5, height: CGFloat(tagCellHeightInt))
         } else if collectionView == stepCollectionView {
             let tag = stepTags[indexPath.row]
             var txtCnt = 0
@@ -467,12 +470,12 @@ extension CategoryViewController {
             _textField.backgroundColor = UIColor.white
             _textField.textAlignment = .center
             _textField.textContentType = .namePrefix
-            _textField.autocapitalizationType = .words
+            _textField.autocapitalizationType = .none
             _textField.borderStyle = .none
             _textField.layer.cornerRadius = 10.0
             _textField.placeholder = lang.txtFieldSearch
             _textField.addShadowView()
-            _textField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+            _textField.addTarget(self, action: #selector(textFieldDidChanged(_:)), for: .editingChanged)
             _textField.translatesAutoresizingMaskIntoConstraints = false
             return _textField
         }()
@@ -659,7 +662,7 @@ extension CategoryViewController {
         stepCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         stepCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         stepCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
-        stepCollectionView.heightAnchor.constraint(equalToConstant: stepBarHeightVal).isActive = true
+        stepCollectionView.heightAnchor.constraint(equalToConstant: CGFloat(stepBarHeightInt)).isActive = true
         
         // scrollView
         scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
@@ -667,20 +670,20 @@ extension CategoryViewController {
         scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
         
-        searchTextField.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + spaceVal).isActive = true
-        searchTextField.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: spaceVal).isActive = true
-        searchTextField.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) + spaceVal).isActive = true
-        searchTextField.heightAnchor.constraint(equalToConstant: searchBarHeightVal).isActive = true
+        searchTextField.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
+        searchTextField.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        searchTextField.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) + CGFloat(marginInt)).isActive = true
+        searchTextField.heightAnchor.constraint(equalToConstant: CGFloat(searchBarHeightInt)).isActive = true
         
-        sortContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + spaceVal).isActive = true
-        sortContainerView.leadingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: spaceVal).isActive = true
+        sortContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
+        sortContainerView.leadingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
         sortContainerView.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 28).isActive = true
         sortContainerView.heightAnchor.constraint(equalTo: searchTextField.heightAnchor, constant: 0).isActive = true
         
-        detailContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + spaceVal).isActive = true
-        detailContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: spaceVal).isActive = true
-        detailContainerView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: spaceVal).isActive = true
-        detailContainerViewHeight = detailContainerView.heightAnchor.constraint(equalToConstant: detailBoxAHeightVal)
+        detailContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
+        detailContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        detailContainerView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
+        detailContainerViewHeight = detailContainerView.heightAnchor.constraint(equalToConstant: CGFloat(detailBoxAHeightInt))
         detailContainerViewHeight.priority = UILayoutPriority(rawValue: 999)
         detailContainerViewHeight.isActive = true
         
@@ -731,14 +734,14 @@ extension CategoryViewController {
         fingerImageView.leadingAnchor.constraint(equalTo: logSizeButton.trailingAnchor, constant: 8).isActive = true
         
         // addBar: 35, space: 7, searchBar: 40, space: 7
-        tagCollectionViewTop = tagCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: stepBarHeightVal + 7 + searchBarHeightVal + 7)
+        tagCollectionViewTop = tagCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt))
         tagCollectionViewTop.priority = UILayoutPriority(rawValue: 999)
         tagCollectionViewTop.isActive = true
         tagCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 7).isActive = true
         tagCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 7).isActive = true
         tagCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: 0).isActive = true
         tagCollectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor, constant: 0).isActive = true
-        tagCollectionViewHeight = tagCollectionView.heightAnchor.constraint(equalToConstant: searchBarHeightVal + 7)
+        tagCollectionViewHeight = tagCollectionView.heightAnchor.constraint(equalToConstant: CGFloat(searchBarHeightInt + marginInt))
         tagCollectionViewHeight.priority = UILayoutPriority(rawValue: 999)
         tagCollectionViewHeight.isActive = true
     }
@@ -815,7 +818,7 @@ extension CategoryViewController {
                 self.detailContainerView.isHidden = true
                 self.searchTextField.isHidden = false
                 self.sortContainerView.isHidden = false
-                self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + searchBarHeightVal + spaceVal
+                self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt)
             }
         } else {
             // Case all non-cateogry tag_types
@@ -833,8 +836,8 @@ extension CategoryViewController {
                 self.detailContainerView.isHidden = false
                 self.searchTextField.isHidden = true
                 self.sortContainerView.isHidden = true
-                self.detailContainerViewHeight.constant = detailBoxAHeightVal
-                self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + detailBoxAHeightVal + spaceVal
+                self.detailContainerViewHeight.constant = CGFloat(detailBoxAHeightInt)
+                self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxAHeightInt + marginInt)
                 
                 self.fingerImageBottom.constant = -75
                 self.downArrowImageView.isHidden = false
@@ -861,8 +864,8 @@ extension CategoryViewController {
                 self.detailContainerView.isHidden = false
                 self.searchTextField.isHidden = true
                 self.sortContainerView.isHidden = true
-                self.detailContainerViewHeight.constant = detailBoxBHeightVal
-                self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + detailBoxBHeightVal + spaceVal
+                self.detailContainerViewHeight.constant = CGFloat(detailBoxBHeightInt)
+                self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxBHeightInt + marginInt)
                 
                 self.fingerImageBottom.constant = -20
                 self.downArrowImageView.isHidden = true
@@ -881,8 +884,8 @@ extension CategoryViewController {
                 self.detailContainerView.isHidden = false
                 self.searchTextField.isHidden = true
                 self.sortContainerView.isHidden = true
-                self.detailContainerViewHeight.constant = detailBoxCHeightVal
-                self.tagCollectionViewTop.constant = stepBarHeightVal + spaceVal + detailBoxCHeightVal + spaceVal
+                self.detailContainerViewHeight.constant = CGFloat(detailBoxCHeightInt)
+                self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxCHeightInt + marginInt)
                 
                 self.fingerImageView.isHidden = true
                 self.downArrowImageView.isHidden = true

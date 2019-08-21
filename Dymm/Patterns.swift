@@ -88,6 +88,7 @@ struct LogGroupType {
 struct TagId {
     static let diary = 17
     static let bookmarks = 18
+    static let condition = 3
 }
 
 struct DiaryMode {

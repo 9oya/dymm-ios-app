@@ -8,8 +8,6 @@
 
 import UIKit
 
-private let tagCellId = "TagCell"
-
 class ProfileViewController: UIViewController {
     
     // MARK: - Properties
@@ -286,7 +284,7 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenWidth = UIScreen.main.bounds.width
-        return CGSize(width: (screenWidth / 2) - 10.5, height: CGFloat(40))
+        return CGSize(width: (screenWidth / 2) - 10.5, height: CGFloat(tagCellHeightInt))
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {

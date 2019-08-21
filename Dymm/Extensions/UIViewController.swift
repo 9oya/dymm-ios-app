@@ -9,8 +9,6 @@
 import Foundation
 import UIKit
 
-private let tagCellId = "TagCell"
-
 extension UIViewController {
     
     // MARK: - Get device info methods

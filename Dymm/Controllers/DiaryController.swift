@@ -14,13 +14,12 @@ private let logGroupTableCellId = "LogGroupTableCell"
 private let logCollectionCellId = "LogCollectionCell"
 private let condCollectionCellId = "CondCollectionCell"
 
-private let logGroupCellHeightVal = 52
-private let logGroupSectionHeaderHeightVal = 45
-private let logTableCellHeightVal = 45
-private let pickerCollectionHeightVal = 32
-private let logCollectionCellHeightVal = 30
-
-private let marginVal = 7
+private let logGroupCellHeightInt = 52
+private let logGroupSectionHeightInt = 45
+private let logGroupFooterHeightInt = 50
+private let logTableCellHeightInt = 45
+private let logCollectionCellHeightInt = 30
+private let pickerCollectionHeightInt = 32
 
 class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDelegate, UIGestureRecognizerDelegate {
     
@@ -313,14 +312,14 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             selectedLogGroup = logGroup
             groupType = logGroup.group_type
             loadGroupOfLogs { (groupOfLogSet) in
-                let collectionViewHeight = logCollectionCellHeightVal * self.getGroupOfLogsTotalCnt(groupOfLogSet)
+                let collectionViewHeight = logCollectionCellHeightInt * self.getGroupOfLogsTotalCnt(groupOfLogSet)
                 self.afterLoadGroupOfLogs(collectionViewHeight)
             }
         } else {
             // Case any log group not existed in selected date section
             groupOfLogSet = nil
             groupType = LogGroupType.morning
-            pickerContainerTransition(pickerCollectionHeightVal)
+            pickerContainerTransition(pickerCollectionHeightInt)
         }
         groupTypePickerView.selectRow(LogGroupType.nighttime - groupType!, inComponent: 0, animated: true)
         UIView.transition(with: self.pickerContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
@@ -521,8 +520,8 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     let total = self.getGroupOfLogsTotalCnt(groupOfLogSet)
                     let duration = Double(total) * 0.04
                     UIView.animate(withDuration: duration, animations: {
-                        cell.groupOfLogsTableHeight.constant = CGFloat((total * logTableCellHeightVal))
-                        cell.containerViewHight.constant = CGFloat((total * logTableCellHeightVal) + logGroupCellHeightVal + 50)
+                        cell.groupOfLogsTableHeight.constant = CGFloat((total * logTableCellHeightInt))
+                        cell.containerViewHight.constant = CGFloat((total * logTableCellHeightInt) + logGroupCellHeightInt + logGroupFooterHeightInt)
                         cell.arrowImageView.transform = CGAffineTransform(rotationAngle: (.pi / 2))
                         self.view.layoutIfNeeded()
                     }, completion: { _ in
@@ -551,14 +550,14 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     groupType = lastLogGroup.group_type + 1
                     groupOfLogSet = nil
                     selectedLogGroupId = nil
-                    afterLoadGroupOfLogs(pickerCollectionHeightVal)
+                    afterLoadGroupOfLogs(pickerCollectionHeightInt)
                 } else {
                     // Case nighttime groupType already exist,
                     // Display last existing logGroup and set parameters.
                     groupType = LogGroupType.nighttime
                     selectedLogGroupId = lastLogGroup.id
                     loadGroupOfLogs { (groupOfLogSet) in
-                        let collectionViewHeight = logCollectionCellHeightVal * self.getGroupOfLogsTotalCnt(groupOfLogSet)
+                        let collectionViewHeight = logCollectionCellHeightInt * self.getGroupOfLogsTotalCnt(groupOfLogSet)
                         self.afterLoadGroupOfLogs(collectionViewHeight)
                     }
                 }
@@ -568,7 +567,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 groupType = selectedLogGroup!.group_type
                 selectedLogGroupId = selectedLogGroup!.id
                 loadGroupOfLogs { (groupOfLogSet) in
-                    let collectionViewHeight = logCollectionCellHeightVal * self.getGroupOfLogsTotalCnt(groupOfLogSet)
+                    let collectionViewHeight = logCollectionCellHeightInt * self.getGroupOfLogsTotalCnt(groupOfLogSet)
                     self.afterLoadGroupOfLogs(collectionViewHeight)
                 }
             }
@@ -578,7 +577,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return CGFloat(logGroupSectionHeaderHeightVal)
+        return CGFloat(logGroupSectionHeightInt)
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
@@ -592,11 +591,11 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath == selectedOnceCellIdxPath {
             let total = getGroupOfLogsTotalCnt(groupOfLogSet!)
-            return CGFloat((total * logTableCellHeightVal) + logGroupCellHeightVal + 50 + marginVal)
+            return CGFloat((total * logTableCellHeightInt) + logGroupCellHeightInt + logGroupFooterHeightInt)
         } else {
             if let cell = tableView.cellForRow(at: indexPath) as? LogGroupTableCell {
                 // This block will transform unselected cells back to default state when tableView beginupdate.
-                cell.containerViewHight.constant = CGFloat(logGroupCellHeightVal - 7)
+                cell.containerViewHight.constant = CGFloat(logGroupCellHeightInt - 7)
                 cell.arrowImageView.transform = CGAffineTransform.identity
                 cell.groupOfLogsTableView.isHidden = true
                 cell.condScoreImageView.isHidden = false
@@ -620,7 +619,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     }
                 }
             }
-            return CGFloat(logGroupCellHeightVal)
+            return CGFloat(logGroupCellHeightInt)
         }
     }
     
@@ -639,8 +638,8 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             cell.groupOfLogSetForPop = groupOfLogSet!
             cell.groupOfLogsTableView.reloadData()
             let total = getGroupOfLogsTotalCnt(groupOfLogSet!)
-            cell.groupOfLogsTableHeight.constant = CGFloat((total * logTableCellHeightVal))
-            cell.containerViewHight.constant = CGFloat((total * logTableCellHeightVal) + logGroupCellHeightVal + 50)
+            cell.groupOfLogsTableHeight.constant = CGFloat((total * logTableCellHeightInt))
+            cell.containerViewHight.constant = CGFloat((total * logTableCellHeightInt) + logGroupCellHeightInt + logGroupFooterHeightInt)
             cell.arrowImageView.transform = CGAffineTransform(rotationAngle: (.pi / 2))
             cell.groupOfLogsTableView.isHidden = false
             cell.condScoreImageView.isHidden = true
@@ -649,7 +648,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             cell.drugLogBulletView.isHidden = true
             cell.condScoreButton.isHidden = false
         } else {
-            cell.containerViewHight.constant = CGFloat(logGroupCellHeightVal - 7)
+            cell.containerViewHight.constant = CGFloat(logGroupCellHeightInt - 7)
             cell.arrowImageView.transform = CGAffineTransform.identity
             cell.groupOfLogsTableView.isHidden = true
             cell.condScoreImageView.isHidden = false
@@ -898,7 +897,7 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
                     selectedLogGroupId = logGroup.id
                     selectedLogGroup = logGroup
                     loadGroupOfLogs { (groupOfLogSet) in
-                        let collectionViewHeight = logCollectionCellHeightVal * self.getGroupOfLogsTotalCnt(groupOfLogSet)
+                        let collectionViewHeight = logCollectionCellHeightInt * self.getGroupOfLogsTotalCnt(groupOfLogSet)
                         self.afterLoadGroupOfLogs(collectionViewHeight)
                     }
                 } else {
@@ -906,14 +905,14 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
                     groupOfLogSet = nil
                     selectedLogGroupId = nil
                     selectedLogGroup = nil
-                    pickerContainerTransition(pickerCollectionHeightVal)
+                    pickerContainerTransition(pickerCollectionHeightInt)
                 }
             } else {
                 // Case there is any logGroup in section(date).
                 groupOfLogSet = nil
                 selectedLogGroupId = nil
                 selectedLogGroup = nil
-                pickerContainerTransition(pickerCollectionHeightVal)
+                pickerContainerTransition(pickerCollectionHeightInt)
             }
         } else if pickerView == condScorePickerView {
             selectedCondPickerIdx = row

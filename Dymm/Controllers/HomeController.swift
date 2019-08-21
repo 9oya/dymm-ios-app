@@ -9,10 +9,9 @@
 import UIKit
 
 private let bannerCellId = "BannerCell"
-private let tagCellId = "TagCell"
 
-private let tagCellHeight: CGFloat = 45
-private let bannerHeight: CGFloat = 160
+private let bannerHeightInt = 160
+let marginInt = 7
 
 class HomeViewController: UIViewController {
     
@@ -206,9 +205,9 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenWidth = UIScreen.main.bounds.width
         if collectionView == bannerCollectionView {
-            return CGSize(width: screenWidth, height: bannerHeight)
+            return CGSize(width: screenWidth, height: CGFloat(bannerHeightInt))
         } else {
-            return CGSize(width: (screenWidth / 2) - 10.5, height: tagCellHeight)
+            return CGSize(width: (screenWidth / 2) - 10.5, height: CGFloat(tagCellHeightInt))
         }
     }
     

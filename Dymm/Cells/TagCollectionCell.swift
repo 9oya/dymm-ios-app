@@ -8,6 +8,10 @@
 
 import UIKit
 
+let tagCellId = "TagCell"
+
+let tagCellHeightInt = 45
+
 class TagCollectionCell: UICollectionViewCell {
     let imageView: UIImageView = {
         let _imageView = UIImageView()
