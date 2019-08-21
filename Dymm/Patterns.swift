@@ -121,14 +121,16 @@ func getLogGroupTypeImage(_ groupType: Int) -> UIImage? {
 }
 
 func getCondScoreImage(_ condScore: Int) -> UIImage? {
-    if condScore < 4 {
-        return UIImage(named: "item-score-bad")
+    if condScore < 3 {
+        return UIImage.itemScoreAwful
+    } else if condScore < 5 {
+        return UIImage.itemScoreBad
     } else if condScore < 7 {
-        return UIImage(named: "item-score-soso")
+        return UIImage.itemScoreSoso
     } else if condScore < 9 {
-        return UIImage(named: "item-score-good")
+        return UIImage.itemScoreGood
     } else {
-        return UIImage(named: "item-score-awesome")
+        return UIImage.itemScoreAwesome
     }
 }
 
@@ -187,4 +189,21 @@ func getEngNameOfMonth(monthNumber: Int) -> String {
     case 11: return "November"
     case 12: return "December"
     default: fatalError("Wrong MonthNumber has been passed")}
+}
+
+func getKorNameOfMonth(engMMM: String) -> String {
+    switch engMMM {
+    case "Jan": return "1월"
+    case "Feb": return "2월"
+    case "Mar": return "3월"
+    case "Apr": return "4월"
+    case "May": return "5월"
+    case "Jun": return "6월"
+    case "Jul": return "7월"
+    case "Aug": return "8월"
+    case "Sep": return "9월"
+    case "Oct": return "10월"
+    case "Nov": return "11월"
+    case "Dec": return "12월"
+    default: fatalError()}
 }

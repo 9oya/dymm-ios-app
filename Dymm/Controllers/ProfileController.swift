@@ -833,6 +833,7 @@ extension ProfileViewController {
         }) {
             if self.selectedCollectionItem == 0 {
                 UserDefaults.standard.setCurrentLanguageId(value: pickedProfileTagId)
+                self.lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
                 self.setupLangProperties()
             }
             self.loadProfile()

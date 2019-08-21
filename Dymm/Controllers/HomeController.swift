@@ -39,6 +39,10 @@ class HomeViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
+        UIView.transition(with: tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.bannerCollectionView.reloadData()
+            self.tagCollectionView.reloadData()
+        })
         if UserDefaults.standard.isSignIn() {
             loadAvatar()
         } else {

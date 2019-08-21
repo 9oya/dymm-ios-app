@@ -97,6 +97,7 @@ class LangPack {
     var avatarDefaultBirthYeaer: String!
     
     var calendarHeaderDateFormat: String!
+    var avatarCondDateFormat: String!
     var calendarSection: ((Int, Int) -> String)!
     
     func getLogGroupTypeName(_ key: Int) -> String {
@@ -621,6 +622,14 @@ func getLanguagePack(_ currentLanguageId: Int) -> LangPack {
     // MARK: Calendar
     
     lang.calendarHeaderDateFormat = {
+        switch currentLanguageId {
+        case LanguageId.eng:
+            return "MMMM YYYY"
+        case LanguageId.kor:
+            return "MM월 YYYY"
+        default: fatalError("")}
+    }()
+    lang.avatarCondDateFormat = {
         switch currentLanguageId {
         case LanguageId.eng:
             return "MMMM YYYY"

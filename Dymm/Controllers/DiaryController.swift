@@ -68,6 +68,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var condContainerHeight: NSLayoutConstraint!
     var condCollectionHeight: NSLayoutConstraint!
     
+    // Helpers
     var refreshControler: UIRefreshControl!
     var scopeGesture: UIPanGestureRecognizer!
     var dateFormatter: DateFormatter!
@@ -88,7 +89,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var selectedTag: BaseModel.Tag?
     var groupOfLogSet: CustomModel.GroupOfLogSet?
     
-    // Values
+    // Non-view properties
     var selectedLogGroupId: Int?
     var selectedCalScope: Int?
     var selectedWeekOfYear: Int?
@@ -710,16 +711,29 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             }
             let avtCond = avtCondList![indexPath.item]
             switch lang.currentLanguageId {
-            case LanguageId.eng: cell.titleLabel.text = avtCond.eng_name
-            case LanguageId.kor: cell.titleLabel.text = avtCond.kor_name
-            case LanguageId.jpn: cell.titleLabel.text = avtCond.jpn_name
+            case LanguageId.eng:
+                cell.titleLabel.text = avtCond.eng_name
+                if let startDate = avtCond.start_date {
+                    cell.startDateLabel.text = "\u{021E2}\(startDate)"
+                }
+                if let endDate = avtCond.end_date {
+                    cell.endDateLabel.text = "\u{2713}\(endDate)"
+                }
+            case LanguageId.kor:
+                cell.titleLabel.text = avtCond.kor_name
+                if let startDate = avtCond.start_date {
+                    let dateArr = startDate.split(separator: "/")
+                    let month = getKorNameOfMonth(engMMM: String(dateArr[0]))
+                    cell.startDateLabel.text = "\u{021E2}\(month)/\(dateArr[1])/\(dateArr[2])"
+                }
+                if let endDate = avtCond.end_date {
+                    let dateArr = endDate.split(separator: "/")
+                    let month = getKorNameOfMonth(engMMM: String(dateArr[0]))
+                    cell.endDateLabel.text = "\u{2713}\(month)/\(dateArr[1])/\(dateArr[2])"
+                }
+            case LanguageId.jpn:
+                cell.titleLabel.text = avtCond.jpn_name
             default: fatalError()}
-            if let start_date = avtCond.start_date {
-                cell.startDateLabel.text = "\u{021E2}\(start_date)"
-            }
-            if let end_date = avtCond.end_date {
-                cell.endDateLabel.text = "\u{2713}\(end_date)"
-            }
             if self.isCondEditBtnTapped {
                 cell.titleLabel.textColor = UIColor.lightGray
                 cell.stackView.isHidden = true
