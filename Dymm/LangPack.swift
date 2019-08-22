@@ -71,7 +71,8 @@ class LangPack {
     var msgMailSnedAgainComplete: String!
     var msgMailNotConfirmedYet: String!
     var msgMailModified: String!
-    var msgIntakeLogComplete: ((String) -> String)!
+//    var msgIntakeLogComplete: ((String) -> String)!
+    var msgIntakeLogComplete: String!
     var msgEmptyName: String!
     var msgEmptyEmail: String!
     var msgInvalidEmail: String!
@@ -477,13 +478,19 @@ func getLanguagePack(_ currentLanguageId: Int) -> LangPack {
         case LanguageId.kor: return "메일주소가 변경되었습니다.\n변경된 메일계정을 확인해 주세요."
         default: fatalError(lang.currentLangErrorMsg)}
     }()
-    func _intakeLogComplete(intake: String) -> String {
+//    func _intakeLogComplete(intake: String) -> String {
+//        switch currentLanguageId {
+//        case LanguageId.eng: return "The \(intake) has been successfully recored!\n\nWant to back Home?"
+//        case LanguageId.kor: return "\(intake) 성공적으로 기록되었습니다!\n\n홈으로 이동하시겠습니까?"
+//        default: fatalError(lang.currentLangErrorMsg)}
+//    }
+//    lang.msgIntakeLogComplete = _intakeLogComplete
+    lang.msgIntakeLogComplete = {
         switch currentLanguageId {
-        case LanguageId.eng: return "The \(intake) has been successfully recored!\n\nWant to back Home?"
-        case LanguageId.kor: return "\(intake) 성공적으로 기록되었습니다!\n\n홈으로 이동하시겠습니까?"
+        case LanguageId.eng: return "Has been successfully recored!\n\nWant to back Home?"
+        case LanguageId.kor: return "성공적으로 기록되었습니다!\n\n홈으로 이동하시겠습니까?"
         default: fatalError(lang.currentLangErrorMsg)}
-    }
-    lang.msgIntakeLogComplete = _intakeLogComplete
+    }()
     lang.msgEmptyName = {
         switch currentLanguageId {
         case LanguageId.eng: return "Enter first name"

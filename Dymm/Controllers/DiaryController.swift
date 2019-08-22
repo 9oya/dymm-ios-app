@@ -135,8 +135,8 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         self.present(alert, animated: true, completion: nil)
     }
     
-    @objc func alertCompl(_ message: String) {
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+    @objc func alertCompl(_ title: String, _ message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: lang.btnNo, style: .cancel) { _ in
             _ = self.navigationController?.popViewController(animated: true)
         })
@@ -592,7 +592,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath == selectedOnceCellIdxPath {
             let total = getGroupOfLogsTotalCnt(groupOfLogSet!)
-            return CGFloat((total * logTableCellHeightInt) + logGroupCellHeightInt + logGroupFooterHeightInt)
+            return CGFloat((total * logTableCellHeightInt) + logGroupCellHeightInt + logGroupFooterHeightInt + marginInt)
         } else {
             if let cell = tableView.cellForRow(at: indexPath) as? LogGroupTableCell {
                 // This block will transform unselected cells back to default state when tableView beginupdate.
@@ -1421,9 +1421,9 @@ extension DiaryViewController {
                 self.loadingImageView.isHidden = true
             }, completion: { (_) in
                 switch self.lang.currentLanguageId {
-                case LanguageId.eng: self.alertCompl(self.lang.msgIntakeLogComplete(self.selectedTag!.eng_name))
-                case LanguageId.kor: self.alertCompl(self.lang.msgIntakeLogComplete(self.selectedTag!.kor_name!))
-                case LanguageId.jpn: self.alertCompl(self.lang.msgIntakeLogComplete(self.selectedTag!.jpn_name!))
+                case LanguageId.eng: self.alertCompl(self.selectedTag!.eng_name, self.lang.msgIntakeLogComplete)
+                case LanguageId.kor: self.alertCompl(self.selectedTag!.kor_name!, self.lang.msgIntakeLogComplete)
+                case LanguageId.jpn: self.alertCompl(self.selectedTag!.jpn_name!, self.lang.msgIntakeLogComplete)
                 default: fatalError()}
             })
         }

@@ -54,6 +54,7 @@ class CategoryViewController: UIViewController {
     var logTimeButton: UIButton!
     var startDateButton: UIButton!
     var endDateButton: UIButton!
+    var langPickButton: UIButton!
     
     // NSLayoutConstraints
     var tagCollectionViewTop: NSLayoutConstraint!
@@ -86,6 +87,8 @@ class CategoryViewController: UIViewController {
     var topLeftButtonType = ButtonType.home
     var bookmark_id: Int?
     var typedKeyword: String?
+    let hangulChars = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ".unicodeScalars
+//    let engChars = "abcdefghijklmnopqrstuvwxygABCDEFGHIJKLMNOPQRSTUVWXYZ".unicodeScalars
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -134,8 +137,8 @@ class CategoryViewController: UIViewController {
         present(alertController, animated: true, completion:{})
     }
     
-    @objc func alertCompl(_ message: String) {
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+    @objc func alertCompl(_ title: String, _ message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
             self.dismiss(animated: true, completion: nil)
         }
@@ -183,6 +186,7 @@ class CategoryViewController: UIViewController {
     }
     
     @objc func textFieldDidChanged(_ textField: UITextField) {
+        let _text = textField.text!
         if textField.text == "" {
             typedKeyword = nil
             loadCategories()
@@ -192,8 +196,26 @@ class CategoryViewController: UIViewController {
             typedKeyword = nil
             return
         } else if textField.text!.count < 2 {
-            typedKeyword = nil
-            return
+            if _text.range(of: "[a-zA-Z]", options: .regularExpression) != nil {
+                typedKeyword = nil
+                return
+            } else if lang.currentLanguageId == LanguageId.kor {
+                for _char in textField.text!.unicodeScalars {
+                    if hangulChars.contains(_char) {
+                        typedKeyword = nil
+                        return
+                    }
+                }
+                typedKeyword = textField.text!
+                searchTagsByKeyword()
+                return
+            }
+        }
+        for _char in textField.text!.unicodeScalars {
+            if hangulChars.contains(_char) {
+                typedKeyword = nil
+                return
+            }
         }
         if superTag!.id == TagId.condition {
             if textField.text!.count < 3 {
@@ -219,6 +241,11 @@ class CategoryViewController: UIViewController {
         } else {
             createABookmark()
         }
+    }
+    
+    @objc func langPickBtnTapped() {
+        // TODO
+        print("langPickBtnTapped")
     }
 }
 
@@ -471,6 +498,7 @@ extension CategoryViewController {
             _textField.textAlignment = .center
             _textField.textContentType = .namePrefix
             _textField.autocapitalizationType = .none
+            _textField.keyboardType = .default
             _textField.borderStyle = .none
             _textField.layer.cornerRadius = 10.0
             _textField.placeholder = lang.txtFieldSearch
@@ -617,6 +645,18 @@ extension CategoryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
+        langPickButton = {
+            let _button = UIButton(type: .system)
+            _button.setTitleColor(UIColor.dimGray, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 23)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(langPickBtnTapped), for: .touchUpInside)
+            _button.backgroundColor = UIColor.white
+            _button.layer.cornerRadius = 10.0
+            _button.addShadowView()
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
         stepCollectionView.dataSource = self
@@ -633,7 +673,8 @@ extension CategoryViewController {
         view.addSubview(stepCollectionView)
         
         scrollView.addSubview(searchTextField)
-        scrollView.addSubview(sortContainerView)
+        scrollView.addSubview(langPickButton)
+//        scrollView.addSubview(sortContainerView)
         scrollView.addSubview(detailContainerView)
         scrollView.addSubview(tagCollectionView)
         
@@ -675,10 +716,15 @@ extension CategoryViewController {
         searchTextField.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) + CGFloat(marginInt)).isActive = true
         searchTextField.heightAnchor.constraint(equalToConstant: CGFloat(searchBarHeightInt)).isActive = true
         
-        sortContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
-        sortContainerView.leadingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
-        sortContainerView.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 28).isActive = true
-        sortContainerView.heightAnchor.constraint(equalTo: searchTextField.heightAnchor, constant: 0).isActive = true
+        langPickButton.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
+        langPickButton.leadingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
+        langPickButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 28).isActive = true
+        langPickButton.heightAnchor.constraint(equalTo: searchTextField.heightAnchor, constant: 0).isActive = true
+        
+//        sortContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
+//        sortContainerView.leadingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
+//        sortContainerView.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 28).isActive = true
+//        sortContainerView.heightAnchor.constraint(equalTo: searchTextField.heightAnchor, constant: 0).isActive = true
         
         detailContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
         detailContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
@@ -917,8 +963,11 @@ extension CategoryViewController {
             self.tagCollectionView.isHidden = true
             self.loadingImageView.isHidden = false
         })
+        if superTag != nil {
+            superTagId = superTag!.id
+        }
         let service = Service(lang: lang)
-        service.getTagSetList(tagId: superTag!.id, sortType: SortType.priority, popoverAlert: { (message) in
+        service.getTagSetList(tagId: superTagId!, sortType: SortType.priority, popoverAlert: { (message) in
             self.retryFunction = self.loadCategories
             self.alertError(message)
         }) { (tagSet) in
@@ -968,9 +1017,9 @@ extension CategoryViewController {
                 self.loadingImageView.isHidden = true
             }, completion: { (_) in
                 switch self.lang.currentLanguageId {
-                case LanguageId.eng: self.alertCompl(self.lang.msgIntakeLogComplete(self.superTag!.eng_name))
-                case LanguageId.kor: self.alertCompl(self.lang.msgIntakeLogComplete(self.superTag!.kor_name!))
-                case LanguageId.jpn: self.alertCompl(self.lang.msgIntakeLogComplete(self.superTag!.jpn_name!))
+                case LanguageId.eng: self.alertCompl(self.superTag!.eng_name, self.lang.msgIntakeLogComplete)
+                case LanguageId.kor: self.alertCompl(self.superTag!.kor_name!, self.lang.msgIntakeLogComplete)
+                case LanguageId.jpn: self.alertCompl(self.superTag!.jpn_name!, self.lang.msgIntakeLogComplete)
                 default: fatalError()}
             })
         }
