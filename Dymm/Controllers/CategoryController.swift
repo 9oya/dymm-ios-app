@@ -24,7 +24,6 @@ class CategoryViewController: UIViewController {
     // UIViews
     var detailContainerView: UIView!
     var searchTextField: UITextField!
-    var sortContainerView: UIView!
     var sizePickerContainerView: UIView!
     
     // UIScrollView
@@ -89,6 +88,10 @@ class CategoryViewController: UIViewController {
     var typedKeyword: String?
     let hangulChars = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ".unicodeScalars
 //    let engChars = "abcdefghijklmnopqrstuvwxygABCDEFGHIJKLMNOPQRSTUVWXYZ".unicodeScalars
+    var lastContentOffset: CGFloat = 0.0
+    var isScrollToLoading: Bool = false
+    var currPageNum: Int = 1
+    var minimumCnt: Int = 30
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -311,6 +314,9 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         view.endEditing(true)
         searchTextField.text = nil
         typedKeyword = nil
+        currPageNum = 1
+        minimumCnt = 30
+        lastContentOffset = 0.0
         if collectionView == tagCollectionView {
             let selected_tag = subTags[indexPath.item]
             stepTags.append(superTag!)
@@ -353,6 +359,10 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         } else {
             fatalError()
         }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+        return CGSize(width: 0, height: marginInt)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
@@ -472,6 +482,36 @@ extension CategoryViewController: UITextFieldDelegate {
     }
 }
 
+extension CategoryViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard let _subTags = subTags else {
+            return
+        }
+        let currScrolledSize = scrollView.frame.size.height + scrollView.contentOffset.y
+        if lastContentOffset > scrollView.contentOffset.y {
+            return
+        }
+        if scrollView.contentSize.height < 0 {
+            return
+        }
+        if _subTags.count == minimumCnt {
+            if currScrolledSize > (scrollView.contentSize.height - 100) {
+                if isScrollToLoading == false {
+                    isScrollToLoading = true
+                    currPageNum += 1
+                    minimumCnt += 30
+                    print(currPageNum)
+                    print(minimumCnt)
+                    print(_subTags.count)
+                    print("\(currScrolledSize) > \(scrollView.contentSize.height - 100)")
+                    loadCategories()
+                }
+            }
+        }
+        lastContentOffset = scrollView.contentOffset.y
+    }
+}
+
 extension CategoryViewController {
     
     // MARK: Private methods
@@ -506,13 +546,6 @@ extension CategoryViewController {
             _textField.addTarget(self, action: #selector(textFieldDidChanged(_:)), for: .editingChanged)
             _textField.translatesAutoresizingMaskIntoConstraints = false
             return _textField
-        }()
-        sortContainerView = {
-            let _view = UIView()
-            _view.backgroundColor = UIColor.white
-            _view.addShadowView()
-            _view.translatesAutoresizingMaskIntoConstraints = false
-            return _view
         }()
         sizePickerContainerView = {
             let _view = UIView()
@@ -659,6 +692,7 @@ extension CategoryViewController {
         }()
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
+        scrollView.delegate = self
         stepCollectionView.dataSource = self
         stepCollectionView.delegate = self
         tagCollectionView.dataSource = self
@@ -674,7 +708,6 @@ extension CategoryViewController {
         
         scrollView.addSubview(searchTextField)
         scrollView.addSubview(langPickButton)
-//        scrollView.addSubview(sortContainerView)
         scrollView.addSubview(detailContainerView)
         scrollView.addSubview(tagCollectionView)
         
@@ -693,7 +726,7 @@ extension CategoryViewController {
         sizePickerContainerView.addSubview(sizePickerView)
         
         // Setup constraints
-        // loadingImageView, alertBlindView
+        // loadingImageView
         loadingImageView.widthAnchor.constraint(equalToConstant: 62).isActive = true
         loadingImageView.heightAnchor.constraint(equalToConstant: 62).isActive = true
         loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
@@ -720,11 +753,6 @@ extension CategoryViewController {
         langPickButton.leadingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
         langPickButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 28).isActive = true
         langPickButton.heightAnchor.constraint(equalTo: searchTextField.heightAnchor, constant: 0).isActive = true
-        
-//        sortContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
-//        sortContainerView.leadingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
-//        sortContainerView.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 28).isActive = true
-//        sortContainerView.heightAnchor.constraint(equalTo: searchTextField.heightAnchor, constant: 0).isActive = true
         
         detailContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
         detailContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
@@ -852,36 +880,35 @@ extension CategoryViewController {
         }
     }
     
-    private func afterFetchCategoriesTransition(_ superTag: BaseModel.Tag, _ subTags: [BaseModel.Tag]) {
-        self.superTag = superTag
-        if superTag.tag_type == TagType.category || superTag.tag_type == TagType.bookmark || superTag.tag_type == TagType.history {
+    private func afterFetchCategoriesTransition(_ _superTag: BaseModel.Tag, _ _subTags: [BaseModel.Tag]) {
+        if _superTag.tag_type == TagType.category || _superTag.tag_type == TagType.bookmark || _superTag.tag_type == TagType.history {
             // Execute category tag_type exclusive
             switch lang.currentLanguageId {
-            case LanguageId.eng: navigationItem.title = superTag.eng_name
-            case LanguageId.kor: navigationItem.title = superTag.kor_name!
+            case LanguageId.eng: navigationItem.title = _superTag.eng_name
+            case LanguageId.kor: navigationItem.title = _superTag.kor_name!
             default: fatalError()}
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = true
                 self.searchTextField.isHidden = false
-                self.sortContainerView.isHidden = false
+                self.langPickButton.isHidden = false
                 self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt)
             }
         } else {
             // Case all non-cateogry tag_types
             switch lang.currentLanguageId {
-            case LanguageId.eng: titleLabel.text = superTag.eng_name
-            case LanguageId.kor: titleLabel.text = superTag.kor_name
-            case LanguageId.jpn: titleLabel.text = superTag.jpn_name
+            case LanguageId.eng: titleLabel.text = _superTag.eng_name
+            case LanguageId.kor: titleLabel.text = _superTag.kor_name
+            case LanguageId.jpn: titleLabel.text = _superTag.jpn_name
             default: fatalError()}
         }
-        if superTag.tag_type == TagType.food || superTag.tag_type == TagType.drug {
+        if _superTag.tag_type == TagType.food || _superTag.tag_type == TagType.drug {
             // Execute food and drug tag_types exclusive
             sizePickerView.selectRow(4, inComponent: 0, animated: true)
             didSelectSizePickerRow(row: 4)
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = false
                 self.searchTextField.isHidden = true
-                self.sortContainerView.isHidden = true
+                self.langPickButton.isHidden = true
                 self.detailContainerViewHeight.constant = CGFloat(detailBoxAHeightInt)
                 self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxAHeightInt + marginInt)
                 
@@ -896,7 +923,7 @@ extension CategoryViewController {
                 
                 self.photoImageView.image = UIImage(named: "photo-pills")
             }
-        } else if superTag.tag_type == TagType.activity {
+        } else if _superTag.tag_type == TagType.activity {
             // Execute activity tag_type exclusive
             selectedXVal = 0
             selectedYVal = 5
@@ -909,7 +936,7 @@ extension CategoryViewController {
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = false
                 self.searchTextField.isHidden = true
-                self.sortContainerView.isHidden = true
+                self.langPickButton.isHidden = true
                 self.detailContainerViewHeight.constant = CGFloat(detailBoxBHeightInt)
                 self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxBHeightInt + marginInt)
                 
@@ -924,12 +951,12 @@ extension CategoryViewController {
                 
                 self.photoImageView.image = UIImage(named: "photo-walking")
             }
-        } else if superTag.tag_type == TagType.condition {
+        } else if _superTag.tag_type == TagType.condition {
             // Execute condition tag_type exclusive
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = false
                 self.searchTextField.isHidden = true
-                self.sortContainerView.isHidden = true
+                self.langPickButton.isHidden = true
                 self.detailContainerViewHeight.constant = CGFloat(detailBoxCHeightInt)
                 self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxCHeightInt + marginInt)
                 
@@ -947,27 +974,38 @@ extension CategoryViewController {
         }
         
         // For all types
-        self.subTags = subTags
-        let tagsCnt = subTags.count
-        self.stepCollectionView.reloadData()
-        self.tagCollectionView.reloadData()
-        UIView.transition(with: self.tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            self.tagCollectionViewHeight.constant = self.getCategoryCollectionViewHeight(tagsCnt)
-            self.loadingImageView.isHidden = true
-            self.tagCollectionView.isHidden = false
-        })
+        self.superTag = _superTag
+        if isScrollToLoading {
+            isScrollToLoading = false
+            if _subTags.count > 0 {
+                self.subTags.append(contentsOf: _subTags)
+                self.tagCollectionView.reloadData()
+                UIView.animate(withDuration: 0.5) {
+                    self.tagCollectionViewHeight.constant = self.getTagCollectionViewHeight(self.subTags.count)
+                }
+            }
+        } else {
+            self.subTags = _subTags
+            tagCollectionView.reloadData()
+            stepCollectionView.reloadData()
+            UIView.transition(with: self.tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.loadingImageView.isHidden = true
+                self.tagCollectionViewHeight.constant = self.getTagCollectionViewHeight(_subTags.count)
+            })
+        }
+//        UIView.transition(with: self.tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+//            self.tagCollectionViewHeight.constant = self.getCategoryCollectionViewHeight(subTags.count)
+//            self.loadingImageView.isHidden = true
+//            self.tagCollectionView.isHidden = false
+//        })
     }
     
     private func loadCategories() {
-        UIView.transition(with: self.loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            self.tagCollectionView.isHidden = true
-            self.loadingImageView.isHidden = false
-        })
         if superTag != nil {
             superTagId = superTag!.id
         }
         let service = Service(lang: lang)
-        service.getTagSetList(tagId: superTagId!, sortType: SortType.priority, popoverAlert: { (message) in
+        service.getTagSetList(tagId: superTagId!, sortType: SortType.priority, pageNum: currPageNum, popoverAlert: { (message) in
             self.retryFunction = self.loadCategories
             self.alertError(message)
         }) { (tagSet) in

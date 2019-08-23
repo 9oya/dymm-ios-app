@@ -27,16 +27,10 @@ extension UIViewController {
         return (view.frame.width / 2) - 30
     }
     
-    func getCategoryCollectionViewHeight(_ numberOfItems: Int) -> CGFloat {
+    func getTagCollectionViewHeight(_ numberOfItems: Int) -> CGFloat {
         let cellHeight = 45 + 7
-        let lineNumber = (numberOfItems / 2) + (numberOfItems % 2 > 0 ? 1:0)
-        return CGFloat(cellHeight * lineNumber)
-    }
-    
-    func getAvatarFactCollectionHeight(_ numberOfItems: Int) -> CGFloat {
-        let cellHeight = 42
-        let lineNumber = (numberOfItems / 2) + (numberOfItems % 2 > 0 ? 1:0)
-        return CGFloat(cellHeight * lineNumber)
+        let numberOfRows = (numberOfItems / 2) + (numberOfItems % 2 > 0 ? 1:0)
+        return CGFloat((cellHeight * numberOfRows))
     }
     
     // MARK: - Get UI component methods

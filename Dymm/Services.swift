@@ -142,11 +142,16 @@ struct Service {
         }
     }
     
-    func getTagSetList(tagId: Int, sortType:String, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
+    func getTagSetList(tagId: Int, sortType: String, pageNum: Int? = nil, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
         var url = "\(URI.host)\(URI.tag)/\(tagId)/set/\(sortType)"
-        if let avatarId = UserDefaults.standard.getAvatarId() {
-            url = "\(URI.host)\(URI.tag)/\(tagId)/set/\(sortType)/\(avatarId)"
+        if let _pageNum = pageNum {
+            if let avatarId = UserDefaults.standard.getAvatarId() {
+                url = "\(URI.host)\(URI.tag)/\(tagId)/set/\(sortType)/avt/\(avatarId)/page/\(_pageNum)"
+            } else {
+                url = "\(URI.host)\(URI.tag)/\(tagId)/set/\(sortType)/page/\(_pageNum)"
+            }
         }
+        
         Alamofire.request(url)
             .validate(contentType: ["application/json"])
             .responseData { response in

@@ -301,10 +301,8 @@ extension ProfileViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        guard let rows = tags?.count else {
-            return 0
-        }
-        return rows
+        guard let _tags = tags else { return 0 }
+        return _tags.count
     }
     
     // MARK: - UIPickerViewDelegate
@@ -312,18 +310,20 @@ extension ProfileViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
         let _containerView = UIView(frame: CGRect(x: 0, y: 0, width: pickerView.bounds.width, height: 60))
         let _label = UILabel(frame: CGRect(x: 0, y: 0, width: pickerView.bounds.width, height: 60))
-        _label.textAlignment = .center
+        guard let _tags = tags else { fatalError() }
         switch lang.currentLanguageId {
-        case LanguageId.eng: _label.text = tags![row].eng_name
-        case LanguageId.kor: _label.text = tags![row].kor_name
-        case LanguageId.jpn: _label.text = tags![row].jpn_name
-        default: _label.text = tags![row].eng_name}
+        case LanguageId.eng: _label.text = _tags[row].eng_name
+        case LanguageId.kor: _label.text = _tags[row].kor_name
+        case LanguageId.jpn: _label.text = _tags[row].jpn_name
+        default: fatalError()}
+        _label.textAlignment = .center
         _containerView.addSubview(_label)
         return _containerView
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        pickedTag = tags![row]
+        guard let _tags = tags else { return }
+        pickedTag = _tags[row]
     }
     
     func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
@@ -337,7 +337,7 @@ extension ProfileViewController {
     
     private func getProfileLabelContainerView() -> UIView {
         let _view = UIView()
-        _view.backgroundColor = UIColor(hex: "WhiteSmoke")
+        _view.backgroundColor = UIColor.whiteSmoke
         _view.translatesAutoresizingMaskIntoConstraints = false
         return _view
     }
@@ -372,7 +372,7 @@ extension ProfileViewController {
     private func setupLayout() {
         // Initialize super view
         lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
-        view.backgroundColor = UIColor(hex: "WhiteSmoke")
+        view.backgroundColor = UIColor.whiteSmoke
         
         // Initialize subveiw properties
         loadingImageView = getLoadingImageView(isHidden: true)
@@ -417,7 +417,7 @@ extension ProfileViewController {
         mailConfMsgLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 15, weight: .regular)
-            _label.textColor = UIColor(hex: "LightSteelBlue")
+            _label.textColor = UIColor.lightSteelBlue
             _label.textAlignment = .center
             _label.numberOfLines = 2
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -736,7 +736,7 @@ extension ProfileViewController {
                 self.introGuideLabel.isHidden = true
                 self.introPlaceHolderLabel.isHidden = false
             }
-            self.tagCollectionHeight.constant = self.getCategoryCollectionViewHeight(self.profile!.profile_tags.count)
+            self.tagCollectionHeight.constant = self.getTagCollectionViewHeight(self.profile!.profile_tags.count)
             self.tagCollectionView.reloadData()
             UIView.transition(with: self.scrollView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.scrollView.isHidden = false
