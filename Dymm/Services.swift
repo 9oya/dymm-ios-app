@@ -495,11 +495,11 @@ struct Service {
         }
     }
     
-    func searchTags(tagId: Int, keyWord:String, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
+    func searchTags(tagId: Int, keyWord: String, page: Int, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
         let params: Parameters = [
             "key_word": keyWord
         ]
-        let url = "\(URI.host)\(URI.tag)/\(tagId)/search"
+        let url = "\(URI.host)\(URI.tag)/\(tagId)/search/page/\(page)"
         Alamofire.request(url, method: .post, parameters: params, encoding: JSONEncoding.default)
             .validate(contentType: ["application/json"])
             .responseData { response in
