@@ -33,9 +33,7 @@ class TagCollectionCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupLayoutStyles()
-        setupLayoutSubviews()
-        setupLayoutConstraints()
+        setupLayout()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -44,17 +42,13 @@ class TagCollectionCell: UICollectionViewCell {
 }
 
 extension TagCollectionCell {
-    private func setupLayoutStyles() {
+    private func setupLayout() {
         backgroundColor = UIColor.white
         addShadowView()
-    }
-    
-    private func setupLayoutSubviews() {
+        
         addSubview(imageView)
         addSubview(label)
-    }
-    
-    private func setupLayoutConstraints() {
+        
         imageView.widthAnchor.constraint(equalToConstant: 30).isActive = true
         imageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
         imageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true

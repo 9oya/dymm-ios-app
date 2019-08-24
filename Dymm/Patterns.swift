@@ -54,6 +54,14 @@ struct LanguageId {
     static let jpn = 34
 }
 
+func getLanguageName(_ id: Int) -> String {
+    switch id {
+    case 30: return "English"
+    case 35: return "한글"
+    case 34: return "日本語"
+    default: fatalError()}
+}
+
 struct SortType {
     static let priority = "priority"
     static let eng = "eng"

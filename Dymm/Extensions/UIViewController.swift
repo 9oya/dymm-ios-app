@@ -30,7 +30,7 @@ extension UIViewController {
     func getTagCollectionViewHeight(_ numberOfItems: Int) -> CGFloat {
         let cellHeight = 45 + 7
         let numberOfRows = (numberOfItems / 2) + (numberOfItems % 2 > 0 ? 1:0)
-        return CGFloat((cellHeight * numberOfRows))
+        return CGFloat(cellHeight * numberOfRows)
     }
     
     // MARK: - Get UI component methods

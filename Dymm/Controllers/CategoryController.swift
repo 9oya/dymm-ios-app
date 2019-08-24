@@ -27,7 +27,7 @@ class CategoryViewController: UIViewController {
     var sizePickerContainerView: UIView!
     
     // UIScrollView
-    var scrollView: UIScrollView!
+//    var scrollView: UIScrollView!
     
     // UICollectionViews
     var stepCollectionView: UICollectionView!
@@ -38,7 +38,7 @@ class CategoryViewController: UIViewController {
     var sizePickerView: UIPickerView!
     
     // UIImageViews
-    var loadingImageView: UIImageView!
+//    var loadingImageView: UIImageView!
     var fingerImageView: UIImageView!
     var downArrowImageView: UIImageView!
     var photoImageView: UIImageView!
@@ -91,7 +91,7 @@ class CategoryViewController: UIViewController {
     var lastContentOffset: CGFloat = 0.0
     var isScrollToLoading: Bool = false
     var currPageNum: Int = 1
-    var minimumCnt: Int = 30
+    var minimumCnt: Int = 40
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -130,7 +130,7 @@ class CategoryViewController: UIViewController {
             self.selectedDate = self.dateFormatter.string(from: datePicker.date)
             UIView.transition(with: self.detailContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.detailContainerView.isHidden = true
-                self.loadingImageView.isHidden = false
+//                self.loadingImageView.isHidden = false
             })
             self.postAConditionLog()
         })
@@ -171,7 +171,7 @@ class CategoryViewController: UIViewController {
     
     @objc func timePickerChanged(_ sender: UIDatePicker){
         let _formatter = DateFormatter()
-        _formatter.locale = Locale(identifier: getUserCountryCode())  // TODO ko_kr
+        _formatter.locale = Locale(identifier: getUserCountryCode())
         _formatter.dateFormat = "HH:mm"
         let selectedTimeArr = _formatter.string(from: sender.date).components(separatedBy: ":")
         selectedXVal = Int(selectedTimeArr[0])
@@ -220,12 +220,12 @@ class CategoryViewController: UIViewController {
                 return
             }
         }
-        if superTag!.id == TagId.condition {
-            if textField.text!.count < 3 {
-                typedKeyword = nil
-                return
-            }
-        }
+//        if superTag!.id == TagId.condition {
+//            if textField.text!.count < 3 {
+//                typedKeyword = nil
+//                return
+//            }
+//        }
         typedKeyword = textField.text!
         searchTagsByKeyword()
     }
@@ -315,7 +315,7 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         searchTextField.text = nil
         typedKeyword = nil
         currPageNum = 1
-        minimumCnt = 30
+        minimumCnt = 40
         lastContentOffset = 0.0
         if collectionView == tagCollectionView {
             let selected_tag = subTags[indexPath.item]
@@ -361,10 +361,6 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
-        return CGSize(width: 0, height: marginInt)
-    }
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         if collectionView == tagCollectionView {
             return 7
@@ -383,6 +379,47 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         } else {
             fatalError()
         }
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard let _subTags = subTags else {
+            return
+        }
+        let currScrolledSize = scrollView.frame.size.height + scrollView.contentOffset.y
+        if lastContentOffset > scrollView.contentOffset.y {
+            // Case scoll up
+            UIView.animate(withDuration: 0.5) {
+                self.searchTextField.isHidden = false
+                self.langPickButton.isHidden = false
+                self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt)
+            }
+            return
+        }
+        if scrollView.contentSize.height < 0 {
+            return
+        }
+        if _subTags.count == minimumCnt {
+            if currScrolledSize > (scrollView.contentSize.height - 50) {
+                if isScrollToLoading == false {
+                    isScrollToLoading = true
+                    currPageNum += 1
+                    minimumCnt += 40
+                    
+                    UIView.animate(withDuration: 0.5) {
+                        self.searchTextField.isHidden = true
+                        self.langPickButton.isHidden = true
+                        self.tagCollectionViewTop.constant = CGFloat(marginInt)
+                    }
+                    
+                    print(currPageNum)
+                    print(minimumCnt)
+                    print(_subTags.count)
+                    print("\(currScrolledSize) > \(scrollView.contentSize.height - 50)")
+                    loadCategories()
+                }
+            }
+        }
+        lastContentOffset = scrollView.contentOffset.y
     }
 }
 
@@ -482,35 +519,35 @@ extension CategoryViewController: UITextFieldDelegate {
     }
 }
 
-extension CategoryViewController: UIScrollViewDelegate {
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard let _subTags = subTags else {
-            return
-        }
-        let currScrolledSize = scrollView.frame.size.height + scrollView.contentOffset.y
-        if lastContentOffset > scrollView.contentOffset.y {
-            return
-        }
-        if scrollView.contentSize.height < 0 {
-            return
-        }
-        if _subTags.count == minimumCnt {
-            if currScrolledSize > (scrollView.contentSize.height - 100) {
-                if isScrollToLoading == false {
-                    isScrollToLoading = true
-                    currPageNum += 1
-                    minimumCnt += 30
-                    print(currPageNum)
-                    print(minimumCnt)
-                    print(_subTags.count)
-                    print("\(currScrolledSize) > \(scrollView.contentSize.height - 100)")
-                    loadCategories()
-                }
-            }
-        }
-        lastContentOffset = scrollView.contentOffset.y
-    }
-}
+//extension CategoryViewController: UIScrollViewDelegate {
+//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        guard let _subTags = subTags else {
+//            return
+//        }
+//        let currScrolledSize = scrollView.frame.size.height + scrollView.contentOffset.y
+//        if lastContentOffset > scrollView.contentOffset.y {
+//            return
+//        }
+//        if scrollView.contentSize.height < 0 {
+//            return
+//        }
+//        if _subTags.count == minimumCnt {
+//            if currScrolledSize > (scrollView.contentSize.height - 50) {
+//                if isScrollToLoading == false {
+//                    isScrollToLoading = true
+//                    currPageNum += 1
+//                    minimumCnt += 40
+//                    print(currPageNum)
+//                    print(minimumCnt)
+//                    print(_subTags.count)
+//                    print("\(currScrolledSize) > \(scrollView.contentSize.height - 50)")
+//                    loadCategories()
+//                }
+//            }
+//        }
+//        lastContentOffset = scrollView.contentOffset.y
+//    }
+//}
 
 extension CategoryViewController {
     
@@ -553,7 +590,7 @@ extension CategoryViewController {
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
-        scrollView = getScrollView()
+//        scrollView = getScrollView()
         stepCollectionView = {
             let layout = UICollectionViewFlowLayout()
             layout.scrollDirection = .horizontal
@@ -565,7 +602,13 @@ extension CategoryViewController {
             _collectionView.translatesAutoresizingMaskIntoConstraints = false
             return _collectionView
         }()
-        tagCollectionView = getCategoryCollectionView()
+        tagCollectionView = {
+            let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
+            _collectionView.backgroundColor = UIColor.clear
+            _collectionView.register(TagCollectionCell.self, forCellWithReuseIdentifier: tagCellId)
+            _collectionView.translatesAutoresizingMaskIntoConstraints = false
+            return _collectionView
+        }()
         timePicker = {
             let _datePicker = UIDatePicker()
             _datePicker.datePickerMode = .countDownTimer
@@ -580,7 +623,7 @@ extension CategoryViewController {
             _pickerView.translatesAutoresizingMaskIntoConstraints = false
             return _pickerView
         }()
-        loadingImageView = getLoadingImageView(isHidden: false)
+//        loadingImageView = getLoadingImageView(isHidden: false)
         fingerImageView = {
             let _imageView = UIImageView()
             _imageView.image = UIImage(named: "item-finger-click")
@@ -680,8 +723,9 @@ extension CategoryViewController {
         }()
         langPickButton = {
             let _button = UIButton(type: .system)
-            _button.setTitleColor(UIColor.dimGray, for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 23)
+            _button.setTitleColor(UIColor.darkGray, for: .normal)
+            _button.setTitle(getLanguageName(lang.currentLanguageId), for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 15)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(langPickBtnTapped), for: .touchUpInside)
             _button.backgroundColor = UIColor.white
@@ -692,7 +736,7 @@ extension CategoryViewController {
         }()
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
-        scrollView.delegate = self
+//        scrollView.delegate = self
         stepCollectionView.dataSource = self
         stepCollectionView.delegate = self
         tagCollectionView.dataSource = self
@@ -702,14 +746,14 @@ extension CategoryViewController {
         searchTextField.delegate = self
         
         // Setup subviews
-        view.addSubview(scrollView)
-        view.addSubview(loadingImageView)
+//        view.addSubview(scrollView)
+//        view.addSubview(loadingImageView)
         view.addSubview(stepCollectionView)
         
-        scrollView.addSubview(searchTextField)
-        scrollView.addSubview(langPickButton)
-        scrollView.addSubview(detailContainerView)
-        scrollView.addSubview(tagCollectionView)
+        view.addSubview(searchTextField)
+        view.addSubview(langPickButton)
+        view.addSubview(detailContainerView)
+        view.addSubview(tagCollectionView)
         
         detailContainerView.addSubview(titleLabel)
         detailContainerView.addSubview(starButton)
@@ -727,10 +771,10 @@ extension CategoryViewController {
         
         // Setup constraints
         // loadingImageView
-        loadingImageView.widthAnchor.constraint(equalToConstant: 62).isActive = true
-        loadingImageView.heightAnchor.constraint(equalToConstant: 62).isActive = true
-        loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
-        loadingImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0).isActive = true
+//        loadingImageView.widthAnchor.constraint(equalToConstant: 62).isActive = true
+//        loadingImageView.heightAnchor.constraint(equalToConstant: 62).isActive = true
+//        loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
+//        loadingImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0).isActive = true
         
         // additionalTopBarView
         stepCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
@@ -739,24 +783,24 @@ extension CategoryViewController {
         stepCollectionView.heightAnchor.constraint(equalToConstant: CGFloat(stepBarHeightInt)).isActive = true
         
         // scrollView
-        scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
-        scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
-        scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+//        scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+//        scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
+//        scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+//        scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
         
-        searchTextField.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
-        searchTextField.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
+        searchTextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         searchTextField.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) + CGFloat(marginInt)).isActive = true
         searchTextField.heightAnchor.constraint(equalToConstant: CGFloat(searchBarHeightInt)).isActive = true
-        
-        langPickButton.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
+
+        langPickButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
         langPickButton.leadingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
         langPickButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 28).isActive = true
         langPickButton.heightAnchor.constraint(equalTo: searchTextField.heightAnchor, constant: 0).isActive = true
         
-        detailContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
-        detailContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
-        detailContainerView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
+        detailContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
+        detailContainerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        detailContainerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
         detailContainerViewHeight = detailContainerView.heightAnchor.constraint(equalToConstant: CGFloat(detailBoxAHeightInt))
         detailContainerViewHeight.priority = UILayoutPriority(rawValue: 999)
         detailContainerViewHeight.isActive = true
@@ -807,17 +851,17 @@ extension CategoryViewController {
         fingerImageBottom.isActive = true
         fingerImageView.leadingAnchor.constraint(equalTo: logSizeButton.trailingAnchor, constant: 8).isActive = true
         
-        // addBar: 35, space: 7, searchBar: 40, space: 7
-        tagCollectionViewTop = tagCollectionView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt))
+//        tagCollectionViewTop = tagCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt))
+        tagCollectionViewTop = tagCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt))
         tagCollectionViewTop.priority = UILayoutPriority(rawValue: 999)
         tagCollectionViewTop.isActive = true
-        tagCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 7).isActive = true
-        tagCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 7).isActive = true
-        tagCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: 0).isActive = true
-        tagCollectionView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor, constant: 0).isActive = true
-        tagCollectionViewHeight = tagCollectionView.heightAnchor.constraint(equalToConstant: CGFloat(searchBarHeightInt + marginInt))
-        tagCollectionViewHeight.priority = UILayoutPriority(rawValue: 999)
-        tagCollectionViewHeight.isActive = true
+        tagCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
+        tagCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 7).isActive = true
+        tagCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+//        tagCollectionView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+//        tagCollectionViewHeight = tagCollectionView.heightAnchor.constraint(equalToConstant: CGFloat(searchBarHeightInt + marginInt))
+//        tagCollectionViewHeight.priority = UILayoutPriority(rawValue: 999)
+//        tagCollectionViewHeight.isActive = true
     }
     
     private func didSelectSizePickerRow(row: Int) {
@@ -980,24 +1024,22 @@ extension CategoryViewController {
             if _subTags.count > 0 {
                 self.subTags.append(contentsOf: _subTags)
                 self.tagCollectionView.reloadData()
-                UIView.animate(withDuration: 0.5) {
-                    self.tagCollectionViewHeight.constant = self.getTagCollectionViewHeight(self.subTags.count)
-                }
+//                UIView.animate(withDuration: 0.5) {
+//                    self.tagCollectionViewHeight.constant = self.getTagCollectionViewHeight(self.subTags.count)
+//                }
             }
         } else {
             self.subTags = _subTags
-            tagCollectionView.reloadData()
+            
             stepCollectionView.reloadData()
-            UIView.transition(with: self.tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.loadingImageView.isHidden = true
-                self.tagCollectionViewHeight.constant = self.getTagCollectionViewHeight(_subTags.count)
+            UIView.transition(with: tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.tagCollectionView.reloadData()
             })
+//            UIView.transition(with: self.tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+//                self.loadingImageView.isHidden = true
+//                self.tagCollectionViewHeight.constant = self.getTagCollectionViewHeight(self.subTags.count)
+//            })
         }
-//        UIView.transition(with: self.tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-//            self.tagCollectionViewHeight.constant = self.getCategoryCollectionViewHeight(subTags.count)
-//            self.loadingImageView.isHidden = true
-//            self.tagCollectionView.isHidden = false
-//        })
     }
     
     private func loadCategories() {
@@ -1050,9 +1092,9 @@ extension CategoryViewController {
         }, tokenRefreshCompletion: {
             self.postAConditionLog()
         }) {
-            UIView.transition(with: self.loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            UIView.transition(with: self.detailContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.detailContainerView.isHidden = false
-                self.loadingImageView.isHidden = true
+//                self.loadingImageView.isHidden = true
             }, completion: { (_) in
                 switch self.lang.currentLanguageId {
                 case LanguageId.eng: self.alertCompl(self.superTag!.eng_name, self.lang.msgIntakeLogComplete)

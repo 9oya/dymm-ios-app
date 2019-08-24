@@ -164,6 +164,7 @@
 		6A8D897622F8886800A7F333 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				6A8D899B22F8898B00A7F333 /* UserDefaults.swift */,
 				6A8D899622F8898B00A7F333 /* NSObject.swift */,
 				6A8D899922F8898B00A7F333 /* String.swift */,
 				6A62B36C230C75C10012C83D /* NSMutableAttributedString.swift */,
@@ -173,7 +174,6 @@
 				6A8D899822F8898B00A7F333 /* UITextField.swift */,
 				6A8D899C22F8898B00A7F333 /* UIView.swift */,
 				6A8D899A22F8898B00A7F333 /* UIViewController.swift */,
-				6A8D899B22F8898B00A7F333 /* UserDefaults.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";

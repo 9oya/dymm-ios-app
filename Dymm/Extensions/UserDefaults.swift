@@ -83,7 +83,7 @@ extension UserDefaults {
     func getCurrentLanguageId() -> Int? {
         let currentLanguageId = integer(forKey: UserDefaultsKeys.currentLanguageId.rawValue)
         if currentLanguageId == 0 {
-            return LanguageId.eng
+            return getLanguageId(alpha2: String(Locale.preferredLanguages[0].prefix(2)))
         }
         return currentLanguageId
     }
