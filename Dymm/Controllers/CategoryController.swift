@@ -149,19 +149,57 @@ class CategoryViewController: UIViewController {
         self.present(alertController, animated: true, completion: nil)
     }
     
+    @objc func presentAuthNavigation() {
+        let vc = AuthViewController()
+        let nc = UINavigationController(rootViewController: vc)
+        present(nc, animated: true, completion: nil)
+    }
+    
     @objc func homeButtonTapped() {
         dismiss(animated: true, completion: nil)
     }
     
+    @objc func starButtonTapped() {
+        if UserDefaults.standard.isSignIn() {
+            if bookmark_id != nil {
+                updateABookmark()
+            } else {
+                createABookmark()
+            }
+        } else {
+            presentAuthNavigation()
+        }
+    }
+    
     @objc func logButtonTapped() {
-        let vc = DiaryViewController()
-        vc.diaryMode = DiaryMode.logger
-        vc.logType = LogType.food
-        vc.selectedTag = superTag!
-        vc.x_val = selectedXVal!
-        vc.y_val = selectedYVal!
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: UIBarButtonItem.Style.plain, target: self, action: nil)
-        self.navigationController?.pushViewController(vc, animated: true)
+        if UserDefaults.standard.isSignIn() {
+            let vc = DiaryViewController()
+            vc.diaryMode = DiaryMode.logger
+            vc.logType = LogType.food
+            vc.selectedTag = superTag!
+            vc.x_val = selectedXVal!
+            vc.y_val = selectedYVal!
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: UIBarButtonItem.Style.plain, target: self, action: nil)
+            self.navigationController?.pushViewController(vc, animated: true)
+        } else {
+            presentAuthNavigation()
+        }
+    }
+    
+    @objc func startDateButtonTapped() {
+        if UserDefaults.standard.isSignIn() {
+            alertDatePicker(cond_log_type: CondLogType.startDate)
+        } else {
+            presentAuthNavigation()
+        }
+    }
+    
+    @objc func endDateButtonTapped() {
+        if UserDefaults.standard.isSignIn() {
+            alertDatePicker(cond_log_type: CondLogType.endDate)
+        } else {
+            presentAuthNavigation()
+        }
     }
     
     @objc func timePickerChanged(_ sender: UIDatePicker){
@@ -217,22 +255,6 @@ class CategoryViewController: UIViewController {
         }
         typedKeyword = textField.text!
         searchTagsByKeyword()
-    }
-    
-    @objc func startDateButtonTapped() {
-        alertDatePicker(cond_log_type: CondLogType.startDate)
-    }
-    
-    @objc func endDateButtonTapped() {
-        alertDatePicker(cond_log_type: CondLogType.endDate)
-    }
-    
-    @objc func starButtonTapped() {
-        if bookmark_id != nil {
-            updateABookmark()
-        } else {
-            createABookmark()
-        }
     }
     
     @objc func langPickBtnTapped() {
@@ -306,6 +328,7 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         currPageNum = 1
         minimumCnt = 40
         lastContentOffset = 0.0
+        isScrollToLoading = false
         if collectionView == tagCollectionView {
             let selected_tag = subTags[indexPath.item]
             stepTags.append(superTag!)
@@ -373,51 +396,29 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         guard let _subTags = subTags else {
             return
         }
-        let currScrolledSize = scrollView.frame.size.height + scrollView.contentOffset.y
-        if lastContentOffset > (scrollView.contentOffset.y + 50) {
-            // Case scoll up
-            UIView.animate(withDuration: 0.5) {
-                self.searchTextField.isHidden = false
-                self.langPickButton.isHidden = false
-                self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt)
-                self.view.layoutIfNeeded()
-            }
-            return
-        }
+        
         if lastContentOffset > scrollView.contentOffset.y {
-            // Case scoll up
+            // Case scolled up
             return
         }
         if scrollView.contentSize.height < 0 {
+            // Case view did initialized
             return
+        } else {
+            lastContentOffset = scrollView.contentOffset.y
         }
-        if _subTags.count == minimumCnt {
-            if currScrolledSize > (scrollView.contentSize.height - 50) {
-                if isScrollToLoading == false {
-                    isScrollToLoading = true
-                    currPageNum += 1
-                    minimumCnt += 40
-                    
-                    UIView.animate(withDuration: 0.5) {
-                        self.searchTextField.isHidden = true
-                        self.langPickButton.isHidden = true
-                        self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt)
-                    }
-                    
-                    print(currPageNum)
-                    print(minimumCnt)
-                    print(_subTags.count)
-                    print("\(currScrolledSize) > \(scrollView.contentSize.height - 50)")
-                    
-                    if typedKeyword != nil {
-                        searchTagsByKeyword()
-                    } else {
-                        loadCategories()
-                    }
+        if (scrollView.frame.size.height + scrollView.contentOffset.y) > (scrollView.contentSize.height - 200) {
+            if _subTags.count == minimumCnt {
+                isScrollToLoading = true
+                currPageNum += 1
+                minimumCnt += 40
+                if typedKeyword != nil {
+                    searchTagsByKeyword()
+                } else {
+                    loadCategories()
                 }
             }
         }
-        lastContentOffset = scrollView.contentOffset.y
     }
 }
 
@@ -769,7 +770,7 @@ extension CategoryViewController {
         timePicker.widthAnchor.constraint(equalToConstant: (view.frame.width / 2)).isActive = true
         timePicker.heightAnchor.constraint(equalToConstant: 125).isActive = true
         
-        logTimeButton.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: -45).isActive = true
+        logTimeButton.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: -40).isActive = true
         logTimeButton.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
         
         titleLabel.topAnchor.constraint(equalTo: detailContainerView.topAnchor, constant: 10).isActive = true
@@ -912,7 +913,7 @@ extension CategoryViewController {
                 self.detailContainerViewHeight.constant = CGFloat(detailBoxAHeightInt)
                 self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxAHeightInt + marginInt)
                 
-                self.fingerImageBottom.constant = -75
+                self.fingerImageView.isHidden = false
                 self.downArrowImageView.isHidden = false
                 self.logSizeButton.isHidden = false
                 self.sizePickerContainerView.isHidden = false
@@ -940,7 +941,7 @@ extension CategoryViewController {
                 self.detailContainerViewHeight.constant = CGFloat(detailBoxBHeightInt)
                 self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxBHeightInt + marginInt)
                 
-                self.fingerImageBottom.constant = -20
+                self.fingerImageView.isHidden = true
                 self.downArrowImageView.isHidden = true
                 self.logSizeButton.isHidden = true
                 self.sizePickerContainerView.isHidden = true
@@ -998,6 +999,11 @@ extension CategoryViewController {
                 self.starButton.setImage(UIImage.btnStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
             }
             self.afterFetchCategoriesTransition(tagSet.tag, tagSet.sub_tags)
+            
+            if tagSet.sub_tags.count > 0 {
+                let indexPath = IndexPath(row: 0, section: 0)
+                self.tagCollectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+            }
         }
     }
     
