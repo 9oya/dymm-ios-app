@@ -48,6 +48,12 @@ struct TagType {
     static let history = 15
 }
 
+struct TagId {
+    static let diary = 17
+    static let bookmarks = 18
+    static let condition = 3
+}
+
 struct LanguageId {
     static let eng = 30
     static let kor = 35
@@ -91,12 +97,6 @@ struct LogGroupType {
     static let daytime = 2
     static let evening = 3
     static let nighttime = 4
-}
-
-struct TagId {
-    static let diary = 17
-    static let bookmarks = 18
-    static let condition = 3
 }
 
 struct DiaryMode {

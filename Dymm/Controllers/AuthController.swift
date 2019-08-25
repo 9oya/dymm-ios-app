@@ -15,12 +15,9 @@ class AuthViewController: UIViewController {
     // MARK: - Properties
     
     // UIView
-    var additionalTopBarView: UIView!
+    var topBarView: UIView!
     var formContainerView: UIView!
     var formGrayLineView: UIView!
-    
-    // UIScrollView
-    var scrollView: UIScrollView!
     
     // UIImageView
     var loadingImageView: UIImageView!
@@ -43,6 +40,7 @@ class AuthViewController: UIViewController {
     var messageLabel: UILabel!
     
     // NSLayoutConstraint
+    var formContainerTop: NSLayoutConstraint!
     var formContainerHeight: NSLayoutConstraint!
     var emailTextFieldTop: NSLayoutConstraint!
 
@@ -85,6 +83,13 @@ class AuthViewController: UIViewController {
             accountSignIn()
         }
     }
+    
+//    @objc func textFieldTapped(textField: UITextField) {
+//        UIView.animate(withDuration: 0.7) {
+//            self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
+//            self.view.layoutIfNeeded()
+//        }
+//    }
 }
 
 extension AuthViewController: UITextFieldDelegate {
@@ -93,7 +98,50 @@ extension AuthViewController: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.endEditing(true)
+        UIView.animate(withDuration: 0.7) {
+            self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
+            self.view.layoutIfNeeded()
+        }
         return false
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        switch textField {
+        case firstNameTextField:
+            UIView.animate(withDuration: 0.7) {
+                self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
+                self.view.layoutIfNeeded()
+            }
+        case lastNameTextField:
+            UIView.animate(withDuration: 0.7) {
+                self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
+                self.view.layoutIfNeeded()
+            }
+        case emailTextField:
+            UIView.animate(withDuration: 0.7) {
+                self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
+                self.view.layoutIfNeeded()
+            }
+        case passwordTextField:
+            if isSignUpForm {
+                UIView.animate(withDuration: 0.7) {
+                    self.formContainerTop.constant = 0
+                    self.view.layoutIfNeeded()
+                }
+            } else {
+                UIView.animate(withDuration: 0.7) {
+                    self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
+                    self.view.layoutIfNeeded()
+                }
+            }
+        case confirmPassTextField:
+            UIView.animate(withDuration: 0.7) {
+                self.formContainerTop.constant = -50
+                self.view.layoutIfNeeded()
+            }
+        default:
+            return
+        }
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
@@ -152,8 +200,7 @@ extension AuthViewController {
         
         // Initialize subveiw properties
         loadingImageView = getLoadingImageView(isHidden: true)
-        scrollView = getScrollView()
-        additionalTopBarView = getAddtionalTopBarView()
+        topBarView = getAddtionalTopBarView()
         forgotButton = getBasicTextButton()
         forgotButton.setTitle(lang.btnForgotPassword, for: .normal)
         closeButton = getCloseButton()
@@ -184,8 +231,9 @@ extension AuthViewController {
             _textField.selectedLineHeight = 1
             _textField.placeholder = lang.txtFieldFirstName
             _textField.title = lang.txtFieldFirstName
-            _textField.textContentType = .namePrefix
+//            _textField.textContentType = .namePrefix
             _textField.autocapitalizationType = .words
+            _textField.keyboardType = .default
             _textField.isHidden = true
             _textField.translatesAutoresizingMaskIntoConstraints = false
             return _textField
@@ -197,7 +245,7 @@ extension AuthViewController {
             _textField.selectedLineColor = UIColor.black
             _textField.placeholder = lang.txtFieldLastName
             _textField.title = lang.txtFieldLastName
-            _textField.textContentType = .namePrefix
+//            _textField.textContentType = .namePrefix
             _textField.autocapitalizationType = .words
             _textField.isHidden = true
             _textField.translatesAutoresizingMaskIntoConstraints = false
@@ -210,7 +258,7 @@ extension AuthViewController {
             _textField.selectedLineColor = UIColor.black
             _textField.placeholder = lang.txtFieldEmail
             _textField.title = lang.txtFieldEmail
-            _textField.textContentType = .emailAddress
+//            _textField.textContentType = .emailAddress
             _textField.keyboardType = .emailAddress
             _textField.autocapitalizationType = .none
             _textField.translatesAutoresizingMaskIntoConstraints = false
@@ -271,12 +319,11 @@ extension AuthViewController {
             return _button
         }()
         
-        view.addSubview(scrollView)
         view.addSubview(loadingImageView)
-        view.addSubview(additionalTopBarView)
+        view.addSubview(formContainerView)
+        view.addSubview(topBarView)
         
-        additionalTopBarView.addSubview(forgotButton)
-        scrollView.addSubview(formContainerView)
+        topBarView.addSubview(forgotButton)
         
         formContainerView.addSubview(titleLabel)
         formContainerView.addSubview(firstNameTextField)
@@ -297,33 +344,26 @@ extension AuthViewController {
         confirmPassTextField.delegate = self
         
         // Setup constraints
-        // loadingImageView
         loadingImageView.widthAnchor.constraint(equalToConstant: 62).isActive = true
         loadingImageView.heightAnchor.constraint(equalToConstant: 62).isActive = true
         loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
         loadingImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0).isActive = true
         
-        // additionalTopBarView
-        additionalTopBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
-        additionalTopBarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
-        additionalTopBarView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
-        additionalTopBarView.heightAnchor.constraint(equalToConstant: 35).isActive = true
+        topBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+        topBarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+        topBarView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
+        topBarView.heightAnchor.constraint(equalToConstant: CGFloat(topBarHeightInt)).isActive = true
         
-        forgotButton.topAnchor.constraint(equalTo: additionalTopBarView.topAnchor, constant: 0).isActive = true
-        forgotButton.trailingAnchor.constraint(equalTo: additionalTopBarView.trailingAnchor, constant: -20).isActive = true
-        forgotButton.bottomAnchor.constraint(equalTo: additionalTopBarView.bottomAnchor, constant: 0).isActive = true
+        forgotButton.topAnchor.constraint(equalTo: topBarView.topAnchor, constant: 0).isActive = true
+        forgotButton.trailingAnchor.constraint(equalTo: topBarView.trailingAnchor, constant: -20).isActive = true
+        forgotButton.bottomAnchor.constraint(equalTo: topBarView.bottomAnchor, constant: 0).isActive = true
         
-        // scrollView
-        scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
-        scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
-        scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
-        
-        formContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 35 + 7).isActive = true
-        formContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 7).isActive = true
-        formContainerView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 7).isActive = true
-//        formContainerView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: 7).isActive = true
-        formContainerView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor, constant: 0).isActive = true
+        formContainerTop = formContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt))
+        formContainerTop.priority = UILayoutPriority(rawValue: 999)
+        formContainerTop.isActive = true
+//        formContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt)).isActive = true
+        formContainerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        formContainerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         formContainerHeight = formContainerView.heightAnchor.constraint(equalToConstant: 260)
         formContainerHeight.priority = UILayoutPriority(rawValue: 999)
         formContainerHeight.isActive = true

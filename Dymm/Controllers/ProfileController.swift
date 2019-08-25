@@ -8,12 +8,14 @@
 
 import UIKit
 
+let topBarHeightInt = 35
+
 class ProfileViewController: UIViewController {
     
     // MARK: - Properties
     
     // UIView
-    var additionalTopBarView: UIView!
+    var topBarView: UIView!
     var mailConfContainerView: UIView!
     var infoContainerView: UIView!
     var infoImageContainerView: UIView!
@@ -23,9 +25,6 @@ class ProfileViewController: UIViewController {
     var phNumberContainerView: UIView!
     var introContainerView: UIView!
     
-    // UIScrollView
-    var scrollView: UIScrollView!
-    
     // UICollectionView
     var tagCollectionView: UICollectionView!
     
@@ -33,7 +32,6 @@ class ProfileViewController: UIViewController {
     var pickerView: UIPickerView!
     
     // UIImageView
-    var loadingImageView: UIImageView!
     var infoImageView: UIImageView!
     var pencilImageView: UIImageView!
     
@@ -61,9 +59,6 @@ class ProfileViewController: UIViewController {
     var introGuideLabel: UILabel!
     var introLabel: UILabel!
     var introPlaceHolderLabel: UILabel!
-    
-    // NSLayoutConstraint
-    var tagCollectionHeight: NSLayoutConstraint!
     
     // Non-view properties
     var lang: LangPack!
@@ -375,15 +370,13 @@ extension ProfileViewController {
         view.backgroundColor = UIColor.whiteSmoke
         
         // Initialize subveiw properties
-        loadingImageView = getLoadingImageView(isHidden: true)
-        additionalTopBarView = getAddtionalTopBarView()
+        topBarView = getAddtionalTopBarView()
         signOutButton = getBasicTextButton()
         signOutButton.addTarget(self, action: #selector(signOutButtonTapped), for: .touchUpInside)
         closeButton = getCloseButton()
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         mailConfAddressButton = getBasicTextButton()
         sendAgainButton = getBasicTextButton()
-        scrollView = getScrollView(isHidden: true)
         firstNameContainerView = getProfileLabelContainerView()
         firstNameContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.firstNameContainerTapped(_:))))
         lastNameContainerView = getProfileLabelContainerView()
@@ -435,6 +428,7 @@ extension ProfileViewController {
             _view.backgroundColor = UIColor.white
             _view.layer.cornerRadius = 10
             _view.addShadowView()
+            _view.isHidden = true
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
@@ -442,6 +436,7 @@ extension ProfileViewController {
             let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
             _collectionView.backgroundColor = UIColor.clear
             _collectionView.register(TagCollectionCell.self, forCellWithReuseIdentifier: tagCellId)
+            _collectionView.isHidden = true
             _collectionView.translatesAutoresizingMaskIntoConstraints = false
             return _collectionView
         }()
@@ -488,14 +483,13 @@ extension ProfileViewController {
         }()
         
         // Setup subviews
-        view.addSubview(scrollView)
-        view.addSubview(loadingImageView)
-        view.addSubview(additionalTopBarView)
+        view.addSubview(topBarView)
         view.addSubview(mailConfContainerView)
+        view.addSubview(infoContainerView)
+        view.addSubview(tagCollectionView)
         
-        additionalTopBarView.addSubview(signOutButton)
-        scrollView.addSubview(infoContainerView)
-        scrollView.addSubview(tagCollectionView)
+        topBarView.addSubview(signOutButton)
+        
         mailConfContainerView.addSubview(mailConfMsgLabel)
         mailConfContainerView.addSubview(mailConfAddressButton)
         mailConfContainerView.addSubview(pencilImageView)
@@ -530,26 +524,20 @@ extension ProfileViewController {
         pickerView.delegate = self
         
         // Setup constraints
-        // loadingImageView, alertBlindView
-        loadingImageView.widthAnchor.constraint(equalToConstant: 62).isActive = true
-        loadingImageView.heightAnchor.constraint(equalToConstant: 62).isActive = true
-        loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
-        loadingImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0).isActive = true
-        
         // additionalTopBarView
-        additionalTopBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
-        additionalTopBarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
-        additionalTopBarView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
-        additionalTopBarView.heightAnchor.constraint(equalToConstant: 35).isActive = true
+        topBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+        topBarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+        topBarView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
+        topBarView.heightAnchor.constraint(equalToConstant: CGFloat(topBarHeightInt)).isActive = true
         
-        signOutButton.topAnchor.constraint(equalTo: additionalTopBarView.topAnchor, constant: 0).isActive = true
-        signOutButton.trailingAnchor.constraint(equalTo: additionalTopBarView.trailingAnchor, constant: -20).isActive = true
-        signOutButton.bottomAnchor.constraint(equalTo: additionalTopBarView.bottomAnchor, constant: 0).isActive = true
+        signOutButton.topAnchor.constraint(equalTo: topBarView.topAnchor, constant: 0).isActive = true
+        signOutButton.trailingAnchor.constraint(equalTo: topBarView.trailingAnchor, constant: -20).isActive = true
+        signOutButton.bottomAnchor.constraint(equalTo: topBarView.bottomAnchor, constant: 0).isActive = true
         
         // mailConfContainerView
-        mailConfContainerView.topAnchor.constraint(equalTo: additionalTopBarView.bottomAnchor, constant: 7).isActive = true
-        mailConfContainerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
-        mailConfContainerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
+        mailConfContainerView.topAnchor.constraint(equalTo: topBarView.bottomAnchor, constant: 7).isActive = true
+        mailConfContainerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        mailConfContainerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         mailConfContainerView.heightAnchor.constraint(equalToConstant: 220).isActive = true
         
         mailConfMsgLabel.leadingAnchor.constraint(equalTo: mailConfContainerView.leadingAnchor, constant: 20).isActive = true
@@ -566,18 +554,11 @@ extension ProfileViewController {
         pencilImageView.leadingAnchor.constraint(equalTo: mailConfAddressButton.trailingAnchor, constant: 5).isActive = true
         pencilImageView.widthAnchor.constraint(equalToConstant: 30).isActive = true
         pencilImageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
-        
-        // scrollView
-        scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
-        scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
-        scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
-        
-        // profileContainerView
-        infoContainerView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 35 + 7).isActive = true
-        infoContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 7).isActive = true
-        infoContainerView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 7).isActive = true
-        infoContainerView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor, constant: 0).isActive = true
+
+        // infoContainerView
+        infoContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt)).isActive = true
+        infoContainerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        infoContainerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         infoContainerView.heightAnchor.constraint(equalToConstant: 280).isActive = true
         
         infoImageContainerView.topAnchor.constraint(equalTo: infoContainerView.topAnchor, constant: 20).isActive = true
@@ -595,7 +576,7 @@ extension ProfileViewController {
         
         firstNameContainerView.topAnchor.constraint(equalTo: infoContainerView.topAnchor, constant: 15).isActive = true
         firstNameContainerView.leadingAnchor.constraint(equalTo: infoImageContainerView.trailingAnchor, constant: 20).isActive = true
-        firstNameContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: -7).isActive = true
+        firstNameContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         firstNameContainerView.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
         firstNameGuideLabel.topAnchor.constraint(equalTo: firstNameContainerView.topAnchor, constant: 2).isActive = true
@@ -608,7 +589,7 @@ extension ProfileViewController {
         
         lastNameContainerView.topAnchor.constraint(equalTo: firstNameContainerView.bottomAnchor, constant: 3).isActive = true
         lastNameContainerView.leadingAnchor.constraint(equalTo: infoImageContainerView.trailingAnchor, constant: 20).isActive = true
-        lastNameContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: -7).isActive = true
+        lastNameContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         lastNameContainerView.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
         lastNameGuideLabel.topAnchor.constraint(equalTo: lastNameContainerView.topAnchor, constant: 2).isActive = true
@@ -621,7 +602,7 @@ extension ProfileViewController {
         
         emailContainerView.topAnchor.constraint(equalTo: lastNameContainerView.bottomAnchor, constant: 3).isActive = true
         emailContainerView.leadingAnchor.constraint(equalTo: infoContainerView.leadingAnchor, constant: 20).isActive = true
-        emailContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: -7).isActive = true
+        emailContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         emailContainerView.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
         emailGuideLabel.topAnchor.constraint(equalTo: emailContainerView.topAnchor, constant: 2).isActive = true
@@ -634,7 +615,7 @@ extension ProfileViewController {
         
         phNumberContainerView.topAnchor.constraint(equalTo: emailContainerView.bottomAnchor, constant: 3).isActive = true
         phNumberContainerView.leadingAnchor.constraint(equalTo: infoContainerView.leadingAnchor, constant: 20).isActive = true
-        phNumberContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: -7).isActive = true
+        phNumberContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         phNumberContainerView.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
         phNumberGuideLabel.topAnchor.constraint(equalTo: phNumberContainerView.topAnchor, constant: 2).isActive = true
@@ -651,7 +632,7 @@ extension ProfileViewController {
         
         introContainerView.topAnchor.constraint(equalTo: phNumberContainerView.bottomAnchor, constant: 3).isActive = true
         introContainerView.leadingAnchor.constraint(equalTo: infoContainerView.leadingAnchor, constant: 20).isActive = true
-        introContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: -7).isActive = true
+        introContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         introContainerView.heightAnchor.constraint(equalToConstant: 80).isActive = true
         
         introGuideLabel.topAnchor.constraint(equalTo: introContainerView.topAnchor, constant: 2).isActive = true
@@ -667,13 +648,10 @@ extension ProfileViewController {
         introPlaceHolderLabel.centerYAnchor.constraint(equalTo: introContainerView.centerYAnchor, constant: 0).isActive = true
         
         // profileCollectionView
-        tagCollectionView.topAnchor.constraint(equalTo: infoContainerView.bottomAnchor, constant: 7).isActive = true
-        tagCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 7).isActive = true
-        tagCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 7).isActive = true
-        tagCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: 0).isActive = true
-        tagCollectionHeight = tagCollectionView.heightAnchor.constraint(equalToConstant: 35 + 7)
-        tagCollectionHeight.priority = UILayoutPriority(rawValue: 999)
-        tagCollectionHeight.isActive = true
+        tagCollectionView.topAnchor.constraint(equalTo: infoContainerView.bottomAnchor, constant: CGFloat(marginInt)).isActive = true
+        tagCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        tagCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        tagCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
     }
     
     private func setupLangProperties() {
@@ -696,7 +674,8 @@ extension ProfileViewController {
             self.retryFunction = self.loadProfile
             self.alertError(message)
         }, emailNotConfirmed: { (email) in
-            UIView.transition(with: self.emailContainerView, duration: 0.7, options: .transitionCrossDissolve, animations: {
+            UIView.transition(with: self.mailConfContainerView, duration: 0.7, options: .transitionCrossDissolve, animations: {
+                self.infoContainerView.isHidden = true
                 self.mailConfAddressButton.setTitle(email, for: .normal)
                 self.mailConfContainerView.isHidden = false
             })
@@ -736,10 +715,10 @@ extension ProfileViewController {
                 self.introGuideLabel.isHidden = true
                 self.introPlaceHolderLabel.isHidden = false
             }
-            self.tagCollectionHeight.constant = self.getTagCollectionViewHeight(self.profile!.profile_tags.count)
             self.tagCollectionView.reloadData()
-            UIView.transition(with: self.scrollView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.scrollView.isHidden = false
+            UIView.transition(with: self.tagCollectionView, duration: 0.7, options: .transitionCrossDissolve, animations: {
+                self.infoContainerView.isHidden = false
+                self.tagCollectionView.isHidden = false
             })
         }
     }

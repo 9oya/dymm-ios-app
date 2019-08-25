@@ -23,7 +23,6 @@ class CategoryViewController: UIViewController {
     
     // UIViews
     var detailContainerView: UIView!
-    var searchTextField: UITextField!
     var sizePickerContainerView: UIView!
     
     // UICollectionViews
@@ -38,6 +37,9 @@ class CategoryViewController: UIViewController {
     var fingerImageView: UIImageView!
     var downArrowImageView: UIImageView!
     var photoImageView: UIImageView!
+    
+    // UITextField
+    var searchTextField: UITextField!
     
     // UILabels
     var titleLabel: UILabel!
@@ -228,7 +230,7 @@ class CategoryViewController: UIViewController {
             loadCategories()
             return
         } else if textField.text!.first == " " {
-            textField.text = ""
+            textField.text = nil
             typedKeyword = nil
             return
         } else if textField.text!.count < 2 {
@@ -890,9 +892,15 @@ extension CategoryViewController {
             default: fatalError()}
             UIView.animate(withDuration: 0.5) {
                 self.detailContainerView.isHidden = true
-                self.searchTextField.isHidden = false
-                self.langPickButton.isHidden = false
-                self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt)
+                if self.superTag!.id == TagId.bookmarks {
+                    self.searchTextField.isHidden = true
+                    self.langPickButton.isHidden = true
+                    self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt)
+                } else {
+                    self.searchTextField.isHidden = false
+                    self.langPickButton.isHidden = false
+                    self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt)
+                }
             }
         } else {
             // Case all non-cateogry tag_types
@@ -902,7 +910,13 @@ extension CategoryViewController {
             case LanguageId.jpn: titleLabel.text = _superTag.jpn_name
             default: fatalError()}
         }
-        if _superTag.tag_type == TagType.food || _superTag.tag_type == TagType.drug {
+        if _superTag.tag_type == TagType.bookmark || _superTag.tag_type == TagType.history {
+            UIView.animate(withDuration: 0.5) {
+                self.searchTextField.isHidden = true
+                self.langPickButton.isHidden = true
+                self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt)
+            }
+        } else if _superTag.tag_type == TagType.food || _superTag.tag_type == TagType.drug {
             // Execute food and drug tag_types exclusive
             sizePickerView.selectRow(4, inComponent: 0, animated: true)
             didSelectSizePickerRow(row: 4)
@@ -975,11 +989,16 @@ extension CategoryViewController {
         }
         
         // For all tag_types
-        self.subTags = _subTags
-        stepCollectionView.reloadData()
-        UIView.transition(with: tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            self.tagCollectionView.reloadData()
-        })
+        subTags = _subTags
+        tagCollectionView.reloadData()
+        UIView.transition(with: stepCollectionView, duration: 0.7, options: .transitionCrossDissolve, animations: {
+            self.stepCollectionView.reloadData()
+        }) { _ in
+            if _subTags.count > 0 {
+                let indexPath = IndexPath(row: 0, section: 0)
+                self.tagCollectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+            }
+        }
     }
     
     private func loadCategories() {
@@ -999,11 +1018,6 @@ extension CategoryViewController {
                 self.starButton.setImage(UIImage.btnStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
             }
             self.afterFetchCategoriesTransition(tagSet.tag, tagSet.sub_tags)
-            
-            if tagSet.sub_tags.count > 0 {
-                let indexPath = IndexPath(row: 0, section: 0)
-                self.tagCollectionView.scrollToItem(at: indexPath, at: .top, animated: true)
-            }
         }
     }
     

@@ -342,7 +342,7 @@ extension HomeViewController {
             self.alertError(message)
         }) { (tagSet) in
             self.tags = tagSet.sub_tags
-            UIView.transition(with: self.tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            UIView.transition(with: self.tagCollectionView, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.tagCollectionView.reloadData()
             })
         }
@@ -359,7 +359,7 @@ extension HomeViewController {
             self.avatar = avatar
             let firstName = avatar.first_name
             let index = firstName.index(firstName.startIndex, offsetBy: 0)
-            UIView.animate(withDuration: 0.2, animations: {
+            UIView.animate(withDuration: 0.5, animations: {
                 self.profileButton.setImage(nil, for: .normal)
                 self.profileButton.setTitle(String(firstName[index]), for: .normal)
                 self.profileButton.setTitleColor(UIColor.white, for: .normal)
