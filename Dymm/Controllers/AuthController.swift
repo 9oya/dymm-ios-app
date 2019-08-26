@@ -231,7 +231,6 @@ extension AuthViewController {
             _textField.selectedLineHeight = 1
             _textField.placeholder = lang.txtFieldFirstName
             _textField.title = lang.txtFieldFirstName
-//            _textField.textContentType = .namePrefix
             _textField.autocapitalizationType = .words
             _textField.keyboardType = .default
             _textField.isHidden = true
@@ -245,7 +244,6 @@ extension AuthViewController {
             _textField.selectedLineColor = UIColor.black
             _textField.placeholder = lang.txtFieldLastName
             _textField.title = lang.txtFieldLastName
-//            _textField.textContentType = .namePrefix
             _textField.autocapitalizationType = .words
             _textField.isHidden = true
             _textField.translatesAutoresizingMaskIntoConstraints = false
@@ -258,7 +256,7 @@ extension AuthViewController {
             _textField.selectedLineColor = UIColor.black
             _textField.placeholder = lang.txtFieldEmail
             _textField.title = lang.txtFieldEmail
-//            _textField.textContentType = .emailAddress
+            _textField.textContentType = .emailAddress
             _textField.keyboardType = .emailAddress
             _textField.autocapitalizationType = .none
             _textField.translatesAutoresizingMaskIntoConstraints = false
@@ -361,7 +359,6 @@ extension AuthViewController {
         formContainerTop = formContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt))
         formContainerTop.priority = UILayoutPriority(rawValue: 999)
         formContainerTop.isActive = true
-//        formContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt)).isActive = true
         formContainerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         formContainerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         formContainerHeight = formContainerView.heightAnchor.constraint(equalToConstant: 260)
@@ -517,10 +514,14 @@ extension AuthViewController {
             setMessageLabel(lang.msgShortPassword)
             return nil
         }
-        let userParams: Parameters = [
+        var userParams: Parameters = [
             "email": email,
             "password": password
         ]
+        let avatar_id = UserDefaults.standard.integer(forKey: email)
+        if avatar_id > 0 {
+            userParams["id"] = avatar_id
+        }
         return userParams
     }
     
@@ -572,6 +573,9 @@ extension AuthViewController {
             UserDefaults.standard.setAvatarId(value: _avatar.id)
             UserDefaults.standard.setCurrentLanguageId(value: auth.language_id)
             UserDefaults.standard.setIsSignIn(value: true)
+            
+            UserDefaults.standard.set(_avatar.id, forKey: _avatar.email)
+            
             self.dismiss(animated: true, completion: nil)
         }
     }
@@ -598,6 +602,9 @@ extension AuthViewController {
             UserDefaults.standard.setAvatarId(value: _avatar.id)
             UserDefaults.standard.setCurrentLanguageId(value: auth.language_id)
             UserDefaults.standard.setIsSignIn(value: true)
+            
+            UserDefaults.standard.set(_avatar.id, forKey: _avatar.email)
+            
             self.dismiss(animated: true, completion: nil)
         }
     }
