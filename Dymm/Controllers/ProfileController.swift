@@ -33,7 +33,6 @@ class ProfileViewController: UIViewController {
     
     // UIImageView
     var infoImageView: UIImageView!
-    var pencilImageView: UIImageView!
     
     // UITextView
     var introTextView: UITextView!
@@ -114,6 +113,26 @@ class ProfileViewController: UIViewController {
     @objc func signOutButtonTapped() {
         UserDefaults.standard.setIsSignIn(value: false)
         dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func mailConfAddressBtnTapped() {
+        let alert = UIAlertController(title: lang.alertEditEmailTitle, message: nil, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
+            if let txtField = alert.textFields?.first, let text = txtField.text {
+                self.newInfoStr = text
+                self.avatarInfoTarget = AvatarInfoTarget.email
+                self.updateAvatarInfo()
+            }
+        }
+        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
+        alert.addTextField { textField in
+            textField.autocapitalizationType = UITextAutocapitalizationType.words
+            textField.placeholder = self.lang.alertEditEmailPlaceholder
+            textField.text = self.profile!.avatar.email
+        }
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
+        self.present(alert, animated: true, completion: nil)
     }
     
     @objc func firstNameContainerTapped(_ sender: UITapGestureRecognizer? = nil) {
@@ -376,6 +395,7 @@ extension ProfileViewController {
         closeButton = getCloseButton()
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         mailConfAddressButton = getBasicTextButton()
+        mailConfAddressButton.addTarget(self, action: #selector(mailConfAddressBtnTapped), for: .touchUpInside)
         sendAgainButton = getBasicTextButton()
         firstNameContainerView = getProfileLabelContainerView()
         firstNameContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.firstNameContainerTapped(_:))))
@@ -415,13 +435,6 @@ extension ProfileViewController {
             _label.numberOfLines = 2
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
-        }()
-        pencilImageView = {
-            let _imageView = UIImageView()
-            _imageView.image = UIImage(named: "button-pencil")
-            _imageView.contentMode = .scaleAspectFit
-            _imageView.translatesAutoresizingMaskIntoConstraints = false
-            return _imageView
         }()
         infoContainerView = {
             let _view = UIView()
@@ -492,7 +505,6 @@ extension ProfileViewController {
         
         mailConfContainerView.addSubview(mailConfMsgLabel)
         mailConfContainerView.addSubview(mailConfAddressButton)
-        mailConfContainerView.addSubview(pencilImageView)
         mailConfContainerView.addSubview(sendAgainButton)
         
         infoContainerView.addSubview(infoImageContainerView)
@@ -524,7 +536,6 @@ extension ProfileViewController {
         pickerView.delegate = self
         
         // Setup constraints
-        // additionalTopBarView
         topBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         topBarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         topBarView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
@@ -534,7 +545,6 @@ extension ProfileViewController {
         signOutButton.trailingAnchor.constraint(equalTo: topBarView.trailingAnchor, constant: -20).isActive = true
         signOutButton.bottomAnchor.constraint(equalTo: topBarView.bottomAnchor, constant: 0).isActive = true
         
-        // mailConfContainerView
         mailConfContainerView.topAnchor.constraint(equalTo: topBarView.bottomAnchor, constant: 7).isActive = true
         mailConfContainerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         mailConfContainerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
@@ -545,17 +555,11 @@ extension ProfileViewController {
         mailConfMsgLabel.centerYAnchor.constraint(equalTo: mailConfContainerView.centerYAnchor, constant: -40).isActive = true
         
         sendAgainButton.bottomAnchor.constraint(equalTo: mailConfContainerView.bottomAnchor, constant: -25).isActive = true
-        sendAgainButton.centerXAnchor.constraint(equalTo: mailConfContainerView.centerXAnchor, constant: 0).isActive = true
+        sendAgainButton.trailingAnchor.constraint(equalTo: mailConfContainerView.trailingAnchor, constant: -15).isActive = true
         
         mailConfAddressButton.bottomAnchor.constraint(equalTo: sendAgainButton.topAnchor, constant: -15).isActive = true
         mailConfAddressButton.centerXAnchor.constraint(equalTo: mailConfContainerView.centerXAnchor, constant: 0).isActive = true
-        
-        pencilImageView.bottomAnchor.constraint(equalTo: sendAgainButton.topAnchor, constant: -24).isActive = true
-        pencilImageView.leadingAnchor.constraint(equalTo: mailConfAddressButton.trailingAnchor, constant: 5).isActive = true
-        pencilImageView.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        pencilImageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
 
-        // infoContainerView
         infoContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt)).isActive = true
         infoContainerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         infoContainerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
@@ -647,7 +651,6 @@ extension ProfileViewController {
         introPlaceHolderLabel.trailingAnchor.constraint(equalTo: introContainerView.trailingAnchor, constant: 0).isActive = true
         introPlaceHolderLabel.centerYAnchor.constraint(equalTo: introContainerView.centerYAnchor, constant: 0).isActive = true
         
-        // profileCollectionView
         tagCollectionView.topAnchor.constraint(equalTo: infoContainerView.bottomAnchor, constant: CGFloat(marginInt)).isActive = true
         tagCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         tagCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
