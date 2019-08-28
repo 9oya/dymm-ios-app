@@ -495,6 +495,41 @@ struct Service {
         }
     }
     
+    func sendMailConfLinkAgain(popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping () -> Void) {
+        guard let avatarId = UserDefaults.standard.getAvatarId() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            print("Load UserDefaults.standard.getAccessToken() failed")
+            return
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)",
+        ]
+        Alamofire.request("\(URI.host)\(URI.mail)/conf-link/\(avatarId)", method: .post, encoding: JSONEncoding.default, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    completion()
+                case 400:
+                    self.badRequest(responseData)
+                case 401:
+                    // TODO
+                    UserDefaults.standard.setIsSignIn(value: false)
+                    return
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "fetchTagSets()")
+                    return
+                }
+        }
+    }
+    
     func searchTags(tagId: Int, keyWord: String, page: Int, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
         let params: Parameters = [
             "key_word": keyWord

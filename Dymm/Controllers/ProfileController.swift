@@ -126,13 +126,16 @@ class ProfileViewController: UIViewController {
         }
         let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
         alert.addTextField { textField in
-            textField.autocapitalizationType = UITextAutocapitalizationType.words
             textField.placeholder = self.lang.alertEditEmailPlaceholder
-            textField.text = self.profile!.avatar.email
+            textField.text = self.newMailAddress!
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
         self.present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func sendMailAgainBtnTapped() {
+        sendMailAgain()
     }
     
     @objc func firstNameContainerTapped(_ sender: UITapGestureRecognizer? = nil) {
@@ -390,13 +393,14 @@ extension ProfileViewController {
         
         // Initialize subveiw properties
         topBarView = getAddtionalTopBarView()
-        signOutButton = getBasicTextButton()
+        signOutButton = getBasicTextButton(UIColor.tomato)
         signOutButton.addTarget(self, action: #selector(signOutButtonTapped), for: .touchUpInside)
         closeButton = getCloseButton()
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         mailConfAddressButton = getBasicTextButton()
         mailConfAddressButton.addTarget(self, action: #selector(mailConfAddressBtnTapped), for: .touchUpInside)
         sendAgainButton = getBasicTextButton()
+        sendAgainButton.addTarget(self, action: #selector(sendMailAgainBtnTapped), for: .touchUpInside)
         firstNameContainerView = getProfileLabelContainerView()
         firstNameContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.firstNameContainerTapped(_:))))
         lastNameContainerView = getProfileLabelContainerView()
@@ -554,7 +558,7 @@ extension ProfileViewController {
         mailConfMsgLabel.trailingAnchor.constraint(equalTo: mailConfContainerView.trailingAnchor, constant: -20).isActive = true
         mailConfMsgLabel.centerYAnchor.constraint(equalTo: mailConfContainerView.centerYAnchor, constant: -40).isActive = true
         
-        sendAgainButton.bottomAnchor.constraint(equalTo: mailConfContainerView.bottomAnchor, constant: -25).isActive = true
+        sendAgainButton.bottomAnchor.constraint(equalTo: mailConfContainerView.bottomAnchor, constant: -15).isActive = true
         sendAgainButton.trailingAnchor.constraint(equalTo: mailConfContainerView.trailingAnchor, constant: -15).isActive = true
         
         mailConfAddressButton.bottomAnchor.constraint(equalTo: sendAgainButton.topAnchor, constant: -15).isActive = true
@@ -677,6 +681,7 @@ extension ProfileViewController {
             self.retryFunction = self.loadProfile
             self.alertError(message)
         }, emailNotConfirmed: { (email) in
+            self.newMailAddress = email
             UIView.transition(with: self.mailConfContainerView, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.infoContainerView.isHidden = true
                 self.mailConfAddressButton.setTitle(email, for: .normal)
@@ -772,6 +777,31 @@ extension ProfileViewController {
             self.updateAvatarInfo()
         }) { (newInfoTxt) in
             self.loadProfile()
+        }
+    }
+    
+    private func sendMailAgain() {
+        UIView.transition(with: mailConfMsgLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.mailConfMsgLabel.text = "...."
+            self.mailConfMsgLabel.textColor = UIColor.black
+            self.mailConfAddressButton.isHidden = true
+            self.sendAgainButton.isHidden = true
+        })
+        mailConfMsgLabel.startRotating()
+        let service = Service(lang: lang)
+        service.sendMailConfLinkAgain(popoverAlert: { (message) in
+            self.retryFunction = self.sendMailAgain
+            self.alertError(message)
+        }) {
+            self.mailConfMsgLabel.stopRotating()
+            UIView.animate(withDuration: 0.5, animations: {
+                self.mailConfMsgLabel.text = self.lang.msgMailSnedAgainComplete
+                self.mailConfMsgLabel.textColor = UIColor.mediumSeaGreen
+            })
+            UIView.transition(with: self.sendAgainButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.mailConfAddressButton.isHidden = false
+                self.sendAgainButton.isHidden = false
+            })
         }
     }
 }

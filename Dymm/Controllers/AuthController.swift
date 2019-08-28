@@ -48,6 +48,7 @@ class AuthViewController: UIViewController {
     var lang: LangPack!
     var retryFunction: (() -> Void)?
     var isSignUpForm: Bool = false
+    var lastEditedTxtField: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,13 +84,6 @@ class AuthViewController: UIViewController {
             accountSignIn()
         }
     }
-    
-//    @objc func textFieldTapped(textField: UITextField) {
-//        UIView.animate(withDuration: 0.7) {
-//            self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
-//            self.view.layoutIfNeeded()
-//        }
-//    }
 }
 
 extension AuthViewController: UITextFieldDelegate {
@@ -108,33 +102,44 @@ extension AuthViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         switch textField {
         case firstNameTextField:
+            if lastEditedTxtField < 3 {
+                lastEditedTxtField = 0
+                return
+            }
             UIView.animate(withDuration: 0.7) {
                 self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
                 self.view.layoutIfNeeded()
             }
         case lastNameTextField:
+            if lastEditedTxtField < 3 {
+                lastEditedTxtField = 1
+                return
+            }
             UIView.animate(withDuration: 0.7) {
                 self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
                 self.view.layoutIfNeeded()
             }
         case emailTextField:
+            if lastEditedTxtField < 3 {
+                lastEditedTxtField = 2
+                return
+            }
             UIView.animate(withDuration: 0.7) {
                 self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
                 self.view.layoutIfNeeded()
             }
         case passwordTextField:
-            if isSignUpForm {
-                UIView.animate(withDuration: 0.7) {
-                    self.formContainerTop.constant = 0
-                    self.view.layoutIfNeeded()
-                }
-            } else {
-                UIView.animate(withDuration: 0.7) {
-                    self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
-                    self.view.layoutIfNeeded()
+            if lastEditedTxtField < 3 {
+                lastEditedTxtField = 3
+                if isSignUpForm {
+                    UIView.animate(withDuration: 0.7) {
+                        self.formContainerTop.constant = 0
+                        self.view.layoutIfNeeded()
+                    }
                 }
             }
         case confirmPassTextField:
+            lastEditedTxtField = 4
             UIView.animate(withDuration: 0.7) {
                 self.formContainerTop.constant = -50
                 self.view.layoutIfNeeded()
