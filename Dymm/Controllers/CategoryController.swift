@@ -224,6 +224,10 @@ class CategoryViewController: UIViewController {
     }
     
     @objc func textFieldDidChanged(_ textField: UITextField) {
+        currPageNum = 1
+        minimumCnt = 40
+        lastContentOffset = 0.0
+        isScrollToLoading = false
         let _text = textField.text!
         if textField.text == "" {
             typedKeyword = nil
@@ -994,7 +998,7 @@ extension CategoryViewController {
         UIView.transition(with: stepCollectionView, duration: 0.7, options: .transitionCrossDissolve, animations: {
             self.stepCollectionView.reloadData()
         }) { _ in
-            if _subTags.count > 0 {
+            if self.subTags.count > 0 {
                 let indexPath = IndexPath(row: 0, section: 0)
                 self.tagCollectionView.scrollToItem(at: indexPath, at: .top, animated: true)
             }
