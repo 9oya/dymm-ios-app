@@ -97,7 +97,7 @@ extension UIViewController {
         if let titleColor = titleColor {
             _button.setTitleColor(titleColor, for: .normal)
         } else {
-            _button.setTitleColor(UIColor(hex: "Tomato"), for: .normal)
+            _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
         }
         _button.titleLabel?.font = .systemFont(ofSize: 15)
         _button.showsTouchWhenHighlighted = true

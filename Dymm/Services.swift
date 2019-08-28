@@ -28,7 +28,7 @@ struct Service {
     
     func unexpectedResponse(_ statusCode: Int, _ data: Data, _ name: String) {
         print("Request \(name) failed \nStatus Code: \(statusCode)")
-        guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
+        guard let json = ((try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]) as [String : Any]??) else {
             fatalError("Decode error message failed")
         }
         fatalError(String(describing: json))
