@@ -58,10 +58,10 @@ class HomeViewController: UIViewController {
     
     @objc func alertError(_ message: String) {
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
+        let confirmAction = UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.retryFunction!()
         }
-        let cancelAction = UIAlertAction(title: lang.btnClose, style: .cancel) { _ in }
+        let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
         alertController.view.tintColor = UIColor.cornflowerBlue

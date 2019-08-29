@@ -101,10 +101,10 @@ class CategoryViewController: UIViewController {
     
     @objc func alertError(_ message: String) {
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
+        let confirmAction = UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.retryFunction!()
         }
-        let cancelAction = UIAlertAction(title: lang.btnNo, style: .cancel) { _ in }
+        let cancelAction = UIAlertAction(title: lang.titleNo, style: .cancel) { _ in }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
         self.present(alertController, animated: true, completion: nil)
@@ -118,9 +118,9 @@ class CategoryViewController: UIViewController {
         datePicker.datePickerMode = .date
         var _title = ""
         if cond_log_type == CondLogType.startDate {
-            _title = "\(lang.btnStartDate!)\n\n\n\n\n\n\n\n"
+            _title = "\(lang.titleStartDate!)\n\n\n\n\n\n\n\n"
         } else {
-            _title = "\(lang.btnEndDate!)\n\n\n\n\n\n\n\n"
+            _title = "\(lang.titleEndDate!)\n\n\n\n\n\n\n\n"
         }
         let alertController = UIAlertController(title: _title, message: nil, preferredStyle: UIAlertController.Style.alert)
         alertController.view.addSubview(datePicker)
@@ -139,10 +139,10 @@ class CategoryViewController: UIViewController {
     
     @objc func alertCompl(_ title: String, _ message: String) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
+        let confirmAction = UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.dismiss(animated: true, completion: nil)
         }
-        let cancelAction = UIAlertAction(title: lang.btnNo, style: .cancel) { _ in
+        let cancelAction = UIAlertAction(title: lang.titleNo, style: .cancel) { _ in
             _ = self.navigationController?.popViewController(animated: true)
         }
         alertController.addAction(confirmAction)
@@ -553,7 +553,7 @@ extension CategoryViewController {
             _textField.keyboardType = .default
             _textField.borderStyle = .none
             _textField.layer.cornerRadius = 10.0
-            _textField.placeholder = lang.txtFieldSearch
+            _textField.placeholder = lang.titleSearch
             _textField.addShadowView()
             _textField.addTarget(self, action: #selector(textFieldDidChanged(_:)), for: .editingChanged)
             _textField.translatesAutoresizingMaskIntoConstraints = false
@@ -677,7 +677,7 @@ extension CategoryViewController {
             _button.setImage(UIImage(named: "button-circle-arrow")!.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 16, height: 17)
             _button.setTitleColor(UIColor.dimGray, for: .normal)
-            _button.setTitle(lang.btnStartDate, for: .normal)
+            _button.setTitle(lang.titleStartDate, for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(startDateButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -688,7 +688,7 @@ extension CategoryViewController {
             _button.setImage(UIImage(named: "button-thin-check")!.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 16, height: 17)
             _button.setTitleColor(UIColor.dimGray, for: .normal)
-            _button.setTitle(lang.btnEndDate, for: .normal)
+            _button.setTitle(lang.titleEndDate, for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(endDateButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -1060,9 +1060,9 @@ extension CategoryViewController {
 //                self.loadingImageView.isHidden = true
             }, completion: { (_) in
                 switch self.lang.currentLanguageId {
-                case LanguageId.eng: self.alertCompl(self.superTag!.eng_name, self.lang.msgIntakeLogComplete)
-                case LanguageId.kor: self.alertCompl(self.superTag!.kor_name!, self.lang.msgIntakeLogComplete)
-                case LanguageId.jpn: self.alertCompl(self.superTag!.jpn_name!, self.lang.msgIntakeLogComplete)
+                case LanguageId.eng: self.alertCompl(self.superTag!.eng_name, self.lang.msgLogComplete)
+                case LanguageId.kor: self.alertCompl(self.superTag!.kor_name!, self.lang.msgLogComplete)
+                case LanguageId.jpn: self.alertCompl(self.superTag!.jpn_name!, self.lang.msgLogComplete)
                 default: fatalError()}
             })
         }

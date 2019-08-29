@@ -124,8 +124,8 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     @objc func alertError(_ message: String) {
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in })
-        alert.addAction(UIAlertAction(title: lang.btnDone, style: .default) { _ in
+        alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
+        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if self.retryFunctionName == "loadGroupOfLogs" {
                 self.loadGroupOfLogs(self.retryCompletion!)
                 return
@@ -137,10 +137,10 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     @objc func alertCompl(_ title: String, _ message: String) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: lang.btnNo, style: .cancel) { _ in
+        alertController.addAction(UIAlertAction(title: lang.titleNo, style: .cancel) { _ in
             _ = self.navigationController?.popViewController(animated: true)
         })
-        alertController.addAction(UIAlertAction(title: lang.btnYes, style: .default) { _ in
+        alertController.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.dismiss(animated: true, completion: nil)
         })
         alertController.view.tintColor = UIColor.cornflowerBlue
@@ -157,8 +157,8 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         }
         alert.view.addSubview(condScorePickerView)
         condScorePickerView.widthAnchor.constraint(equalTo: alert.view.widthAnchor, constant: 0).isActive = true
-        alert.addAction(UIAlertAction(title: lang.btnClose, style: .cancel) { _ in })
-        alert.addAction(UIAlertAction(title: lang.btnDone, style: .default) { _ in
+        alert.addAction(UIAlertAction(title: lang.titleClose, style: .cancel) { _ in })
+        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             self.updateLogGroupCondScore()
         })
         alert.view.tintColor = UIColor.cornflowerBlue
@@ -218,12 +218,12 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     @objc func condRightButtonTapped() {
         if isCondEditBtnTapped {
             isCondEditBtnTapped = false
-            condRightButton.setTitle(lang.btnEdit, for: .normal)
+            condRightButton.setTitle(lang.titleEdit, for: .normal)
             condRightButton.setTitleColor(UIColor.cornflowerBlue, for: .normal)
             condCollectionView.reloadData()
         } else {
             isCondEditBtnTapped = true
-            condRightButton.setTitle(lang.btnDone, for: .normal)
+            condRightButton.setTitle(lang.titleDone, for: .normal)
             condRightButton.setTitleColor(UIColor.tomato, for: .normal)
             UIView.animate(withDuration: 0.5) {
                 self.condCollectionView.reloadData()
@@ -233,7 +233,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     @objc func condLeftButtonTapped() {
         isCondEditBtnTapped = false
-        condRightButton.setTitle(lang.btnEdit, for: .normal)
+        condRightButton.setTitle(lang.titleEdit, for: .normal)
         condRightButton.setTitleColor(UIColor.cornflowerBlue, for: .normal)
         UIView.transition(with: self.blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.blindView.isHidden = true
@@ -384,7 +384,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 weekday = "\u{2728}\(lang.getWeekdayName(Calendar.current.component(.weekday, from: date!)))"
             }
             
-            label.text = "\(weekday), \(lang.calendarSection(logGroup.month_number, logGroup.day_number))"
+            label.text = "\(weekday), \(lang.getLogGroupSection(logGroup.month_number, logGroup.day_number))"
             label.textAlignment = .center
             label.frame = CGRect(x: 0, y: -30, width: 100, height: 45)
             label.sizeToFit()
@@ -427,7 +427,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
         } else if diaryMode == DiaryMode.logger {
             if indexPath.row == 0 {
                 // Appeare additional cell 'Create new'
-                cell.nameLabel.text = lang.labelCreateNewGroup
+                cell.nameLabel.text = lang.titleCreateNewGroup
                 cell.nameLabel.textColor = UIColor.cornflowerBlue
                 cell.groupTypeImageView.image = nil
                 cell.foodLogBulletView.isHidden = true
@@ -1085,7 +1085,7 @@ extension DiaryViewController {
         }()
         condLeftButton = {
             let _button = UIButton(type: .system)
-            _button.setTitle(lang.btnClose, for: .normal)
+            _button.setTitle(lang.titleClose, for: .normal)
             _button.setTitleColor(UIColor.clear, for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 21, height: 21)
             _button.showsTouchWhenHighlighted = false
@@ -1096,7 +1096,7 @@ extension DiaryViewController {
         }()
         condRightButton = {
             let _button = UIButton(type: .system)
-            _button.setTitle(lang.btnEdit, for: .normal)
+            _button.setTitle(lang.titleEdit, for: .normal)
             _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 21, height: 21)
             _button.showsTouchWhenHighlighted = true
@@ -1295,7 +1295,7 @@ extension DiaryViewController {
         if blindView.isHidden {
             groupTypePickerView.selectRow(LogGroupType.nighttime - (groupType!), inComponent: 0, animated: true)
             UIView.transition(with: blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.pickerDateLabel.text = self.lang.calendarSection!(logGroup.month_number, logGroup.day_number)
+                self.pickerDateLabel.text = self.lang.getLogGroupSection(logGroup.month_number, logGroup.day_number)
                 self.pickerContainerView.isHidden = false
                 self.condContainerView.isHidden = true
                 self.blindView.isHidden = false
@@ -1421,9 +1421,9 @@ extension DiaryViewController {
                 self.loadingImageView.isHidden = true
             }, completion: { (_) in
                 switch self.lang.currentLanguageId {
-                case LanguageId.eng: self.alertCompl(self.selectedTag!.eng_name, self.lang.msgIntakeLogComplete)
-                case LanguageId.kor: self.alertCompl(self.selectedTag!.kor_name!, self.lang.msgIntakeLogComplete)
-                case LanguageId.jpn: self.alertCompl(self.selectedTag!.jpn_name!, self.lang.msgIntakeLogComplete)
+                case LanguageId.eng: self.alertCompl(self.selectedTag!.eng_name, self.lang.msgLogComplete)
+                case LanguageId.kor: self.alertCompl(self.selectedTag!.kor_name!, self.lang.msgLogComplete)
+                case LanguageId.jpn: self.alertCompl(self.selectedTag!.jpn_name!, self.lang.msgLogComplete)
                 default: fatalError()}
             })
         }

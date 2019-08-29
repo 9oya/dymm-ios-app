@@ -59,10 +59,10 @@ class AuthViewController: UIViewController {
     
     @objc func alertError(_ message: String) {
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
+        let confirmAction = UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.retryFunction!()
         }
-        let cancelAction = UIAlertAction(title: lang.btnClose, style: .cancel) { _ in }
+        let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
         alertController.view.tintColor = UIColor.cornflowerBlue
@@ -82,6 +82,21 @@ class AuthViewController: UIViewController {
             accountSignUp()
         } else {
             accountSignIn()
+        }
+    }
+    
+    @objc func forgotPasswordBtnTapped() {
+        guard let email = emailTextField.text else {
+            setMessageLabel(lang.msgEmptyEmail)
+            return
+        }
+        guard email.count > 0 else {
+            setMessageLabel(lang.msgEmptyEmail)
+            return
+        }
+        guard email.isValidEmail() else {
+            setMessageLabel(lang.msgInvalidEmail)
+            return
         }
     }
 }
@@ -206,8 +221,8 @@ extension AuthViewController {
         // Initialize subveiw properties
         loadingImageView = getLoadingImageView(isHidden: true)
         topBarView = getAddtionalTopBarView()
-        forgotButton = getBasicTextButton()
-        forgotButton.setTitle(lang.btnForgotPassword, for: .normal)
+        forgotButton = getBasicTextButton(UIColor.tomato)
+        forgotButton.setTitle(lang.titleForgotPassword, for: .normal)
         closeButton = getCloseButton()
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         formGrayLineView = getGrayLineView()
@@ -224,7 +239,7 @@ extension AuthViewController {
             _label.font = .systemFont(ofSize: 20, weight: .light)
             _label.textColor = UIColor.black
             _label.textAlignment = .center
-            _label.text = lang.labelSignIn
+            _label.text = lang.titleSignIn
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -234,8 +249,8 @@ extension AuthViewController {
             _textField.selectedTitleColor = UIColor.black
             _textField.selectedLineColor = UIColor.black
             _textField.selectedLineHeight = 1
-            _textField.placeholder = lang.txtFieldFirstName
-            _textField.title = lang.txtFieldFirstName
+            _textField.placeholder = lang.titleFirstName
+            _textField.title = lang.titleFirstName
             _textField.autocapitalizationType = .words
             _textField.keyboardType = .default
             _textField.isHidden = true
@@ -247,8 +262,8 @@ extension AuthViewController {
             _textField.font = .systemFont(ofSize: 15, weight: .light)
             _textField.selectedTitleColor = UIColor.black
             _textField.selectedLineColor = UIColor.black
-            _textField.placeholder = lang.txtFieldLastName
-            _textField.title = lang.txtFieldLastName
+            _textField.placeholder = lang.titleLastName
+            _textField.title = lang.titleLastName
             _textField.autocapitalizationType = .words
             _textField.isHidden = true
             _textField.translatesAutoresizingMaskIntoConstraints = false
@@ -259,8 +274,8 @@ extension AuthViewController {
             _textField.font = .systemFont(ofSize: 15, weight: .light)
             _textField.selectedTitleColor = UIColor.black
             _textField.selectedLineColor = UIColor.black
-            _textField.placeholder = lang.txtFieldEmail
-            _textField.title = lang.txtFieldEmail
+            _textField.placeholder = lang.titleEmail
+            _textField.title = lang.titleEmail
             _textField.textContentType = .emailAddress
             _textField.keyboardType = .emailAddress
             _textField.autocapitalizationType = .none
@@ -272,8 +287,8 @@ extension AuthViewController {
             _textField.font = .systemFont(ofSize: 15, weight: .light)
             _textField.selectedTitleColor = UIColor.black
             _textField.selectedLineColor = UIColor.black
-            _textField.placeholder = lang.txtFieldPassword
-            _textField.title = lang.txtFieldPassword
+            _textField.placeholder = lang.titlePassword
+            _textField.title = lang.titlePassword
             _textField.isSecureTextEntry = true
             _textField.textContentType = .password
             _textField.translatesAutoresizingMaskIntoConstraints = false
@@ -284,8 +299,8 @@ extension AuthViewController {
             _textField.font = .systemFont(ofSize: 15, weight: .light)
             _textField.selectedTitleColor = UIColor.black
             _textField.selectedLineColor = UIColor.black
-            _textField.placeholder = lang.txtFieldConfirmPassword
-            _textField.title = lang.txtFieldConfirmPassword
+            _textField.placeholder = lang.titleConfirmPassword
+            _textField.title = lang.titleConfirmPassword
             _textField.isSecureTextEntry = true
             _textField.textContentType = .password
             _textField.isHidden = true
@@ -305,7 +320,7 @@ extension AuthViewController {
             let _button = UIButton(type: .system)
             _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 16)
-            _button.setTitle(lang.btnSignUp, for: .normal)
+            _button.setTitle(lang.titleSignUp, for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(formSwapButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -314,7 +329,7 @@ extension AuthViewController {
         submitButton = {
             let _button = UIButton(type: .system)
             _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
-            _button.setTitle(lang.btnSubmit, for: .normal)
+            _button.setTitle(lang.titleSubmit, for: .normal)
             _button.addTarget(self, action: #selector(submitButtonTapped), for: .touchUpInside)
             _button.titleLabel?.font = .systemFont(ofSize: 16)
             _button.showsTouchWhenHighlighted = true
@@ -428,8 +443,8 @@ extension AuthViewController {
                 self.view.layoutIfNeeded()
             })
             UIView.transition(with: titleLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.titleLabel.text = self.lang.labelSignIn
-                self.formSwapButton.setTitle(self.lang.btnSignUp, for: .normal)
+                self.titleLabel.text = self.lang.titleSignIn
+                self.formSwapButton.setTitle(self.lang.titleSignUp, for: .normal)
             })
             isSignUpForm = false
         } else {
@@ -442,8 +457,8 @@ extension AuthViewController {
                 self.view.layoutIfNeeded()
             })
             UIView.transition(with: titleLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.titleLabel.text = self.lang.labelSignUp
-                self.formSwapButton.setTitle(self.lang.btnSignIn, for: .normal)
+                self.titleLabel.text = self.lang.titleSignUp
+                self.formSwapButton.setTitle(self.lang.titleSignIn, for: .normal)
             })
             self.isSignUpForm = true
         }

@@ -81,10 +81,10 @@ class ProfileViewController: UIViewController {
     
     @objc func alertError(_ message: String) {
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnYes, style: .default) { _ in
+        let confirmAction = UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.retryFunction!()
         }
-        let cancelAction = UIAlertAction(title: lang.btnClose, style: .cancel) { _ in }
+        let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
         alertController.view.tintColor = UIColor.cornflowerBlue
@@ -95,9 +95,9 @@ class ProfileViewController: UIViewController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
         alert.view.addSubview(pickerView)
         pickerView.topAnchor.constraint(equalTo: alert.view.topAnchor, constant: 0).isActive = true
-        alert.addAction(UIAlertAction(title: lang.btnClose, style: .default) { _ in })
+        alert.addAction(UIAlertAction(title: lang.titleClose, style: .default) { _ in })
         pickerView.widthAnchor.constraint(equalTo: alert.view.widthAnchor, constant: 0).isActive = true
-        alert.addAction(UIAlertAction(title: lang.btnDone, style: .default) { _ in
+        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             self.updateProfileTag()
         })
         let height:NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 250)
@@ -116,17 +116,17 @@ class ProfileViewController: UIViewController {
     }
     
     @objc func mailConfAddressBtnTapped() {
-        let alert = UIAlertController(title: lang.alertEditEmailTitle, message: nil, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
+        let alert = UIAlertController(title: lang.titleEditEmail, message: nil, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let txtField = alert.textFields?.first, let text = txtField.text {
                 self.newInfoStr = text
                 self.avatarInfoTarget = AvatarInfoTarget.email
                 self.updateAvatarInfo()
             }
         }
-        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
+        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
         alert.addTextField { textField in
-            textField.placeholder = self.lang.alertEditEmailPlaceholder
+            textField.placeholder = self.lang.titleEmail
             textField.text = self.newMailAddress!
         }
         alert.addAction(confirmAction)
@@ -139,8 +139,8 @@ class ProfileViewController: UIViewController {
     }
     
     @objc func firstNameContainerTapped(_ sender: UITapGestureRecognizer? = nil) {
-        let alert = UIAlertController(title: lang.alertEditFirstNameTitle, message: nil, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
+        let alert = UIAlertController(title: lang.titleEditFirstName, message: nil, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let txtField = alert.textFields?.first, let text = txtField.text {
                 if text == "" {
                     return
@@ -152,10 +152,10 @@ class ProfileViewController: UIViewController {
                 self.updateAvatarInfo()
             }
         }
-        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
+        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
         alert.addTextField { textField in
             textField.autocapitalizationType = UITextAutocapitalizationType.words
-            textField.placeholder = self.lang.alertEditFirstNamePlaceholder
+            textField.placeholder = self.lang.titleFirstName
             textField.text = self.profile!.avatar.first_name
             textField.keyboardAppearance = .default
             textField.keyboardType = .default
@@ -167,18 +167,18 @@ class ProfileViewController: UIViewController {
     }
     
     @objc func lastNameContainerTapped(_ sender: UITapGestureRecognizer? = nil) {
-        let alert = UIAlertController(title: lang.alertEditLastNameTitle, message: nil, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
+        let alert = UIAlertController(title: lang.titleEditLastName, message: nil, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let txtField = alert.textFields?.first, let text = txtField.text {
                 self.newInfoStr = text
                 self.avatarInfoTarget = AvatarInfoTarget.lastName
                 self.updateAvatarInfo()
             }
         }
-        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
+        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
         alert.addTextField { textField in
             textField.autocapitalizationType = UITextAutocapitalizationType.words
-            textField.placeholder = self.lang.alertEditLastNamePlaceholder
+            textField.placeholder = self.lang.titleLastName
             textField.text = self.profile!.avatar.last_name
         }
         alert.addAction(confirmAction)
@@ -187,18 +187,18 @@ class ProfileViewController: UIViewController {
     }
     
     @objc func emailContainerTapped(_ sender: UITapGestureRecognizer? = nil) {
-        let alert = UIAlertController(title: lang.alertEditEmailTitle, message: nil, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
+        let alert = UIAlertController(title: lang.titleEditEmail, message: nil, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let txtField = alert.textFields?.first, let text = txtField.text {
                 self.newInfoStr = text
                 self.avatarInfoTarget = AvatarInfoTarget.email
                 self.updateAvatarInfo()
             }
         }
-        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
+        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
         alert.addTextField { textField in
             textField.autocapitalizationType = UITextAutocapitalizationType.words
-            textField.placeholder = self.lang.alertEditEmailPlaceholder
+            textField.placeholder = self.lang.titleEmail
             textField.text = self.profile!.avatar.email
         }
         alert.addAction(confirmAction)
@@ -207,18 +207,18 @@ class ProfileViewController: UIViewController {
     }
     
     @objc func phNumContainerTapped(_ sender: UITapGestureRecognizer? = nil) {
-        let alert = UIAlertController(title: lang.alertEditPhNumTitle, message: nil, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
+        let alert = UIAlertController(title: lang.titleEditPhoneNum, message: nil, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let txtField = alert.textFields?.first, let text = txtField.text {
                 self.newInfoStr = text
                 self.avatarInfoTarget = AvatarInfoTarget.phNumber
                 self.updateAvatarInfo()
             }
         }
-        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
+        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
         alert.addTextField { textField in
             textField.autocapitalizationType = UITextAutocapitalizationType.words
-            textField.placeholder = self.lang.alertEditPhNumPlaceholder
+            textField.placeholder = self.lang.titlePhoneNum
             textField.text = self.profile!.avatar.ph_number ?? nil
         }
         alert.addAction(confirmAction)
@@ -227,7 +227,7 @@ class ProfileViewController: UIViewController {
     }
     
     @objc func introContainerTapped(_ sender: UITapGestureRecognizer? = nil) {
-        let alert = UIAlertController(title: lang.alertEditIntroTitle, message: nil, preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: lang.titleEditIntro, message: nil, preferredStyle: .actionSheet)
         introTextView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         let controller = UIViewController()
         introTextView.frame = controller.view.frame
@@ -236,14 +236,14 @@ class ProfileViewController: UIViewController {
         }
         controller.view.addSubview(introTextView)
         alert.setValue(controller, forKey: "contentViewController")
-        let confirmAction = UIAlertAction(title: lang.btnDone, style: .default) { _ in
+        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let text = self.introTextView.text {
                 self.newInfoStr = text
                 self.avatarInfoTarget = AvatarInfoTarget.intro
                 self.updateAvatarInfo()
             }
         }
-        let cancelAction = UIAlertAction(title: lang.btnCancel, style: .cancel) { _ in }
+        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
         self.present(alert, animated: true, completion: nil)
@@ -664,15 +664,15 @@ extension ProfileViewController {
     private func setupLangProperties() {
         navigationItem.title = lang.titleProfile
         mailConfMsgLabel.text = lang.msgMailNotConfirmedYet
-        firstNameGuideLabel.text = lang.labelAvatarFirstName
-        lastNameGuideLabel.text = lang.labelAvatarLastName
-        emailGuideLabel.text = lang.labelUserMail
-        phNumberGuideLabel.text = lang.labelUserPhoneNum
-        introGuideLabel.text = lang.labelAvatarIntroduction
-        phNumberPlaceHolderLabel.text = lang.labelUserPhoneNum
-        introPlaceHolderLabel.text = lang.labelAvatarIntroduction
-        signOutButton.setTitle(lang.btnSignOut, for: .normal)
-        sendAgainButton.setTitle(lang.btnSendAgain, for: .normal)
+        firstNameGuideLabel.text = lang.titleFirstNameUpper
+        lastNameGuideLabel.text = lang.titleLastNameUpper
+        emailGuideLabel.text = lang.titleEmailUpper
+        phNumberGuideLabel.text = lang.titlePhoneNumUpper
+        introGuideLabel.text = lang.titleIntroUpper
+        phNumberPlaceHolderLabel.text = lang.titlePhoneNumUpper
+        introPlaceHolderLabel.text = lang.titleIntroUpper
+        signOutButton.setTitle(lang.titleSignOut, for: .normal)
+        sendAgainButton.setTitle(lang.titleSendAgain, for: .normal)
     }
     
     private func loadProfile() {
@@ -782,7 +782,7 @@ extension ProfileViewController {
     
     private func sendMailAgain() {
         UIView.transition(with: mailConfMsgLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            self.mailConfMsgLabel.text = "...."
+            self.mailConfMsgLabel.text = "u/{027B9}"
             self.mailConfMsgLabel.textColor = UIColor.black
             self.mailConfAddressButton.isHidden = true
             self.sendAgainButton.isHidden = true

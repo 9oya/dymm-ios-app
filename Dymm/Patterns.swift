@@ -54,20 +54,6 @@ struct TagId {
     static let condition = 3
 }
 
-struct LanguageId {
-    static let eng = 30
-    static let kor = 35
-    static let jpn = 34
-}
-
-func getLanguageName(_ id: Int) -> String {
-    switch id {
-    case 30: return "English"
-    case 35: return "한글"
-    case 34: return "日本語"
-    default: fatalError()}
-}
-
 struct SortType {
     static let priority = "priority"
     static let eng = "eng"
@@ -142,15 +128,6 @@ func getCondScoreImage(_ condScore: Int) -> UIImage? {
     }
 }
 
-func getLanguageId(alpha2: String) -> Int {
-    switch alpha2 {
-    case "en": return LanguageId.eng
-    case "kr": return LanguageId.kor
-    case "jp": return LanguageId.jpn
-    default: return LanguageId.eng
-    }
-}
-
 struct CountryId {
     static let australia = 358
     static let canada = 236
@@ -180,38 +157,4 @@ func getProfileUIColor(key: Int) -> UIColor {
     case 14: return UIColor.hex_cccc66
     // TODO: case 999 -> Photo
     default: fatalError("Wrong ProfileColor key has been passed")}
-}
-
-func getEngNameOfMonth(monthNumber: Int) -> String {
-    switch monthNumber {
-    case 1: return "January"
-    case 2: return "February"
-    case 3: return "March"
-    case 4: return "April"
-    case 5: return "May"
-    case 6: return "June"
-    case 7: return "July"
-    case 8: return "August"
-    case 9: return "September"
-    case 10: return "October"
-    case 11: return "November"
-    case 12: return "December"
-    default: fatalError("Wrong MonthNumber has been passed")}
-}
-
-func getKorNameOfMonth(engMMM: String) -> String {
-    switch engMMM {
-    case "Jan": return "1월"
-    case "Feb": return "2월"
-    case "Mar": return "3월"
-    case "Apr": return "4월"
-    case "May": return "5월"
-    case "Jun": return "6월"
-    case "Jul": return "7월"
-    case "Aug": return "8월"
-    case "Sep": return "9월"
-    case "Oct": return "10월"
-    case "Nov": return "11월"
-    case "Dec": return "12월"
-    default: fatalError()}
 }
