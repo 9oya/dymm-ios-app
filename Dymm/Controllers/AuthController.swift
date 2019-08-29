@@ -69,6 +69,27 @@ class AuthViewController: UIViewController {
         present(alertController, animated: true, completion: nil)
     }
     
+    @objc func forgotPasswordBtnTapped() {
+        let alert = UIAlertController(title: lang.titleForgotPasswordAlert, message: "\n" + lang.msgMailEnter, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
+            if let txtField = alert.textFields?.first, let text = txtField.text {
+                print(text)
+//                self.newInfoStr = text
+//                self.avatarInfoTarget = AvatarInfoTarget.email
+//                self.updateAvatarInfo()
+            }
+        }
+        let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
+        alert.addTextField { textField in
+            textField.autocapitalizationType = .none
+            textField.keyboardType = .emailAddress
+            textField.placeholder = self.lang.titleEmail
+        }
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
     @objc func closeButtonTapped() {
         dismiss(animated: true, completion: nil)
     }
@@ -82,21 +103,6 @@ class AuthViewController: UIViewController {
             accountSignUp()
         } else {
             accountSignIn()
-        }
-    }
-    
-    @objc func forgotPasswordBtnTapped() {
-        guard let email = emailTextField.text else {
-            setMessageLabel(lang.msgEmptyEmail)
-            return
-        }
-        guard email.count > 0 else {
-            setMessageLabel(lang.msgEmptyEmail)
-            return
-        }
-        guard email.isValidEmail() else {
-            setMessageLabel(lang.msgInvalidEmail)
-            return
         }
     }
 }
@@ -223,6 +229,7 @@ extension AuthViewController {
         topBarView = getAddtionalTopBarView()
         forgotButton = getBasicTextButton(UIColor.tomato)
         forgotButton.setTitle(lang.titleForgotPassword, for: .normal)
+        forgotButton.addTarget(self, action: #selector(forgotPasswordBtnTapped), for: .touchUpInside)
         closeButton = getCloseButton()
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         formGrayLineView = getGrayLineView()

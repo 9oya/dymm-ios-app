@@ -197,7 +197,8 @@ class ProfileViewController: UIViewController {
         }
         let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
         alert.addTextField { textField in
-            textField.autocapitalizationType = UITextAutocapitalizationType.words
+            textField.autocapitalizationType = .none
+            textField.keyboardType = .emailAddress
             textField.placeholder = self.lang.titleEmail
             textField.text = self.profile!.avatar.email
         }
@@ -795,7 +796,7 @@ extension ProfileViewController {
         }) {
             self.mailConfMsgLabel.stopRotating()
             UIView.animate(withDuration: 0.5, animations: {
-                self.mailConfMsgLabel.text = self.lang.msgMailSnedAgainComplete
+                self.mailConfMsgLabel.text = self.lang.msgMailSendAgainComplete
                 self.mailConfMsgLabel.textColor = UIColor.mediumSeaGreen
             })
             UIView.transition(with: self.sendAgainButton, duration: 0.5, options: .transitionCrossDissolve, animations: {

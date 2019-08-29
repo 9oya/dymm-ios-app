@@ -36,13 +36,16 @@ struct LangPack {
     var titleEditLastName: String!
     var titleEditPhoneNum: String!
     var titleEmail: String!
+    var titleEmailFound: ((String) -> String)!
     var titleEmailUpper: String!
+    var titleEmailValidCode: ((String) -> String)!
     var titleEndDate: String!
     var titleFirstName: String!
     var titleFirstNameUpper: String!
     var titleFold: String!
     var titleFoodLog: String!
     var titleForgotPassword: String!
+    var titleForgotPasswordAlert: String!
     var titleGuest: String!
     var titleIntro: String!
     var titleIntroUpper: String!
@@ -79,9 +82,11 @@ struct LangPack {
     var msgInactiveFood: String!
     var msgInvalidEmail: String!
     var msgLogComplete: String!
+    var msgMailEnter: String!
     var msgMailModified: String!
     var msgMailNotConfirmedYet: String!
-    var msgMailSnedAgainComplete: String!
+    var msgMailSendAgainComplete: String!
+    var msgMailSendValidCode: ((String) -> String)!
     var msgMismatchConfirmPassword: String!
     var msgNetworkFailure: String!
     var msgShortPassword: String!
@@ -89,6 +94,7 @@ struct LangPack {
     var msgUnauthInvalidEmail: String!
     var msgUnauthInvalidPassword: String!
     var msgUnauthInvalidUser: String!
+    var msgValidCodeEnter: String!
     
     var calendarHeaderDateFormat: String!
     
@@ -235,12 +241,26 @@ struct LangPack {
             case LanguageId.kor: return "메일주소"
             default: fatalError()}
         }()
+        func _titleEmailFound(_ email: String) -> String {
+            switch currentLanguageId {
+            case LanguageId.eng: return "We found an account associated /nwith \"\(email)\""
+            case LanguageId.kor: return "\"\(email)\" (으)로 등록된 계정을 찾았습니다."
+            default: fatalError()}
+        }
+        self.titleEmailFound = _titleEmailFound
         self.titleEmailUpper = {
             switch currentLanguageId {
             case LanguageId.eng: return "EMAIL ADDRESS"
             case LanguageId.kor: return "메일주소"
             default: fatalError()}
         }()
+        func _titleEmailValidCode(_ email: String) -> String {
+            switch currentLanguageId {
+            case LanguageId.eng: return "A verification code was sent to /n\(email)"
+            case LanguageId.kor: return "인증 코드를 발송하였습니다. /n\(email)"
+            default: fatalError()}
+        }
+        self.titleEmailValidCode = _titleEmailValidCode
         self.titleEndDate = {
             switch currentLanguageId {
             case LanguageId.eng: return "End date"
@@ -275,6 +295,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Forgot password?"
             case LanguageId.kor: return "패스워드를 잊으셨나요?"
+            default: fatalError()}
+        }()
+        self.titleForgotPasswordAlert = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "I forgot my Dymm password"
+            case LanguageId.kor: return "Dymm 패스워드를 분실하였습니다."
             default: fatalError()}
         }()
         self.titleGuest = {
@@ -494,6 +520,12 @@ struct LangPack {
             case LanguageId.kor: return "성공적으로 기록되었습니다!\n\n홈으로 이동하시겠습니까?"
             default: fatalError()}
         }()
+        self.msgMailEnter = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Enter your account email address"
+            case LanguageId.kor: return "이메일 주소를 입력하십시오."
+            default: fatalError()}
+        }()
         self.msgMailModified = {
             switch currentLanguageId {
             case LanguageId.eng: return "Your email address has been modified.\nPlease confirm Your new email."
@@ -506,12 +538,19 @@ struct LangPack {
             case LanguageId.kor: return "계정이 아직 확인되지 않았습니다.\n메일계정을 확인해 주세요."
             default: fatalError()}
         }()
-        self.msgMailSnedAgainComplete = {
+        self.msgMailSendAgainComplete = {
             switch currentLanguageId {
             case LanguageId.eng: return "Account email has been resent.\nPleas confirm Your email."
             case LanguageId.kor: return "계정 확인 메일이 다시 보내졌습니다.\n메일계정을 확인해 주세요."
             default: fatalError()}
         }()
+        func _msgMailSendValidCode(_ email: String) -> String {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Email an account verification code to /n\(email)"
+            case LanguageId.kor: return "이메일로 계정 인증 코드 발송하기 /n\(email)"
+            default: fatalError()}
+        }
+        self.msgMailSendValidCode = _msgMailSendValidCode
         self.msgMismatchConfirmPassword = {
             switch currentLanguageId {
             case LanguageId.eng: return "Those password didn't match. Try again"
@@ -552,6 +591,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "You have tried to access inactive account.\nPlease try another email."
             case LanguageId.kor: return "사용이 정지된 계정으로 접근하셨습니다.\n다른 이메일로 시도해주세요."
+            default: fatalError()}
+        }()
+        self.msgValidCodeEnter = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Enter the account verification code you received"
+            case LanguageId.kor: return "보내드린 계정 인증 코드를 입력하세요."
             default: fatalError()}
         }()
         
