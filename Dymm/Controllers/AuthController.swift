@@ -560,11 +560,11 @@ extension AuthViewController {
     private func unauthorized(_ pattern: Int) {
         switch pattern {
         case UnauthType.mailInvalid:
-            setMessageLabel(lang.msgForbiddenInvalidEmail)
+            setMessageLabel(lang.msgUnauthInvalidEmail)
         case UnauthType.mailDuplicated:
-            setMessageLabel(lang.msgForbiddenDuplicatedEmail)
+            setMessageLabel(lang.msgUnauthDuplicatedEmail)
         case UnauthType.passwordInvalid:
-            setMessageLabel(lang.msgForbiddenInvalidPassword)
+            setMessageLabel(lang.msgUnauthInvalidPassword)
         default:
             fatalError("Unexpected forbidden pattern has passed")
         }

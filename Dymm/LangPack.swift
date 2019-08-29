@@ -70,10 +70,6 @@ class LangPack {
     var msgFloatingInvalidEmail: String!
     var msgFloatingInvalidPassword: String!
     var msgFloatingMismatchConfirmPassword: String!
-    var msgForbiddenDuplicatedEmail: String!
-    var msgForbiddenInvalidEmail: String!
-    var msgForbiddenInvalidPassword: String!
-    var msgForbiddenInvalidUser: String!
     var msgInactiveFood: String!
     var msgInvalidEmail: String!
     var msgLogComplete: String!
@@ -83,6 +79,10 @@ class LangPack {
     var msgMismatchConfirmPassword: String!
     var msgNetworkFailure: String!
     var msgShortPassword: String!
+    var msgUnauthDuplicatedEmail: String!
+    var msgUnauthInvalidEmail: String!
+    var msgUnauthInvalidPassword: String!
+    var msgUnauthInvalidUser: String!
     
     var calendarHeaderDateFormat: String!
     var getLogGroupSection: ((Int, Int) -> String)!
@@ -471,30 +471,6 @@ func getLanguagePack(_ currentLanguageId: Int) -> LangPack {
         case LanguageId.kor: return "패스워드 확인 불일치"
         default: fatalError()}
     }()
-    lang.msgForbiddenDuplicatedEmail = {
-        switch currentLanguageId {
-        case LanguageId.eng: return "That mail address is already taken. Try another"
-        case LanguageId.kor: return "이미 사용중인 메일주소 입니다. 다르게 시도해보세요."
-        default: fatalError()}
-    }()
-    lang.msgForbiddenInvalidEmail = {
-        switch currentLanguageId {
-        case LanguageId.eng: return "Couldn't find your Account"
-        case LanguageId.kor: return "일치하는 메일주소를 찾을 수 없습니다."
-        default: fatalError()}
-    }()
-    lang.msgForbiddenInvalidPassword = {
-        switch currentLanguageId {
-        case LanguageId.eng: return "Wrong password.\nTry again or click Lost account."
-        case LanguageId.kor: return "패스워드가 잘못 입력되었습니다.\n다시 시도하거나 비밀번호변경을 클릭하세요."
-        default: fatalError()}
-    }()
-    lang.msgForbiddenInvalidUser = {
-        switch currentLanguageId {
-        case LanguageId.eng: return "You have tried to access inactive account.\nPlease try another email."
-        case LanguageId.kor: return "사용이 정지된 계정으로 접근하셨습니다.\n다른 이메일로 시도해주세요."
-        default: fatalError()}
-    }()
     lang.msgInvalidEmail = {
         switch currentLanguageId {
         case LanguageId.eng: return "Invalid mail address"
@@ -547,6 +523,30 @@ func getLanguagePack(_ currentLanguageId: Int) -> LangPack {
         switch currentLanguageId {
         case LanguageId.eng: return "Use 8 characters or more"
         case LanguageId.kor: return "패스워드가 8자리이상 입력되어야 합니다."
+        default: fatalError()}
+    }()
+    lang.msgUnauthDuplicatedEmail = {
+        switch currentLanguageId {
+        case LanguageId.eng: return "That mail address is already taken. Try another"
+        case LanguageId.kor: return "이미 사용중인 메일주소 입니다. 다르게 시도해보세요."
+        default: fatalError()}
+    }()
+    lang.msgUnauthInvalidEmail = {
+        switch currentLanguageId {
+        case LanguageId.eng: return "Couldn't find your Account"
+        case LanguageId.kor: return "일치하는 메일주소를 찾을 수 없습니다."
+        default: fatalError()}
+    }()
+    lang.msgUnauthInvalidPassword = {
+        switch currentLanguageId {
+        case LanguageId.eng: return "Wrong password.\nTry again or click Lost account."
+        case LanguageId.kor: return "패스워드가 잘못 입력되었습니다.\n다시 시도하거나 비밀번호변경을 클릭하세요."
+        default: fatalError()}
+    }()
+    lang.msgUnauthInvalidUser = {
+        switch currentLanguageId {
+        case LanguageId.eng: return "You have tried to access inactive account.\nPlease try another email."
+        case LanguageId.kor: return "사용이 정지된 계정으로 접근하셨습니다.\n다른 이메일로 시도해주세요."
         default: fatalError()}
     }()
     
