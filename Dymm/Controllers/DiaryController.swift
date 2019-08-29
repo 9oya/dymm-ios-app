@@ -944,7 +944,7 @@ extension DiaryViewController {
 
     private func setupLayout() {
         // Initialize view
-        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
+        lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         navigationItem.title = lang.titleDiary
         view.backgroundColor = UIColor(hex: "WhiteSmoke")
         

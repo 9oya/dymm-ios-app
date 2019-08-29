@@ -530,7 +530,7 @@ extension CategoryViewController {
 
     private func setupLayout() {
         // Initialize view
-        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
+        lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = UIColor(hex: "WhiteSmoke")
         
         // Initialize subveiw properties

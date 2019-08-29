@@ -190,7 +190,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
 
 extension LogGroupTableCell {
     private func setupLayout() {
-        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
+        lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         selectionStyle = .none
         backgroundColor = UIColor.clear
         

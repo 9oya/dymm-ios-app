@@ -388,7 +388,7 @@ extension ProfileViewController {
     
     private func setupLayout() {
         // Initialize super view
-        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
+        lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = UIColor.whiteSmoke
         
         // Initialize subveiw properties
@@ -761,7 +761,7 @@ extension ProfileViewController {
         }) {
             if self.selectedCollectionItem == 0 {
                 UserDefaults.standard.setCurrentLanguageId(value: self.pickedTag!.id)
-                self.lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
+                self.lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
                 self.setupLangProperties()
             }
             self.loadProfile()

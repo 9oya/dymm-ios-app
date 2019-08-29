@@ -38,7 +38,7 @@ class HomeViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
+        lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         UIView.transition(with: tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.bannerCollectionView.reloadData()
             self.tagCollectionView.reloadData()
@@ -243,7 +243,7 @@ extension HomeViewController {
 
     private func setupLayout() {
         // Initialize view
-        lang = getLanguagePack(UserDefaults.standard.getCurrentLanguageId()!)
+        lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = UIColor(hex: "WhiteSmoke")
         
         // Initialize subveiw properties
