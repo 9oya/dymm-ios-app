@@ -697,7 +697,7 @@ extension CategoryViewController {
         langPickButton = {
             let _button = UIButton(type: .system)
             _button.setTitleColor(UIColor.darkGray, for: .normal)
-            _button.setTitle(getLanguageName(lang.currentLanguageId), for: .normal)
+            _button.setTitle(LangHelper.getLanguageName(lang.currentLanguageId), for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 15)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(langPickBtnTapped), for: .touchUpInside)

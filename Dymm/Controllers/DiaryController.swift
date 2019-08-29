@@ -723,12 +723,12 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 cell.titleLabel.text = avtCond.kor_name
                 if let startDate = avtCond.start_date {
                     let dateArr = startDate.split(separator: "/")
-                    let month = getKorNameOfMonth(engMMM: String(dateArr[0]))
+                    let month = LangHelper.getKorNameOfMonth(engMMM: String(dateArr[0]))
                     cell.startDateLabel.text = "\u{021E2}\(month)/\(dateArr[1])/\(dateArr[2])"
                 }
                 if let endDate = avtCond.end_date {
                     let dateArr = endDate.split(separator: "/")
-                    let month = getKorNameOfMonth(engMMM: String(dateArr[0]))
+                    let month = LangHelper.getKorNameOfMonth(engMMM: String(dateArr[0]))
                     cell.endDateLabel.text = "\u{2713}\(month)/\(dateArr[1])/\(dateArr[2])"
                 }
             case LanguageId.jpn:

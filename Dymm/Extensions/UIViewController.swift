@@ -14,7 +14,7 @@ extension UIViewController {
     // MARK: - Get device info methods
     
     func getDeviceLanguage() -> Int {
-        return getLanguageId(alpha2: String(Locale.preferredLanguages[0].prefix(2)))
+        return LangHelper.getLanguageId(alpha2: String(Locale.preferredLanguages[0].prefix(2)))
     }
     
     func getUserCountryCode() -> String {
