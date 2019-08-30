@@ -170,22 +170,6 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return CGFloat(logTableCellHeightVal)
     }
-    
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return CGFloat.leastNormalMagnitude
-    }
-    
-    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return CGFloat.leastNormalMagnitude
-    }
-    
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return nil
-    }
-    
-    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        return nil
-    }
 }
 
 extension LogGroupTableCell {
@@ -203,7 +187,7 @@ extension LogGroupTableCell {
         }()
         arrowImageView = {
             let _imageView = UIImageView()
-            _imageView.image = UIImage(named: "item-poly-left")
+            _imageView.image = UIImage.itemPolyLeft
             _imageView.contentMode = .scaleAspectFit
             _imageView.isHidden = true
             _imageView.translatesAutoresizingMaskIntoConstraints = false

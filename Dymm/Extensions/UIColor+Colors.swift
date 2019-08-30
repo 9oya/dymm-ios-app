@@ -293,7 +293,8 @@ extension UIColor {
     static let tomato = UIColor(hex: "Tomato")
     static let coral = UIColor(hex: "Coral")
     static let indianRed = UIColor(hex: "IndianRed")
-    static let rosyBrown: UIColor = UIColor(hex: "RosyBrown")
+    static let rosyBrown = UIColor(hex: "RosyBrown")
+    static let darkOrange = UIColor(hex: "DarkOrange")
     
     // Blue
     static let dodgerBlue = UIColor(hex: "DodgerBlue")
@@ -308,9 +309,7 @@ extension UIColor {
     static let hex_72e5Ea = UIColor(hex: "#72E5EA")
     
     // Gray
-    static let lightGray = UIColor(hex: "LightGray")
     static let whiteSmoke = UIColor(hex: "WhiteSmoke")
-    static let darkGray = UIColor(hex: "DarkGray")
     static let dimGray = UIColor(hex: "DimGray")
     
     static let hex_666699 = UIColor(hex: "#666699")

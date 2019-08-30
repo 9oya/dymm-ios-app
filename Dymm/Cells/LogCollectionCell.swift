@@ -9,32 +9,13 @@
 import UIKit
 
 class LogCollectionCell: UICollectionViewCell {
-    let bulletView: UIView = {
-        let _view = UIView(frame: CGRect(x: 0, y: 0, width: 7, height: 7))
-        _view.layer.cornerRadius = 3.5
-        _view.translatesAutoresizingMaskIntoConstraints = false
-        return _view
-    }()
-    let nameLabel: UILabel = {
-        let _label = UILabel()
-        _label.font = .systemFont(ofSize: 15)
-        _label.textAlignment = .left
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
-    let quantityLabel: UILabel = {
-        let _label = UILabel()
-        _label.font = .systemFont(ofSize: 15)
-        _label.textAlignment = .right
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
+    var bulletView: UIView!
+    var nameLabel: UILabel!
+    var quantityLabel: UILabel!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupLayoutStyles()
-        setupLayoutSubviews()
-        setupLayoutConstraints()
+        setupLayout()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -43,17 +24,34 @@ class LogCollectionCell: UICollectionViewCell {
 }
 
 extension LogCollectionCell {
-    private func setupLayoutStyles() {
+    private func setupLayout() {
         backgroundColor = UIColor.clear
-    }
-    
-    private func setupLayoutSubviews() {
+        
+        bulletView = {
+            let _view = UIView(frame: CGRect(x: 0, y: 0, width: 7, height: 7))
+            _view.layer.cornerRadius = 3.5
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        nameLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 15)
+            _label.textAlignment = .left
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        quantityLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 15)
+            _label.textAlignment = .right
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        
         addSubview(bulletView)
         addSubview(nameLabel)
         addSubview(quantityLabel)
-    }
-    
-    private func setupLayoutConstraints() {
+        
         bulletView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
         bulletView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15).isActive = true
         bulletView.widthAnchor.constraint(equalToConstant: 7).isActive = true

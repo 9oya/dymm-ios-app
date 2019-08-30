@@ -9,34 +9,13 @@
 import UIKit
 
 class BannerCollectionCell: UICollectionViewCell {
-    let imageView: UIImageView = {
-        let _imageView = UIImageView()
-        _imageView.contentMode = .scaleAspectFit
-        _imageView.translatesAutoresizingMaskIntoConstraints = false
-        return _imageView
-    }()
-    let titleLabel: UILabel = {
-        let _label = UILabel()
-        _label.font = .boldSystemFont(ofSize: 20)
-        _label.textAlignment = .center
-        _label.numberOfLines = 1
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
-    let subtitleLabel: UILabel = {
-        let _label = UILabel()
-        _label.font = .systemFont(ofSize: 14)
-        _label.textAlignment = .center
-        _label.numberOfLines = 4
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
+    var imageView: UIImageView!
+    var titleLabel: UILabel!
+    var subtitleLabel: UILabel!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupLayoutStyles()
-        setupLayoutSubviews()
-        setupLayoutConstraints()
+        setupLayout()
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -44,18 +23,37 @@ class BannerCollectionCell: UICollectionViewCell {
 }
 
 extension BannerCollectionCell {
-    private func setupLayoutStyles() {
+    private func setupLayout() {
         backgroundColor = UIColor.white
         addShadowView()
-    }
-    
-    private func setupLayoutSubviews() {
+        
+        imageView = {
+            let _imageView = UIImageView()
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        titleLabel = {
+            let _label = UILabel()
+            _label.font = .boldSystemFont(ofSize: 20)
+            _label.textAlignment = .center
+            _label.numberOfLines = 1
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        subtitleLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 14)
+            _label.textAlignment = .center
+            _label.numberOfLines = 4
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        
         addSubview(imageView)
         addSubview(titleLabel)
         addSubview(subtitleLabel)
-    }
-    
-    private func setupLayoutConstraints() {
+        
         imageView.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
         imageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
         imageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0).isActive = true

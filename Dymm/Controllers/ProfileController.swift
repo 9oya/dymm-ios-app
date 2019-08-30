@@ -25,6 +25,7 @@ class ProfileViewController: UIViewController {
     var emailContainerView: UIView!
     var phNumberContainerView: UIView!
     var introContainerView: UIView!
+    var changePasswordView: UIView!
     
     // UICollectionView
     var tagCollectionView: UICollectionView!
@@ -59,17 +60,18 @@ class ProfileViewController: UIViewController {
     var introGuideLabel: UILabel!
     var introLabel: UILabel!
     var introPlaceHolderLabel: UILabel!
+    var changePasswordPlaceHolderLabel: UILabel!
     
     // Non-view properties
     var lang: LangPack!
     var retryFunction: (() -> Void)?
-    var mailMessage: String?
-    var newMailAddress: String?
     var profile: CustomModel.Profile?
-    var selectedCollectionItem: Int?
     var tags: [BaseModel.Tag]?
     var pickedTag: BaseModel.Tag?
+    var mailMessage: String?
+    var newMailAddress: String?
     var newInfoStr: String?
+    var selectedCollectionItem: Int?
     var avatarInfoTarget: Int?
     
     override func viewDidLoad() {
@@ -250,6 +252,11 @@ class ProfileViewController: UIViewController {
         alert.addAction(cancelAction)
         self.present(alert, animated: true, completion: nil)
     }
+    
+    @objc func changePasswordTapped(_ sender: UITapGestureRecognizer? = nil) {
+        // TODO
+        print("")
+    }
 }
 
 extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
@@ -413,6 +420,8 @@ extension ProfileViewController {
         phNumberContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.phNumContainerTapped(_:))))
         introContainerView = getProfileLabelContainerView()
         introContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.introContainerTapped(_:))))
+        changePasswordView = getProfileLabelContainerView()
+        changePasswordView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.changePasswordTapped(_:))))
         firstNameGuideLabel = getProfileGuideLabel()
         lastNameGuideLabel = getProfileGuideLabel()
         emailGuideLabel = getProfileGuideLabel()

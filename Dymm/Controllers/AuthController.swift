@@ -47,8 +47,8 @@ class AuthViewController: UIViewController {
     // Non-view properties
     var lang: LangPack!
     var retryFunction: (() -> Void)?
-    var isSignUpForm: Bool = false
-    var lastEditedTxtField: Int = 0
+    var isSignUpForm = false
+    var lastEditedTxtField = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,7 +99,35 @@ class AuthViewController: UIViewController {
     }
     
     @objc func formSwapButtonTapped() {
-        transitionAuthForm()
+        if isSignUpForm {
+            UIView.animate(withDuration: 0.5, animations: {
+                self.formContainerHeight.constant = 260
+                self.emailTextFieldTop.constant = 10
+                self.firstNameTextField.isHidden = true
+                self.lastNameTextField.isHidden = true
+                self.confirmPassTextField.isHidden = true
+                self.view.layoutIfNeeded()
+            })
+            UIView.transition(with: titleLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.titleLabel.text = self.lang.titleSignIn
+                self.formSwapButton.setTitle(self.lang.titleSignUp, for: .normal)
+            })
+            isSignUpForm = false
+        } else {
+            UIView.animate(withDuration: 0.5, animations: {
+                self.formContainerHeight.constant = 425
+                self.emailTextFieldTop.constant = 120
+                self.firstNameTextField.isHidden = false
+                self.lastNameTextField.isHidden = false
+                self.confirmPassTextField.isHidden = false
+                self.view.layoutIfNeeded()
+            })
+            UIView.transition(with: titleLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.titleLabel.text = self.lang.titleSignUp
+                self.formSwapButton.setTitle(self.lang.titleSignIn, for: .normal)
+            })
+            isSignUpForm = true
+        }
     }
     
     @objc func submitButtonTapped() {
@@ -228,7 +256,7 @@ extension AuthViewController {
     private func setupLayout() {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
-        view.backgroundColor = UIColor(hex: "WhiteSmoke")
+        view.backgroundColor = UIColor.whiteSmoke
         
         // Initialize subveiw properties
         loadingImageView = getLoadingImageView(isHidden: true)
@@ -323,7 +351,7 @@ extension AuthViewController {
         messageLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 14)
-            _label.textColor = UIColor(hex: "DarkOrange")
+            _label.textColor = UIColor.darkOrange
             _label.textAlignment = .center
             _label.numberOfLines = 2
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -350,6 +378,14 @@ extension AuthViewController {
             return _button
         }()
         
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
+        firstNameTextField.delegate = self
+        lastNameTextField.delegate = self
+        emailTextField.delegate = self
+        passwordTextField.delegate = self
+        confirmPassTextField.delegate = self
+        
+        // Setup subviews
         view.addSubview(loadingImageView)
         view.addSubview(formContainerView)
         view.addSubview(topBarView)
@@ -366,13 +402,6 @@ extension AuthViewController {
         formContainerView.addSubview(formSwapButton)
         formContainerView.addSubview(submitButton)
         formContainerView.addSubview(formGrayLineView)
-        
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
-        firstNameTextField.delegate = self
-        lastNameTextField.delegate = self
-        emailTextField.delegate = self
-        passwordTextField.delegate = self
-        confirmPassTextField.delegate = self
         
         // Setup constraints
         loadingImageView.widthAnchor.constraint(equalToConstant: 62).isActive = true
@@ -445,120 +474,24 @@ extension AuthViewController {
         submitButton.bottomAnchor.constraint(equalTo: formContainerView.bottomAnchor, constant: -10).isActive = true
     }
     
-    private func transitionAuthForm() {
-        if isSignUpForm {
-            UIView.animate(withDuration: 0.5, animations: {
-                self.formContainerHeight.constant = 260
-                self.emailTextFieldTop.constant = 10
-                self.firstNameTextField.isHidden = true
-                self.lastNameTextField.isHidden = true
-                self.confirmPassTextField.isHidden = true
-                self.view.layoutIfNeeded()
-            })
-            UIView.transition(with: titleLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.titleLabel.text = self.lang.titleSignIn
-                self.formSwapButton.setTitle(self.lang.titleSignUp, for: .normal)
-            })
-            isSignUpForm = false
-        } else {
-            UIView.animate(withDuration: 0.5, animations: {
-                self.formContainerHeight.constant = 425
-                self.emailTextFieldTop.constant = 120
-                self.firstNameTextField.isHidden = false
-                self.lastNameTextField.isHidden = false
-                self.confirmPassTextField.isHidden = false
-                self.view.layoutIfNeeded()
-            })
-            UIView.transition(with: titleLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.titleLabel.text = self.lang.titleSignUp
-                self.formSwapButton.setTitle(self.lang.titleSignIn, for: .normal)
-            })
-            self.isSignUpForm = true
-        }
-    }
-    
-    private func setMessageLabel(_ message: String) {
+    private func displayErrorMessage(_ message: String) {
         messageLabel.text = message
         UIView.transition(with: messageLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.messageLabel.isHidden = false
         })
     }
     
-    private func validateSignUpParams() -> Parameters? {
-        guard let first_name = firstNameTextField.text,
-            let last_name = lastNameTextField.text,
-            let email = emailTextField.text,
-            let password = passwordTextField.text,
-            let confirmPassword = confirmPassTextField.text else {
-                return nil
+    private func unauthorized(_ pattern: Int) {
+        switch pattern {
+        case UnauthType.mailInvalid:
+            displayErrorMessage(lang.msgUnauthInvalidEmail)
+        case UnauthType.mailDuplicated:
+            displayErrorMessage(lang.msgUnauthDuplicatedEmail)
+        case UnauthType.passwordInvalid:
+            displayErrorMessage(lang.msgUnauthInvalidPassword)
+        default:
+            fatalError()
         }
-        guard first_name.count > 0 else {
-            setMessageLabel(lang.msgEmptyName)
-            return nil
-        }
-        guard email.count > 0 else {
-            setMessageLabel(lang.msgEmptyEmail)
-            return nil
-        }
-        guard email.isValidEmail() else {
-            setMessageLabel(lang.msgInvalidEmail)
-            return nil
-        }
-        guard password.count > 0 else {
-            setMessageLabel(lang.msgEmptyPassword)
-            return nil
-        }
-        guard password.count >= 8 else {
-            setMessageLabel(lang.msgShortPassword)
-            return nil
-        }
-        guard passwordTextField.text == confirmPassword else {
-            setMessageLabel(lang.msgMismatchConfirmPassword)
-            return nil
-        }
-        let userParams: Parameters = [
-            "first_name": first_name,
-            "last_name": last_name,
-            "email": email,
-            "password": password,
-            "language_id": getDeviceLanguage()
-        ]
-        return userParams
-    }
-    
-    private func validateSignInParams() -> Parameters? {
-        guard let email = emailTextField.text,
-            let password = passwordTextField.text else {
-                return nil
-        }
-        guard email.count > 0 else {
-            setMessageLabel(lang.msgEmptyEmail)
-            return nil
-        }
-        guard email.isValidEmail() else {
-            setMessageLabel(lang.msgInvalidEmail)
-            return nil
-        }
-        guard password.count > 0 else {
-            setMessageLabel(lang.msgEmptyPassword)
-            return nil
-        }
-        guard password.count >= 8 else {
-            setMessageLabel(lang.msgShortPassword)
-            return nil
-        }
-        var userParams: Parameters = [
-            "email": email,
-            "password": password
-        ]
-        let avatar_id = UserDefaults.standard.integer(forKey: email)
-        if avatar_id > 0 {
-            userParams["id"] = avatar_id
-        }
-        return userParams
-    }
-    
-    private func loadingViewTrainsition() {
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             if self.loadingImageView.isHidden {
                 self.formContainerView.isHidden = true
@@ -570,30 +503,41 @@ extension AuthViewController {
         })
     }
     
-    private func unauthorized(_ pattern: Int) {
-        switch pattern {
-        case UnauthType.mailInvalid:
-            setMessageLabel(lang.msgUnauthInvalidEmail)
-        case UnauthType.mailDuplicated:
-            setMessageLabel(lang.msgUnauthDuplicatedEmail)
-        case UnauthType.passwordInvalid:
-            setMessageLabel(lang.msgUnauthInvalidPassword)
-        default:
-            fatalError("Unexpected forbidden pattern has passed")
-        }
-        self.loadingViewTrainsition()
-    }
-    
     private func accountSignIn() {
-        guard let params = validateSignInParams() else {
+        guard let email = emailTextField.text,
+            let password = passwordTextField.text else {
+                return
+        }
+        guard email.count > 0 else {
+            displayErrorMessage(lang.msgEmptyEmail)
             return
+        }
+        guard email.isValidEmail() else {
+            displayErrorMessage(lang.msgInvalidEmail)
+            return
+        }
+        guard password.count > 0 else {
+            displayErrorMessage(lang.msgEmptyPassword)
+            return
+        }
+        guard password.count >= 8 else {
+            displayErrorMessage(lang.msgShortPassword)
+            return
+        }
+        var params: Parameters = [
+            "email": email,
+            "password": password
+        ]
+        let avatar_id = UserDefaults.standard.integer(forKey: email)
+        if avatar_id > 0 {
+            params["id"] = avatar_id
         }
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
             self.loadingImageView.isHidden = false
         })
         let service = Service(lang: lang)
-        service.authExistingAvatar(params: params, unauthorized: { pattern in
+        service.authOldAvatar(params: params, unauthorized: { pattern in
             self.unauthorized(pattern)
         }, popoverAlert: { message in
             self.retryFunction = self.accountSignIn
@@ -612,9 +556,44 @@ extension AuthViewController {
     }
     
     private func accountSignUp() {
-        guard let params = validateSignUpParams() else {
+        guard let first_name = firstNameTextField.text,
+            let last_name = lastNameTextField.text,
+            let email = emailTextField.text,
+            let password = passwordTextField.text,
+            let confirmPassword = confirmPassTextField.text else {
+                return
+        }
+        guard first_name.count > 0 else {
+            displayErrorMessage(lang.msgEmptyName)
             return
         }
+        guard email.count > 0 else {
+            displayErrorMessage(lang.msgEmptyEmail)
+            return
+        }
+        guard email.isValidEmail() else {
+            displayErrorMessage(lang.msgInvalidEmail)
+            return
+        }
+        guard password.count > 0 else {
+            displayErrorMessage(lang.msgEmptyPassword)
+            return
+        }
+        guard password.count >= 8 else {
+            displayErrorMessage(lang.msgShortPassword)
+            return
+        }
+        guard passwordTextField.text == confirmPassword else {
+            displayErrorMessage(lang.msgMismatchConfirmPassword)
+            return
+        }
+        let params: Parameters = [
+            "first_name": first_name,
+            "last_name": last_name,
+            "email": email,
+            "password": password,
+            "language_id": getDeviceLanguage()
+        ]
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
             self.loadingImageView.isHidden = false

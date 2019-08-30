@@ -66,11 +66,9 @@ extension CondCollectionCell {
             _imageView.image = UIImage.btnRemove
             _imageView.isHidden = true
             _imageView.contentMode = .scaleAspectFit
-//            _imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
-        
         
         addSubview(stackView)
         addSubview(titleLabel)

@@ -8,28 +8,12 @@
 
 import UIKit
 
-let tagCellId = "TagCell"
-
+let tagCellId = "TagCollectionCell"
 let tagCellHeightInt = 45
 
 class TagCollectionCell: UICollectionViewCell {
-    let imageView: UIImageView = {
-        let _imageView = UIImageView()
-        _imageView.contentMode = .scaleAspectFit
-        _imageView.translatesAutoresizingMaskIntoConstraints = false
-        return _imageView
-    }()
-    let label: UILabel = {
-        let _label = UILabel()
-        _label.font = .systemFont(ofSize: 14)
-        _label.textAlignment = .center
-        _label.numberOfLines = 3
-        _label.adjustsFontSizeToFitWidth = true
-        _label.minimumScaleFactor = 0.5
-        _label.allowsDefaultTighteningForTruncation = true
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
+    var imageView: UIImageView!
+    var label: UILabel!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -45,6 +29,24 @@ extension TagCollectionCell {
     private func setupLayout() {
         backgroundColor = UIColor.white
         addShadowView()
+        
+        imageView = {
+            let _imageView = UIImageView()
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        label = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 14)
+            _label.textAlignment = .center
+            _label.numberOfLines = 3
+            _label.adjustsFontSizeToFitWidth = true
+            _label.minimumScaleFactor = 0.5
+            _label.allowsDefaultTighteningForTruncation = true
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
         
         addSubview(imageView)
         addSubview(label)

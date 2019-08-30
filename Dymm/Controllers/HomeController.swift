@@ -8,8 +8,7 @@
 
 import UIKit
 
-private let bannerCellId = "BannerCell"
-
+private let bannerCellId = "BannerCollectionCell"
 private let bannerHeightInt = 160
 let marginInt = 7
 
@@ -108,7 +107,7 @@ class HomeViewController: UIViewController {
         }
         let indexPath = IndexPath(item: (banners!.count - 1) - nextIdx, section: 0)
         bannerCollectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
-        UIView.transition(with: self.pageControl, duration: 0.5, options: .transitionCrossDissolve, animations: {
+        UIView.transition(with: pageControl, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.pageControl.currentPage = nextIdx
         })
     }
@@ -123,23 +122,25 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if collectionView == self.bannerCollectionView {
+        switch collectionView {
+        case bannerCollectionView:
             guard let number = banners?.count else {
                 return 0
             }
             return number
-        } else if collectionView == self.tagCollectionView {
+        case tagCollectionView:
             guard let number = tags?.count else {
                 return 0
             }
             return number
-        } else {
-            return 0
+        default:
+            fatalError()
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if collectionView == self.bannerCollectionView {
+        switch collectionView {
+        case bannerCollectionView:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: bannerCellId, for: indexPath) as? BannerCollectionCell else {
                 fatalError()
             }
@@ -160,11 +161,11 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
                 fatalError()
             }
             return cell
-        } else {
+        case tagCollectionView:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: tagCellId, for: indexPath) as? TagCollectionCell else {
                 fatalError()
             }
-            if let tag = tags?[indexPath.row] {
+            if let tag = tags?[indexPath.item] {
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.label.text = tag.eng_name
                 case LanguageId.kor: cell.label.text = tag.kor_name
@@ -172,16 +173,19 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
                 cell.imageView.image = UIImage(named: "tagId-\(tag.id)")
             }
             return cell
+        default:
+            fatalError()
         }
     }
     
     // MARK: - UICollectionViewDelegate
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if collectionView == bannerCollectionView {
+        switch collectionView {
+        case bannerCollectionView:
             return
-        } else {
-            guard let tag = tags?[indexPath.row] else {
+        case tagCollectionView:
+            guard let tag = tags?[indexPath.item] else {
                 return
             }
             if tag.id == TagId.diary {
@@ -197,6 +201,8 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             }
             self.selectedTag = tag
             presentCategoryNavigation()
+        default:
+            fatalError()
         }
     }
     
@@ -207,33 +213,40 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let screenWidth = UIScreen.main.bounds.width
-        if collectionView == bannerCollectionView {
-            return CGSize(width: screenWidth, height: CGFloat(bannerHeightInt))
-        } else {
-            return CGSize(width: (screenWidth / 2) - 10.5, height: CGFloat(tagCellHeightInt))
+        switch collectionView {
+        case bannerCollectionView:
+            return CGSize(width: UIScreen.main.bounds.width, height: CGFloat(bannerHeightInt))
+        case tagCollectionView:
+            return CGSize(width: (UIScreen.main.bounds.width / 2) - 10.5, height: CGFloat(tagCellHeightInt))
+        default:
+            fatalError()
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        if collectionView == bannerCollectionView {
+        switch collectionView {
+        case bannerCollectionView:
             return 0
-        } else {
+        case tagCollectionView:
             return 7
+        default:
+            fatalError()
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        if collectionView == bannerCollectionView {
+        switch collectionView {
+        case bannerCollectionView:
             return 0
-        } else {
+        case tagCollectionView:
             return 7
+        default:
+            fatalError()
         }
     }
     
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        let x = targetContentOffset.pointee.x
-        pageControl.currentPage = Int(x / view.frame.width)
+        pageControl.currentPage = Int(targetContentOffset.pointee.x / view.frame.width)
     }
 }
 
@@ -244,7 +257,7 @@ extension HomeViewController {
     private func setupLayout() {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
-        view.backgroundColor = UIColor(hex: "WhiteSmoke")
+        view.backgroundColor = UIColor.whiteSmoke
         
         // Initialize subveiw properties
         tagCollectionView = getCategoryCollectionView()
@@ -270,14 +283,14 @@ extension HomeViewController {
             return _pageControl
         }()
         titleImageView = {
-            let _imageView = UIImageView(image: UIImage(named: "symbol-logo-small"))
+            let _imageView = UIImageView(image: UIImage.symbolLogoSmall)
             _imageView.frame = CGRect(x: 0, y: 0, width: 26, height: 26)
             _imageView.contentMode = .scaleAspectFit
             return _imageView
         }()
         profileButton = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage(named: "button-profile")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.btnProfile.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 31, height: 31)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(profileButtonTapped), for: .touchUpInside)
@@ -292,6 +305,7 @@ extension HomeViewController {
         tagCollectionView.dataSource = self
         tagCollectionView.delegate = self
         
+        // Setup subviews
         view.addSubview(bannerCollectionView)
         view.addSubview(tagCollectionView)
         view.addSubview(pageControl)
@@ -336,8 +350,7 @@ extension HomeViewController {
     
     private func loadCategories() {
         let service = Service(lang: lang)
-        let homeTagId = 16
-        service.getTagSetList(tagId: homeTagId, sortType: SortType.priority, popoverAlert: { (message) in
+        service.getTagSetList(tagId: TagId.home, sortType: SortType.priority, popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }) { (tagSet) in

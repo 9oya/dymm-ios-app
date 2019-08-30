@@ -9,14 +9,7 @@
 import UIKit
 
 class StepCollectionCell: UICollectionViewCell {
-    let label: UILabel = {
-        let _label = UILabel()
-        _label.font = .systemFont(ofSize: 14)
-        _label.textAlignment = .center
-        _label.numberOfLines = 2
-        _label.translatesAutoresizingMaskIntoConstraints = false
-        return _label
-    }()
+    var label: UILabel!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -30,6 +23,15 @@ class StepCollectionCell: UICollectionViewCell {
 extension StepCollectionCell {
     private func setupLayout() {
         backgroundColor = UIColor.white
+        
+        label = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 14)
+            _label.textAlignment = .center
+            _label.numberOfLines = 2
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
         
         addSubview(label)
         

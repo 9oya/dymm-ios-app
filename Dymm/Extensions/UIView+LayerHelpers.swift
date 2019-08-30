@@ -58,6 +58,7 @@ extension UIView {
             self.layer.add(animate, forKey: kAnimationKey)
         }
     }
+    
     func stopRotating() {
         let kAnimationKey = "rotation"
         
