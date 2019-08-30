@@ -457,7 +457,7 @@ struct Service {
                     }
                     unauthorized(decodedData.pattern)
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "authExistedAccount()")
+                    self.unexpectedResponse(statusCode, responseData, "authOldAvatar()")
                     return
                 }
         }
@@ -524,7 +524,7 @@ struct Service {
                     }
                     return
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    self.unexpectedResponse(statusCode, responseData, "postAvatarCond()")
                     return
                 }
         }
@@ -560,7 +560,7 @@ struct Service {
                     }
                     return
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    self.unexpectedResponse(statusCode, responseData, "postABookmark()")
                     return
                 }
         }
@@ -596,7 +596,7 @@ struct Service {
                     }
                     return
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    self.unexpectedResponse(statusCode, responseData, "postASingleLog()")
                     return
                 }
         }
@@ -623,11 +623,10 @@ struct Service {
                 case 400:
                     self.badRequest(responseData)
                 case 401:
-                    // TODO
                     UserDefaults.standard.setIsSignIn(value: false)
-                    return
+                    fatalError()
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchTagSets()")
+                    self.unexpectedResponse(statusCode, responseData, "sendMailConfLinkAgain()")
                     return
                 }
         }
@@ -657,7 +656,63 @@ struct Service {
                 case 400:
                     self.badRequest(responseData)
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchTagSets()")
+                    self.unexpectedResponse(statusCode, responseData, "searchTags()")
+                    return
+                }
+        }
+    }
+    
+    func findEmailAddress(params: Parameters, unauthorized: @escaping () -> Void, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping () -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            print("Load UserDefaults.standard.getAccessToken() failed")
+            return
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)",
+        ]
+        Alamofire.request("\(URI.host)\(URI.avatar)/email/find", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    completion()
+                case 400:
+                    self.badRequest(responseData)
+                case 401:
+                    unauthorized()
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "findEmailAddress()")
+                    return
+                }
+        }
+    }
+    
+    func sendEmailVerifCode(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping () -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            print("Load UserDefaults.standard.getAccessToken() failed")
+            return
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)",
+        ]
+        Alamofire.request("\(URI.host)\(URI.avatar)/email/verif", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    completion()
+                case 400:
+                    self.badRequest(responseData)
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "findEmailAddress()")
                     return
                 }
         }

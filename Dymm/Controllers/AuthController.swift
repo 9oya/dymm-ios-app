@@ -49,6 +49,10 @@ class AuthViewController: UIViewController {
     var retryFunction: (() -> Void)?
     var isSignUpForm = false
     var lastEditedTxtField = 0
+    var emailToFind: String?
+    var verifCode: String?
+    var isEmailFound = true
+    var isCodeCorrect = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -69,17 +73,21 @@ class AuthViewController: UIViewController {
         present(alertController, animated: true, completion: nil)
     }
     
-    @objc func forgotPasswordBtnTapped() {
-        let alert = UIAlertController(title: lang.titleForgotPasswordAlert, message: "\n" + lang.msgMailEnter, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
+    @objc func findEmailAlert() {
+        var title = lang.titleForgotPasswordAlert
+        if !isEmailFound {
+            title = lang.titleEmailNotFound
+        }
+        let alert = UIAlertController(title: title, message: "\n" + lang.msgMailEnter, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.titleSubmit, style: .default) { _ in
             if let txtField = alert.textFields?.first, let text = txtField.text {
-                print(text)
-//                self.newInfoStr = text
-//                self.avatarInfoTarget = AvatarInfoTarget.email
-//                self.updateAvatarInfo()
+                self.emailToFind = text
+                self.findEmail()
             }
         }
-        let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
+        let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in
+            self.isEmailFound = true
+        }
         alert.addTextField { textField in
             textField.autocapitalizationType = .none
             textField.keyboardType = .emailAddress
@@ -87,6 +95,46 @@ class AuthViewController: UIViewController {
             confirmAction.isEnabled = false
             NotificationCenter.default.addObserver(forName: UITextField.textDidChangeNotification, object: textField, queue: OperationQueue.main) { (notification) in
                 confirmAction.isEnabled = textField.text!.count > 0 && textField.text!.isValidEmail()
+            }
+        }
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func foundEmailComplAlert() {
+        let alert = UIAlertController(title: lang.titleEmailFound(emailToFind!), message: "\n" + lang.msgMailSendValidCode(emailToFind!), preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.titleSend, style: .default) { _ in
+            self.sendVerificationCodeToMail()
+        }
+        let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func verificationCodeAlert() {
+        var title = lang.titleEmailValidCode(emailToFind!)
+        if !isCodeCorrect {
+            title = lang.titleEmailValidCode(emailToFind!)
+        }
+        let alert = UIAlertController(title: title, message: "\n" + lang.msgValidCodeEnter, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.titleSubmit, style: .default) { _ in
+            if let txtField = alert.textFields?.first, let text = txtField.text {
+                self.verifCode = text
+                self.verifyEmailCode()
+            }
+        }
+        let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in
+            self.isCodeCorrect = true
+        }
+        alert.addTextField { textField in
+            textField.autocapitalizationType = .allCharacters
+            textField.keyboardType = .default
+            textField.placeholder = self.lang.titleVerifCode
+            confirmAction.isEnabled = false
+            NotificationCenter.default.addObserver(forName: UITextField.textDidChangeNotification, object: textField, queue: OperationQueue.main) { (notification) in
+                confirmAction.isEnabled = textField.text!.count > 5
             }
         }
         alert.addAction(confirmAction)
@@ -263,7 +311,7 @@ extension AuthViewController {
         topBarView = getAddtionalTopBarView()
         forgotButton = getBasicTextButton(UIColor.tomato)
         forgotButton.setTitle(lang.titleForgotPassword, for: .normal)
-        forgotButton.addTarget(self, action: #selector(forgotPasswordBtnTapped), for: .touchUpInside)
+        forgotButton.addTarget(self, action: #selector(findEmailAlert), for: .touchUpInside)
         closeButton = getCloseButton()
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         formGrayLineView = getGrayLineView()
@@ -615,5 +663,48 @@ extension AuthViewController {
             UserDefaults.standard.set(_avatar.id, forKey: _avatar.email)
             self.dismiss(animated: true, completion: nil)
         }
+    }
+    
+    private func findEmail() {
+        let params: Parameters = [
+            "email": emailToFind!
+        ]
+        let service = Service(lang: lang)
+        service.findEmailAddress(params: params, unauthorized: {
+            self.isEmailFound = false
+            self.findEmailAlert()
+        }, popoverAlert: { (message) in
+            self.retryFunction = self.findEmail
+            self.alertError(message)
+        }) {
+            self.isEmailFound = true
+            self.foundEmailComplAlert()
+        }
+    }
+    
+    private func sendVerificationCodeToMail() {
+        UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.formContainerView.isHidden = true
+            self.loadingImageView.isHidden = false
+        })
+        let params: Parameters = [
+            "email": emailToFind!
+        ]
+        let service = Service(lang: lang)
+        service.sendEmailVerifCode(params: params, popoverAlert: { (message) in
+            self.retryFunction = self.sendVerificationCodeToMail
+            self.alertError(message)
+        }) {
+            self.isCodeCorrect = true
+            UIView.transition(with: self.formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.formContainerView.isHidden = false
+                self.loadingImageView.isHidden = true
+            })
+            self.verificationCodeAlert()
+        }
+    }
+    
+    private func verifyEmailCode() {
+        print("")
     }
 }

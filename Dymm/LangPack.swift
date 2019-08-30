@@ -31,6 +31,7 @@ struct LangPack {
     var titleEditPhoneNum: String!
     var titleEmail: String!
     var titleEmailFound: ((String) -> String)!
+    var titleEmailNotFound: String!
     var titleEmailUpper: String!
     var titleEmailValidCode: ((String) -> String)!
     var titleEndDate: String!
@@ -62,8 +63,10 @@ struct LangPack {
     var titleSpread: String!
     var titleStartDate: String!
     var titleStay: String!
+    var titleSend: String!
     var titleSubmit: String!
     var titleToday: String!
+    var titleVerifCode: String!
     var titleWeekdays: [String]!
     var titleYes: String!
     
@@ -237,11 +240,17 @@ struct LangPack {
         }()
         func _titleEmailFound(_ email: String) -> String {
             switch currentLanguageId {
-            case LanguageId.eng: return "We found an account associated /nwith \"\(email)\""
+            case LanguageId.eng: return "We found an account associated with \"\(email)\""
             case LanguageId.kor: return "\"\(email)\" (으)로 등록된 계정을 찾았습니다."
             default: fatalError()}
         }
         self.titleEmailFound = _titleEmailFound
+        self.titleEmailNotFound = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "\u{26A0}Email address not found."
+            case LanguageId.kor: return "\u{26A0}메일주소를 찾을 수 없습니다."
+            default: fatalError()}
+        }()
         self.titleEmailUpper = {
             switch currentLanguageId {
             case LanguageId.eng: return "EMAIL ADDRESS"
@@ -250,8 +259,8 @@ struct LangPack {
         }()
         func _titleEmailValidCode(_ email: String) -> String {
             switch currentLanguageId {
-            case LanguageId.eng: return "A verification code was sent to /n\(email)"
-            case LanguageId.kor: return "인증 코드를 발송하였습니다. /n\(email)"
+            case LanguageId.eng: return "A verification code was sent to \(email)"
+            case LanguageId.kor: return "인증 코드를 발송하였습니다. \(email)"
             default: fatalError()}
         }
         self.titleEmailValidCode = _titleEmailValidCode
@@ -431,6 +440,12 @@ struct LangPack {
             case LanguageId.kor: return "머무르기"
             default: fatalError()}
         }()
+        self.titleSend = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Send"
+            case LanguageId.kor: return "전송"
+            default: fatalError()}
+        }()
         self.titleSubmit = {
             switch currentLanguageId {
             case LanguageId.eng: return "Submit"
@@ -441,6 +456,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Today"
             case LanguageId.kor: return "오늘"
+            default: fatalError()}
+        }()
+        self.titleVerifCode = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Verification Code"
+            case LanguageId.kor: return "인증 코드"
             default: fatalError()}
         }()
         self.titleWeekdays = {
@@ -540,8 +561,8 @@ struct LangPack {
         }()
         func _msgMailSendValidCode(_ email: String) -> String {
             switch currentLanguageId {
-            case LanguageId.eng: return "Email an account verification code to /n\(email)"
-            case LanguageId.kor: return "이메일로 계정 인증 코드 발송하기 /n\(email)"
+            case LanguageId.eng: return "Email an account verification code to \n\(email)"
+            case LanguageId.kor: return "이메일로 계정 인증 코드 발송하기 \n\(email)"
             default: fatalError()}
         }
         self.msgMailSendValidCode = _msgMailSendValidCode
