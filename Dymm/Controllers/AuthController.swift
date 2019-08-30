@@ -84,6 +84,10 @@ class AuthViewController: UIViewController {
             textField.autocapitalizationType = .none
             textField.keyboardType = .emailAddress
             textField.placeholder = self.lang.titleEmail
+            confirmAction.isEnabled = false
+            NotificationCenter.default.addObserver(forName: UITextField.textDidChangeNotification, object: textField, queue: OperationQueue.main) { (notification) in
+                confirmAction.isEnabled = textField.text!.count > 0 && textField.text!.isValidEmail()
+            }
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
@@ -145,9 +149,11 @@ extension AuthViewController: UITextFieldDelegate {
                 lastEditedTxtField = 2
                 return
             }
-            UIView.animate(withDuration: 0.7) {
-                self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
-                self.view.layoutIfNeeded()
+            if isSignUpForm {
+                UIView.animate(withDuration: 0.7) {
+                    self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
+                    self.view.layoutIfNeeded()
+                }
             }
         case passwordTextField:
             if lastEditedTxtField < 3 {
@@ -579,7 +585,7 @@ extension AuthViewController {
     }
     
     private func accountSignIn() {
-        guard let parameters = validateSignInParams() else {
+        guard let params = validateSignInParams() else {
             return
         }
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
@@ -587,7 +593,7 @@ extension AuthViewController {
             self.loadingImageView.isHidden = false
         })
         let service = Service(lang: lang)
-        service.authExistingAvatar(parameters, unauthorized: { pattern in
+        service.authExistingAvatar(params: params, unauthorized: { pattern in
             self.unauthorized(pattern)
         }, popoverAlert: { message in
             self.retryFunction = self.accountSignIn
@@ -606,7 +612,7 @@ extension AuthViewController {
     }
     
     private func accountSignUp() {
-        guard let parameters = validateSignUpParams() else {
+        guard let params = validateSignUpParams() else {
             return
         }
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
@@ -614,7 +620,7 @@ extension AuthViewController {
             self.loadingImageView.isHidden = false
         })
         let service = Service(lang: lang)
-        service.createNewAvatar(parameters, unauthorized: { pattern in
+        service.createNewAvatar(params: params, unauthorized: { pattern in
             self.unauthorized(pattern)
         }, popoverAlert: { (message) in
             self.retryFunction = self.accountSignUp

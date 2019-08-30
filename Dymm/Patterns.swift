@@ -10,15 +10,12 @@ import Foundation
 import UIKit
 
 struct URI {
-    static let host: String = "http://127.0.0.1:5000"
-    //    static let apiServerHost: String = "https://flava-api-test4.herokuapp.com"
+    static let host = "http://127.0.0.1:5000"
+    // static let apiServerHost = "https://flava-api-test4.herokuapp.com"
     static let avatar = "/api/avatar"
-    static let diary = "/api/diary"
+    static let banner = "/api/banner"
     static let mail = "/api/mail"
     static let tag = "/api/tag"
-    static let log = "/api/log"
-    static let banner = "/api/banner"
-    static let profile = "/api/profile"
 }
 
 struct ForbiddenType {
@@ -48,29 +45,11 @@ struct TagType {
     static let history = 15
 }
 
-struct TagId {
-    static let diary = 17
-    static let bookmarks = 18
-    static let condition = 3
-}
-
 struct SortType {
     static let priority = "priority"
     static let eng = "eng"
     static let kor = "kor"
     static let jpn = "jpn"
-}
-
-struct CalScope {
-    static let week = 1
-    static let month = 2
-}
-
-struct LogType {
-    static let food = 1
-    static let drug = 1
-    static let act = 1
-    static let condScore = 1
 }
 
 struct CondLogType {
@@ -85,6 +64,11 @@ struct LogGroupType {
     static let nighttime = 4
 }
 
+struct LogGroupOption {
+    static let score = "score"
+    static let remove = "remove"
+}
+
 struct DiaryMode {
     static let logger = 1
     static let editor = 2
@@ -95,6 +79,11 @@ struct ButtonType {
     static let close = 2
 }
 
+struct CalScope {
+    static let week = 1
+    static let month = 2
+}
+
 struct AvatarInfoTarget {
     static let firstName = 11
     static let lastName = 12
@@ -102,6 +91,37 @@ struct AvatarInfoTarget {
     static let phNumber = 14
     static let intro = 15
     static let profile_type = 16
+}
+
+struct TagId {
+    static let diary = 17
+    static let bookmarks = 18
+    static let condition = 3
+}
+
+struct CountryId {
+    static let australia = 358
+    static let canada = 236
+    static let ireland = 316
+    static let japan = 263
+    static let newZealand = 368
+    static let southKorea = 265
+    static let unitedKingdom = 322
+    static let unitedStates = 240
+}
+
+struct LanguageId {
+    static let eng = 30
+    static let kor = 35
+    static let jpn = 34
+}
+
+func getDeviceLanguage() -> Int {
+    return LangHelper.getLanguageId(alpha2: String(Locale.preferredLanguages[0].prefix(2)))
+}
+
+func getUserCountryCode() -> String {
+    return ((Locale.current as NSLocale).object(forKey: .countryCode) as? String)!
 }
 
 func getLogGroupTypeImage(_ groupType: Int) -> UIImage? {
@@ -128,17 +148,6 @@ func getCondScoreImage(_ condScore: Int) -> UIImage? {
     }
 }
 
-struct CountryId {
-    static let australia = 358
-    static let canada = 236
-    static let ireland = 316
-    static let japan = 263
-    static let newZealand = 368
-    static let southKorea = 265
-    static let unitedKingdom = 322
-    static let unitedStates = 240
-}
-
 func getProfileUIColor(key: Int) -> UIColor {
     switch key {
     case 1: return UIColor.dodgerBlue
@@ -156,5 +165,5 @@ func getProfileUIColor(key: Int) -> UIColor {
     case 13: return UIColor.hex_9999ff
     case 14: return UIColor.hex_cccc66
     // TODO: case 999 -> Photo
-    default: fatalError("Wrong ProfileColor key has been passed")}
+    default: fatalError()}
 }

@@ -64,7 +64,7 @@ class CategoryViewController: UIViewController {
     var retryFunction: (() -> Void)?
     private lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: getUserCountryCode())  // TODO ko_kr
+        formatter.locale = Locale(identifier: getUserCountryCode())
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
@@ -129,7 +129,7 @@ class CategoryViewController: UIViewController {
             UIView.transition(with: self.detailContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.detailContainerView.isHidden = true
             })
-            self.postAConditionLog()
+            self.createAConditionLog()
         })
         let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil)
         alertController.addAction(selectAction)
@@ -177,7 +177,6 @@ class CategoryViewController: UIViewController {
         if UserDefaults.standard.isSignIn() {
             let vc = DiaryViewController()
             vc.diaryMode = DiaryMode.logger
-            vc.logType = LogType.food
             vc.selectedTag = superTag!
             vc.x_val = selectedXVal!
             vc.y_val = selectedYVal!
@@ -1035,7 +1034,7 @@ extension CategoryViewController {
         }
     }
     
-    private func postAConditionLog() {
+    private func createAConditionLog() {
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -1048,16 +1047,15 @@ extension CategoryViewController {
             "log_date": selectedDate!
         ]
         let service = Service(lang: lang)
-        service.postACondLog(params: params, popoverAlert: { (message) in
-            self.retryFunction = self.postAConditionLog
+        service.postAvatarCond(params: params, popoverAlert: { (message) in
+            self.retryFunction = self.createAConditionLog
             self.detailContainerView.isHidden = true
             self.alertError(message)
         }, tokenRefreshCompletion: {
-            self.postAConditionLog()
+            self.createAConditionLog()
         }) {
             UIView.transition(with: self.detailContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.detailContainerView.isHidden = false
-//                self.loadingImageView.isHidden = true
             }, completion: { (_) in
                 switch self.lang.currentLanguageId {
                 case LanguageId.eng: self.alertCompl(self.superTag!.eng_name, self.lang.msgLogComplete)
@@ -1069,8 +1067,17 @@ extension CategoryViewController {
     }
     
     private func createABookmark() {
+        guard let avatarId = UserDefaults.standard.getAvatarId() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let params: Parameters = [
+            "avatar_id": avatarId,
+            "tag_id": superTag!.id,
+            "tag_type": superTag!.tag_type!
+        ]
         let service = Service(lang: lang)
-        service.postABookmark(tag_type: superTag!.tag_type!, sub_tag_id: superTag!.id, popoverAlert: { (message) in
+        service.postABookmark(params: params, popoverAlert: { (message) in
             self.retryFunction = self.createABookmark
             self.alertError(message)
         }, tokenRefreshCompletion: {

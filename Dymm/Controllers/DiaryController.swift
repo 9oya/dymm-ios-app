@@ -20,6 +20,8 @@ private let logGroupFooterHeightInt = 50
 private let logTableCellHeightInt = 45
 private let logCollectionCellHeightInt = 30
 private let pickerCollectionHeightInt = 32
+private let groupTypePickerRowHeightInt = 60
+private let condScorePickerRowHeightInt = 40
 
 class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDelegate, UIGestureRecognizerDelegate {
     
@@ -79,40 +81,40 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     // Models
     var diaryMode: Int = DiaryMode.editor
-    var logGroupDictTwoDimArr = [Int:[Int:BaseModel.LogGroup]]()  // [dayOfyear:[groupType:IntakeLogGroup]]
+    var logGroupDictTwoDimArr = [Int:[Int:BaseModel.LogGroup]]() // [dayOfyear:[groupType:IntakeLogGroup]]
     var logGroupSectTwoDimArr = [[CustomModel.LogGroupSection]]()
     var logGroups: [BaseModel.LogGroup]? // For event marking
     var avtCondList: [BaseModel.AvatarCond]?
     var selectedLogGroup: BaseModel.LogGroup?
-    var selectedTableSection: Int?
-    var selectedTableRow: Int?
     var selectedTag: BaseModel.Tag?
     var groupOfLogSet: CustomModel.GroupOfLogSet?
+    let condScores: [Int] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     
     // Non-view properties
+    var selectedTableSection: Int?
+    var selectedTableRow: Int?
     var selectedLogGroupId: Int?
     var selectedCalScope: Int?
     var selectedWeekOfYear: Int?
     var selectedDate: String?
     var selectedOnceCellIdxPath: IndexPath?
+    var selectedCondPickerIdx = 3
+    var selectedCondScore = 7
+    var selectedAvatarCondId: Int?
+    let numberOfGroupType = 4
+    var editedCellIdxPath: IndexPath?
     var yearNumber: Int?
     var monthNumber: Int?
     var dayNumber: Int?
     var groupType: Int?
     var weekOfYear: Int?
     var dayOfYear: Int?
-    var logType: Int?
     var x_val: Int?
     var y_val: Int?
-    let condScores: [Int] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    var selectedCondPickerIdx: Int = 3
-    var selectedCondScore: Int = 7
     var isToggleBtnTapped: Bool = false
     var isPullToRefresh: Bool = false
     var isLogGroupTableEdited: Bool = false
-    var editedCellIdxPath: IndexPath?
     var isCondEditBtnTapped: Bool = false
-    var selectedAvatarCondId: Int?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -212,7 +214,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             self.pickerContainerView.isHidden = true
             self.loadingImageView.isHidden = false
         })
-        postAGroupOfLog()
+        createGroupOfALog()
     }
     
     @objc func condRightButtonTapped() {
@@ -261,12 +263,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         return false
     }
     
-    // MARK: - CalendarViewDataSource
-    
-    func calendar(_ calendar: FSCalendar, boundingRectWillChange bounds: CGRect, animated: Bool) {
-        calendarViewHeight.constant = bounds.height
-        view.layoutIfNeeded()
-    }
+    // MARK: - FSCalendarDataSource
     
     func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int {
         guard let _logGroups = logGroups else {
@@ -299,10 +296,10 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         weekOfYear = Calendar.current.component(.weekOfYear, from: date)
         dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: date)!
         selectedDate = dateFormatter.string(from: date)
+        // logGrouDictArr: [groupType:LogGroup]
         if let logGroupDictArr = logGroupDictTwoDimArr[dayOfYear!] {
-            // logGrouDictArr: [groupType:LogGroup]
-            // Case selected calendar date has some of logGroups,
-            // display last log group.
+            // Case found some logGroups in section.
+            // Display last log group.
             let sortedGroupTypes = logGroupDictArr.keys.sorted(by: >)
             var sortedLogGourpArr = [BaseModel.LogGroup]()
             sortedGroupTypes.forEach { (key) in
@@ -317,7 +314,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
                 self.afterLoadGroupOfLogs(collectionViewHeight)
             }
         } else {
-            // Case any log group not existed in selected date section
+            // Case no logGroups are found in the section
             groupOfLogSet = nil
             groupType = LogGroupType.morning
             pickerContainerTransition(pickerCollectionHeightInt)
@@ -346,6 +343,11 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         }
         updateLogGroupTable()
     }
+    
+    func calendar(_ calendar: FSCalendar, boundingRectWillChange bounds: CGRect, animated: Bool) {
+        calendarViewHeight.constant = bounds.height
+        view.layoutIfNeeded()
+    }
 }
 
 extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
@@ -359,31 +361,33 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let rowCnt = logGroupSectTwoDimArr[section].count
-        if diaryMode == DiaryMode.editor {
+        switch diaryMode {
+        case DiaryMode.editor:
             return rowCnt
+        case DiaryMode.logger:
+            // Add "Create new group" cell
+            return rowCnt + 1
+        default:
+            fatalError()
         }
-        return rowCnt + 1  // Add +1 for 'Create new group' button
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if logGroupSectTwoDimArr.count <= 0 {
             return nil
         } else {
+            // Set properties
             let logGroup = logGroupSectTwoDimArr[section][0].logGroup
-            let label = UILabel()
-            let strDate = "\(logGroup.year_number)-\(logGroup.month_number)-\(logGroup.day_number)"
-            let date = dateFormatter.date(from: strDate)
+            let date = dateFormatter.date(from: "\(logGroup.year_number)-\(logGroup.month_number)-\(logGroup.day_number)")
             var weekday = lang.getWeekdayName(Calendar.current.component(.weekday, from: date!))
-            
-            // Case current section date is calendar today
             let strTodayDateArr = dateFormatter.string(from: calendarView.today!).components(separatedBy: "-")
-            let _monthNumber = Int(strTodayDateArr[1])
-            let _dayNumber = Int(strTodayDateArr[2])
-            if _monthNumber == logGroup.month_number && _dayNumber == logGroup.day_number {
-                // When current day is today add a ✨ emoji on section label
-                weekday = "\u{2728}\(lang.getWeekdayName(Calendar.current.component(.weekday, from: date!)))"
+            if Int(strTodayDateArr[1]) == logGroup.month_number && Int(strTodayDateArr[2]) == logGroup.day_number {
+                // If the date of the currently selected section is today add the ✨ emoji in it to prefix
+                weekday = "\u{2728}" + weekday
             }
             
+            // Set view layout
+            let label = UILabel()
             label.text = "\(weekday), \(lang.getLogGroupSection(logGroup.month_number, logGroup.day_number))"
             label.textAlignment = .center
             label.frame = CGRect(x: 0, y: -30, width: 100, height: 45)
@@ -398,12 +402,12 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: logGroupTableCellId, for: indexPath) as? LogGroupTableCell else {
             fatalError()
         }
-        if diaryMode == DiaryMode.editor {
+        switch diaryMode {
+        case DiaryMode.editor:
             let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
-            let intakeGroupTitle = lang.getLogGroupTypeName(logGroup.group_type)
             cell.arrowImageView.isHidden = false
             cell.condScoreImageView.isHidden = false
-            cell.nameLabel.text = intakeGroupTitle
+            cell.nameLabel.text = lang.getLogGroupTypeName(logGroup.group_type)
             cell.groupTypeImageView.image = getLogGroupTypeImage(logGroup.group_type)
             cell.nameLabel.textColor = UIColor.black
             if logGroup.food_cnt > 0 {
@@ -424,9 +428,9 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             }
             cell.condScoreButton.addTarget(self, action: #selector(alertCondScorePicker), for: .touchUpInside)
             return cell
-        } else if diaryMode == DiaryMode.logger {
+        case DiaryMode.logger:
             if indexPath.row == 0 {
-                // Appeare additional cell 'Create new'
+                // Case 'Create new group' cell
                 cell.nameLabel.text = lang.titleCreateNewGroup
                 cell.nameLabel.textColor = UIColor.cornflowerBlue
                 cell.groupTypeImageView.image = nil
@@ -436,13 +440,12 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 return cell
             } else {
                 let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row - 1].logGroup
-                let intakeGroupTitle = lang.getLogGroupTypeName(logGroup.group_type)
-                cell.nameLabel.text = intakeGroupTitle
+                cell.nameLabel.text = lang.getLogGroupTypeName(logGroup.group_type)
                 cell.groupTypeImageView.image = nil
                 cell.nameLabel.textColor = UIColor.cornflowerBlue
                 return cell
             }
-        } else {
+        default:
             fatalError()
         }
     }
@@ -454,7 +457,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if diaryMode == DiaryMode.logger {
             if indexPath.row == 0 {
-                // "Create new" cell can't swipe to delete.
+                // Case "Create new group" cell disable swipe to delete.
                 return
             }
         }
@@ -468,7 +471,8 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
     // MARK: - UITableViewDelegate
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if diaryMode == DiaryMode.editor {
+        switch diaryMode {
+        case DiaryMode.editor:
             selectedLogGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
             selectedTableSection = indexPath.section
             selectedTableRow = indexPath.row
@@ -479,7 +483,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     fatalError()
                 }
                 if indexPath == self.selectedOnceCellIdxPath {
-                    // Case select already selected cell
+                    // Case did select row that has already been selected.
                     self.selectedOnceCellIdxPath = nil
                     self.selectedTableSection = nil
                     self.selectedTableRow = nil
@@ -497,8 +501,8 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     }, completion: { _ in
                         UIView.transition(with: cell.groupOfLogsTableView, duration: 0.3, options: .transitionCrossDissolve, animations: {
                             cell.groupOfLogsTableView.isHidden = true
-                            cell.condScoreImageView.isHidden = false
                             cell.condScoreButton.isHidden = true
+                            cell.condScoreImageView.isHidden = false
                             if self.selectedLogGroup!.food_cnt > 0 {
                                 cell.foodLogBulletView.isHidden = false
                             }
@@ -512,7 +516,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     })
                     self.updateLogGroupTable()
                 } else {
-                    // Case select cell tapped at first time
+                    // Case did select row for the first time.
                     cell.selectedLogGroup = self.selectedLogGroup!
                     cell.groupOfLogSetForCnt = self.groupOfLogSet!
                     cell.groupOfLogSetForPop = self.groupOfLogSet!
@@ -528,8 +532,8 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     }, completion: { _ in
                         UIView.transition(with: cell.groupOfLogsTableView, duration: 0.3, options: .transitionCrossDissolve, animations: {
                             cell.groupOfLogsTableView.isHidden = false
-                            cell.condScoreImageView.isHidden = true
                             cell.condScoreButton.isHidden = false
+                            cell.condScoreImageView.isHidden = true
                             cell.foodLogBulletView.isHidden = true
                             cell.actLogBulletView.isHidden = true
                             cell.drugLogBulletView.isHidden = true
@@ -540,20 +544,20 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     })
                 }
             }
-        } else if diaryMode == DiaryMode.logger {
-            if indexPath.row <= 0 {
-                // User tapped 'Create new group' cell
+        case DiaryMode.logger:
+            if indexPath.row == 0 {
+                // Case did select row 'Create new group' cell
                 let lastLogGroup = logGroupSectTwoDimArr[indexPath.section].first!.logGroup
                 selectedLogGroup = lastLogGroup
                 if LogGroupType.nighttime > lastLogGroup.group_type {
-                    // Case nighttime groupType has not been created yet,
+                    // Case the "Nighttime" groupType has not been created yet.
                     // Display next groupType of logGroup and set parameters.
                     groupType = lastLogGroup.group_type + 1
                     groupOfLogSet = nil
                     selectedLogGroupId = nil
                     afterLoadGroupOfLogs(pickerCollectionHeightInt)
                 } else {
-                    // Case nighttime groupType already exist,
+                    // Case the "Nighttime" groupType has already been created.
                     // Display last existing logGroup and set parameters.
                     groupType = LogGroupType.nighttime
                     selectedLogGroupId = lastLogGroup.id
@@ -563,7 +567,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     }
                 }
             } else {
-                // User tapped already existed logGroup table cell
+                // Case did select row that has already been created.
                 selectedLogGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row - 1].logGroup
                 groupType = selectedLogGroup!.group_type
                 selectedLogGroupId = selectedLogGroup!.id
@@ -572,7 +576,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     self.afterLoadGroupOfLogs(collectionViewHeight)
                 }
             }
-        } else {
+        default:
             fatalError()
         }
     }
@@ -595,7 +599,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             return CGFloat((total * logTableCellHeightInt) + logGroupCellHeightInt + logGroupFooterHeightInt + marginInt)
         } else {
             if let cell = tableView.cellForRow(at: indexPath) as? LogGroupTableCell {
-                // This block will transform unselected cells back to default state when tableView beginupdate.
+                // This code block will transform unselected cells back to default state when a tableView beginupdates.
                 cell.containerViewHight.constant = CGFloat(logGroupCellHeightInt - 7)
                 cell.arrowImageView.transform = CGAffineTransform.identity
                 cell.groupOfLogsTableView.isHidden = true
@@ -628,8 +632,9 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
         if diaryMode == DiaryMode.logger {
             return
         }
-        // The cell has not store data itself.
-        // They need resetting when they displayed from vanished on screen.
+        // The cells has not store data itself.
+        // So when they vanished from the screen, they lost view layout infos.
+        // That means they need to resetting view layouts, when they reappear from vanishing.
         guard let cell = cell as? LogGroupTableCell else {
             return
         }
@@ -685,7 +690,8 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if collectionView == pickerCollectionView {
+        switch collectionView {
+        case pickerCollectionView:
             var total = 0
             if let foodLogs = groupOfLogSet?.food_logs {
                 total += (foodLogs.count)
@@ -697,19 +703,85 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 total += (drugLogs.count)
             }
             return total
-        } else if collectionView == condCollectionView {
+        case condCollectionView:
             return avtCondList?.count ?? 0
-        } else {
+        default:
             fatalError()
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if collectionView == condCollectionView {
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: condCollectionCellId, for: indexPath) as? CondCollectionCell else {
+        switch collectionView {
+        case pickerCollectionView:
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: logCollectionCellId, for: indexPath) as? LogCollectionCell else {
                 fatalError()
             }
-            let avtCond = avtCondList![indexPath.item]
+            if ((groupOfLogSet!.food_logs?.count) != nil && ((groupOfLogSet!.food_logs?.count)!) > 0) {
+                let foodLog = groupOfLogSet!.food_logs!.popLast()
+                cell.bulletView.backgroundColor = UIColor.tomato
+                switch lang.currentLanguageId {
+                case LanguageId.eng: cell.nameLabel.text = foodLog!.eng_name
+                case LanguageId.kor: cell.nameLabel.text = foodLog!.kor_name
+                case LanguageId.jpn: cell.nameLabel.text = foodLog!.jpn_name
+                default: fatalError()}
+                var x_val = ""
+                if foodLog!.x_val! > 0 {
+                    x_val = "\(foodLog!.x_val!)"
+                }
+                if foodLog!.y_val == 0 {
+                    cell.quantityLabel.text = "\(x_val)"
+                } else if foodLog!.y_val == 1 {
+                    cell.quantityLabel.text = "\(x_val)¼"
+                } else if foodLog!.y_val == 2 {
+                    cell.quantityLabel.text = "\(x_val)½"
+                } else if foodLog!.y_val == 3 {
+                    cell.quantityLabel.text = "\(x_val)¾"
+                }
+            } else if ((groupOfLogSet!.act_logs?.count) != nil && ((groupOfLogSet!.act_logs?.count)!) > 0) {
+                let actLog = groupOfLogSet!.act_logs!.popLast()
+                cell.bulletView.backgroundColor = UIColor.cornflowerBlue
+                switch lang.currentLanguageId {
+                case LanguageId.eng: cell.nameLabel.text = actLog!.eng_name
+                case LanguageId.kor: cell.nameLabel.text = actLog!.kor_name
+                case LanguageId.jpn: cell.nameLabel.text = actLog!.jpn_name
+                default: fatalError()}
+                var hr = ""
+                var min = ""
+                if actLog!.x_val! > 0 {
+                    hr = "\(actLog!.x_val!)hr"
+                }
+                if actLog!.y_val != 0 {
+                    min = " \(actLog!.y_val!)min"
+                }
+                cell.quantityLabel.text = "\(hr)\(min)"
+            } else if ((groupOfLogSet!.drug_logs?.count) != nil && ((groupOfLogSet!.drug_logs?.count)!) > 0) {
+                let drugLog = groupOfLogSet!.drug_logs!.popLast()
+                cell.bulletView.backgroundColor = UIColor.hex_72e5Ea
+                switch lang.currentLanguageId {
+                case LanguageId.eng: cell.nameLabel.text = drugLog!.eng_name
+                case LanguageId.kor: cell.nameLabel.text = drugLog!.kor_name
+                case LanguageId.jpn: cell.nameLabel.text = drugLog!.jpn_name
+                default: fatalError()}
+                var x_val = ""
+                if drugLog!.x_val! > 0 {
+                    x_val = "\(drugLog!.x_val!)"
+                }
+                if drugLog!.y_val == 0 {
+                    cell.quantityLabel.text = "\(x_val)"
+                } else if drugLog!.y_val == 1 {
+                    cell.quantityLabel.text = "\(x_val)¼"
+                } else if drugLog!.y_val == 2 {
+                    cell.quantityLabel.text = "\(x_val)½"
+                } else if drugLog!.y_val == 3 {
+                    cell.quantityLabel.text = "\(x_val)¾"
+                }
+            }
+            return cell
+        case condCollectionView:
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: condCollectionCellId, for: indexPath) as? CondCollectionCell,
+                let avtCond = avtCondList?[indexPath.item] else {
+                fatalError()
+            }
             switch lang.currentLanguageId {
             case LanguageId.eng:
                 cell.titleLabel.text = avtCond.eng_name
@@ -733,7 +805,9 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 }
             case LanguageId.jpn:
                 cell.titleLabel.text = avtCond.jpn_name
-            default: fatalError()}
+            default:
+                fatalError()
+            }
             if self.isCondEditBtnTapped {
                 cell.titleLabel.textColor = UIColor.lightGray
                 cell.stackView.isHidden = true
@@ -744,88 +818,31 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 cell.removeImageView.isHidden = true
             }
             return cell
-        }
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: logCollectionCellId, for: indexPath) as? LogCollectionCell else {
+        default:
             fatalError()
         }
-        if ((groupOfLogSet!.food_logs?.count) != nil && ((groupOfLogSet!.food_logs?.count)!) > 0) {
-            let foodLog = groupOfLogSet!.food_logs!.popLast()
-            cell.bulletView.backgroundColor = UIColor.tomato
-            switch lang.currentLanguageId {
-            case LanguageId.eng: cell.nameLabel.text = foodLog!.eng_name
-            case LanguageId.kor: cell.nameLabel.text = foodLog!.kor_name
-            case LanguageId.jpn: cell.nameLabel.text = foodLog!.jpn_name
-            default: fatalError()}
-            var x_val = ""
-            if foodLog!.x_val! > 0 {
-                x_val = "\(foodLog!.x_val!)"
-            }
-            if foodLog!.y_val == 0 {
-                cell.quantityLabel.text = "\(x_val)"
-            } else if foodLog!.y_val == 1 {
-                cell.quantityLabel.text = "\(x_val)¼"
-            } else if foodLog!.y_val == 2 {
-                cell.quantityLabel.text = "\(x_val)½"
-            } else if foodLog!.y_val == 3 {
-                cell.quantityLabel.text = "\(x_val)¾"
-            }
-        } else if ((groupOfLogSet!.act_logs?.count) != nil && ((groupOfLogSet!.act_logs?.count)!) > 0) {
-            let actLog = groupOfLogSet!.act_logs!.popLast()
-            cell.bulletView.backgroundColor = UIColor.cornflowerBlue
-            switch lang.currentLanguageId {
-            case LanguageId.eng: cell.nameLabel.text = actLog!.eng_name
-            case LanguageId.kor: cell.nameLabel.text = actLog!.kor_name
-            case LanguageId.jpn: cell.nameLabel.text = actLog!.jpn_name
-            default: fatalError()}
-            var hr = ""
-            var min = ""
-            if actLog!.x_val! > 0 {
-                hr = "\(actLog!.x_val!)hr"
-            }
-            if actLog!.y_val != 0 {
-                min = " \(actLog!.y_val!)min"
-            }
-            cell.quantityLabel.text = "\(hr)\(min)"
-        } else if ((groupOfLogSet!.drug_logs?.count) != nil && ((groupOfLogSet!.drug_logs?.count)!) > 0) {
-            let drugLog = groupOfLogSet!.drug_logs!.popLast()
-            cell.bulletView.backgroundColor = UIColor.hex_72e5Ea
-            switch lang.currentLanguageId {
-            case LanguageId.eng: cell.nameLabel.text = drugLog!.eng_name
-            case LanguageId.kor: cell.nameLabel.text = drugLog!.kor_name
-            case LanguageId.jpn: cell.nameLabel.text = drugLog!.jpn_name
-            default: fatalError()}
-            var x_val = ""
-            if drugLog!.x_val! > 0 {
-                x_val = "\(drugLog!.x_val!)"
-            }
-            if drugLog!.y_val == 0 {
-                cell.quantityLabel.text = "\(x_val)"
-            } else if drugLog!.y_val == 1 {
-                cell.quantityLabel.text = "\(x_val)¼"
-            } else if drugLog!.y_val == 2 {
-                cell.quantityLabel.text = "\(x_val)½"
-            } else if drugLog!.y_val == 3 {
-                cell.quantityLabel.text = "\(x_val)¾"
-            }
-        }
-        return cell
     }
     
     // MARK: - UICollectionViewDelegate
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if collectionView == condCollectionView {
+        switch collectionView {
+        case pickerCollectionView:
+            return
+        case condCollectionView:
             if isCondEditBtnTapped {
-                selectedAvatarCondId = self.avtCondList![indexPath.item].id
+                selectedAvatarCondId = avtCondList![indexPath.item].id
                 updateAvatarCondRemove()
                 return
             }
             condLeftButtonTapped()
             let vc = CategoryViewController()
             vc.topLeftButtonType = ButtonType.close
-            vc.superTagId = self.avtCondList![indexPath.item].tag_id
+            vc.superTagId = avtCondList![indexPath.item].tag_id
             let nc = UINavigationController(rootViewController: vc)
-            self.present(nc, animated: true, completion: nil)
+            present(nc, animated: true, completion: nil)
+        default:
+            fatalError()
         }
     }
     
@@ -837,10 +854,14 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenWidth = UIScreen.main.bounds.width
-        if collectionView == condCollectionView {
+        switch collectionView {
+        case pickerCollectionView:
+            return CGSize(width: screenWidth - (screenWidth / 5), height: CGFloat(30))
+        case condCollectionView:
             return CGSize(width: screenWidth - (screenWidth / 7), height: CGFloat(45))
+        default:
+            fatalError()
         }
-        return CGSize(width: screenWidth - (screenWidth / 5), height: CGFloat(30))
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
@@ -861,26 +882,15 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        if pickerView == groupTypePickerView {
-            return 4
-        } else if pickerView == condScorePickerView {
+        switch pickerView {
+        case groupTypePickerView:
+            return numberOfGroupType
+        case condScorePickerView:
             return condScores.count
-        } else {
+        default:
             fatalError()
         }
     }
-    
-    func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
-        if pickerView == groupTypePickerView {
-            return 60
-        } else if pickerView == condScorePickerView {
-            return 40
-        } else {
-            fatalError()
-        }
-    }
-    
-    // MARK: - UIPickerViewDelegate
     
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
         if pickerView == groupTypePickerView {
@@ -902,12 +912,16 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
         }
     }
     
+    // MARK: - UIPickerViewDelegate
+    
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        if pickerView == groupTypePickerView {
+        switch pickerView {
+        case groupTypePickerView:
             groupType = LogGroupType.nighttime - row
             if let logGroupDict = logGroupDictTwoDimArr[dayOfYear!] {
+                // Case found a logGroup in the section.
                 if let logGroup = logGroupDict[groupType!] {
-                    // Case pick existing logGroup
+                    // Case found some groupOfLogs in the logGroup.
                     selectedLogGroupId = logGroup.id
                     selectedLogGroup = logGroup
                     loadGroupOfLogs { (groupOfLogSet) in
@@ -915,24 +929,35 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
                         self.afterLoadGroupOfLogs(collectionViewHeight)
                     }
                 } else {
-                    // Case there is any groupOfLogs in picked logGroup.
+                    // Case no groupOfLogs are found in the logGroup.
                     groupOfLogSet = nil
                     selectedLogGroupId = nil
                     selectedLogGroup = nil
                     pickerContainerTransition(pickerCollectionHeightInt)
                 }
             } else {
-                // Case there is any logGroup in section(date).
+                // Case no logGroups are found in the section.
                 groupOfLogSet = nil
                 selectedLogGroupId = nil
                 selectedLogGroup = nil
                 pickerContainerTransition(pickerCollectionHeightInt)
             }
-        } else if pickerView == condScorePickerView {
+        case condScorePickerView:
             selectedCondPickerIdx = row
             selectedCondScore = condScores[9 - row]
             condScorePickerView.reloadAllComponents()
-        } else {
+        default:
+            fatalError()
+        }
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+        switch pickerView {
+        case groupTypePickerView:
+            return CGFloat(groupTypePickerRowHeightInt)
+        case condScorePickerView:
+            return CGFloat(condScorePickerRowHeightInt)
+        default:
             fatalError()
         }
     }
@@ -989,7 +1014,7 @@ extension DiaryViewController {
         }()
         dateFormatter = {
             let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: getUserCountryCode())  // TODO ko_kr
+            formatter.locale = Locale(identifier: getUserCountryCode())
             formatter.dateFormat = "yyyy-MM-dd"
             return formatter
         }()
@@ -1107,7 +1132,6 @@ extension DiaryViewController {
         refreshControler = {
             let _refresh = UIRefreshControl()
             _refresh.tintColor = UIColor.lightSteelBlue
-//            _refresh.attributedTitle = NSAttributedString(string: "Pull to refresh")
             _refresh.addTarget(self, action: #selector(refreshLogGroupTableView(sender:)), for: UIControl.Event.valueChanged)
             return _refresh
         }()
@@ -1130,6 +1154,10 @@ extension DiaryViewController {
         condCollectionView.delegate = self
         groupTypePickerView.dataSource = self
         groupTypePickerView.delegate = self
+        
+        selectedWeekOfYear = Calendar.current.component(.weekOfYear, from: calendarView.today!)
+        selectedCalScope = CalScope.week
+        groupType = LogGroupType.morning
         
         // Setup subviews
         view.addSubview(logGroupTableView)
@@ -1158,7 +1186,6 @@ extension DiaryViewController {
         condContainerView.addSubview(condRightButton)
         
         // Setup constraints
-        // loadingImageView, blindView
         loadingImageView.widthAnchor.constraint(equalToConstant: 62).isActive = true
         loadingImageView.heightAnchor.constraint(equalToConstant: 62).isActive = true
         loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
@@ -1245,10 +1272,6 @@ extension DiaryViewController {
         logGroupTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
         logGroupTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
         logGroupTableView.panGestureRecognizer.require(toFail: scopeGesture)
-        
-        selectedWeekOfYear = Calendar.current.component(.weekOfYear, from: calendarView.today!)
-        selectedCalScope = CalScope.week
-        groupType = LogGroupType.morning
     }
     
     private func updateLogGroupTable(completion: (() -> Void)? = nil) {
@@ -1305,10 +1328,8 @@ extension DiaryViewController {
     
     private func loadLogGroups() {
         let selectedDateArr = dateFormatter.string(from: calendarView.currentPage).components(separatedBy: "-")
-        let yearNumber = selectedDateArr[0]
-        let monthNumber = Int(selectedDateArr[1])!
         let service = Service(lang: lang)
-        service.getLogGroups(yearNumber: yearNumber, monthNumber: monthNumber, weekOfYear: selectedWeekOfYear, popoverAlert: { message in
+        service.getLogGroups(yearNumber: selectedDateArr[0], monthNumber: Int(selectedDateArr[1])!, weekOfYear: selectedWeekOfYear, popoverAlert: { message in
             self.retryFunction = self.loadLogGroups
             self.alertError(message)
         }, tokenRefreshCompletion: {
@@ -1349,7 +1370,7 @@ extension DiaryViewController {
     
     private func loadGroupOfLogs(_ completion: @escaping (CustomModel.GroupOfLogSet) -> Void) {
         let service = Service(lang: lang)
-        service.getGroupOfLogs(self.selectedLogGroupId!, popoverAlert: { (message) in
+        service.getGroupOfLogs(logGroupId: self.selectedLogGroupId!, popoverAlert: { (message) in
             self.retryFunctionName = "loadGroupOfLogs"
             self.retryCompletion = completion
             self.pickerContainerView.isHidden = true
@@ -1387,7 +1408,7 @@ extension DiaryViewController {
         }
     }
     
-    private func postAGroupOfLog() {
+    private func createGroupOfALog() {
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -1410,11 +1431,11 @@ extension DiaryViewController {
         }
         let service = Service(lang: lang)
         service.postASingleLog(params: params, popoverAlert: { (message) in
-            self.retryFunction = self.postAGroupOfLog
+            self.retryFunction = self.createGroupOfALog
             self.pickerContainerView.isHidden = true
             self.alertError(message)
         }, tokenRefreshCompletion: {
-            self.postAGroupOfLog()
+            self.createGroupOfALog()
         }) {
             UIView.transition(with: self.loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.pickerContainerView.isHidden = true
@@ -1430,12 +1451,8 @@ extension DiaryViewController {
     }
     
     private func updateLogGroupCondScore() {
-        var params = Parameters()
-        params = [
-            "cond_score": selectedCondScore,
-        ]
         let service = Service(lang: lang)
-        service.putLogGroupCondScore(selectedLogGroupId!, params: params, popoverAlert: { (message) in
+        service.putLogGroup(logGroupId: selectedLogGroupId!, option: LogGroupOption.score, score: selectedCondScore, popoverAlert: { (message) in
             self.retryFunction = self.updateLogGroupCondScore
             self.alertError(message)
         }, tokenRefreshCompletion: {
@@ -1453,10 +1470,10 @@ extension DiaryViewController {
             _logGroupId = self.logGroupSectTwoDimArr[editedCellIdxPath!.section][editedCellIdxPath!.row].logGroup.id
         }
         let service = Service(lang: lang)
-        service.putLogGroupRemove(_logGroupId, popoverAlert: { (message) in
+        service.putLogGroup(logGroupId: _logGroupId, option: LogGroupOption.remove, score: nil, popoverAlert: { (message) in
             self.retryFunction = self.updateLogGroupRemove
             self.alertError(message)
-        }, tokenRefreshCompletion: { 
+        }, tokenRefreshCompletion: {
             self.updateLogGroupRemove()
         }) {
             self.isLogGroupTableEdited = true
@@ -1466,7 +1483,7 @@ extension DiaryViewController {
     
     private func updateAvatarCondRemove() {
         let service = Service(lang: lang)
-        service.putAvatarCond(self.selectedAvatarCondId!, popoverAlert: { (message) in
+        service.putAvatarCond(avatarCondId: self.selectedAvatarCondId!, popoverAlert: { (message) in
             self.retryFunction = self.updateAvatarCondRemove
             self.alertError(message)
         }, tokenRefreshCompletion: {

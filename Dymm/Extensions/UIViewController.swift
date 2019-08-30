@@ -11,16 +11,6 @@ import UIKit
 
 extension UIViewController {
     
-    // MARK: - Get device info methods
-    
-    func getDeviceLanguage() -> Int {
-        return LangHelper.getLanguageId(alpha2: String(Locale.preferredLanguages[0].prefix(2)))
-    }
-    
-    func getUserCountryCode() -> String {
-        return ((Locale.current as NSLocale).object(forKey: .countryCode) as? String)!
-    }
-    
     // MARK: - Get value methods
     
     func getButtonWidth() -> CGFloat {

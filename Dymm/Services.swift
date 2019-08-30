@@ -17,7 +17,7 @@ struct Service {
         self.lang = lang
     }
     
-    // MARK: - Service helpers
+    // MARK: - Helpers
     
     func badRequest(_ responseData: Data) {
         guard let decodedData = try? self.decoder.decode(BadRequest.self, from: responseData) else {
@@ -116,153 +116,6 @@ struct Service {
     
     // MARK: - GET services
     
-    func getBannerList(popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ banners: [BaseModel.Banner]) -> Void) {
-        Alamofire.request("\(URI.host)\(URI.banner)")
-            .validate(contentType: ["application/json"])
-            .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                }
-                switch statusCode {
-                case 200:
-                    guard let decodedData = try? JSONDecoder().decode(Ok<[BaseModel.Banner]>.self, from: responseData) else {
-                        fatalError()
-                    }
-                    guard let data = decodedData.data else {
-                        fatalError()
-                    }
-                    completion(data)
-                case 400:
-                    self.badRequest(responseData)
-                default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchTagSets()")
-                    return
-                }
-        }
-    }
-    
-    func getTagSetList(tagId: Int, sortType: String, pageNum: Int? = nil, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
-        var url = "\(URI.host)\(URI.tag)/\(tagId)/set/\(sortType)"
-        if let _pageNum = pageNum {
-            if let avatarId = UserDefaults.standard.getAvatarId() {
-                url = "\(URI.host)\(URI.tag)/\(tagId)/set/\(sortType)/avt/\(avatarId)/page/\(_pageNum)"
-            } else {
-                url = "\(URI.host)\(URI.tag)/\(tagId)/set/\(sortType)/page/\(_pageNum)"
-            }
-        }
-        
-        Alamofire.request(url)
-            .validate(contentType: ["application/json"])
-            .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                }
-                switch statusCode {
-                case 200:
-                    guard let decodedData = try? JSONDecoder().decode(Ok<CustomModel.TagSet>.self, from: responseData) else {
-                        fatalError()
-                    }
-                    guard let data = decodedData.data else {
-                        fatalError()
-                    }
-                    completion(data)
-                case 400:
-                    self.badRequest(responseData)
-                default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchTagSets()")
-                    return
-                }
-        }
-    }
-    
-    func getProfile(popoverAlert: @escaping (_ message: String) -> Void, emailNotConfirmed: @escaping (_ email: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ avatarAndFacts: CustomModel.Profile) -> Void) {
-        guard let accessToken = UserDefaults.standard.getAccessToken() else {
-            UserDefaults.standard.setIsSignIn(value: false)
-            fatalError("UserDefaults.standard.getAccessToken()")
-        }
-        guard let avatarId = UserDefaults.standard.getAvatarId() else {
-            UserDefaults.standard.setIsSignIn(value: false)
-            fatalError("UserDefaults.standard.getAvatarId()")
-        }
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(accessToken)"
-        ]
-        Alamofire.request("\(URI.host)\(URI.avatar)/\(avatarId)/profile", method: .get, headers: headers)
-            .validate(contentType: ["application/json"])
-            .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                }
-                switch statusCode {
-                case 200:
-                    guard let decodedData = try? self.decoder.decode(Ok<CustomModel.Profile>.self, from: responseData) else {
-                        fatalError("jsonDecoder.decode(Ok<UserModel.Profile>.self, from: responseData)")
-                    }
-                    guard let data = decodedData.data else {
-                        fatalError("decodedData.data")
-                    }
-                    completion(data)
-                case 400:
-                    self.badRequest(responseData)
-                case 401:
-                    guard let decodedData = try? self.decoder.decode(Unauthorized.self, from: responseData) else {
-                        fatalError("Decode \(Unauthorized.self) failed")
-                    }
-                    emailNotConfirmed(decodedData.message)
-                    return
-                case 403:
-                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
-                        tokenRefreshCompletion()
-                    }
-                    return
-                default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchProfile()")
-                    return
-                }
-        }
-    }
-    
-    func getProfileTagSets(tagId: Int, isSelected: Bool, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ profileTagSet: CustomModel.ProfileTagSet) -> Void) {
-        guard let accessToken = UserDefaults.standard.getAccessToken() else {
-            UserDefaults.standard.setIsSignIn(value: false)
-            fatalError()
-        }
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(accessToken)"
-        ]
-        Alamofire.request("\(URI.host)\(URI.tag)/\(tagId)/set/match/\(isSelected)", method: .get, headers: headers)
-            .validate(contentType: ["application/json"])
-            .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                }
-                switch statusCode {
-                case 200:
-                    guard let decodedData = try? self.decoder.decode(Ok<CustomModel.ProfileTagSet>.self, from: responseData) else {
-                        fatalError()
-                    }
-                    guard let data = decodedData.data else {
-                        fatalError()
-                    }
-                    completion(data)
-                case 400:
-                    self.badRequest(responseData)
-                case 403:
-                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
-                        tokenRefreshCompletion()
-                    }
-                    return
-                default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchSetOfFacts()")
-                    return
-                }
-        }
-    }
-    
     func getAvatar(popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ data: BaseModel.Avatar) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
@@ -300,6 +153,54 @@ struct Service {
                     return
                 default:
                     self.unexpectedResponse(statusCode, responseData, "validateUser()")
+                    return
+                }
+        }
+    }
+    
+    func getProfile(popoverAlert: @escaping (_ message: String) -> Void, emailNotConfirmed: @escaping (_ email: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ avatarAndFacts: CustomModel.Profile) -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        guard let avatarId = UserDefaults.standard.getAvatarId() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)"
+        ]
+        Alamofire.request("\(URI.host)\(URI.avatar)/\(avatarId)/profile", method: .get, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<CustomModel.Profile>.self, from: responseData) else {
+                        fatalError("jsonDecoder.decode(Ok<UserModel.Profile>.self, from: responseData)")
+                    }
+                    guard let data = decodedData.data else {
+                        fatalError("decodedData.data")
+                    }
+                    completion(data)
+                case 400:
+                    self.badRequest(responseData)
+                case 401:
+                    guard let decodedData = try? self.decoder.decode(Unauthorized.self, from: responseData) else {
+                        fatalError("Decode \(Unauthorized.self) failed")
+                    }
+                    emailNotConfirmed(decodedData.message)
+                    return
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "fetchProfile()")
                     return
                 }
         }
@@ -359,11 +260,11 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        var params = "\(avatarId)/\(yearNumber)/\(monthNumber)"
+        var url = "\(URI.host)\(URI.avatar)/\(avatarId)/group/\(yearNumber)/\(monthNumber)"
         if let weekOfYear = weekOfYear {
-            params += "/\(weekOfYear)"
+            url += "/\(weekOfYear)"
         }
-        Alamofire.request("\(URI.host)\(URI.log)/group/\(params)", headers: headers)
+        Alamofire.request(url, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -393,7 +294,7 @@ struct Service {
         }
     }
     
-    func getGroupOfLogs(_ logGroupId: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.GroupOfLogSet) -> Void) {
+    func getGroupOfLogs(logGroupId: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.GroupOfLogSet) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -401,7 +302,7 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        Alamofire.request("\(URI.host)\(URI.log)/group/\(logGroupId)/tag-log", headers: headers)
+        Alamofire.request("\(URI.host)\(URI.avatar)/group/\(logGroupId)/log", headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -431,10 +332,108 @@ struct Service {
         }
     }
     
+    func getBannerList(popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ banners: [BaseModel.Banner]) -> Void) {
+        Alamofire.request("\(URI.host)\(URI.banner)")
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? JSONDecoder().decode(Ok<[BaseModel.Banner]>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    guard let data = decodedData.data else {
+                        fatalError()
+                    }
+                    completion(data)
+                case 400:
+                    self.badRequest(responseData)
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "fetchTagSets()")
+                    return
+                }
+        }
+    }
+    
+    func getTagSetList(tagId: Int, sortType: String, pageNum: Int? = nil, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
+        var url = "\(URI.host)\(URI.tag)/\(tagId)/set/\(sortType)"
+        if let _pageNum = pageNum {
+            if let avatarId = UserDefaults.standard.getAvatarId() {
+                url += "/avt/\(avatarId)/page/\(_pageNum)"
+            } else {
+                url += "/page/\(_pageNum)"
+            }
+        }
+        Alamofire.request(url)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? JSONDecoder().decode(Ok<CustomModel.TagSet>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    guard let data = decodedData.data else {
+                        fatalError()
+                    }
+                    completion(data)
+                case 400:
+                    self.badRequest(responseData)
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "fetchTagSets()")
+                    return
+                }
+        }
+    }
+    
+    func getProfileTagSets(tagId: Int, isSelected: Bool, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ profileTagSet: CustomModel.ProfileTagSet) -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)"
+        ]
+        Alamofire.request("\(URI.host)\(URI.tag)/\(tagId)/set/match/\(isSelected)", method: .get, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<CustomModel.ProfileTagSet>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    guard let data = decodedData.data else {
+                        fatalError()
+                    }
+                    completion(data)
+                case 400:
+                    self.badRequest(responseData)
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "fetchSetOfFacts()")
+                    return
+                }
+        }
+    }
+    
     // MARK: - POST services
     
-    func authExistingAvatar(_ parameters: Parameters, unauthorized: @escaping (_ pattern: Int) -> Void, popoverAlert: @escaping (_ message: String) -> Void, completion: @escaping (_ auth: CustomModel.Auth) -> Void) {
-        Alamofire.request("\(URI.host)\(URI.avatar)", method: .post, parameters: parameters, encoding: JSONEncoding.default)
+    func authExistingAvatar(params: Parameters, unauthorized: @escaping (_ pattern: Int) -> Void, popoverAlert: @escaping (_ message: String) -> Void, completion: @escaping (_ auth: CustomModel.Auth) -> Void) {
+        Alamofire.request("\(URI.host)\(URI.avatar)/auth", method: .post, parameters: params, encoding: JSONEncoding.default)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -464,8 +463,8 @@ struct Service {
         }
     }
     
-    func createNewAvatar(_ parameters: Parameters, unauthorized: @escaping (_ pattern: Int) -> Void, popoverAlert: @escaping (_ message: String) -> Void, completion: @escaping (_ auth: CustomModel.Auth) -> Void) {
-        Alamofire.request("\(URI.host)\(URI.avatar)/create", method: .post, parameters: parameters, encoding: JSONEncoding.default)
+    func createNewAvatar(params: Parameters, unauthorized: @escaping (_ pattern: Int) -> Void, popoverAlert: @escaping (_ message: String) -> Void, completion: @escaping (_ auth: CustomModel.Auth) -> Void) {
+        Alamofire.request("\(URI.host)\(URI.avatar)/create", method: .post, parameters: params, encoding: JSONEncoding.default)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -495,11 +494,7 @@ struct Service {
         }
     }
     
-    func sendMailConfLinkAgain(popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping () -> Void) {
-        guard let avatarId = UserDefaults.standard.getAvatarId() else {
-            UserDefaults.standard.setIsSignIn(value: false)
-            fatalError()
-        }
+    func postAvatarCond(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             print("Load UserDefaults.standard.getAccessToken() failed")
             return
@@ -507,7 +502,115 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        Alamofire.request("\(URI.host)\(URI.mail)/conf-link/\(avatarId)", method: .post, encoding: JSONEncoding.default, headers: headers)
+        Alamofire.request("\(URI.host)\(URI.avatar)/cond", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<String>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    print(decodedData.message)
+                    completion()
+                case 400:
+                    self.badRequest(responseData)
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    return
+                }
+        }
+    }
+    
+    func postABookmark(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            print("Load UserDefaults.standard.getAccessToken() failed")
+            return
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)",
+        ]
+        Alamofire.request("\(URI.host)\(URI.avatar)/bookmark", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<String>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    print(decodedData.message)
+                    completion()
+                case 400:
+                    self.badRequest(responseData)
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    return
+                }
+        }
+    }
+    
+    func postASingleLog(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            print("Load UserDefaults.standard.getAccessToken() failed")
+            return
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)",
+        ]
+        Alamofire.request("\(URI.host)\(URI.avatar)/log", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<String>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    print(decodedData.message)
+                    completion()
+                case 400:
+                    self.badRequest(responseData)
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    return
+                }
+        }
+    }
+    
+    func sendMailConfLinkAgain(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping () -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            print("Load UserDefaults.standard.getAccessToken() failed")
+            return
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)",
+        ]
+        Alamofire.request("\(URI.host)\(URI.mail)/conf-link", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -560,121 +663,9 @@ struct Service {
         }
     }
     
-    func postASingleLog(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
-        guard let accessToken = UserDefaults.standard.getAccessToken() else {
-            print("Load UserDefaults.standard.getAccessToken() failed")
-            return
-        }
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(accessToken)",
-        ]
-        Alamofire.request("\(URI.host)\(URI.log)", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
-            .validate(contentType: ["application/json"])
-            .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                }
-                switch statusCode {
-                case 200:
-                    guard let decodedData = try? self.decoder.decode(Ok<String>.self, from: responseData) else {
-                        fatalError()
-                    }
-                    print(decodedData.message)
-                    completion()
-                case 400:
-                    self.badRequest(responseData)
-                case 403:
-                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
-                        tokenRefreshCompletion()
-                    }
-                    return
-                default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
-                    return
-                }
-        }
-    }
-    
-    func postACondLog(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
-        guard let accessToken = UserDefaults.standard.getAccessToken() else {
-            print("Load UserDefaults.standard.getAccessToken() failed")
-            return
-        }
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(accessToken)",
-        ]
-        Alamofire.request("\(URI.host)\(URI.log)/cond", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
-            .validate(contentType: ["application/json"])
-            .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                }
-                switch statusCode {
-                case 200:
-                    guard let decodedData = try? self.decoder.decode(Ok<String>.self, from: responseData) else {
-                        fatalError()
-                    }
-                    print(decodedData.message)
-                    completion()
-                case 400:
-                    self.badRequest(responseData)
-                case 403:
-                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
-                        tokenRefreshCompletion()
-                    }
-                    return
-                default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
-                    return
-                }
-        }
-    }
-    
-    func postABookmark(tag_type: Int, sub_tag_id: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
-        guard let accessToken = UserDefaults.standard.getAccessToken() else {
-            print("Load UserDefaults.standard.getAccessToken() failed")
-            return
-        }
-        guard let avatarId = UserDefaults.standard.getAvatarId() else {
-            UserDefaults.standard.setIsSignIn(value: false)
-            fatalError()
-        }
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(accessToken)",
-        ]
-        Alamofire.request("\(URI.host)\(URI.avatar)/\(avatarId)/bookmark/\(tag_type)/\(sub_tag_id)", method: .post, encoding: JSONEncoding.default, headers: headers)
-            .validate(contentType: ["application/json"])
-            .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                }
-                switch statusCode {
-                case 200:
-                    guard let decodedData = try? self.decoder.decode(Ok<String>.self, from: responseData) else {
-                        fatalError()
-                    }
-                    print(decodedData.message)
-                    completion()
-                case 400:
-                    self.badRequest(responseData)
-                case 403:
-                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
-                        tokenRefreshCompletion()
-                    }
-                    return
-                default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
-                    return
-                }
-        }
-    }
-    
     // MARK: - PUT services
     
-    func putProfileTag(profile_tag_id: Int, new_tag_id: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+    func putAvatarInfo(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ newInfoTxt: String) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -682,7 +673,40 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)"
         ]
-        Alamofire.request("\(URI.host)\(URI.profile)/\(profile_tag_id)/\(new_tag_id)", method: .put, headers: headers)
+        Alamofire.request("\(URI.host)\(URI.avatar)", method: .put, parameters: params, encoding: JSONEncoding.default, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    completion(params["new_info"] as! String)
+                case 400:
+                    self.badRequest(responseData)
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    return
+                }
+        }
+    }
+    
+    
+    func putProfileTag(profile_tag_id: Int, tag_id: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)"
+        ]
+        Alamofire.request("\(URI.host)\(URI.avatar)/profile/\(profile_tag_id)/\(tag_id)", method: .put, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -706,156 +730,7 @@ struct Service {
         }
     }
     
-    func putAvatarInfo(target: Int, newInfoTxt: String, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ newInfoTxt: String) -> Void) {
-        guard let accessToken = UserDefaults.standard.getAccessToken() else {
-            UserDefaults.standard.setIsSignIn(value: false)
-            fatalError()
-        }
-        guard let avatarId = UserDefaults.standard.getAvatarId() else {
-            UserDefaults.standard.setIsSignIn(value: false)
-            fatalError()
-        }
-        let params: Parameters = [
-            "avatar_id": avatarId,
-            "target": target,
-            "new_info": newInfoTxt
-            ]
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(accessToken)"
-        ]
-        Alamofire.request("\(URI.host)\(URI.avatar)", method: .put, parameters: params, encoding: JSONEncoding.default, headers: headers)
-            .validate(contentType: ["application/json"])
-            .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                }
-                switch statusCode {
-                case 200:
-                    completion(newInfoTxt)
-                case 400:
-                    self.badRequest(responseData)
-                case 403:
-                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
-                        tokenRefreshCompletion()
-                    }
-                    return
-                default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
-                    return
-                }
-        }
-    }
-    
-    func putLogGroupCondScore(_ logGroupId: Int, params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
-        guard let accessToken = UserDefaults.standard.getAccessToken() else {
-            UserDefaults.standard.setIsSignIn(value: false)
-            fatalError()
-        }
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(accessToken)",
-        ]
-        Alamofire.request("\(URI.host)\(URI.log)/group/\(logGroupId)/cond-score", method: .put, parameters: params, encoding: JSONEncoding.default, headers: headers)
-            .validate(contentType: ["application/json"])
-            .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                }
-                switch statusCode {
-                case 200:
-                    guard let decodedData = try? self.decoder.decode(Ok<String>.self, from: responseData) else {
-                        fatalError()
-                    }
-                    print(decodedData.message)
-                    completion()
-                case 400:
-                    self.badRequest(responseData)
-                case 403:
-                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
-                        tokenRefreshCompletion()
-                    }
-                    return
-                default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
-                    return
-                }
-        }
-    }
-    
-    func putLogGroupRemove(_ logGroupId: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
-        guard let accessToken = UserDefaults.standard.getAccessToken() else {
-            UserDefaults.standard.setIsSignIn(value: false)
-            fatalError()
-        }
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(accessToken)",
-        ]
-        Alamofire.request("\(URI.host)\(URI.log)/group/\(logGroupId)/remove", method: .put, encoding: JSONEncoding.default, headers: headers)
-            .validate(contentType: ["application/json"])
-            .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                }
-                switch statusCode {
-                case 200:
-                    guard let decodedData = try? self.decoder.decode(Ok<String>.self, from: responseData) else {
-                        fatalError()
-                    }
-                    print(decodedData.message)
-                    completion()
-                case 400:
-                    self.badRequest(responseData)
-                case 403:
-                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
-                        tokenRefreshCompletion()
-                    }
-                    return
-                default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
-                    return
-                }
-        }
-    }
-    
-    func putGroupOfALog(_ tagLogId: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
-        guard let accessToken = UserDefaults.standard.getAccessToken() else {
-            UserDefaults.standard.setIsSignIn(value: false)
-            fatalError()
-        }
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(accessToken)",
-        ]
-        Alamofire.request("\(URI.host)\(URI.log)/\(tagLogId)", method: .put, encoding: JSONEncoding.default, headers: headers)
-            .validate(contentType: ["application/json"])
-            .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                }
-                switch statusCode {
-                case 200:
-                    guard let decodedData = try? self.decoder.decode(Ok<String>.self, from: responseData) else {
-                        fatalError()
-                    }
-                    print(decodedData.message)
-                    completion()
-                case 400:
-                    self.badRequest(responseData)
-                case 403:
-                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
-                        tokenRefreshCompletion()
-                    }
-                    return
-                default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
-                    return
-                }
-        }
-    }
-    
-    func putAvatarCond(_ avatarCondId: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+    func putAvatarCond(avatarCondId: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -904,6 +779,82 @@ struct Service {
             "Authorization": "Bearer \(accessToken)",
         ]
         Alamofire.request("\(URI.host)\(URI.avatar)/\(avatarId)/bookmark/\(bookmark_id)", method: .put, encoding: JSONEncoding.default, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<String>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    print(decodedData.message)
+                    completion()
+                case 400:
+                    self.badRequest(responseData)
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    return
+                }
+        }
+    }
+    
+    func putLogGroup(logGroupId: Int, option: String, score: Int?, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)",
+        ]
+        var url = "\(URI.host)\(URI.avatar)/group/\(logGroupId)/\(option)"
+        if let _score = score {
+            url += "/\(_score)"
+        }
+        Alamofire.request(url, method: .put, encoding: JSONEncoding.default, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<String>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    print(decodedData.message)
+                    completion()
+                case 400:
+                    self.badRequest(responseData)
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    return
+                }
+        }
+    }
+    
+    func putGroupOfALog(tagLogId: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)",
+        ]
+        Alamofire.request("\(URI.host)\(URI.avatar)/log/\(tagLogId)", method: .put, encoding: JSONEncoding.default, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {

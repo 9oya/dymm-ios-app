@@ -8,12 +8,6 @@
 
 import Foundation
 
-struct LanguageId {
-    static let eng = 30
-    static let kor = 35
-    static let jpn = 34
-}
-
 struct LangPack {
     var currentLanguageId: Int!
     

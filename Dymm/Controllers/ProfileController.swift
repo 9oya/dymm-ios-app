@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Alamofire
 
 let topBarHeightInt = 35
 
@@ -754,7 +755,7 @@ extension ProfileViewController {
     private func updateProfileTag() {
         let profileTagId = profile!.profile_tags[selectedCollectionItem!].id
         let service = Service(lang: lang)
-        service.putProfileTag(profile_tag_id: profileTagId, new_tag_id: pickedTag!.id, popoverAlert: { (message) in
+        service.putProfileTag(profile_tag_id: profileTagId, tag_id: pickedTag!.id, popoverAlert: { (message) in
             self.retryFunction = self.updateProfileTag
             self.alertError(message)
         }, tokenRefreshCompletion: {
@@ -770,8 +771,17 @@ extension ProfileViewController {
     }
     
     private func updateAvatarInfo() {
+        guard let avatarId = UserDefaults.standard.getAvatarId() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let params: Parameters = [
+            "avatar_id": avatarId,
+            "target": self.avatarInfoTarget!,
+            "new_info": self.newInfoStr!
+        ]
         let service = Service(lang: lang)
-        service.putAvatarInfo(target: self.avatarInfoTarget!, newInfoTxt: self.newInfoStr!, popoverAlert: { (message) in
+        service.putAvatarInfo(params: params, popoverAlert: { (message) in
             self.retryFunction = self.updateAvatarInfo
             self.alertError(message)
         }, tokenRefreshCompletion: {
@@ -789,8 +799,15 @@ extension ProfileViewController {
             self.sendAgainButton.isHidden = true
         })
         mailConfMsgLabel.startRotating()
+        guard let avatarId = UserDefaults.standard.getAvatarId() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let params: Parameters = [
+            "avatar_id": avatarId
+        ]
         let service = Service(lang: lang)
-        service.sendMailConfLinkAgain(popoverAlert: { (message) in
+        service.sendMailConfLinkAgain(params: params, popoverAlert: { (message) in
             self.retryFunction = self.sendMailAgain
             self.alertError(message)
         }) {
