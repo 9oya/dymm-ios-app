@@ -51,6 +51,8 @@ class AuthViewController: UIViewController {
     var lastEditedTxtField = 0
     var emailToFind: String?
     var verifCode: String?
+    var newPassword: String?
+    var confPassword: String?
     var isEmailFound = true
     var isCodeCorrect = true
     
@@ -73,7 +75,7 @@ class AuthViewController: UIViewController {
         present(alertController, animated: true, completion: nil)
     }
     
-    @objc func findEmailAlert() {
+    @objc func alertFindEmail() {
         var title = lang.titleForgotPasswordAlert
         if !isEmailFound {
             title = lang.titleEmailNotFound
@@ -102,7 +104,7 @@ class AuthViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    @objc func foundEmailComplAlert() {
+    @objc func alertFoundEmailCompl() {
         let alert = UIAlertController(title: lang.titleEmailFound(emailToFind!), message: "\n" + lang.msgMailSendValidCode(emailToFind!), preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleSend, style: .default) { _ in
             self.sendVerificationCodeToMail()
@@ -113,10 +115,10 @@ class AuthViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    @objc func verificationCodeAlert() {
+    @objc func alertVerificationCode() {
         var title = lang.titleEmailValidCode(emailToFind!)
         if !isCodeCorrect {
-            title = lang.titleEmailValidCode(emailToFind!)
+            title = lang.titleIncorrectEmailCode
         }
         let alert = UIAlertController(title: title, message: "\n" + lang.msgValidCodeEnter, preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleSubmit, style: .default) { _ in
@@ -139,6 +141,56 @@ class AuthViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func alertChangePassword() {
+        let alert = UIAlertController(title: lang.titlePasswordChange, message: "\n" + lang.msgShortPassword, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.titleSubmit, style: .default) { _ in
+            self.changePassword()
+        }
+        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in
+            self.isCodeCorrect = true
+        }
+        alert.addTextField { textField in
+            textField.autocapitalizationType = .none
+            textField.keyboardType = .default
+            textField.textContentType = .password
+            textField.isSecureTextEntry = true
+            textField.placeholder = self.lang.titlePasswordNew
+            confirmAction.isEnabled = false
+            NotificationCenter.default.addObserver(forName: UITextField.textDidChangeNotification, object: textField, queue: OperationQueue.main) { (notification) in
+                self.newPassword = textField.text!
+                if self.newPassword!.count >= 8 && self.newPassword == self.confPassword {
+                    confirmAction.isEnabled = true
+                }
+            }
+        }
+        alert.addTextField { textField in
+            textField.autocapitalizationType = .none
+            textField.keyboardType = .default
+            textField.textContentType = .newPassword
+            textField.isSecureTextEntry = true
+            textField.placeholder = self.lang.titlePasswordConfirm
+            confirmAction.isEnabled = false
+            NotificationCenter.default.addObserver(forName: UITextField.textDidChangeNotification, object: textField, queue: OperationQueue.main) { (notification) in
+                self.confPassword = textField.text!
+                if self.newPassword!.count >= 8 && self.newPassword == self.confPassword {
+                    confirmAction.isEnabled = true
+                }
+            }
+        }
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func alertChangePasswordCompl() {
+        let alert = UIAlertController(title: lang.titlePasswordChangeCompl, message: "\n" + lang.msgChangePasswordCompl, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
+            return
+        }
+        alert.addAction(confirmAction)
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -204,27 +256,27 @@ extension AuthViewController: UITextFieldDelegate {
         switch textField {
         case firstNameTextField:
             if lastEditedTxtField < 3 {
-                lastEditedTxtField = 0
                 return
             }
+            lastEditedTxtField = 0
             UIView.animate(withDuration: 0.7) {
                 self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
                 self.view.layoutIfNeeded()
             }
         case lastNameTextField:
             if lastEditedTxtField < 3 {
-                lastEditedTxtField = 1
                 return
             }
+            lastEditedTxtField = 1
             UIView.animate(withDuration: 0.7) {
                 self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
                 self.view.layoutIfNeeded()
             }
         case emailTextField:
             if lastEditedTxtField < 3 {
-                lastEditedTxtField = 2
                 return
             }
+            lastEditedTxtField = 2
             if isSignUpForm {
                 UIView.animate(withDuration: 0.7) {
                     self.formContainerTop.constant = CGFloat(topBarHeightInt + marginInt)
@@ -311,7 +363,7 @@ extension AuthViewController {
         topBarView = getAddtionalTopBarView()
         forgotButton = getBasicTextButton(UIColor.tomato)
         forgotButton.setTitle(lang.titleForgotPassword, for: .normal)
-        forgotButton.addTarget(self, action: #selector(findEmailAlert), for: .touchUpInside)
+        forgotButton.addTarget(self, action: #selector(alertFindEmail), for: .touchUpInside)
         closeButton = getCloseButton()
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         formGrayLineView = getGrayLineView()
@@ -341,6 +393,7 @@ extension AuthViewController {
             _textField.placeholder = lang.titleFirstName
             _textField.title = lang.titleFirstName
             _textField.autocapitalizationType = .words
+            _textField.autocorrectionType = .no
             _textField.keyboardType = .default
             _textField.isHidden = true
             _textField.translatesAutoresizingMaskIntoConstraints = false
@@ -354,6 +407,7 @@ extension AuthViewController {
             _textField.placeholder = lang.titleLastName
             _textField.title = lang.titleLastName
             _textField.autocapitalizationType = .words
+            _textField.autocorrectionType = .no
             _textField.isHidden = true
             _textField.translatesAutoresizingMaskIntoConstraints = false
             return _textField
@@ -367,6 +421,7 @@ extension AuthViewController {
             _textField.title = lang.titleEmail
             _textField.textContentType = .emailAddress
             _textField.keyboardType = .emailAddress
+            _textField.autocorrectionType = .no
             _textField.autocapitalizationType = .none
             _textField.translatesAutoresizingMaskIntoConstraints = false
             return _textField
@@ -388,8 +443,8 @@ extension AuthViewController {
             _textField.font = .systemFont(ofSize: 15, weight: .light)
             _textField.selectedTitleColor = UIColor.black
             _textField.selectedLineColor = UIColor.black
-            _textField.placeholder = lang.titleConfirmPassword
-            _textField.title = lang.titleConfirmPassword
+            _textField.placeholder = lang.titlePasswordConfirm
+            _textField.title = lang.titlePasswordConfirm
             _textField.isSecureTextEntry = true
             _textField.textContentType = .password
             _textField.isHidden = true
@@ -670,15 +725,15 @@ extension AuthViewController {
             "email": emailToFind!
         ]
         let service = Service(lang: lang)
-        service.findEmailAddress(params: params, unauthorized: {
+        service.solveAvatarEmail(option: MailOption.find,params: params, unauthorized: {
             self.isEmailFound = false
-            self.findEmailAlert()
+            self.alertFindEmail()
         }, popoverAlert: { (message) in
             self.retryFunction = self.findEmail
             self.alertError(message)
         }) {
             self.isEmailFound = true
-            self.foundEmailComplAlert()
+            self.alertFoundEmailCompl()
         }
     }
     
@@ -691,7 +746,9 @@ extension AuthViewController {
             "email": emailToFind!
         ]
         let service = Service(lang: lang)
-        service.sendEmailVerifCode(params: params, popoverAlert: { (message) in
+        service.solveAvatarEmail(option: MailOption.verify, params: params, unauthorized: {
+            return
+        }, popoverAlert: { (message) in
             self.retryFunction = self.sendVerificationCodeToMail
             self.alertError(message)
         }) {
@@ -700,11 +757,62 @@ extension AuthViewController {
                 self.formContainerView.isHidden = false
                 self.loadingImageView.isHidden = true
             })
-            self.verificationCodeAlert()
+            self.alertVerificationCode()
         }
     }
     
     private func verifyEmailCode() {
-        print("")
+        UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.formContainerView.isHidden = true
+            self.loadingImageView.isHidden = false
+        })
+        let params: Parameters = [
+            "email": emailToFind!,
+            "code": verifCode!
+        ]
+        let service = Service(lang: lang)
+        service.solveAvatarEmail(option: MailOption.code, params: params, unauthorized: {
+            self.isCodeCorrect = false
+            self.alertVerificationCode()
+        }, popoverAlert: { (message) in
+            self.retryFunction = self.verifyEmailCode
+            self.alertError(message)
+        }) {
+            self.isCodeCorrect = true
+            UIView.transition(with: self.formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.formContainerView.isHidden = false
+                self.loadingImageView.isHidden = true
+            })
+            self.alertChangePassword()
+        }
+    }
+    
+    private func changePassword() {
+        UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.formContainerView.isHidden = true
+            self.loadingImageView.isHidden = false
+        })
+        guard let avatarId = UserDefaults.standard.getAvatarId() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let params: Parameters = [
+            "avatar_id": avatarId,
+            "target": AvatarInfoTarget.password,
+            "new_info": confPassword!
+        ]
+        let service = Service(lang: lang)
+        service.putAvatarInfo(params: params, popoverAlert: { (message) in
+            self.retryFunction = self.changePassword
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.changePassword()
+        }) { (newInfoTxt) in
+            UIView.transition(with: self.formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.formContainerView.isHidden = false
+                self.loadingImageView.isHidden = true
+            })
+            self.alertChangePasswordCompl()
+        }
     }
 }

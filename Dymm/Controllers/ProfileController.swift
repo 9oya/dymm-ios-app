@@ -786,8 +786,8 @@ extension ProfileViewController {
         }
         let params: Parameters = [
             "avatar_id": avatarId,
-            "target": self.avatarInfoTarget!,
-            "new_info": self.newInfoStr!
+            "target": avatarInfoTarget!,
+            "new_info": newInfoStr!
         ]
         let service = Service(lang: lang)
         service.putAvatarInfo(params: params, popoverAlert: { (message) in

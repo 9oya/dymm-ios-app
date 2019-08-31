@@ -69,6 +69,12 @@ struct LogGroupOption {
     static let remove = "remove"
 }
 
+struct MailOption {
+    static let find = "find"
+    static let verify = "verify"
+    static let code = "code"
+}
+
 struct DiaryMode {
     static let logger = 1
     static let editor = 2
@@ -91,6 +97,7 @@ struct AvatarInfoTarget {
     static let phNumber = 14
     static let intro = 15
     static let profile_type = 16
+    static let password = 17
 }
 
 struct TagId {

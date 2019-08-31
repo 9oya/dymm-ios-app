@@ -17,7 +17,6 @@ struct LangPack {
     var titleClose: String!
     var titleCondScore: String!
     var titleCondScores: [String]!
-    var titleConfirmPassword: String!
     var titleContinue: String!
     var titleCreateNew: String!
     var titleCreateNewGroup: String!
@@ -42,6 +41,7 @@ struct LangPack {
     var titleForgotPassword: String!
     var titleForgotPasswordAlert: String!
     var titleGuest: String!
+    var titleIncorrectEmailCode: String!
     var titleIntro: String!
     var titleIntroUpper: String!
     var titleLastName: String!
@@ -50,6 +50,11 @@ struct LangPack {
     var titleMyAvtCond: String!
     var titleNo: String!
     var titlePassword: String!
+    var titlePasswordChange: String!
+    var titlePasswordChangeCompl: String!
+    var titlePasswordConfirm: String!
+    var titlePasswordNew: String!
+    var titlePasswordOld: String!
     var titlePhoneNum: String!
     var titlePhoneNumUpper: String!
     var titleProfile: String!
@@ -70,6 +75,7 @@ struct LangPack {
     var titleWeekdays: [String]!
     var titleYes: String!
     
+    var msgChangePasswordCompl: String!
     var msgEmptyEmail: String!
     var msgEmptyName: String!
     var msgEmptyPassword: String!
@@ -158,12 +164,6 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return ["Awful", "Bad", "Soso", "Good", "Awesome!"]
             case LanguageId.kor: return ["최악", "나쁨", "보통", "좋음", "최고!"]
-            default: fatalError()}
-        }()
-        self.titleConfirmPassword = {
-            switch currentLanguageId {
-            case LanguageId.eng: return "Confirm Password"
-            case LanguageId.kor: return "패스워드 확인"
             default: fatalError()}
         }()
         self.titleContinue = {
@@ -312,6 +312,12 @@ struct LangPack {
             case LanguageId.kor: return "게스트"
             default: fatalError()}
         }()
+        self.titleIncorrectEmailCode = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "\u{26A0}Incorrect or expired verification code"
+            case LanguageId.kor: return "\u{26A0}일치하지 않는 또는 만료된 인증 코드"
+            default: fatalError()}
+        }()
         self.titleIntro = {
             switch currentLanguageId {
             case LanguageId.eng: return "Introduction"
@@ -360,6 +366,36 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Password"
             case LanguageId.kor: return "패스워드"
+            default: fatalError()}
+        }()
+        self.titlePasswordChange = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Change Password"
+            case LanguageId.kor: return "패스워드 변경"
+            default: fatalError()}
+        }()
+        self.titlePasswordChangeCompl = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Password Change Complete!"
+            case LanguageId.kor: return "패스워드 변경이 완료되었습니다!"
+            default: fatalError()}
+        }()
+        self.titlePasswordConfirm = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Confirm Password"
+            case LanguageId.kor: return "패스워드 확인"
+            default: fatalError()}
+        }()
+        self.titlePasswordNew = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "New Password"
+            case LanguageId.kor: return "새 패스워드"
+            default: fatalError()}
+        }()
+        self.titlePasswordOld = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Old Password"
+            case LanguageId.kor: return "이전 패스워드"
             default: fatalError()}
         }()
         self.titlePhoneNum = {
@@ -481,6 +517,12 @@ struct LangPack {
         
         // MARK: Messages
         
+        self.msgChangePasswordCompl = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Your new password has been successfully changed."
+            case LanguageId.kor: return "당신의 새 패스워드가 성공적으로 변경되었습니다."
+            default: fatalError()}
+        }()
         self.msgEmptyEmail = {
             switch currentLanguageId {
             case LanguageId.eng: return "Enter mail address"

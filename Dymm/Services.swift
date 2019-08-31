@@ -662,7 +662,7 @@ struct Service {
         }
     }
     
-    func findEmailAddress(params: Parameters, unauthorized: @escaping () -> Void, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping () -> Void) {
+    func solveAvatarEmail(option: String, params: Parameters, unauthorized: @escaping () -> Void, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping () -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             print("Load UserDefaults.standard.getAccessToken() failed")
             return
@@ -670,7 +670,7 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        Alamofire.request("\(URI.host)\(URI.avatar)/email/find", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
+        Alamofire.request("\(URI.host)\(URI.avatar)/email/\(option)", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -684,33 +684,6 @@ struct Service {
                     self.badRequest(responseData)
                 case 401:
                     unauthorized()
-                default:
-                    self.unexpectedResponse(statusCode, responseData, "findEmailAddress()")
-                    return
-                }
-        }
-    }
-    
-    func sendEmailVerifCode(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping () -> Void) {
-        guard let accessToken = UserDefaults.standard.getAccessToken() else {
-            print("Load UserDefaults.standard.getAccessToken() failed")
-            return
-        }
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(accessToken)",
-        ]
-        Alamofire.request("\(URI.host)\(URI.avatar)/email/verif", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
-            .validate(contentType: ["application/json"])
-            .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                }
-                switch statusCode {
-                case 200:
-                    completion()
-                case 400:
-                    self.badRequest(responseData)
                 default:
                     self.unexpectedResponse(statusCode, responseData, "findEmailAddress()")
                     return
