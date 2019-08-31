@@ -9,7 +9,7 @@
 import UIKit
 
 private let bannerCellId = "BannerCollectionCell"
-private let bannerHeightInt = 160
+private let bannerHeightInt = 250
 let marginInt = 7
 
 class HomeViewController: UIViewController {
@@ -149,12 +149,15 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             cell.subtitleLabel.textColor = UIColor(hex: banners![indexPath.item].txt_color)
             switch lang.currentLanguageId {
             case LanguageId.eng:
+                cell.imageView.image = UIImage(named: "item-rectangle")!.withRenderingMode(.alwaysOriginal)
                 cell.titleLabel.text = banners![indexPath.item].eng_title
                 cell.subtitleLabel.text = banners![indexPath.item].eng_subtitle
             case LanguageId.kor:
+                cell.imageView.image = UIImage(named: "item-rectangle")!.withRenderingMode(.alwaysOriginal)
                 cell.titleLabel.text = banners![indexPath.item].kor_title
                 cell.subtitleLabel.text = banners![indexPath.item].eng_subtitle
             case LanguageId.jpn:
+                cell.imageView.image = UIImage(named: "item-rectangle")!.withRenderingMode(.alwaysOriginal)
                 cell.titleLabel.text = banners![indexPath.item].jpn_title
                 cell.subtitleLabel.text = banners![indexPath.item].eng_subtitle
             default:
@@ -277,8 +280,8 @@ extension HomeViewController {
         pageControl = {
             let _pageControl = UIPageControl()
             _pageControl.currentPage = 0
-            _pageControl.currentPageIndicatorTintColor = UIColor.lightGray
-            _pageControl.pageIndicatorTintColor = UIColor.whiteSmoke
+            _pageControl.currentPageIndicatorTintColor = .white
+            _pageControl.pageIndicatorTintColor = UIColor.white.withAlphaComponent(0.4)
             _pageControl.translatesAutoresizingMaskIntoConstraints = false
             return _pageControl
         }()
@@ -314,7 +317,7 @@ extension HomeViewController {
         bannerCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 1).isActive = true
         bannerCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         bannerCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
-        bannerCollectionView.heightAnchor.constraint(equalToConstant: 160).isActive = true
+        bannerCollectionView.heightAnchor.constraint(equalToConstant: CGFloat(bannerHeightInt)).isActive = true
         
         pageControl.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
         pageControl.bottomAnchor.constraint(equalTo: bannerCollectionView.bottomAnchor, constant: 3).isActive = true

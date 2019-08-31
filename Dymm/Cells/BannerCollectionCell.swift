@@ -35,9 +35,9 @@ extension BannerCollectionCell {
         }()
         titleLabel = {
             let _label = UILabel()
-            _label.font = .boldSystemFont(ofSize: 20)
+            _label.font = .boldSystemFont(ofSize: 30)
             _label.textAlignment = .center
-            _label.numberOfLines = 1
+            _label.numberOfLines = 6
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -54,15 +54,17 @@ extension BannerCollectionCell {
         addSubview(titleLabel)
         addSubview(subtitleLabel)
         
-        imageView.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
-        imageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
-        imageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0).isActive = true
-        imageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0).isActive = true
+//        imageView.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
+//        imageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
+//        imageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0).isActive = true
+//        imageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0).isActive = true
+        imageView.centerXAnchor.constraint(equalTo: centerXAnchor, constant: 0).isActive = true
+        imageView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
         
         titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor, constant: 0).isActive = true
-        titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -10).isActive = true
+        titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -15).isActive = true
         
         subtitleLabel.centerXAnchor.constraint(equalTo: centerXAnchor, constant: 0).isActive = true
-        subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2).isActive = true
+        subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16).isActive = true
     }
 }
