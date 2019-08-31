@@ -25,7 +25,7 @@ class ProfileViewController: UIViewController {
     var emailContainerView: UIView!
     var phNumberContainerView: UIView!
     var introContainerView: UIView!
-    var changePasswordView: UIView!
+    var passwordContainerView: UIView!
     
     // UICollectionView
     var tagCollectionView: UICollectionView!
@@ -60,7 +60,7 @@ class ProfileViewController: UIViewController {
     var introGuideLabel: UILabel!
     var introLabel: UILabel!
     var introPlaceHolderLabel: UILabel!
-    var changePasswordPlaceHolderLabel: UILabel!
+    var passwordPlaceHolderLabel: UILabel!
     
     // Non-view properties
     var lang: LangPack!
@@ -73,6 +73,10 @@ class ProfileViewController: UIViewController {
     var newInfoStr: String?
     var selectedCollectionItem: Int?
     var avatarInfoTarget: Int?
+    var oldPassword: String?
+    var newPassword: String?
+    var confPassword: String?
+    var isOldPasswordCorrect = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -253,9 +257,87 @@ class ProfileViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    @objc func changePasswordTapped(_ sender: UITapGestureRecognizer? = nil) {
-        // TODO
-        print("")
+    @objc func alertChangePasswordCompl() {
+        let alert = UIAlertController(title: lang.titlePasswordChangeCompl, message: "\n" + lang.msgChangePasswordCompl, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
+            UserDefaults.standard.setIsSignIn(value: false)
+            self.dismiss(animated: true, completion: nil)
+            return
+        }
+        alert.addAction(confirmAction)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func alertChangePassword(_ sender: UITapGestureRecognizer? = nil) {
+        var title = lang.titlePasswordChange
+        if !isOldPasswordCorrect {
+            title = lang.titleIncorrectOldPassword
+        }
+        let alert = UIAlertController(title: title, message: "\n" + lang.msgShortPassword, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.titleSubmit, style: .default) { _ in
+            self.newInfoStr = self.newPassword
+            self.avatarInfoTarget = AvatarInfoTarget.password
+            self.updateAvatarInfo()
+        }
+        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in
+            self.newInfoStr = nil
+            self.oldPassword = nil
+            self.newPassword = nil
+            self.confPassword = nil
+            self.avatarInfoTarget = nil
+            self.isOldPasswordCorrect = true
+        }
+        alert.addTextField { textField in
+            textField.autocapitalizationType = .none
+            textField.keyboardType = .default
+            textField.textContentType = .password
+            textField.isSecureTextEntry = true
+            textField.placeholder = self.lang.titlePasswordOld
+            confirmAction.isEnabled = false
+            NotificationCenter.default.addObserver(forName: UITextField.textDidChangeNotification, object: textField, queue: OperationQueue.main) { (notification) in
+                self.oldPassword = textField.text!
+                if self.oldPassword != nil && self.newPassword != nil && self.confPassword != nil {
+                    if self.oldPassword!.count >= 8 && self.newPassword!.count >= 8 && self.newPassword == self.confPassword {
+                        confirmAction.isEnabled = true
+                    }
+                }
+            }
+        }
+        alert.addTextField { textField in
+            textField.autocapitalizationType = .none
+            textField.keyboardType = .default
+            textField.textContentType = .password
+            textField.isSecureTextEntry = true
+            textField.placeholder = self.lang.titlePasswordNew
+            confirmAction.isEnabled = false
+            NotificationCenter.default.addObserver(forName: UITextField.textDidChangeNotification, object: textField, queue: OperationQueue.main) { (notification) in
+                self.newPassword = textField.text!
+                if self.oldPassword != nil && self.newPassword != nil && self.confPassword != nil {
+                    if self.oldPassword!.count >= 8 && self.newPassword!.count >= 8 && self.newPassword == self.confPassword {
+                        confirmAction.isEnabled = true
+                    }
+                }
+            }
+        }
+        alert.addTextField { textField in
+            textField.autocapitalizationType = .none
+            textField.keyboardType = .default
+            textField.textContentType = .newPassword
+            textField.isSecureTextEntry = true
+            textField.placeholder = self.lang.titlePasswordConfirm
+            confirmAction.isEnabled = false
+            NotificationCenter.default.addObserver(forName: UITextField.textDidChangeNotification, object: textField, queue: OperationQueue.main) { (notification) in
+                self.confPassword = textField.text!
+                if self.oldPassword != nil && self.newPassword != nil && self.confPassword != nil {
+                    if self.oldPassword!.count >= 8 && self.newPassword!.count >= 8 && self.newPassword == self.confPassword {
+                        confirmAction.isEnabled = true
+                    }
+                }
+            }
+        }
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
+        self.present(alert, animated: true, completion: nil)
     }
 }
 
@@ -363,7 +445,7 @@ extension ProfileViewController {
     
     private func getProfileLabelContainerView() -> UIView {
         let _view = UIView()
-        _view.backgroundColor = UIColor.whiteSmoke
+        _view.backgroundColor = .whiteSmoke
         _view.translatesAutoresizingMaskIntoConstraints = false
         return _view
     }
@@ -371,7 +453,7 @@ extension ProfileViewController {
     private func getProfileGuideLabel() -> UILabel {
         let _label = UILabel()
         _label.font = .systemFont(ofSize: 10, weight: .regular)
-        _label.textColor = UIColor(hex: "Silver")
+        _label.textColor = .silver
         _label.textAlignment = .left
         _label.translatesAutoresizingMaskIntoConstraints = false
         return _label
@@ -389,7 +471,7 @@ extension ProfileViewController {
     private func getProfilePlaceHolderLabel() -> UILabel {
         let _label = UILabel()
         _label.font = .systemFont(ofSize: 15, weight: .regular)
-        _label.textColor = UIColor(hex: "Silver")
+        _label.textColor = .silver
         _label.textAlignment = .center
         _label.translatesAutoresizingMaskIntoConstraints = false
         return _label
@@ -420,8 +502,8 @@ extension ProfileViewController {
         phNumberContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.phNumContainerTapped(_:))))
         introContainerView = getProfileLabelContainerView()
         introContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.introContainerTapped(_:))))
-        changePasswordView = getProfileLabelContainerView()
-        changePasswordView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.changePasswordTapped(_:))))
+        passwordContainerView = getProfileLabelContainerView()
+        passwordContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertChangePassword(_:))))
         firstNameGuideLabel = getProfileGuideLabel()
         lastNameGuideLabel = getProfileGuideLabel()
         emailGuideLabel = getProfileGuideLabel()
@@ -433,7 +515,14 @@ extension ProfileViewController {
         phNumberLabel = getProfileLabel()
         phNumberPlaceHolderLabel = getProfilePlaceHolderLabel()
         introPlaceHolderLabel = getProfilePlaceHolderLabel()
-        
+        passwordPlaceHolderLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 15, weight: .thin)
+            _label.textColor = .tomato
+            _label.textAlignment = .center
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
         mailConfContainerView = {
             let _view = UIView()
             _view.backgroundColor = UIColor.white
@@ -445,7 +534,7 @@ extension ProfileViewController {
         mailConfMsgLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 15, weight: .regular)
-            _label.textColor = UIColor.lightSteelBlue
+            _label.textColor = .lightSteelBlue
             _label.textAlignment = .center
             _label.numberOfLines = 2
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -528,6 +617,7 @@ extension ProfileViewController {
         infoContainerView.addSubview(emailContainerView)
         infoContainerView.addSubview(phNumberContainerView)
         infoContainerView.addSubview(introContainerView)
+        infoContainerView.addSubview(passwordContainerView)
         
         infoImageContainerView.addSubview(infoImageView)
         infoImageContainerView.addSubview(infoImageLabel)
@@ -543,6 +633,7 @@ extension ProfileViewController {
         introContainerView.addSubview(introGuideLabel)
         introContainerView.addSubview(introLabel)
         introContainerView.addSubview(introPlaceHolderLabel)
+        passwordContainerView.addSubview(passwordPlaceHolderLabel)
         
         setupLangProperties()
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
@@ -578,7 +669,7 @@ extension ProfileViewController {
         infoContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt)).isActive = true
         infoContainerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         infoContainerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        infoContainerView.heightAnchor.constraint(equalToConstant: 280).isActive = true
+        infoContainerView.heightAnchor.constraint(equalToConstant: 325).isActive = true
         
         infoImageContainerView.topAnchor.constraint(equalTo: infoContainerView.topAnchor, constant: 20).isActive = true
         infoImageContainerView.leadingAnchor.constraint(equalTo: infoContainerView.leadingAnchor, constant: 20).isActive = true
@@ -654,6 +745,15 @@ extension ProfileViewController {
         introContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         introContainerView.heightAnchor.constraint(equalToConstant: 80).isActive = true
         
+        passwordContainerView.topAnchor.constraint(equalTo: introContainerView.bottomAnchor, constant: 3).isActive = true
+        passwordContainerView.leadingAnchor.constraint(equalTo: infoContainerView.leadingAnchor, constant: 20).isActive = true
+        passwordContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        passwordContainerView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        
+        passwordPlaceHolderLabel.leadingAnchor.constraint(equalTo: passwordContainerView.leadingAnchor, constant: 0).isActive = true
+        passwordPlaceHolderLabel.trailingAnchor.constraint(equalTo: passwordContainerView.trailingAnchor, constant: 0).isActive = true
+        passwordPlaceHolderLabel.centerYAnchor.constraint(equalTo: passwordContainerView.centerYAnchor, constant: 0).isActive = true
+        
         introGuideLabel.topAnchor.constraint(equalTo: introContainerView.topAnchor, constant: 2).isActive = true
         introGuideLabel.leadingAnchor.constraint(equalTo: introContainerView.leadingAnchor, constant: 6).isActive = true
         introGuideLabel.trailingAnchor.constraint(equalTo: introContainerView.trailingAnchor, constant: 0).isActive = true
@@ -680,8 +780,9 @@ extension ProfileViewController {
         emailGuideLabel.text = lang.titleEmailUpper
         phNumberGuideLabel.text = lang.titlePhoneNumUpper
         introGuideLabel.text = lang.titleIntroUpper
-        phNumberPlaceHolderLabel.text = lang.titlePhoneNumUpper
-        introPlaceHolderLabel.text = lang.titleIntroUpper
+        phNumberPlaceHolderLabel.text = lang.titlePhoneNum
+        introPlaceHolderLabel.text = lang.titleIntro
+        passwordPlaceHolderLabel.text = lang.titlePasswordChange
         signOutButton.setTitle(lang.titleSignOut, for: .normal)
         sendAgainButton.setTitle(lang.titleSendAgain, for: .normal)
     }
@@ -784,18 +885,37 @@ extension ProfileViewController {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
         }
-        let params: Parameters = [
+        var params: Parameters = [
             "avatar_id": avatarId,
             "target": avatarInfoTarget!,
             "new_info": newInfoStr!
         ]
+        if oldPassword != nil {
+            params["old_password"] = oldPassword!
+        }
         let service = Service(lang: lang)
-        service.putAvatarInfo(params: params, popoverAlert: { (message) in
+        service.putAvatarInfo(params: params, unauthorized: { (pattern) in
+            if pattern == UnauthType.passwordInvalid {
+                self.isOldPasswordCorrect = false
+                self.alertChangePassword()
+            }
+        }, popoverAlert: { (message) in
             self.retryFunction = self.updateAvatarInfo
             self.alertError(message)
         }, tokenRefreshCompletion: {
             self.updateAvatarInfo()
         }) { (newInfoTxt) in
+            self.newInfoStr = nil
+            self.oldPassword = nil
+            self.newPassword = nil
+            self.confPassword = nil
+            self.isOldPasswordCorrect = true
+            if self.avatarInfoTarget == AvatarInfoTarget.password {
+                self.alertChangePasswordCompl()
+                self.avatarInfoTarget = nil
+                return
+            }
+            self.avatarInfoTarget = nil
             self.loadProfile()
         }
     }

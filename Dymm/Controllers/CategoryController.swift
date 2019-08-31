@@ -530,7 +530,7 @@ extension CategoryViewController {
     private func setupLayout() {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
-        view.backgroundColor = UIColor(hex: "WhiteSmoke")
+        view.backgroundColor = .whiteSmoke
         
         // Initialize subveiw properties
         detailContainerView = {
@@ -560,7 +560,7 @@ extension CategoryViewController {
         }()
         sizePickerContainerView = {
             let _view = UIView()
-            _view.backgroundColor = UIColor.darkGray
+            _view.backgroundColor = .darkGray
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
@@ -568,7 +568,7 @@ extension CategoryViewController {
             let layout = UICollectionViewFlowLayout()
             layout.scrollDirection = .horizontal
             let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
-            _collectionView.backgroundColor = UIColor.white
+            _collectionView.backgroundColor = .white
             _collectionView.register(StepCollectionCell.self, forCellWithReuseIdentifier: stepCellId)
             _collectionView.semanticContentAttribute = .forceLeftToRight
             _collectionView.showsHorizontalScrollIndicator = false
@@ -577,7 +577,7 @@ extension CategoryViewController {
         }()
         tagCollectionView = {
             let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
-            _collectionView.backgroundColor = UIColor.clear
+            _collectionView.backgroundColor = .clear
             _collectionView.register(TagCollectionCell.self, forCellWithReuseIdentifier: tagCellId)
             _collectionView.translatesAutoresizingMaskIntoConstraints = false
             return _collectionView

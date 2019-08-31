@@ -42,6 +42,7 @@ struct LangPack {
     var titleForgotPasswordAlert: String!
     var titleGuest: String!
     var titleIncorrectEmailCode: String!
+    var titleIncorrectOldPassword: String!
     var titleIntro: String!
     var titleIntroUpper: String!
     var titleLastName: String!
@@ -316,6 +317,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "\u{26A0}Incorrect or expired verification code"
             case LanguageId.kor: return "\u{26A0}일치하지 않는 또는 만료된 인증 코드"
+            default: fatalError()}
+        }()
+        self.titleIncorrectOldPassword = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "\u{26A0}Incorrect old password."
+            case LanguageId.kor: return "\u{26A0}이전 패스워드가 정확하지 않습니다."
             default: fatalError()}
         }()
         self.titleIntro = {

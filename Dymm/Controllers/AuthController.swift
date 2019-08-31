@@ -802,7 +802,9 @@ extension AuthViewController {
             "new_info": confPassword!
         ]
         let service = Service(lang: lang)
-        service.putAvatarInfo(params: params, popoverAlert: { (message) in
+        service.putAvatarInfo(params: params, unauthorized: { (pattern) in
+            print(pattern)
+        }, popoverAlert: { (message) in
             self.retryFunction = self.changePassword
             self.alertError(message)
         }, tokenRefreshCompletion: {

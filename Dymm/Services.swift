@@ -693,7 +693,7 @@ struct Service {
     
     // MARK: - PUT services
     
-    func putAvatarInfo(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ newInfoTxt: String) -> Void) {
+    func putAvatarInfo(params: Parameters, unauthorized: @escaping (_ pattern: Int) -> Void, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ newInfoTxt: String) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -713,6 +713,11 @@ struct Service {
                     completion(params["new_info"] as! String)
                 case 400:
                     self.badRequest(responseData)
+                case 401:
+                    guard let decodedData = try? self.decoder.decode(Unauthorized.self, from: responseData) else {
+                        fatalError()
+                    }
+                    unauthorized(decodedData.pattern)
                 case 403:
                     _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
                         tokenRefreshCompletion()

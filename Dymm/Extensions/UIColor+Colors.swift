@@ -310,6 +310,7 @@ extension UIColor {
     
     // Gray
     static let whiteSmoke = UIColor(hex: "WhiteSmoke")
+    static let silver = UIColor(hex: "Silver")
     static let dimGray = UIColor(hex: "DimGray")
     
     static let hex_666699 = UIColor(hex: "#666699")
