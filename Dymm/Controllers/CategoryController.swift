@@ -22,16 +22,17 @@ class CategoryViewController: UIViewController {
     // MARK: - Properties
     
     // UIViews
-    var detailContainerView: UIView!
-    var sizePickerContainerView: UIView!
+    var detailContainer: UIView!
+    var sizePickerContainer: UIView!
     
     // UICollectionViews
-    var stepCollectionView: UICollectionView!
-    var tagCollectionView: UICollectionView!
+    var stepCollection: UICollectionView!
+    var tagCollection: UICollectionView!
     
     // UIPickerViews
     var timePicker: UIDatePicker!
-    var sizePickerView: UIPickerView!
+    var sizePicker: UIPickerView!
+    var langPicker: UIPickerView!
     
     // UIImageViews
     var fingerImageView: UIImageView!
@@ -54,9 +55,9 @@ class CategoryViewController: UIViewController {
     var langPickButton: UIButton!
     
     // NSLayoutConstraints
-    var tagCollectionViewTop: NSLayoutConstraint!
+    var tagCollectionTop: NSLayoutConstraint!
     var tagCollectionViewHeight: NSLayoutConstraint!
-    var detailContainerViewHeight: NSLayoutConstraint!
+    var detailContainerHeight: NSLayoutConstraint!
     var fingerImageBottom: NSLayoutConstraint!
     
     // Non-view properties
@@ -72,6 +73,8 @@ class CategoryViewController: UIViewController {
     var superTagId: Int?
     var subTags: [BaseModel.Tag]!
     var stepTags: [BaseModel.Tag] = []
+    var langTags: [BaseModel.Tag]?
+    var selectedLangTag: BaseModel.Tag?
     var selectedXVal: Int?
     var selectedYVal: Int?
     var selectedDate: String?
@@ -126,8 +129,8 @@ class CategoryViewController: UIViewController {
         alertController.view.addSubview(datePicker)
         let selectAction = UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: { _ in
             self.selectedDate = self.dateFormatter.string(from: datePicker.date)
-            UIView.transition(with: self.detailContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.detailContainerView.isHidden = true
+            UIView.transition(with: self.detailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.detailContainer.isHidden = true
             })
             self.createAConditionLog()
         })
@@ -135,6 +138,33 @@ class CategoryViewController: UIViewController {
         alertController.addAction(selectAction)
         alertController.addAction(cancelAction)
         present(alertController, animated: true, completion:{})
+    }
+    
+    @objc func alertLangPicker() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
+        alert.view.addSubview(langPicker)
+        langPicker.topAnchor.constraint(equalTo: alert.view.topAnchor, constant: 0).isActive = true
+        alert.addAction(UIAlertAction(title: lang.titleClose, style: .default) { _ in })
+        langPicker.widthAnchor.constraint(equalTo: alert.view.widthAnchor, constant: 0).isActive = true
+        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
+            if let langId = self.selectedLangTag?.id {
+                self.lang = LangPack(langId)
+                UIView.transition(with: self.langPickButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                    self.langPickButton.setTitle(LangHelper.getLanguageName(langId), for: .normal)
+                })
+            } else {
+                self.lang = LangPack(LanguageId.eng)
+                UIView.transition(with: self.langPickButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                    self.langPickButton.setTitle(LangHelper.getLanguageName(LanguageId.eng), for: .normal)
+                })
+            }
+            self.tagCollection.reloadData()
+            self.stepCollection.reloadData()
+        })
+        let height:NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 250)
+        alert.view.addConstraint(height)
+        alert.view.tintColor = UIColor.cornflowerBlue
+        self.present(alert, animated: true, completion: nil )
     }
     
     @objc func alertCompl(_ title: String, _ message: String) {
@@ -263,8 +293,7 @@ class CategoryViewController: UIViewController {
     }
     
     @objc func langPickBtnTapped() {
-        // TODO
-        print("langPickBtnTapped")
+        loadLangTagsOnPicker()
     }
 }
 
@@ -277,12 +306,12 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if collectionView == tagCollectionView {
+        if collectionView == tagCollection {
             guard let number = subTags?.count else {
                 return 0
             }
             return number
-        } else if collectionView == stepCollectionView {
+        } else if collectionView == stepCollection {
             return stepTags.count
         } else {
             fatalError()
@@ -290,7 +319,7 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if collectionView == tagCollectionView {
+        if collectionView == tagCollection {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: tagCellId, for: indexPath) as? TagCollectionCell else {
                 fatalError()
             }
@@ -309,7 +338,7 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
             }
             cell.imageView.image = UIImage(named: "tagId-\(tag.id)")
             return cell
-        } else if collectionView == stepCollectionView {
+        } else if collectionView == stepCollection {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: stepCellId, for: indexPath) as? StepCollectionCell else {
                 fatalError()
             }
@@ -334,12 +363,12 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         minimumCnt = 40
         lastContentOffset = 0.0
         isScrollToLoading = false
-        if collectionView == tagCollectionView {
+        if collectionView == tagCollection {
             let selected_tag = subTags[indexPath.item]
             stepTags.append(superTag!)
             superTag = selected_tag
             loadCategories()
-        } else if collectionView == stepCollectionView {
+        } else if collectionView == stepCollection {
             superTag = stepTags[indexPath.item]
             while stepTags.count > indexPath.item {
                 stepTags.remove(at: indexPath.item)
@@ -357,9 +386,9 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if collectionView == tagCollectionView {
+        if collectionView == tagCollection {
             return CGSize(width: (view.frame.width / 2) - 10.5, height: CGFloat(tagCellHeightInt))
-        } else if collectionView == stepCollectionView {
+        } else if collectionView == stepCollection {
             let tag = stepTags[indexPath.row]
             var txtCnt = 0
             switch lang.currentLanguageId {
@@ -378,9 +407,9 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        if collectionView == tagCollectionView {
+        if collectionView == tagCollection {
             return 7
-        } else if collectionView == stepCollectionView {
+        } else if collectionView == stepCollection {
             return 2
         } else {
             fatalError()
@@ -388,9 +417,9 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        if collectionView == tagCollectionView {
+        if collectionView == tagCollection {
             return 7
-        } else if collectionView == stepCollectionView {
+        } else if collectionView == stepCollection {
             return 0
         } else {
             fatalError()
@@ -432,79 +461,111 @@ extension CategoryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     // MARK: UIPickerViewDataSource
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        if pickerView == sizePickerView {
-            return 1
-        } else if pickerView == timePicker {
-            return 2
-        } else {
-            fatalError()
-        }
+        return 1
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return 397  // 0~99
+        switch pickerView {
+        case sizePicker:
+            // 0, 1/4, 2/4, 3/4, 1, 1+1/4 ... 99
+            return 397
+        case langPicker:
+            guard let numberOfRows = langTags?.count else {
+                return 0
+            }
+            return numberOfRows
+        default:
+            fatalError()
+        }
+        
     }
     
-    func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
-        return 35
+    func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
+        switch pickerView {
+        case sizePicker:
+            let containerView = UIView(frame: CGRect(x: 0, y: 0, width: 35, height: 58))
+            let portion = row / 4
+            let remainder = row % 4
+            if remainder == 0 {
+                let numberLabel = UILabel(frame: CGRect(x: 0, y: 15, width: 33, height: 23))
+                let bottomImage = UIImageView(frame: CGRect(x: 0, y: 41, width: 33, height: 18))
+                numberLabel.text = "\(portion)"
+                numberLabel.font = .systemFont(ofSize: 20, weight: .regular)
+                numberLabel.textAlignment = .center
+                bottomImage.image = UIImage(named: "item-div-big")
+                containerView.addSubview(numberLabel)
+                containerView.addSubview(bottomImage)
+                if row == selectedSizePickerRow {
+                    numberLabel.textColor = UIColor.white
+                } else {
+                    numberLabel.textColor = UIColor.white
+                }
+            } else {
+                let midImage = UIImageView(frame: CGRect(x: 0, y: 22, width: 33, height: 10))
+                let bottomImage = UIImageView(frame: CGRect(x: 0, y: 47, width: 33, height: 10))
+                bottomImage.image = UIImage(named: "item-div-small")
+                containerView.addSubview(midImage)
+                containerView.addSubview(bottomImage)
+                switch remainder {
+                case 1:
+                    if row == selectedSizePickerRow {
+                        midImage.image = UIImage(named: "item-quarter-filled")
+                    } else {
+                        midImage.image = UIImage(named: "item-quarter-empty")
+                    }
+                case 2:
+                    if row == selectedSizePickerRow {
+                        midImage.image = UIImage(named: "item-half-filled")
+                    } else {
+                        midImage.image = UIImage(named: "item-half-empty")
+                    }
+                case 3:
+                    if row == selectedSizePickerRow {
+                        midImage.image = UIImage(named: "item-almost-filled")
+                    } else {
+                        midImage.image = UIImage(named: "item-almost-empty")
+                    }
+                default:
+                    break
+                }
+            }
+            containerView.transform = CGAffineTransform(rotationAngle: (.pi / 2))
+            return containerView
+        case langPicker:
+            let _containerView = UIView(frame: CGRect(x: 0, y: 0, width: pickerView.bounds.width, height: 60))
+            let _label = UILabel(frame: CGRect(x: 0, y: 0, width: pickerView.bounds.width, height: 60))
+            guard let _tags = langTags else { fatalError() }
+            switch lang.currentLanguageId {
+            case LanguageId.eng: _label.text = _tags[row].eng_name
+            case LanguageId.kor: _label.text = _tags[row].kor_name
+            case LanguageId.jpn: _label.text = _tags[row].jpn_name
+            default: fatalError()}
+            _label.textAlignment = .center
+            _containerView.addSubview(_label)
+            return _containerView
+        default:
+            fatalError()
+        }
+        
     }
     
     // MARK: UIPickerViewDelegate
     
-    func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
-        let containerView = UIView(frame: CGRect(x: 0, y: 0, width: 35, height: 58))
-        let portion = row / 4
-        let remainder = row % 4
-        if remainder == 0 {
-            let numberLabel = UILabel(frame: CGRect(x: 0, y: 15, width: 33, height: 23))
-            let bottomImage = UIImageView(frame: CGRect(x: 0, y: 41, width: 33, height: 18))
-            numberLabel.text = "\(portion)"
-            numberLabel.font = .systemFont(ofSize: 20, weight: .regular)
-            numberLabel.textAlignment = .center
-            bottomImage.image = UIImage(named: "item-div-big")
-            containerView.addSubview(numberLabel)
-            containerView.addSubview(bottomImage)
-            if row == selectedSizePickerRow {
-                numberLabel.textColor = UIColor.white
-            } else {
-                numberLabel.textColor = UIColor.white
-            }
-        } else {
-            let midImage = UIImageView(frame: CGRect(x: 0, y: 22, width: 33, height: 10))
-            let bottomImage = UIImageView(frame: CGRect(x: 0, y: 47, width: 33, height: 10))
-            bottomImage.image = UIImage(named: "item-div-small")
-            containerView.addSubview(midImage)
-            containerView.addSubview(bottomImage)
-            switch remainder {
-            case 1:
-                if row == selectedSizePickerRow {
-                    midImage.image = UIImage(named: "item-quarter-filled")
-                } else {
-                    midImage.image = UIImage(named: "item-quarter-empty")
-                }
-            case 2:
-                if row == selectedSizePickerRow {
-                    midImage.image = UIImage(named: "item-half-filled")
-                } else {
-                    midImage.image = UIImage(named: "item-half-empty")
-                }
-            case 3:
-                if row == selectedSizePickerRow {
-                    midImage.image = UIImage(named: "item-almost-filled")
-                } else {
-                    midImage.image = UIImage(named: "item-almost-empty")
-                }
-            default:
-                break
-            }
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        switch pickerView {
+        case sizePicker:
+            didSelectSizePickerRow(row: row)
+            pickerView.reloadAllComponents()
+        case langPicker:
+            guard let _tags = langTags else { return }
+            selectedLangTag = _tags[row]
+        default:
+            fatalError()
         }
-        containerView.transform = CGAffineTransform(rotationAngle: (.pi / 2))
-        return containerView
     }
     
-    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        didSelectSizePickerRow(row: row)
-        pickerView.reloadAllComponents()
+    func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+        return 35
     }
 }
 
@@ -533,7 +594,7 @@ extension CategoryViewController {
         view.backgroundColor = .whiteSmoke
         
         // Initialize subveiw properties
-        detailContainerView = {
+        detailContainer = {
             let _view = UIView()
             _view.backgroundColor = UIColor.white
             _view.addShadowView()
@@ -558,13 +619,16 @@ extension CategoryViewController {
             _textField.translatesAutoresizingMaskIntoConstraints = false
             return _textField
         }()
-        sizePickerContainerView = {
+        sizePickerContainer = {
             let _view = UIView()
-            _view.backgroundColor = .darkGray
+            _view.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+            _view.clipsToBounds = true
+            _view.layer.cornerRadius = 10
+            _view.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
-        stepCollectionView = {
+        stepCollection = {
             let layout = UICollectionViewFlowLayout()
             layout.scrollDirection = .horizontal
             let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
@@ -575,7 +639,7 @@ extension CategoryViewController {
             _collectionView.translatesAutoresizingMaskIntoConstraints = false
             return _collectionView
         }()
-        tagCollectionView = {
+        tagCollection = {
             let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
             _collectionView.backgroundColor = .clear
             _collectionView.register(TagCollectionCell.self, forCellWithReuseIdentifier: tagCellId)
@@ -590,7 +654,12 @@ extension CategoryViewController {
             _datePicker.translatesAutoresizingMaskIntoConstraints = false
             return _datePicker
         }()
-        sizePickerView = {
+        langPicker = {
+            let _pickerView = UIPickerView()
+            _pickerView.translatesAutoresizingMaskIntoConstraints = false
+            return _pickerView
+        }()
+        sizePicker = {
             let _pickerView = UIPickerView()
             _pickerView.transform = CGAffineTransform(rotationAngle: -(.pi / 2))
             _pickerView.translatesAutoresizingMaskIntoConstraints = false
@@ -708,40 +777,42 @@ extension CategoryViewController {
         }()
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
-        stepCollectionView.dataSource = self
-        stepCollectionView.delegate = self
-        tagCollectionView.dataSource = self
-        tagCollectionView.delegate = self
-        sizePickerView.dataSource = self
-        sizePickerView.delegate = self
+        stepCollection.dataSource = self
+        stepCollection.delegate = self
+        tagCollection.dataSource = self
+        tagCollection.delegate = self
+        sizePicker.dataSource = self
+        sizePicker.delegate = self
+        langPicker.dataSource = self
+        langPicker.delegate = self
         searchTextField.delegate = self
         
         // Setup subviews
-        view.addSubview(stepCollectionView)
+        view.addSubview(stepCollection)
         view.addSubview(searchTextField)
         view.addSubview(langPickButton)
-        view.addSubview(detailContainerView)
-        view.addSubview(tagCollectionView)
+        view.addSubview(detailContainer)
+        view.addSubview(tagCollection)
         
-        detailContainerView.addSubview(titleLabel)
-        detailContainerView.addSubview(starButton)
-        detailContainerView.addSubview(photoImageView)
-        detailContainerView.addSubview(logSizeButton)
-        detailContainerView.addSubview(logTimeButton)
-        detailContainerView.addSubview(startDateButton)
-        detailContainerView.addSubview(endDateButton)
-        detailContainerView.addSubview(fingerImageView)
-        detailContainerView.addSubview(sizePickerContainerView)
-        detailContainerView.addSubview(downArrowImageView)
-        detailContainerView.addSubview(timePicker)
+        detailContainer.addSubview(titleLabel)
+        detailContainer.addSubview(starButton)
+        detailContainer.addSubview(photoImageView)
+        detailContainer.addSubview(logSizeButton)
+        detailContainer.addSubview(logTimeButton)
+        detailContainer.addSubview(startDateButton)
+        detailContainer.addSubview(endDateButton)
+        detailContainer.addSubview(fingerImageView)
+        detailContainer.addSubview(sizePickerContainer)
+        detailContainer.addSubview(downArrowImageView)
+        detailContainer.addSubview(timePicker)
         
-        sizePickerContainerView.addSubview(sizePickerView)
+        sizePickerContainer.addSubview(sizePicker)
         
         // Setup constraints
-        stepCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
-        stepCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
-        stepCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
-        stepCollectionView.heightAnchor.constraint(equalToConstant: CGFloat(stepBarHeightInt)).isActive = true
+        stepCollection.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+        stepCollection.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+        stepCollection.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
+        stepCollection.heightAnchor.constraint(equalToConstant: CGFloat(stepBarHeightInt)).isActive = true
         
         searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
         searchTextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
@@ -753,65 +824,64 @@ extension CategoryViewController {
         langPickButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 28).isActive = true
         langPickButton.heightAnchor.constraint(equalTo: searchTextField.heightAnchor, constant: 0).isActive = true
         
-        detailContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
-        detailContainerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
-        detailContainerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        detailContainerViewHeight = detailContainerView.heightAnchor.constraint(equalToConstant: CGFloat(detailBoxAHeightInt))
-        detailContainerViewHeight.priority = UILayoutPriority(rawValue: 999)
-        detailContainerViewHeight.isActive = true
+        detailContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
+        detailContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        detailContainer.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        detailContainerHeight = detailContainer.heightAnchor.constraint(equalToConstant: CGFloat(detailBoxAHeightInt))
+        detailContainerHeight.priority = UILayoutPriority(rawValue: 999)
+        detailContainerHeight.isActive = true
         
-        photoImageView.topAnchor.constraint(equalTo: detailContainerView.topAnchor, constant: 65).isActive = true
-        photoImageView.centerXAnchor.constraint(equalTo: detailContainerView.centerXAnchor, constant: 0).isActive = true
+        photoImageView.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 65).isActive = true
+        photoImageView.centerXAnchor.constraint(equalTo: detailContainer.centerXAnchor, constant: 0).isActive = true
         
-        startDateButton.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: -10).isActive = true
-        startDateButton.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
+        startDateButton.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -10).isActive = true
+        startDateButton.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
         
-        endDateButton.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: -10).isActive = true
-        endDateButton.leadingAnchor.constraint(equalTo: detailContainerView.leadingAnchor, constant: view.frame.width / 10).isActive = true
+        endDateButton.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -10).isActive = true
+        endDateButton.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: view.frame.width / 10).isActive = true
         
-        timePicker.leadingAnchor.constraint(equalTo: detailContainerView.leadingAnchor, constant: 7).isActive = true
-        timePicker.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: 0).isActive = true
+        timePicker.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: 7).isActive = true
+        timePicker.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: 0).isActive = true
         timePicker.widthAnchor.constraint(equalToConstant: (view.frame.width / 2)).isActive = true
         timePicker.heightAnchor.constraint(equalToConstant: 125).isActive = true
         
-        logTimeButton.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: -40).isActive = true
-        logTimeButton.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
+        logTimeButton.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -40).isActive = true
+        logTimeButton.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
         
-        titleLabel.topAnchor.constraint(equalTo: detailContainerView.topAnchor, constant: 10).isActive = true
-        titleLabel.leadingAnchor.constraint(equalTo: detailContainerView.leadingAnchor, constant: 10).isActive = true
-        titleLabel.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: -(27 + 7)).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 10).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: 10).isActive = true
+        titleLabel.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(27 + 7)).isActive = true
         
-        starButton.topAnchor.constraint(equalTo: detailContainerView.topAnchor, constant: 7).isActive = true
-        starButton.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: -7).isActive = true
+        starButton.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 7).isActive = true
+        starButton.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -7).isActive = true
         
-        // pickerContainerView
-        sizePickerContainerView.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: 0).isActive = true
-        sizePickerContainerView.leadingAnchor.constraint(equalTo: detailContainerView.leadingAnchor, constant: 0).isActive = true
-        sizePickerContainerView.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: 0).isActive = true
-        sizePickerContainerView.heightAnchor.constraint(equalToConstant: 58).isActive = true
+        sizePickerContainer.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: 0).isActive = true
+        sizePickerContainer.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: 0).isActive = true
+        sizePickerContainer.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: 0).isActive = true
+        sizePickerContainer.heightAnchor.constraint(equalToConstant: 58).isActive = true
         
-        sizePickerView.centerXAnchor.constraint(equalTo: sizePickerContainerView.centerXAnchor, constant: 0).isActive = true
-        sizePickerView.centerYAnchor.constraint(equalTo: sizePickerContainerView.centerYAnchor, constant: 0).isActive = true
-        sizePickerView.widthAnchor.constraint(equalToConstant: 58).isActive = true
-        sizePickerView.heightAnchor.constraint(equalToConstant: view.frame.width + 200).isActive = true
+        sizePicker.centerXAnchor.constraint(equalTo: sizePickerContainer.centerXAnchor, constant: 0).isActive = true
+        sizePicker.centerYAnchor.constraint(equalTo: sizePickerContainer.centerYAnchor, constant: 0).isActive = true
+        sizePicker.widthAnchor.constraint(equalToConstant: 58).isActive = true
+        sizePicker.heightAnchor.constraint(equalToConstant: view.frame.width + 200).isActive = true
         
-        downArrowImageView.centerXAnchor.constraint(equalTo: detailContainerView.centerXAnchor, constant: 0).isActive = true
-        downArrowImageView.topAnchor.constraint(equalTo: sizePickerContainerView.topAnchor, constant: -1).isActive = true
+        downArrowImageView.centerXAnchor.constraint(equalTo: detailContainer.centerXAnchor, constant: 0).isActive = true
+        downArrowImageView.topAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -1).isActive = true
         
-        logSizeButton.bottomAnchor.constraint(equalTo: sizePickerContainerView.topAnchor, constant: -5).isActive = true
-        logSizeButton.trailingAnchor.constraint(equalTo: detailContainerView.trailingAnchor, constant: -(view.frame.width / 5)).isActive = true
+        logSizeButton.bottomAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -15).isActive = true
+        logSizeButton.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 5)).isActive = true
         
-        fingerImageBottom = fingerImageView.bottomAnchor.constraint(equalTo: detailContainerView.bottomAnchor, constant: -75)
+        fingerImageBottom = fingerImageView.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -75)
         fingerImageBottom.priority = UILayoutPriority(rawValue: 999)
         fingerImageBottom.isActive = true
         fingerImageView.leadingAnchor.constraint(equalTo: logSizeButton.trailingAnchor, constant: 8).isActive = true
         
-        tagCollectionViewTop = tagCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt))
-        tagCollectionViewTop.priority = UILayoutPriority(rawValue: 999)
-        tagCollectionViewTop.isActive = true
-        tagCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
-        tagCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        tagCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+        tagCollectionTop = tagCollection.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt))
+        tagCollectionTop.priority = UILayoutPriority(rawValue: 999)
+        tagCollectionTop.isActive = true
+        tagCollection.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        tagCollection.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        tagCollection.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
     }
     
     private func didSelectSizePickerRow(row: Int) {
@@ -822,7 +892,7 @@ extension CategoryViewController {
             switch remainder {
             case 0:
                 // Case select nothing
-                sizePickerView.selectRow(1, inComponent: 0, animated: true)
+                sizePicker.selectRow(1, inComponent: 0, animated: true)
                 logSizeButton.setTitle("¼", for: .normal)
                 // "0 + 1/4"
                 selectedXVal = 0
@@ -881,7 +951,7 @@ extension CategoryViewController {
             isScrollToLoading = false
             if _subTags.count > 0 {
                 self.subTags.append(contentsOf: _subTags)
-                self.tagCollectionView.reloadData()
+                self.tagCollection.reloadData()
             }
             return
         }
@@ -893,15 +963,15 @@ extension CategoryViewController {
             case LanguageId.kor: navigationItem.title = _superTag.kor_name!
             default: fatalError()}
             UIView.animate(withDuration: 0.5) {
-                self.detailContainerView.isHidden = true
+                self.detailContainer.isHidden = true
                 if self.superTag!.id == TagId.bookmarks {
                     self.searchTextField.isHidden = true
                     self.langPickButton.isHidden = true
-                    self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt)
+                    self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt)
                 } else {
                     self.searchTextField.isHidden = false
                     self.langPickButton.isHidden = false
-                    self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt)
+                    self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt)
                 }
             }
         } else {
@@ -916,23 +986,23 @@ extension CategoryViewController {
             UIView.animate(withDuration: 0.5) {
                 self.searchTextField.isHidden = true
                 self.langPickButton.isHidden = true
-                self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt)
+                self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt)
             }
         } else if _superTag.tag_type == TagType.food || _superTag.tag_type == TagType.drug {
             // Execute food and drug tag_types exclusive
-            sizePickerView.selectRow(4, inComponent: 0, animated: true)
+            sizePicker.selectRow(4, inComponent: 0, animated: true)
             didSelectSizePickerRow(row: 4)
             UIView.animate(withDuration: 0.5) {
-                self.detailContainerView.isHidden = false
+                self.detailContainer.isHidden = false
                 self.searchTextField.isHidden = true
                 self.langPickButton.isHidden = true
-                self.detailContainerViewHeight.constant = CGFloat(detailBoxAHeightInt)
-                self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxAHeightInt + marginInt)
+                self.detailContainerHeight.constant = CGFloat(detailBoxAHeightInt)
+                self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxAHeightInt + marginInt)
                 
                 self.fingerImageView.isHidden = false
                 self.downArrowImageView.isHidden = false
                 self.logSizeButton.isHidden = false
-                self.sizePickerContainerView.isHidden = false
+                self.sizePickerContainer.isHidden = false
                 self.logTimeButton.isHidden = true
                 self.timePicker.isHidden = true
                 self.startDateButton.isHidden = true
@@ -951,16 +1021,16 @@ extension CategoryViewController {
             self.timePicker.setDate(calendar.date(from: components)!, animated: true)
             logTimeButton.setTitle("5min", for: .normal)
             UIView.animate(withDuration: 0.5) {
-                self.detailContainerView.isHidden = false
+                self.detailContainer.isHidden = false
                 self.searchTextField.isHidden = true
                 self.langPickButton.isHidden = true
-                self.detailContainerViewHeight.constant = CGFloat(detailBoxBHeightInt)
-                self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxBHeightInt + marginInt)
+                self.detailContainerHeight.constant = CGFloat(detailBoxBHeightInt)
+                self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxBHeightInt + marginInt)
                 
                 self.fingerImageView.isHidden = true
                 self.downArrowImageView.isHidden = true
                 self.logSizeButton.isHidden = true
-                self.sizePickerContainerView.isHidden = true
+                self.sizePickerContainer.isHidden = true
                 self.logTimeButton.isHidden = false
                 self.timePicker.isHidden = false
                 self.startDateButton.isHidden = true
@@ -971,16 +1041,16 @@ extension CategoryViewController {
         } else if _superTag.tag_type == TagType.condition {
             // Execute condition tag_type exclusive
             UIView.animate(withDuration: 0.5) {
-                self.detailContainerView.isHidden = false
+                self.detailContainer.isHidden = false
                 self.searchTextField.isHidden = true
                 self.langPickButton.isHidden = true
-                self.detailContainerViewHeight.constant = CGFloat(detailBoxCHeightInt)
-                self.tagCollectionViewTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxCHeightInt + marginInt)
+                self.detailContainerHeight.constant = CGFloat(detailBoxCHeightInt)
+                self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxCHeightInt + marginInt)
                 
                 self.fingerImageView.isHidden = true
                 self.downArrowImageView.isHidden = true
                 self.logSizeButton.isHidden = true
-                self.sizePickerContainerView.isHidden = true
+                self.sizePickerContainer.isHidden = true
                 self.logTimeButton.isHidden = true
                 self.timePicker.isHidden = true
                 self.startDateButton.isHidden = false
@@ -992,13 +1062,13 @@ extension CategoryViewController {
         
         // For all tag_types
         subTags = _subTags
-        tagCollectionView.reloadData()
-        UIView.transition(with: stepCollectionView, duration: 0.7, options: .transitionCrossDissolve, animations: {
-            self.stepCollectionView.reloadData()
+        tagCollection.reloadData()
+        UIView.transition(with: stepCollection, duration: 0.7, options: .transitionCrossDissolve, animations: {
+            self.stepCollection.reloadData()
         }) { _ in
             if self.subTags.count > 0 {
                 let indexPath = IndexPath(row: 0, section: 0)
-                self.tagCollectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+                self.tagCollection.scrollToItem(at: indexPath, at: .top, animated: true)
             }
         }
     }
@@ -1048,13 +1118,13 @@ extension CategoryViewController {
         let service = Service(lang: lang)
         service.postAvatarCond(params: params, popoverAlert: { (message) in
             self.retryFunction = self.createAConditionLog
-            self.detailContainerView.isHidden = true
+            self.detailContainer.isHidden = true
             self.alertError(message)
         }, tokenRefreshCompletion: {
             self.createAConditionLog()
         }) {
-            UIView.transition(with: self.detailContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.detailContainerView.isHidden = false
+            UIView.transition(with: self.detailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.detailContainer.isHidden = false
             }, completion: { (_) in
                 switch self.lang.currentLanguageId {
                 case LanguageId.eng: self.alertCompl(self.superTag!.eng_name, self.lang.msgLogComplete)
@@ -1099,6 +1169,20 @@ extension CategoryViewController {
             UIView.animate(withDuration: 0.5, animations: {
                 self.starButton.setImage(UIImage.btnStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
             })
+        }
+    }
+    
+    private func loadLangTagsOnPicker() {
+        let service = Service(lang: lang)
+        service.getProfileTagSets(tagId: TagId.language, isSelected: false, popoverAlert: { (message) in
+            self.retryFunction = self.loadLangTagsOnPicker
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.loadLangTagsOnPicker()
+        }) { (profileTagSet) in
+            self.langTags = profileTagSet.sub_tags
+            self.langPicker.reloadAllComponents()
+            self.alertLangPicker()
         }
     }
 }

@@ -101,10 +101,11 @@ struct AvatarInfoTarget {
 }
 
 struct TagId {
+    static let condition = 3
     static let home = 16
     static let diary = 17
     static let bookmarks = 18
-    static let condition = 3
+    static let language = 20
 }
 
 struct CountryId {

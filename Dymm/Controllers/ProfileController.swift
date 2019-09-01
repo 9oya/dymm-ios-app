@@ -16,22 +16,22 @@ class ProfileViewController: UIViewController {
     // MARK: - Properties
     
     // UIView
-    var topBarView: UIView!
-    var mailConfContainerView: UIView!
-    var infoContainerView: UIView!
-    var infoImageContainerView: UIView!
-    var firstNameContainerView: UIView!
-    var lastNameContainerView: UIView!
-    var emailContainerView: UIView!
-    var phNumberContainerView: UIView!
-    var introContainerView: UIView!
-    var passwordContainerView: UIView!
+    var topBarContainer: UIView!
+    var mailConfContainer: UIView!
+    var infoContainer: UIView!
+    var infoImageContainer: UIView!
+    var firstNameContainer: UIView!
+    var lastNameContainer: UIView!
+    var emailContainer: UIView!
+    var phNumberContainer: UIView!
+    var introContainer: UIView!
+    var passwordContainer: UIView!
     
     // UICollectionView
-    var tagCollectionView: UICollectionView!
+    var tagCollection: UICollectionView!
     
     // UIPickerView
-    var pickerView: UIPickerView!
+    var profileTagPicker: UIPickerView!
     
     // UIImageView
     var infoImageView: UIImageView!
@@ -100,10 +100,10 @@ class ProfileViewController: UIViewController {
     
     @objc func alertPicker() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
-        alert.view.addSubview(pickerView)
-        pickerView.topAnchor.constraint(equalTo: alert.view.topAnchor, constant: 0).isActive = true
+        alert.view.addSubview(profileTagPicker)
+        profileTagPicker.topAnchor.constraint(equalTo: alert.view.topAnchor, constant: 0).isActive = true
         alert.addAction(UIAlertAction(title: lang.titleClose, style: .default) { _ in })
-        pickerView.widthAnchor.constraint(equalTo: alert.view.widthAnchor, constant: 0).isActive = true
+        profileTagPicker.widthAnchor.constraint(equalTo: alert.view.widthAnchor, constant: 0).isActive = true
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             self.updateProfileTag()
         })
@@ -377,7 +377,7 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
     // MARK: - UICollectionViewDelegate
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedCollectionItem = indexPath.row
-        loadProfileTags()
+        loadProfileTagsOnPicker()
     }
     
     // MARK: - UICollectionView DelegateFlowLayout
@@ -483,7 +483,7 @@ extension ProfileViewController {
         view.backgroundColor = UIColor.whiteSmoke
         
         // Initialize subveiw properties
-        topBarView = getAddtionalTopBarView()
+        topBarContainer = getAddtionalTopBarView()
         signOutButton = getBasicTextButton(UIColor.tomato)
         signOutButton.addTarget(self, action: #selector(signOutButtonTapped), for: .touchUpInside)
         closeButton = getCloseButton()
@@ -492,18 +492,18 @@ extension ProfileViewController {
         mailConfAddressButton.addTarget(self, action: #selector(mailConfAddressBtnTapped), for: .touchUpInside)
         sendAgainButton = getBasicTextButton()
         sendAgainButton.addTarget(self, action: #selector(sendMailAgainBtnTapped), for: .touchUpInside)
-        firstNameContainerView = getProfileLabelContainerView()
-        firstNameContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.firstNameContainerTapped(_:))))
-        lastNameContainerView = getProfileLabelContainerView()
-        lastNameContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.lastNameContainerTapped(_:))))
-        emailContainerView = getProfileLabelContainerView()
-        emailContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.emailContainerTapped(_:))))
-        phNumberContainerView = getProfileLabelContainerView()
-        phNumberContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.phNumContainerTapped(_:))))
-        introContainerView = getProfileLabelContainerView()
-        introContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.introContainerTapped(_:))))
-        passwordContainerView = getProfileLabelContainerView()
-        passwordContainerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertChangePassword(_:))))
+        firstNameContainer = getProfileLabelContainerView()
+        firstNameContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.firstNameContainerTapped(_:))))
+        lastNameContainer = getProfileLabelContainerView()
+        lastNameContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.lastNameContainerTapped(_:))))
+        emailContainer = getProfileLabelContainerView()
+        emailContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.emailContainerTapped(_:))))
+        phNumberContainer = getProfileLabelContainerView()
+        phNumberContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.phNumContainerTapped(_:))))
+        introContainer = getProfileLabelContainerView()
+        introContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.introContainerTapped(_:))))
+        passwordContainer = getProfileLabelContainerView()
+        passwordContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertChangePassword(_:))))
         firstNameGuideLabel = getProfileGuideLabel()
         lastNameGuideLabel = getProfileGuideLabel()
         emailGuideLabel = getProfileGuideLabel()
@@ -523,7 +523,7 @@ extension ProfileViewController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-        mailConfContainerView = {
+        mailConfContainer = {
             let _view = UIView()
             _view.backgroundColor = UIColor.white
             _view.addShadowView()
@@ -540,7 +540,7 @@ extension ProfileViewController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-        infoContainerView = {
+        infoContainer = {
             let _view = UIView()
             _view.backgroundColor = UIColor.white
             _view.layer.cornerRadius = 10
@@ -549,7 +549,7 @@ extension ProfileViewController {
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
-        tagCollectionView = {
+        tagCollection = {
             let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
             _collectionView.backgroundColor = UIColor.clear
             _collectionView.register(TagCollectionCell.self, forCellWithReuseIdentifier: tagCellId)
@@ -557,12 +557,12 @@ extension ProfileViewController {
             _collectionView.translatesAutoresizingMaskIntoConstraints = false
             return _collectionView
         }()
-        pickerView = {
+        profileTagPicker = {
             let _pickerView = UIPickerView()
             _pickerView.translatesAutoresizingMaskIntoConstraints = false
             return _pickerView
         }()
-        infoImageContainerView = {
+        infoImageContainer = {
             let _view = UIView()
             _view.backgroundColor = UIColor.white
             _view.translatesAutoresizingMaskIntoConstraints = false
@@ -600,176 +600,176 @@ extension ProfileViewController {
         }()
         
         // Setup subviews
-        view.addSubview(topBarView)
-        view.addSubview(mailConfContainerView)
-        view.addSubview(infoContainerView)
-        view.addSubview(tagCollectionView)
+        view.addSubview(topBarContainer)
+        view.addSubview(mailConfContainer)
+        view.addSubview(infoContainer)
+        view.addSubview(tagCollection)
         
-        topBarView.addSubview(signOutButton)
+        topBarContainer.addSubview(signOutButton)
         
-        mailConfContainerView.addSubview(mailConfMsgLabel)
-        mailConfContainerView.addSubview(mailConfAddressButton)
-        mailConfContainerView.addSubview(sendAgainButton)
+        mailConfContainer.addSubview(mailConfMsgLabel)
+        mailConfContainer.addSubview(mailConfAddressButton)
+        mailConfContainer.addSubview(sendAgainButton)
         
-        infoContainerView.addSubview(infoImageContainerView)
-        infoContainerView.addSubview(firstNameContainerView)
-        infoContainerView.addSubview(lastNameContainerView)
-        infoContainerView.addSubview(emailContainerView)
-        infoContainerView.addSubview(phNumberContainerView)
-        infoContainerView.addSubview(introContainerView)
-        infoContainerView.addSubview(passwordContainerView)
+        infoContainer.addSubview(infoImageContainer)
+        infoContainer.addSubview(firstNameContainer)
+        infoContainer.addSubview(lastNameContainer)
+        infoContainer.addSubview(emailContainer)
+        infoContainer.addSubview(phNumberContainer)
+        infoContainer.addSubview(introContainer)
+        infoContainer.addSubview(passwordContainer)
         
-        infoImageContainerView.addSubview(infoImageView)
-        infoImageContainerView.addSubview(infoImageLabel)
-        firstNameContainerView.addSubview(firstNameGuideLabel)
-        firstNameContainerView.addSubview(firstNameLabel)
-        lastNameContainerView.addSubview(lastNameGuideLabel)
-        lastNameContainerView.addSubview(lastNameLabel)
-        emailContainerView.addSubview(emailGuideLabel)
-        emailContainerView.addSubview(emailLabel)
-        phNumberContainerView.addSubview(phNumberGuideLabel)
-        phNumberContainerView.addSubview(phNumberLabel)
-        phNumberContainerView.addSubview(phNumberPlaceHolderLabel)
-        introContainerView.addSubview(introGuideLabel)
-        introContainerView.addSubview(introLabel)
-        introContainerView.addSubview(introPlaceHolderLabel)
-        passwordContainerView.addSubview(passwordPlaceHolderLabel)
+        infoImageContainer.addSubview(infoImageView)
+        infoImageContainer.addSubview(infoImageLabel)
+        firstNameContainer.addSubview(firstNameGuideLabel)
+        firstNameContainer.addSubview(firstNameLabel)
+        lastNameContainer.addSubview(lastNameGuideLabel)
+        lastNameContainer.addSubview(lastNameLabel)
+        emailContainer.addSubview(emailGuideLabel)
+        emailContainer.addSubview(emailLabel)
+        phNumberContainer.addSubview(phNumberGuideLabel)
+        phNumberContainer.addSubview(phNumberLabel)
+        phNumberContainer.addSubview(phNumberPlaceHolderLabel)
+        introContainer.addSubview(introGuideLabel)
+        introContainer.addSubview(introLabel)
+        introContainer.addSubview(introPlaceHolderLabel)
+        passwordContainer.addSubview(passwordPlaceHolderLabel)
         
         setupLangProperties()
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
-        tagCollectionView.dataSource = self
-        tagCollectionView.delegate = self
-        pickerView.delegate = self
+        tagCollection.dataSource = self
+        tagCollection.delegate = self
+        profileTagPicker.delegate = self
         
         // Setup constraints
-        topBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
-        topBarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
-        topBarView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
-        topBarView.heightAnchor.constraint(equalToConstant: CGFloat(topBarHeightInt)).isActive = true
+        topBarContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+        topBarContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+        topBarContainer.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
+        topBarContainer.heightAnchor.constraint(equalToConstant: CGFloat(topBarHeightInt)).isActive = true
         
-        signOutButton.topAnchor.constraint(equalTo: topBarView.topAnchor, constant: 0).isActive = true
-        signOutButton.trailingAnchor.constraint(equalTo: topBarView.trailingAnchor, constant: -20).isActive = true
-        signOutButton.bottomAnchor.constraint(equalTo: topBarView.bottomAnchor, constant: 0).isActive = true
+        signOutButton.topAnchor.constraint(equalTo: topBarContainer.topAnchor, constant: 0).isActive = true
+        signOutButton.trailingAnchor.constraint(equalTo: topBarContainer.trailingAnchor, constant: -20).isActive = true
+        signOutButton.bottomAnchor.constraint(equalTo: topBarContainer.bottomAnchor, constant: 0).isActive = true
         
-        mailConfContainerView.topAnchor.constraint(equalTo: topBarView.bottomAnchor, constant: 7).isActive = true
-        mailConfContainerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
-        mailConfContainerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        mailConfContainerView.heightAnchor.constraint(equalToConstant: 220).isActive = true
+        mailConfContainer.topAnchor.constraint(equalTo: topBarContainer.bottomAnchor, constant: 7).isActive = true
+        mailConfContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        mailConfContainer.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        mailConfContainer.heightAnchor.constraint(equalToConstant: 220).isActive = true
         
-        mailConfMsgLabel.leadingAnchor.constraint(equalTo: mailConfContainerView.leadingAnchor, constant: 20).isActive = true
-        mailConfMsgLabel.trailingAnchor.constraint(equalTo: mailConfContainerView.trailingAnchor, constant: -20).isActive = true
-        mailConfMsgLabel.centerYAnchor.constraint(equalTo: mailConfContainerView.centerYAnchor, constant: -40).isActive = true
+        mailConfMsgLabel.leadingAnchor.constraint(equalTo: mailConfContainer.leadingAnchor, constant: 20).isActive = true
+        mailConfMsgLabel.trailingAnchor.constraint(equalTo: mailConfContainer.trailingAnchor, constant: -20).isActive = true
+        mailConfMsgLabel.centerYAnchor.constraint(equalTo: mailConfContainer.centerYAnchor, constant: -40).isActive = true
         
-        sendAgainButton.bottomAnchor.constraint(equalTo: mailConfContainerView.bottomAnchor, constant: -15).isActive = true
-        sendAgainButton.trailingAnchor.constraint(equalTo: mailConfContainerView.trailingAnchor, constant: -15).isActive = true
+        sendAgainButton.bottomAnchor.constraint(equalTo: mailConfContainer.bottomAnchor, constant: -15).isActive = true
+        sendAgainButton.trailingAnchor.constraint(equalTo: mailConfContainer.trailingAnchor, constant: -15).isActive = true
         
         mailConfAddressButton.bottomAnchor.constraint(equalTo: sendAgainButton.topAnchor, constant: -15).isActive = true
-        mailConfAddressButton.centerXAnchor.constraint(equalTo: mailConfContainerView.centerXAnchor, constant: 0).isActive = true
+        mailConfAddressButton.centerXAnchor.constraint(equalTo: mailConfContainer.centerXAnchor, constant: 0).isActive = true
 
-        infoContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt)).isActive = true
-        infoContainerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
-        infoContainerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        infoContainerView.heightAnchor.constraint(equalToConstant: 325).isActive = true
+        infoContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt)).isActive = true
+        infoContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        infoContainer.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        infoContainer.heightAnchor.constraint(equalToConstant: 325).isActive = true
         
-        infoImageContainerView.topAnchor.constraint(equalTo: infoContainerView.topAnchor, constant: 20).isActive = true
-        infoImageContainerView.leadingAnchor.constraint(equalTo: infoContainerView.leadingAnchor, constant: 20).isActive = true
-        infoImageContainerView.widthAnchor.constraint(equalToConstant: 70).isActive = true
-        infoImageContainerView.heightAnchor.constraint(equalToConstant: 70).isActive = true
+        infoImageContainer.topAnchor.constraint(equalTo: infoContainer.topAnchor, constant: 20).isActive = true
+        infoImageContainer.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
+        infoImageContainer.widthAnchor.constraint(equalToConstant: 70).isActive = true
+        infoImageContainer.heightAnchor.constraint(equalToConstant: 70).isActive = true
         
-        infoImageView.topAnchor.constraint(equalTo: infoImageContainerView.topAnchor, constant: 0).isActive = true
-        infoImageView.leadingAnchor.constraint(equalTo: infoImageContainerView.leadingAnchor, constant: 0).isActive = true
-        infoImageView.trailingAnchor.constraint(equalTo: infoImageContainerView.trailingAnchor, constant: 0).isActive = true
-        infoImageView.bottomAnchor.constraint(equalTo: infoImageContainerView.bottomAnchor, constant: 0).isActive = true
+        infoImageView.topAnchor.constraint(equalTo: infoImageContainer.topAnchor, constant: 0).isActive = true
+        infoImageView.leadingAnchor.constraint(equalTo: infoImageContainer.leadingAnchor, constant: 0).isActive = true
+        infoImageView.trailingAnchor.constraint(equalTo: infoImageContainer.trailingAnchor, constant: 0).isActive = true
+        infoImageView.bottomAnchor.constraint(equalTo: infoImageContainer.bottomAnchor, constant: 0).isActive = true
         
-        infoImageLabel.centerXAnchor.constraint(equalTo: infoImageContainerView.centerXAnchor, constant: 0).isActive = true
-        infoImageLabel.centerYAnchor.constraint(equalTo: infoImageContainerView.centerYAnchor, constant: 0).isActive = true
+        infoImageLabel.centerXAnchor.constraint(equalTo: infoImageContainer.centerXAnchor, constant: 0).isActive = true
+        infoImageLabel.centerYAnchor.constraint(equalTo: infoImageContainer.centerYAnchor, constant: 0).isActive = true
         
-        firstNameContainerView.topAnchor.constraint(equalTo: infoContainerView.topAnchor, constant: 15).isActive = true
-        firstNameContainerView.leadingAnchor.constraint(equalTo: infoImageContainerView.trailingAnchor, constant: 20).isActive = true
-        firstNameContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        firstNameContainerView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        firstNameContainer.topAnchor.constraint(equalTo: infoContainer.topAnchor, constant: 15).isActive = true
+        firstNameContainer.leadingAnchor.constraint(equalTo: infoImageContainer.trailingAnchor, constant: 20).isActive = true
+        firstNameContainer.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        firstNameContainer.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
-        firstNameGuideLabel.topAnchor.constraint(equalTo: firstNameContainerView.topAnchor, constant: 2).isActive = true
-        firstNameGuideLabel.leadingAnchor.constraint(equalTo: firstNameContainerView.leadingAnchor, constant: 6).isActive = true
-        firstNameGuideLabel.trailingAnchor.constraint(equalTo: firstNameContainerView.trailingAnchor, constant: 0).isActive = true
+        firstNameGuideLabel.topAnchor.constraint(equalTo: firstNameContainer.topAnchor, constant: 2).isActive = true
+        firstNameGuideLabel.leadingAnchor.constraint(equalTo: firstNameContainer.leadingAnchor, constant: 6).isActive = true
+        firstNameGuideLabel.trailingAnchor.constraint(equalTo: firstNameContainer.trailingAnchor, constant: 0).isActive = true
         
         firstNameLabel.topAnchor.constraint(equalTo: firstNameGuideLabel.bottomAnchor, constant: 2).isActive = true
-        firstNameLabel.leadingAnchor.constraint(equalTo: firstNameContainerView.leadingAnchor, constant: 6).isActive = true
-        firstNameLabel.trailingAnchor.constraint(equalTo: firstNameContainerView.trailingAnchor, constant: 0).isActive = true
+        firstNameLabel.leadingAnchor.constraint(equalTo: firstNameContainer.leadingAnchor, constant: 6).isActive = true
+        firstNameLabel.trailingAnchor.constraint(equalTo: firstNameContainer.trailingAnchor, constant: 0).isActive = true
         
-        lastNameContainerView.topAnchor.constraint(equalTo: firstNameContainerView.bottomAnchor, constant: 3).isActive = true
-        lastNameContainerView.leadingAnchor.constraint(equalTo: infoImageContainerView.trailingAnchor, constant: 20).isActive = true
-        lastNameContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        lastNameContainerView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        lastNameContainer.topAnchor.constraint(equalTo: firstNameContainer.bottomAnchor, constant: 3).isActive = true
+        lastNameContainer.leadingAnchor.constraint(equalTo: infoImageContainer.trailingAnchor, constant: 20).isActive = true
+        lastNameContainer.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        lastNameContainer.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
-        lastNameGuideLabel.topAnchor.constraint(equalTo: lastNameContainerView.topAnchor, constant: 2).isActive = true
-        lastNameGuideLabel.leadingAnchor.constraint(equalTo: lastNameContainerView.leadingAnchor, constant: 6).isActive = true
-        lastNameGuideLabel.trailingAnchor.constraint(equalTo: lastNameContainerView.trailingAnchor, constant: 0).isActive = true
+        lastNameGuideLabel.topAnchor.constraint(equalTo: lastNameContainer.topAnchor, constant: 2).isActive = true
+        lastNameGuideLabel.leadingAnchor.constraint(equalTo: lastNameContainer.leadingAnchor, constant: 6).isActive = true
+        lastNameGuideLabel.trailingAnchor.constraint(equalTo: lastNameContainer.trailingAnchor, constant: 0).isActive = true
         
         lastNameLabel.topAnchor.constraint(equalTo: lastNameGuideLabel.bottomAnchor, constant: 2).isActive = true
-        lastNameLabel.leadingAnchor.constraint(equalTo: lastNameContainerView.leadingAnchor, constant: 6).isActive = true
-        lastNameLabel.trailingAnchor.constraint(equalTo: lastNameContainerView.trailingAnchor, constant: 0).isActive = true
+        lastNameLabel.leadingAnchor.constraint(equalTo: lastNameContainer.leadingAnchor, constant: 6).isActive = true
+        lastNameLabel.trailingAnchor.constraint(equalTo: lastNameContainer.trailingAnchor, constant: 0).isActive = true
         
-        emailContainerView.topAnchor.constraint(equalTo: lastNameContainerView.bottomAnchor, constant: 3).isActive = true
-        emailContainerView.leadingAnchor.constraint(equalTo: infoContainerView.leadingAnchor, constant: 20).isActive = true
-        emailContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        emailContainerView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        emailContainer.topAnchor.constraint(equalTo: lastNameContainer.bottomAnchor, constant: 3).isActive = true
+        emailContainer.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
+        emailContainer.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        emailContainer.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
-        emailGuideLabel.topAnchor.constraint(equalTo: emailContainerView.topAnchor, constant: 2).isActive = true
-        emailGuideLabel.leadingAnchor.constraint(equalTo: emailContainerView.leadingAnchor, constant: 6).isActive = true
-        emailGuideLabel.trailingAnchor.constraint(equalTo: emailContainerView.trailingAnchor, constant: 0).isActive = true
+        emailGuideLabel.topAnchor.constraint(equalTo: emailContainer.topAnchor, constant: 2).isActive = true
+        emailGuideLabel.leadingAnchor.constraint(equalTo: emailContainer.leadingAnchor, constant: 6).isActive = true
+        emailGuideLabel.trailingAnchor.constraint(equalTo: emailContainer.trailingAnchor, constant: 0).isActive = true
         
         emailLabel.topAnchor.constraint(equalTo: emailGuideLabel.bottomAnchor, constant: 2).isActive = true
-        emailLabel.leadingAnchor.constraint(equalTo: emailContainerView.leadingAnchor, constant: 6).isActive = true
-        emailLabel.trailingAnchor.constraint(equalTo: emailContainerView.trailingAnchor, constant: 0).isActive = true
+        emailLabel.leadingAnchor.constraint(equalTo: emailContainer.leadingAnchor, constant: 6).isActive = true
+        emailLabel.trailingAnchor.constraint(equalTo: emailContainer.trailingAnchor, constant: 0).isActive = true
         
-        phNumberContainerView.topAnchor.constraint(equalTo: emailContainerView.bottomAnchor, constant: 3).isActive = true
-        phNumberContainerView.leadingAnchor.constraint(equalTo: infoContainerView.leadingAnchor, constant: 20).isActive = true
-        phNumberContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        phNumberContainerView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        phNumberContainer.topAnchor.constraint(equalTo: emailContainer.bottomAnchor, constant: 3).isActive = true
+        phNumberContainer.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
+        phNumberContainer.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        phNumberContainer.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
-        phNumberGuideLabel.topAnchor.constraint(equalTo: phNumberContainerView.topAnchor, constant: 2).isActive = true
-        phNumberGuideLabel.leadingAnchor.constraint(equalTo: phNumberContainerView.leadingAnchor, constant: 6).isActive = true
-        phNumberGuideLabel.trailingAnchor.constraint(equalTo: phNumberContainerView.trailingAnchor, constant: 0).isActive = true
+        phNumberGuideLabel.topAnchor.constraint(equalTo: phNumberContainer.topAnchor, constant: 2).isActive = true
+        phNumberGuideLabel.leadingAnchor.constraint(equalTo: phNumberContainer.leadingAnchor, constant: 6).isActive = true
+        phNumberGuideLabel.trailingAnchor.constraint(equalTo: phNumberContainer.trailingAnchor, constant: 0).isActive = true
         
         phNumberLabel.topAnchor.constraint(equalTo: phNumberGuideLabel.bottomAnchor, constant: 2).isActive = true
-        phNumberLabel.leadingAnchor.constraint(equalTo: phNumberContainerView.leadingAnchor, constant: 6).isActive = true
-        phNumberLabel.trailingAnchor.constraint(equalTo: phNumberContainerView.trailingAnchor, constant: 0).isActive = true
+        phNumberLabel.leadingAnchor.constraint(equalTo: phNumberContainer.leadingAnchor, constant: 6).isActive = true
+        phNumberLabel.trailingAnchor.constraint(equalTo: phNumberContainer.trailingAnchor, constant: 0).isActive = true
         
-        phNumberPlaceHolderLabel.leadingAnchor.constraint(equalTo: phNumberContainerView.leadingAnchor, constant: 0).isActive = true
-        phNumberPlaceHolderLabel.trailingAnchor.constraint(equalTo: phNumberContainerView.trailingAnchor, constant: 0).isActive = true
-        phNumberPlaceHolderLabel.centerYAnchor.constraint(equalTo: phNumberContainerView.centerYAnchor, constant: 0).isActive = true
+        phNumberPlaceHolderLabel.leadingAnchor.constraint(equalTo: phNumberContainer.leadingAnchor, constant: 0).isActive = true
+        phNumberPlaceHolderLabel.trailingAnchor.constraint(equalTo: phNumberContainer.trailingAnchor, constant: 0).isActive = true
+        phNumberPlaceHolderLabel.centerYAnchor.constraint(equalTo: phNumberContainer.centerYAnchor, constant: 0).isActive = true
         
-        introContainerView.topAnchor.constraint(equalTo: phNumberContainerView.bottomAnchor, constant: 3).isActive = true
-        introContainerView.leadingAnchor.constraint(equalTo: infoContainerView.leadingAnchor, constant: 20).isActive = true
-        introContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        introContainerView.heightAnchor.constraint(equalToConstant: 80).isActive = true
+        introContainer.topAnchor.constraint(equalTo: phNumberContainer.bottomAnchor, constant: 3).isActive = true
+        introContainer.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
+        introContainer.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        introContainer.heightAnchor.constraint(equalToConstant: 80).isActive = true
         
-        passwordContainerView.topAnchor.constraint(equalTo: introContainerView.bottomAnchor, constant: 3).isActive = true
-        passwordContainerView.leadingAnchor.constraint(equalTo: infoContainerView.leadingAnchor, constant: 20).isActive = true
-        passwordContainerView.trailingAnchor.constraint(equalTo: infoContainerView.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        passwordContainerView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        passwordContainer.topAnchor.constraint(equalTo: introContainer.bottomAnchor, constant: 3).isActive = true
+        passwordContainer.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
+        passwordContainer.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        passwordContainer.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
-        passwordPlaceHolderLabel.leadingAnchor.constraint(equalTo: passwordContainerView.leadingAnchor, constant: 0).isActive = true
-        passwordPlaceHolderLabel.trailingAnchor.constraint(equalTo: passwordContainerView.trailingAnchor, constant: 0).isActive = true
-        passwordPlaceHolderLabel.centerYAnchor.constraint(equalTo: passwordContainerView.centerYAnchor, constant: 0).isActive = true
+        passwordPlaceHolderLabel.leadingAnchor.constraint(equalTo: passwordContainer.leadingAnchor, constant: 0).isActive = true
+        passwordPlaceHolderLabel.trailingAnchor.constraint(equalTo: passwordContainer.trailingAnchor, constant: 0).isActive = true
+        passwordPlaceHolderLabel.centerYAnchor.constraint(equalTo: passwordContainer.centerYAnchor, constant: 0).isActive = true
         
-        introGuideLabel.topAnchor.constraint(equalTo: introContainerView.topAnchor, constant: 2).isActive = true
-        introGuideLabel.leadingAnchor.constraint(equalTo: introContainerView.leadingAnchor, constant: 6).isActive = true
-        introGuideLabel.trailingAnchor.constraint(equalTo: introContainerView.trailingAnchor, constant: 0).isActive = true
+        introGuideLabel.topAnchor.constraint(equalTo: introContainer.topAnchor, constant: 2).isActive = true
+        introGuideLabel.leadingAnchor.constraint(equalTo: introContainer.leadingAnchor, constant: 6).isActive = true
+        introGuideLabel.trailingAnchor.constraint(equalTo: introContainer.trailingAnchor, constant: 0).isActive = true
         
         introLabel.topAnchor.constraint(equalTo: introGuideLabel.bottomAnchor, constant: 2).isActive = true
-        introLabel.leadingAnchor.constraint(equalTo: introContainerView.leadingAnchor, constant: 6).isActive = true
-        introLabel.trailingAnchor.constraint(equalTo: introContainerView.trailingAnchor, constant: 0).isActive = true
+        introLabel.leadingAnchor.constraint(equalTo: introContainer.leadingAnchor, constant: 6).isActive = true
+        introLabel.trailingAnchor.constraint(equalTo: introContainer.trailingAnchor, constant: 0).isActive = true
         
-        introPlaceHolderLabel.leadingAnchor.constraint(equalTo: introContainerView.leadingAnchor, constant: 0).isActive = true
-        introPlaceHolderLabel.trailingAnchor.constraint(equalTo: introContainerView.trailingAnchor, constant: 0).isActive = true
-        introPlaceHolderLabel.centerYAnchor.constraint(equalTo: introContainerView.centerYAnchor, constant: 0).isActive = true
+        introPlaceHolderLabel.leadingAnchor.constraint(equalTo: introContainer.leadingAnchor, constant: 0).isActive = true
+        introPlaceHolderLabel.trailingAnchor.constraint(equalTo: introContainer.trailingAnchor, constant: 0).isActive = true
+        introPlaceHolderLabel.centerYAnchor.constraint(equalTo: introContainer.centerYAnchor, constant: 0).isActive = true
         
-        tagCollectionView.topAnchor.constraint(equalTo: infoContainerView.bottomAnchor, constant: CGFloat(marginInt)).isActive = true
-        tagCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
-        tagCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        tagCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+        tagCollection.topAnchor.constraint(equalTo: infoContainer.bottomAnchor, constant: CGFloat(marginInt)).isActive = true
+        tagCollection.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        tagCollection.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        tagCollection.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
     }
     
     private func setupLangProperties() {
@@ -794,10 +794,10 @@ extension ProfileViewController {
             self.alertError(message)
         }, emailNotConfirmed: { (email) in
             self.newMailAddress = email
-            UIView.transition(with: self.mailConfContainerView, duration: 0.7, options: .transitionCrossDissolve, animations: {
-                self.infoContainerView.isHidden = true
+            UIView.transition(with: self.mailConfContainer, duration: 0.7, options: .transitionCrossDissolve, animations: {
+                self.infoContainer.isHidden = true
                 self.mailConfAddressButton.setTitle(email, for: .normal)
-                self.mailConfContainerView.isHidden = false
+                self.mailConfContainer.isHidden = false
             })
         }, tokenRefreshCompletion: {
             self.loadProfile()
@@ -835,29 +835,29 @@ extension ProfileViewController {
                 self.introGuideLabel.isHidden = true
                 self.introPlaceHolderLabel.isHidden = false
             }
-            self.tagCollectionView.reloadData()
-            UIView.transition(with: self.tagCollectionView, duration: 0.7, options: .transitionCrossDissolve, animations: {
-                self.infoContainerView.isHidden = false
-                self.tagCollectionView.isHidden = false
+            self.tagCollection.reloadData()
+            UIView.transition(with: self.tagCollection, duration: 0.7, options: .transitionCrossDissolve, animations: {
+                self.infoContainer.isHidden = false
+                self.tagCollection.isHidden = false
             })
         }
     }
     
-    private func loadProfileTags() {
+    private func loadProfileTagsOnPicker() {
         let profile_tag = profile!.profile_tags[selectedCollectionItem!]
         let service = Service(lang: lang)
         service.getProfileTagSets(tagId: profile_tag.tag_id, isSelected: profile_tag.is_selected, popoverAlert: { (message) in
-            self.retryFunction = self.loadProfileTags
+            self.retryFunction = self.loadProfileTagsOnPicker
             self.alertError(message)
         }, tokenRefreshCompletion: {
-            self.loadProfileTags()
+            self.loadProfileTagsOnPicker()
         }) { (profileTagSet) in
             self.tags = profileTagSet.sub_tags
             if profileTagSet.sub_tags.count > 0 {
                 self.pickedTag = profileTagSet.sub_tags[profileTagSet.select_idx]
             }
-            self.pickerView.reloadAllComponents()
-            self.pickerView.selectRow(profileTagSet.select_idx, inComponent: 0, animated: true)
+            self.profileTagPicker.reloadAllComponents()
+            self.profileTagPicker.selectRow(profileTagSet.select_idx, inComponent: 0, animated: true)
             self.alertPicker()
         }
     }
