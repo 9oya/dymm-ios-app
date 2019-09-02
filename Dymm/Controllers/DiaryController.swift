@@ -54,9 +54,6 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var pickerDateLabel: UILabel!
     var condTitleLabel: UILabel!
     
-    // UITextView
-    var noteTextView: UITextView!
-    
     // UIButton
     var toggleButton: UIButton!
     var pickerCancelButton: UIButton!
@@ -114,8 +111,10 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var groupType: Int?
     var weekOfYear: Int?
     var dayOfYear: Int?
-    var x_val: Int?
-    var y_val: Int?
+    var xVal: Int?
+    var yVal: Int?
+    var thisMonthAvgScore: Float?
+    var lastMonthAvgScore: Float?
     var isToggleBtnTapped: Bool = false
     var isPullToRefresh: Bool = false
     var isLogGroupTableEdited: Bool = false
@@ -173,7 +172,24 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     @objc func alertNoteTextView(_ sender: UITapGestureRecognizer? = nil) {
-        let alert = UIAlertController(title: "\u{1F4CD}", message: nil, preferredStyle: .alert)
+        var message = ""
+        switch lang.currentLanguageId {
+        case LanguageId.eng:
+            message = "\(lang.getLogGroupTypeName(selectedLogGroup!.group_type)) \(LangHelper.getEngNameOfMM(monthNumber: selectedLogGroup!.month_number))/\(selectedLogGroup!.day_number)/\(selectedLogGroup!.year_number)"
+        case LanguageId.kor:
+            message = "\(lang.getLogGroupTypeName(selectedLogGroup!.group_type)) \(LangHelper.getKorNameOfMonth(monthNumber: selectedLogGroup!.month_number, engMMM: nil))/\(selectedLogGroup!.day_number)/\(selectedLogGroup!.year_number)"
+        case LanguageId.jpn:
+            // TODO
+            print("")
+        default: fatalError() }
+        let alert = UIAlertController(title: lang.titleSimpleNote, message: message, preferredStyle: .alert)
+        let noteTextView: UITextView = {
+            let _textView = UITextView()
+            _textView.backgroundColor = UIColor(hex: "#FFFDB1")
+            _textView.font = .systemFont(ofSize: 16, weight: .light)
+            _textView.translatesAutoresizingMaskIntoConstraints = false
+            return _textView
+        }()
         noteTextView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         let controller = UIViewController()
         noteTextView.frame = controller.view.frame
@@ -190,6 +206,86 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
 //                }
             })
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
+        alert.view.tintColor = UIColor.cornflowerBlue
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func alertAvgCondScore() {
+        var message = ""
+        var month = ""
+        var heightInt = 0
+        switch lang.currentLanguageId {
+        case LanguageId.eng:
+            month = LangHelper.getEngNameOfMM(monthNumber: monthNumber!)
+            heightInt = 210
+        case LanguageId.kor:
+            month = LangHelper.getKorNameOfMonth(monthNumber: monthNumber!, engMMM: nil)
+            heightInt = 190
+        case LanguageId.jpn:
+            // TODO
+            print("")
+        default: fatalError() }
+        let imageView: UIImageView = {
+            let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 12))
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            return imageView
+        }()
+        let changedScorelabel: UILabel = {
+            let label = UILabel(frame: CGRect(x: 0, y: 0, width: 25, height: 15))
+            label.font = .systemFont(ofSize: 12, weight: .regular)
+            label.textColor = .lightGray
+            label.translatesAutoresizingMaskIntoConstraints = false
+            return label
+        }()
+        if thisMonthAvgScore! < lastMonthAvgScore! {
+            message = lang.msgAvgScoreDown
+            imageView.image = UIImage(named: "item-diagonal-down")!.withRenderingMode(.alwaysOriginal)
+            changedScorelabel.text = String(format: "-%.1f", (lastMonthAvgScore! - thisMonthAvgScore!))
+        } else if thisMonthAvgScore! == lastMonthAvgScore! {
+            message = lang.msgAvgScoreEqual
+            imageView.image = UIImage(named: "item-diagonal-up-gray")!.withRenderingMode(.alwaysOriginal)
+            changedScorelabel.text = "+0.0"
+        } else {
+            message = lang.msgAvgScoreUp
+            imageView.image = UIImage(named: "item-diagonal-up")!.withRenderingMode(.alwaysOriginal)
+            changedScorelabel.text = String(format: "+%.1f", (thisMonthAvgScore! - lastMonthAvgScore!))
+        }
+        let alert = UIAlertController(title: lang.titleAvgScore(month), message: message, preferredStyle: .alert)
+        let thisMonthlabel: UILabel = {
+            let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+            label.text = String(format: "%.1f", thisMonthAvgScore!)
+            label.translatesAutoresizingMaskIntoConstraints = false
+            return label
+        }()
+        let lastMonthlabel: UILabel = {
+            let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+            label.text = String(format: "%.1f", lastMonthAvgScore!)
+            label.translatesAutoresizingMaskIntoConstraints = false
+            return label
+        }()
+        
+        alert.view.addSubview(imageView)
+        alert.view.addSubview(changedScorelabel)
+        alert.view.addSubview(thisMonthlabel)
+        alert.view.addSubview(lastMonthlabel)
+        
+        imageView.centerXAnchor.constraint(equalTo: alert.view.centerXAnchor, constant: 0).isActive = true
+        imageView.centerYAnchor.constraint(equalTo: alert.view.centerYAnchor, constant: 10).isActive = true
+        
+        changedScorelabel.centerXAnchor.constraint(equalTo: alert.view.centerXAnchor, constant: 0).isActive = true
+        changedScorelabel.bottomAnchor.constraint(equalTo: imageView.topAnchor, constant: -1).isActive = true
+        
+        thisMonthlabel.centerYAnchor.constraint(equalTo: alert.view.centerYAnchor, constant: 10).isActive = true
+        thisMonthlabel.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 10).isActive = true
+        
+        lastMonthlabel.centerYAnchor.constraint(equalTo: alert.view.centerYAnchor, constant: 10).isActive = true
+        lastMonthlabel.trailingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: -10).isActive = true
+        
+        let height = NSLayoutConstraint(item: alert.view!, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: CGFloat(heightInt))
+        alert.view.addConstraint(height)
+        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
+            
+        })
         alert.view.tintColor = UIColor.cornflowerBlue
         self.present(alert, animated: true, completion: nil)
     }
@@ -273,6 +369,14 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     @objc func homeButtonTapped() {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func avgScoreButtonTapped() {
+        loadAvgCondScore()
+    }
+    
+    @objc func noteButtonTapped() {
         dismiss(animated: true, completion: nil)
     }
     
@@ -815,6 +919,15 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 let avtCond = avtCondList?[indexPath.item] else {
                 fatalError()
             }
+            if self.isCondEditBtnTapped {
+                cell.titleLabel.textColor = UIColor.lightGray
+                cell.stackView.isHidden = true
+                cell.removeImageView.isHidden = false
+            } else {
+                cell.titleLabel.textColor = UIColor.black
+                cell.stackView.isHidden = false
+                cell.removeImageView.isHidden = true
+            }
             switch lang.currentLanguageId {
             case LanguageId.eng:
                 cell.titleLabel.text = avtCond.eng_name
@@ -828,27 +941,18 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 cell.titleLabel.text = avtCond.kor_name
                 if let startDate = avtCond.start_date {
                     let dateArr = startDate.split(separator: "/")
-                    let month = LangHelper.getKorNameOfMonth(engMMM: String(dateArr[0]))
+                    let month = LangHelper.getKorNameOfMonth(monthNumber: nil, engMMM: String(dateArr[0]))
                     cell.startDateLabel.text = "\u{021E2}\(month)/\(dateArr[1])/\(dateArr[2])"
                 }
                 if let endDate = avtCond.end_date {
                     let dateArr = endDate.split(separator: "/")
-                    let month = LangHelper.getKorNameOfMonth(engMMM: String(dateArr[0]))
+                    let month = LangHelper.getKorNameOfMonth(monthNumber: nil, engMMM: String(dateArr[0]))
                     cell.endDateLabel.text = "\u{2713}\(month)/\(dateArr[1])/\(dateArr[2])"
                 }
             case LanguageId.jpn:
                 cell.titleLabel.text = avtCond.jpn_name
             default:
                 fatalError()
-            }
-            if self.isCondEditBtnTapped {
-                cell.titleLabel.textColor = UIColor.lightGray
-                cell.stackView.isHidden = true
-                cell.removeImageView.isHidden = false
-            } else {
-                cell.titleLabel.textColor = UIColor.black
-                cell.stackView.isHidden = false
-                cell.removeImageView.isHidden = true
             }
             return cell
         default:
@@ -1109,15 +1213,6 @@ extension DiaryViewController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-        noteTextView = {
-            let _textView = UITextView()
-//            _textView.backgroundColor = UIColor.whiteSmoke
-//            _textView.backgroundColor = UIColor.white.withAlphaComponent(0.7)
-            _textView.backgroundColor = UIColor(hex: "#FFFDB1")
-            _textView.font = .systemFont(ofSize: 16, weight: .light)
-            _textView.translatesAutoresizingMaskIntoConstraints = false
-            return _textView
-        }()
         pickerCancelButton = getCancelButton()
         pickerCancelButton.addTarget(self, action: #selector(pickerCancelButtonTapped), for: .touchUpInside)
         pickerCheckButton = getCheckButton()
@@ -1145,7 +1240,7 @@ extension DiaryViewController {
             _button.setImage(UIImage(named: "item-pin-line")!.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
             _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
+            _button.addTarget(self, action:#selector(noteButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
@@ -1154,7 +1249,7 @@ extension DiaryViewController {
             _button.setImage(UIImage(named: "button-avg-score")!.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
             _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
+            _button.addTarget(self, action:#selector(avgScoreButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
@@ -1485,8 +1580,8 @@ extension DiaryViewController {
             "day_of_year": dayOfYear!,
             "group_type": groupType!,
             "log_date": selectedDate!,
-            "x_val": x_val!,
-            "y_val": y_val!,
+            "x_val": xVal!,
+            "y_val": yVal!,
         ]
         if let logGroupId = selectedLogGroupId {
             params["log_group_id"] = logGroupId
@@ -1552,6 +1647,24 @@ extension DiaryViewController {
             self.updateAvatarCondRemove()
         }) {
             self.loadAvatarCondList()
+        }
+    }
+    
+    private func loadAvgCondScore() {
+        let selectedDateArr = dateFormatter.string(from: calendarView.currentPage).components(separatedBy: "-")
+        yearNumber = Int(selectedDateArr[0])!
+        monthNumber = Int(selectedDateArr[1])!
+        let service = Service(lang: lang)
+        service.getAvgCondScorePerMonth(yearNumber: selectedDateArr[0], monthNumber: Int(selectedDateArr[1])!, popoverAlert: { (message) in
+            self.retryFunction = self.loadAvgCondScore
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.loadAvgCondScore()
+        }) { (avgScoreSet) in
+            let formatter = NumberFormatter()
+            self.thisMonthAvgScore = formatter.number(from: avgScoreSet.this_month_score)!.floatValue
+            self.lastMonthAvgScore = formatter.number(from: avgScoreSet.last_month_score)!.floatValue
+            self.alertAvgCondScore()
         }
     }
 }

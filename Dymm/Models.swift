@@ -427,6 +427,22 @@ struct CustomModel {
         let logGroup: BaseModel.LogGroup
     }
     
+    struct AvgCondScoreSet: Codable {
+        let this_month_score: String
+        let last_month_score: String
+        
+        enum CodingKeys: String, CodingKey {
+            case this_month_score
+            case last_month_score
+        }
+        
+        init(from decoder: Decoder) throws {
+            let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
+            self.this_month_score = try valueContainer.decode(String.self, forKey: CodingKeys.this_month_score)
+            self.last_month_score = try valueContainer.decode(String.self, forKey: CodingKeys.last_month_score)
+        }
+    }
+    
     struct Profile: Codable {
         let avatar: BaseModel.Avatar
         let profile_tags: [BaseModel.ProfileTag]

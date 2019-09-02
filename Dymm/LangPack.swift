@@ -12,6 +12,7 @@ struct LangPack {
     var currentLanguageId: Int!
     
     var titleAll: String!
+    var titleAvgScore: ((String) -> String)!
     var titleBackHome: String!
     var titleCancel: String!
     var titleClose: String!
@@ -77,6 +78,9 @@ struct LangPack {
     var titleWeekdays: [String]!
     var titleYes: String!
     
+    var msgAvgScoreDown: String!
+    var msgAvgScoreEqual: String!
+    var msgAvgScoreUp: String!
     var msgChangePasswordCompl: String!
     var msgEmptyEmail: String!
     var msgEmptyName: String!
@@ -138,6 +142,14 @@ struct LangPack {
             case LanguageId.jpn: return ""
             default: fatalError()}
         }()
+        func _titleAvgScore(_ month: String) -> String {
+            switch currentLanguageId {
+            case LanguageId.eng: return "My \(month) Condition Score"
+            case LanguageId.kor: return "나의 \(month) 컨디션 점수"
+            case LanguageId.jpn: return ""
+            default: fatalError()}
+        }
+        self.titleAvgScore = _titleAvgScore
         self.titleBackHome = {
             switch currentLanguageId {
             case LanguageId.eng: return "Back to Home"
@@ -468,8 +480,8 @@ struct LangPack {
         }()
         self.titleSimpleNote = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Simple Note"
-            case LanguageId.kor: return "심플 노트"
+            case LanguageId.eng: return "Note"
+            case LanguageId.kor: return "노트"
             default: fatalError()}
         }()
         self.titleSpread = {
@@ -531,6 +543,24 @@ struct LangPack {
         
         // MARK: Messages
         
+        self.msgAvgScoreDown = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Your condition score for this month has gone down."
+            case LanguageId.kor: return "당신의 이번 달 컨디션 점수가 하락했습니다."
+            default: fatalError()}
+        }()
+        self.msgAvgScoreEqual = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Your score for this month has been maintained."
+            case LanguageId.kor: return "당신의 이번 달 컨디션 점수가 유지되었습니다."
+            default: fatalError()}
+        }()
+        self.msgAvgScoreUp = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Your condition score for this month has gone up."
+            case LanguageId.kor: return "당신의 이번 달 컨디션 점수가 상승했습니다."
+            default: fatalError()}
+        }()
         self.msgChangePasswordCompl = {
             switch currentLanguageId {
             case LanguageId.eng: return "Your new password has been successfully changed."
@@ -724,7 +754,40 @@ struct LangHelper {
         default: fatalError()}
     }
     
-    static func getKorNameOfMonth(engMMM: String) -> String {
+    static func getEngNameOfMM(monthNumber: Int) -> String {
+        switch monthNumber {
+        case 1: return "Jan"
+        case 2: return "Feb"
+        case 3: return "Mar"
+        case 4: return "Apr"
+        case 5: return "May"
+        case 6: return "Jun"
+        case 7: return "Jul"
+        case 8: return "Aug"
+        case 9: return "Sep"
+        case 10: return "Oct"
+        case 11: return "Nov"
+        case 12: return "Dec"
+        default: fatalError()}
+    }
+    
+    static func getKorNameOfMonth(monthNumber: Int?, engMMM: String?) -> String {
+        if monthNumber != nil {
+            switch monthNumber {
+            case 1: return "1월"
+            case 2: return "2월"
+            case 3: return "3월"
+            case 4: return "4월"
+            case 5: return "5월"
+            case 6: return "6월"
+            case 7: return "7월"
+            case 8: return "8월"
+            case 9: return "9월"
+            case 10: return "10월"
+            case 11: return "11월"
+            case 12: return "12월"
+            default: fatalError()}
+        }
         switch engMMM {
         case "Jan": return "1월"
         case "Feb": return "2월"

@@ -208,8 +208,8 @@ class CategoryViewController: UIViewController {
             let vc = DiaryViewController()
             vc.diaryMode = DiaryMode.logger
             vc.selectedTag = superTag!
-            vc.x_val = selectedXVal!
-            vc.y_val = selectedYVal!
+            vc.xVal = selectedXVal!
+            vc.yVal = selectedYVal!
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: UIBarButtonItem.Style.plain, target: self, action: nil)
             self.navigationController?.pushViewController(vc, animated: true)
         } else {

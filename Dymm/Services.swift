@@ -294,6 +294,49 @@ struct Service {
         }
     }
     
+    func getAvgCondScorePerMonth(yearNumber: String, monthNumber: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.AvgCondScoreSet) -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        guard let avatarId = UserDefaults.standard.getAvatarId() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)",
+        ]
+        let url = "\(URI.host)\(URI.avatar)/\(avatarId)/group/\(yearNumber)/\(monthNumber)/avg-score"
+        Alamofire.request(url, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<CustomModel.AvgCondScoreSet>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    guard let avgCondScoreSet = decodedData.data else {
+                        fatalError()
+                    }
+                    completion(avgCondScoreSet)
+                case 400:
+                    self.badRequest(responseData)
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "getAvgCondScorePerMonth()")
+                    return
+                }
+        }
+    }
+    
     func getGroupOfLogs(logGroupId: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.GroupOfLogSet) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
@@ -326,7 +369,7 @@ struct Service {
                     }
                     return
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchLogs()")
+                    self.unexpectedResponse(statusCode, responseData, "getGroupOfLogs()")
                     return
                 }
         }
@@ -352,7 +395,7 @@ struct Service {
                 case 400:
                     self.badRequest(responseData)
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchTagSets()")
+                    self.unexpectedResponse(statusCode, responseData, "getBannerList()")
                     return
                 }
         }
@@ -386,7 +429,7 @@ struct Service {
                 case 400:
                     self.badRequest(responseData)
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchTagSets()")
+                    self.unexpectedResponse(statusCode, responseData, "getTagSetList()")
                     return
                 }
         }
@@ -424,7 +467,7 @@ struct Service {
                     }
                     return
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "fetchSetOfFacts()")
+                    self.unexpectedResponse(statusCode, responseData, "getProfileTagSets()")
                     return
                 }
         }
@@ -443,17 +486,17 @@ struct Service {
                 switch statusCode {
                 case 200:
                     guard let decodedData = try? self.decoder.decode(Ok<CustomModel.Auth>.self, from: responseData) else {
-                        fatalError("jsonDecoder.decode(Ok<UserModel.Auth>.self, from: responseData)")
+                        fatalError()
                     }
                     guard let auth = decodedData.data else {
-                        fatalError("decodedData.data")
+                        fatalError()
                     }
                     completion(auth)
                 case 400:
                     self.badRequest(responseData)
                 case 401:
                     guard let decodedData = try? self.decoder.decode(Unauthorized.self, from: responseData) else {
-                        fatalError("jsonDecoder.decode(Unauthorized.self, from: responseData)")
+                        fatalError()
                     }
                     unauthorized(decodedData.pattern)
                 default:
