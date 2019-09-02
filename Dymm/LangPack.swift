@@ -66,6 +66,7 @@ struct LangPack {
     var titleSignIn: String!
     var titleSignOut: String!
     var titleSignUp: String!
+    var titleSimpleNote: String!
     var titleSpread: String!
     var titleStartDate: String!
     var titleStay: String!
@@ -463,6 +464,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Sign up"
             case LanguageId.kor: return "가입하기"
+            default: fatalError()}
+        }()
+        self.titleSimpleNote = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Simple Note"
+            case LanguageId.kor: return "심플 노트"
             default: fatalError()}
         }()
         self.titleSpread = {

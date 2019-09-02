@@ -155,11 +155,11 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             case LanguageId.kor:
                 cell.imageView.image = UIImage(named: "item-rectangle")!.withRenderingMode(.alwaysOriginal)
                 cell.titleLabel.text = banners![indexPath.item].kor_title
-                cell.subtitleLabel.text = banners![indexPath.item].eng_subtitle
+                cell.subtitleLabel.text = banners![indexPath.item].kor_subtitle
             case LanguageId.jpn:
                 cell.imageView.image = UIImage(named: "item-rectangle")!.withRenderingMode(.alwaysOriginal)
                 cell.titleLabel.text = banners![indexPath.item].jpn_title
-                cell.subtitleLabel.text = banners![indexPath.item].eng_subtitle
+                cell.subtitleLabel.text = banners![indexPath.item].jpn_subtitle
             default:
                 fatalError()
             }

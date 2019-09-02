@@ -54,11 +54,16 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var pickerDateLabel: UILabel!
     var condTitleLabel: UILabel!
     
+    // UITextView
+    var noteTextView: UITextView!
+    
     // UIButton
     var toggleButton: UIButton!
     var pickerCancelButton: UIButton!
     var pickerCheckButton: UIButton!
     var homeButton: UIButton!
+    var notesButton: UIButton!
+    var avgScoreButton: UIButton!
     var condButton: UIButton!
     var condLeftButton: UIButton!
     var condRightButton: UIButton!
@@ -127,7 +132,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     @objc func alertError(_ message: String) {
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
-        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
+        alert.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
             if self.retryFunctionName == "loadGroupOfLogs" {
                 self.loadGroupOfLogs(self.retryCompletion!)
                 return
@@ -165,6 +170,28 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         })
         alert.view.tintColor = UIColor.cornflowerBlue
         self.present(alert, animated: true, completion: nil )
+    }
+    
+    @objc func alertNoteTextView(_ sender: UITapGestureRecognizer? = nil) {
+        let alert = UIAlertController(title: "\u{1F4CD}", message: nil, preferredStyle: .alert)
+        noteTextView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        let controller = UIViewController()
+        noteTextView.frame = controller.view.frame
+//        if let originTxt = introLabel.text {
+//            noteTextView.text = originTxt
+//        }
+        controller.view.addSubview(noteTextView)
+        alert.setValue(controller, forKey: "contentViewController")
+        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
+//                if let text = self.noteTextView.text {
+//                    self.newInfoStr = text
+//                    self.avatarInfoTarget = AvatarInfoTarget.intro
+//                    self.updateAvatarInfo()
+//                }
+            })
+        alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
+        alert.view.tintColor = UIColor.cornflowerBlue
+        self.present(alert, animated: true, completion: nil)
     }
     
     @objc func toggleButtonTapped() {
@@ -427,6 +454,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.condScoreButton.setImage(UIImage.btnDottedCircle, for: .normal)
             }
             cell.condScoreButton.addTarget(self, action: #selector(alertCondScorePicker), for: .touchUpInside)
+            cell.noteButton.addTarget(self, action: #selector(alertNoteTextView(_:)), for: .touchUpInside)
             return cell
         case DiaryMode.logger:
             if indexPath.row == 0 {
@@ -502,6 +530,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                         UIView.transition(with: cell.groupOfLogsTableView, duration: 0.3, options: .transitionCrossDissolve, animations: {
                             cell.groupOfLogsTableView.isHidden = true
                             cell.condScoreButton.isHidden = true
+                            cell.noteButton.isHidden = true
                             cell.condScoreImageView.isHidden = false
                             if self.selectedLogGroup!.food_cnt > 0 {
                                 cell.foodLogBulletView.isHidden = false
@@ -533,6 +562,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                         UIView.transition(with: cell.groupOfLogsTableView, duration: 0.3, options: .transitionCrossDissolve, animations: {
                             cell.groupOfLogsTableView.isHidden = false
                             cell.condScoreButton.isHidden = false
+                            cell.noteButton.isHidden = false
                             cell.condScoreImageView.isHidden = true
                             cell.foodLogBulletView.isHidden = true
                             cell.actLogBulletView.isHidden = true
@@ -605,6 +635,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.groupOfLogsTableView.isHidden = true
                 cell.condScoreImageView.isHidden = false
                 cell.condScoreButton.isHidden = true
+                cell.noteButton.isHidden = true
                 if diaryMode == DiaryMode.editor {
                     let logGroup = self.logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
                     if logGroup.food_cnt > 0 {
@@ -653,12 +684,14 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             cell.actLogBulletView.isHidden = true
             cell.drugLogBulletView.isHidden = true
             cell.condScoreButton.isHidden = false
+            cell.noteButton.isHidden = false
         } else {
             cell.containerViewHight.constant = CGFloat(logGroupCellHeightInt - 7)
             cell.arrowImageView.transform = CGAffineTransform.identity
             cell.groupOfLogsTableView.isHidden = true
             cell.condScoreImageView.isHidden = false
             cell.condScoreButton.isHidden = true
+            cell.noteButton.isHidden = true
             let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
             if diaryMode == DiaryMode.editor {
                 if logGroup.food_cnt > 0 {
@@ -1076,6 +1109,15 @@ extension DiaryViewController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
+        noteTextView = {
+            let _textView = UITextView()
+//            _textView.backgroundColor = UIColor.whiteSmoke
+//            _textView.backgroundColor = UIColor.white.withAlphaComponent(0.7)
+            _textView.backgroundColor = UIColor(hex: "#FFFDB1")
+            _textView.font = .systemFont(ofSize: 16, weight: .light)
+            _textView.translatesAutoresizingMaskIntoConstraints = false
+            return _textView
+        }()
         pickerCancelButton = getCancelButton()
         pickerCancelButton.addTarget(self, action: #selector(pickerCancelButtonTapped), for: .touchUpInside)
         pickerCheckButton = getCheckButton()
@@ -1092,6 +1134,24 @@ extension DiaryViewController {
         homeButton = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage(named: "button-home")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        notesButton = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage(named: "item-pin-line")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        avgScoreButton = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage(named: "button-avg-score")!.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
@@ -1131,13 +1191,14 @@ extension DiaryViewController {
         }()
         refreshControler = {
             let _refresh = UIRefreshControl()
-            _refresh.tintColor = UIColor.lightSteelBlue
+            _refresh.tintColor = UIColor.whiteSmoke
             _refresh.addTarget(self, action: #selector(refreshLogGroupTableView(sender:)), for: UIControl.Event.valueChanged)
             return _refresh
         }()
         
         if diaryMode == DiaryMode.editor {
             navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
+            navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: notesButton), UIBarButtonItem(customView: avgScoreButton)]
             calendarView.appearance.titleDefaultColor = UIColor.black
             condButton.isHidden = false
         }
@@ -1169,7 +1230,8 @@ extension DiaryViewController {
         view.addSubview(condLeftButton)
         view.addGestureRecognizer(scopeGesture)
         
-        logGroupTableView.addSubview(refreshControler)
+        // TODO
+        // logGroupTableView.addSubview(refreshControler)
         
         blindView.addSubview(pickerContainerView)
         blindView.addSubview(condContainerView)

@@ -234,7 +234,7 @@ class ProfileViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    @objc func introContainerTapped(_ sender: UITapGestureRecognizer? = nil) {
+    @objc func alertIntroTextView(_ sender: UITapGestureRecognizer? = nil) {
         let alert = UIAlertController(title: lang.titleEditIntro, message: nil, preferredStyle: .actionSheet)
         introTextView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         let controller = UIViewController()
@@ -501,7 +501,7 @@ extension ProfileViewController {
         phNumberContainer = getProfileLabelContainerView()
         phNumberContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.phNumContainerTapped(_:))))
         introContainer = getProfileLabelContainerView()
-        introContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.introContainerTapped(_:))))
+        introContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertIntroTextView(_:))))
         passwordContainer = getProfileLabelContainerView()
         passwordContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertChangePassword(_:))))
         firstNameGuideLabel = getProfileGuideLabel()
@@ -584,8 +584,8 @@ extension ProfileViewController {
         }()
         introTextView = {
             let _textView = UITextView()
-            _textView.backgroundColor = UIColor.white
-            _textView.font = .systemFont(ofSize: 14, weight: .regular)
+            _textView.backgroundColor = UIColor.white.withAlphaComponent(0.7)
+            _textView.font = .systemFont(ofSize: 16, weight: .regular)
             _textView.translatesAutoresizingMaskIntoConstraints = false
             return _textView
         }()

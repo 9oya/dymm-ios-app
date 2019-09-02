@@ -18,6 +18,7 @@ class LogGroupTableCell: UITableViewCell {
     var arrowImageView: UIImageView!
     var groupTypeImageView: UIImageView!
     var condScoreImageView: UIImageView!
+    var noteImageView: UIImageView!
     var nameLabel: UILabel!
     var foodLogBulletView: UIView!
     var actLogBulletView: UIView!
@@ -25,6 +26,7 @@ class LogGroupTableCell: UITableViewCell {
     var groupOfLogsTableView: UITableView!
     var groupOfLogsTableHeight: NSLayoutConstraint!
     var condScoreButton: UIButton!
+    var noteButton: UIButton!
     
     var lang: LangPack!
     var selectedLogGroup: BaseModel.LogGroup?
@@ -209,8 +211,28 @@ extension LogGroupTableCell {
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
+        noteImageView = {
+            let _imageView = UIImageView()
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.image = UIImage(named: "item-pin-colored")
+            _imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
+            _imageView.addShadowView()
+            _imageView.isHidden = true
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
         condScoreButton = {
             let _button = UIButton(frame: CGRect(x: 0, y: 0, width: 21, height: 21))
+            _button.addShadowView()
+            _button.showsTouchWhenHighlighted = true
+            _button.isHidden = true
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        noteButton = {
+            let _button = UIButton()
+            _button.setImage(UIImage(named: "item-pin-colored"), for: .normal)
+            _button.adjustsImageSizeForAccessibilityContentSizeCategory = true
             _button.addShadowView()
             _button.showsTouchWhenHighlighted = true
             _button.isHidden = true
@@ -271,11 +293,13 @@ extension LogGroupTableCell {
         containerView.addSubview(groupTypeImageView)
         containerView.addSubview(nameLabel)
         containerView.addSubview(condScoreImageView)
+        containerView.addSubview(noteImageView)
         containerView.addSubview(foodLogBulletView)
         containerView.addSubview(actLogBulletView)
         containerView.addSubview(drugLogBulletView)
         containerView.addSubview(groupOfLogsTableView)
         containerView.addSubview(condScoreButton)
+        containerView.addSubview(noteButton)
         
         containerView.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
         containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
@@ -295,6 +319,9 @@ extension LogGroupTableCell {
         
         condScoreImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12).isActive = true
         condScoreImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -((frame.width / 4) + 10)).isActive = true
+        
+        noteImageView.leadingAnchor.constraint(equalTo: condScoreImageView.trailingAnchor, constant: 10).isActive = true
+        noteImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 20).isActive = true
         
         foodLogBulletView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 20).isActive = true
         foodLogBulletView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20).isActive = true
@@ -320,5 +347,8 @@ extension LogGroupTableCell {
         
         condScoreButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor, constant: 0).isActive = true
         condScoreButton.topAnchor.constraint(equalTo: groupOfLogsTableView.bottomAnchor, constant: 15).isActive = true
+        
+        noteButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20).isActive = true
+        noteButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 10).isActive = true
     }
 }
