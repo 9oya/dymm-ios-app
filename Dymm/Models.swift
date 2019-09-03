@@ -235,7 +235,9 @@ struct BaseModel {
         let act_cnt: Int
         let drug_cnt: Int
         let has_cond_score: Bool
+        let has_note: Bool
         let cond_score: Int?
+        let note: String?
         let day_number: Int
         
         enum CodingKeys: String, CodingKey {
@@ -249,7 +251,9 @@ struct BaseModel {
             case act_cnt
             case drug_cnt
             case has_cond_score
+            case has_note
             case cond_score
+            case note
             case day_number
         }
         
@@ -265,7 +269,9 @@ struct BaseModel {
             self.act_cnt = try valueContainer.decode(Int.self, forKey: CodingKeys.act_cnt)
             self.drug_cnt = try valueContainer.decode(Int.self, forKey: CodingKeys.drug_cnt)
             self.has_cond_score = try valueContainer.decode(Bool.self, forKey: CodingKeys.has_cond_score)
+            self.has_note = try valueContainer.decode(Bool.self, forKey: CodingKeys.has_note)
             self.cond_score = try? valueContainer.decode(Int.self, forKey: CodingKeys.cond_score)
+            self.note = try? valueContainer.decode(String.self, forKey: CodingKeys.note)
             self.day_number = try valueContainer.decode(Int.self, forKey: CodingKeys.day_number)
         }
     }

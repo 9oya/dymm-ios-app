@@ -231,7 +231,7 @@ extension LogGroupTableCell {
         }()
         noteButton = {
             let _button = UIButton()
-            _button.setImage(UIImage(named: "item-pin-colored"), for: .normal)
+            _button.setImage(UIImage(named: "item-pin-gray"), for: .normal)
             _button.adjustsImageSizeForAccessibilityContentSizeCategory = true
             _button.addShadowView()
             _button.showsTouchWhenHighlighted = true
@@ -320,8 +320,8 @@ extension LogGroupTableCell {
         condScoreImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12).isActive = true
         condScoreImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -((frame.width / 4) + 10)).isActive = true
         
+        noteImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12).isActive = true
         noteImageView.leadingAnchor.constraint(equalTo: condScoreImageView.trailingAnchor, constant: 10).isActive = true
-        noteImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 20).isActive = true
         
         foodLogBulletView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 20).isActive = true
         foodLogBulletView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20).isActive = true

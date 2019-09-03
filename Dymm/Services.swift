@@ -882,7 +882,7 @@ struct Service {
         }
     }
     
-    func putLogGroup(logGroupId: Int, option: String, score: Int?, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+    func putLogGroup(logGroupId: Int, option: String, params: Parameters?, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -890,11 +890,8 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        var url = "\(URI.host)\(URI.avatar)/group/\(logGroupId)/\(option)"
-        if let _score = score {
-            url += "/\(_score)"
-        }
-        Alamofire.request(url, method: .put, encoding: JSONEncoding.default, headers: headers)
+        let url = "\(URI.host)\(URI.avatar)/group/\(logGroupId)/\(option)"
+        Alamofire.request(url, method: .put, parameters: params, encoding: JSONEncoding.default, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {

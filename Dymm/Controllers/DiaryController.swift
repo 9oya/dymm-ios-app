@@ -113,6 +113,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var dayOfYear: Int?
     var xVal: Int?
     var yVal: Int?
+    var newNote: String?
     var thisMonthAvgScore: Float?
     var lastMonthAvgScore: Float?
     var isToggleBtnTapped: Bool = false
@@ -193,17 +194,24 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         noteTextView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         let controller = UIViewController()
         noteTextView.frame = controller.view.frame
-//        if let originTxt = introLabel.text {
-//            noteTextView.text = originTxt
-//        }
+        if let oldNote = selectedLogGroup?.note {
+            noteTextView.text = oldNote
+        }
         controller.view.addSubview(noteTextView)
         alert.setValue(controller, forKey: "contentViewController")
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
-//                if let text = self.noteTextView.text {
-//                    self.newInfoStr = text
-//                    self.avatarInfoTarget = AvatarInfoTarget.intro
-//                    self.updateAvatarInfo()
-//                }
+                if let text = noteTextView.text {
+                    self.newNote = text
+                    if let oldNote = self.selectedLogGroup?.note {
+                        if oldNote != self.newNote {
+                            self.updateLogGroupNote()
+                        }
+                    } else {
+                        if self.newNote!.count > 0 {
+                            self.updateLogGroupNote()
+                        }
+                    }
+                }
             })
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
         alert.view.tintColor = UIColor.cornflowerBlue
@@ -250,7 +258,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             imageView.image = UIImage(named: "item-diagonal-up")!.withRenderingMode(.alwaysOriginal)
             changedScorelabel.text = String(format: "+%.1f", (thisMonthAvgScore! - lastMonthAvgScore!))
         }
-        let alert = UIAlertController(title: lang.titleAvgScore(month), message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: lang.titleAvgScore(month + "."), message: message, preferredStyle: .alert)
         let thisMonthlabel: UILabel = {
             let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
             label.text = String(format: "%.1f", thisMonthAvgScore!)
@@ -557,6 +565,13 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.condScoreImageView.image = UIImage.btnDottedCircle
                 cell.condScoreButton.setImage(UIImage.btnDottedCircle, for: .normal)
             }
+            if logGroup.note != nil {
+                cell.noteImageView.isHidden = false
+                cell.noteButton.setImage(UIImage(named: "item-pin-colored"), for: .normal)
+            } else {
+                cell.noteImageView.isHidden = true
+                cell.noteButton.setImage(UIImage(named: "item-pin-gray"), for: .normal)
+            }
             cell.condScoreButton.addTarget(self, action: #selector(alertCondScorePicker), for: .touchUpInside)
             cell.noteButton.addTarget(self, action: #selector(alertNoteTextView(_:)), for: .touchUpInside)
             return cell
@@ -569,6 +584,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.foodLogBulletView.isHidden = true
                 cell.actLogBulletView.isHidden = true
                 cell.drugLogBulletView.isHidden = true
+                cell.noteImageView.isHidden = true
                 return cell
             } else {
                 let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row - 1].logGroup
@@ -645,6 +661,9 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                             if self.selectedLogGroup!.drug_cnt > 0 {
                                 cell.drugLogBulletView.isHidden = false
                             }
+                            if self.selectedLogGroup!.note != nil {
+                                cell.noteImageView.isHidden = false
+                            }
                         })
                     })
                     self.updateLogGroupTable()
@@ -671,6 +690,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                             cell.foodLogBulletView.isHidden = true
                             cell.actLogBulletView.isHidden = true
                             cell.drugLogBulletView.isHidden = true
+                            cell.noteImageView.isHidden = true
                         })
                     })
                     self.updateLogGroupTable(completion: {
@@ -757,6 +777,11 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     } else {
                         cell.drugLogBulletView.isHidden = true
                     }
+                    if logGroup.note != nil {
+                        cell.noteImageView.isHidden = false
+                    } else {
+                        cell.noteImageView.isHidden = true
+                    }
                 }
             }
             return CGFloat(logGroupCellHeightInt)
@@ -787,6 +812,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             cell.foodLogBulletView.isHidden = true
             cell.actLogBulletView.isHidden = true
             cell.drugLogBulletView.isHidden = true
+            cell.noteImageView.isHidden = true
             cell.condScoreButton.isHidden = false
             cell.noteButton.isHidden = false
         } else {
@@ -812,6 +838,11 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     cell.drugLogBulletView.isHidden = false
                 } else {
                     cell.drugLogBulletView.isHidden = true
+                }
+                if logGroup.note != nil {
+                    cell.noteImageView.isHidden = false
+                } else {
+                    cell.noteImageView.isHidden = true
                 }
             }
         }
@@ -1608,12 +1639,30 @@ extension DiaryViewController {
     }
     
     private func updateLogGroupCondScore() {
+        let params: Parameters = [
+            "cond_score": selectedCondScore
+        ]
         let service = Service(lang: lang)
-        service.putLogGroup(logGroupId: selectedLogGroupId!, option: LogGroupOption.score, score: selectedCondScore, popoverAlert: { (message) in
+        service.putLogGroup(logGroupId: selectedLogGroupId!, option: LogGroupOption.score, params: params, popoverAlert: { (message) in
             self.retryFunction = self.updateLogGroupCondScore
             self.alertError(message)
         }, tokenRefreshCompletion: {
             self.updateLogGroupCondScore()
+        }) {
+            self.loadLogGroups()
+        }
+    }
+    
+    private func updateLogGroupNote() {
+        let params: Parameters = [
+            "note_txt": newNote!
+        ]
+        let service = Service(lang: lang)
+        service.putLogGroup(logGroupId: selectedLogGroupId!, option: LogGroupOption.note, params: params, popoverAlert: { (message) in
+            self.retryFunction = self.updateLogGroupNote
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.updateLogGroupNote()
         }) {
             self.loadLogGroups()
         }
@@ -1627,7 +1676,7 @@ extension DiaryViewController {
             _logGroupId = self.logGroupSectTwoDimArr[editedCellIdxPath!.section][editedCellIdxPath!.row].logGroup.id
         }
         let service = Service(lang: lang)
-        service.putLogGroup(logGroupId: _logGroupId, option: LogGroupOption.remove, score: nil, popoverAlert: { (message) in
+        service.putLogGroup(logGroupId: _logGroupId, option: LogGroupOption.remove, params: nil, popoverAlert: { (message) in
             self.retryFunction = self.updateLogGroupRemove
             self.alertError(message)
         }, tokenRefreshCompletion: {

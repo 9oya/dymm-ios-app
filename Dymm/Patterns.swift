@@ -66,6 +66,7 @@ struct LogGroupType {
 
 struct LogGroupOption {
     static let score = "score"
+    static let note = "note"
     static let remove = "remove"
 }
 
