@@ -104,12 +104,10 @@ class CategoryViewController: UIViewController {
     
     @objc func alertError(_ message: String) {
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.titleYes, style: .default) { _ in
+        alertController.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.retryFunction!()
-        }
-        let cancelAction = UIAlertAction(title: lang.titleNo, style: .cancel) { _ in }
-        alertController.addAction(confirmAction)
-        alertController.addAction(cancelAction)
+        })
+        alertController.addAction(UIAlertAction(title: lang.titleNo, style: .cancel) { _ in })
         self.present(alertController, animated: true, completion: nil)
     }
     
@@ -425,6 +423,8 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
             fatalError()
         }
     }
+    
+    // MARK: - UIScrollViewDelegate
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard let _subTags = subTags else {
@@ -776,7 +776,6 @@ extension CategoryViewController {
             return _button
         }()
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
         stepCollection.dataSource = self
         stepCollection.delegate = self
         tagCollection.dataSource = self
@@ -788,6 +787,7 @@ extension CategoryViewController {
         searchTextField.delegate = self
         
         // Setup subviews
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
         view.addSubview(stepCollection)
         view.addSubview(searchTextField)
         view.addSubview(langPickButton)

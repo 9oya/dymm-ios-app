@@ -296,6 +296,9 @@ extension UIColor {
     static let rosyBrown = UIColor(hex: "RosyBrown")
     static let darkOrange = UIColor(hex: "DarkOrange")
     
+    // Yellow
+    static let hex_fffede = UIColor(hex: "#FFFEDE")
+    
     // Blue
     static let dodgerBlue = UIColor(hex: "DodgerBlue")
     static let cornflowerBlue = UIColor(hex: "CornflowerBlue")

@@ -183,10 +183,10 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             // TODO
             print("")
         default: fatalError() }
-        let alert = UIAlertController(title: lang.titleSimpleNote, message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: lang.titleNote, message: message, preferredStyle: .alert)
         let noteTextView: UITextView = {
             let _textView = UITextView()
-            _textView.backgroundColor = UIColor(hex: "#FFFDB1")
+            _textView.backgroundColor = .hex_fffede
             _textView.font = .systemFont(ofSize: 16, weight: .light)
             _textView.translatesAutoresizingMaskIntoConstraints = false
             return _textView
@@ -384,8 +384,10 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         loadAvgCondScore()
     }
     
-    @objc func noteButtonTapped() {
-        dismiss(animated: true, completion: nil)
+    @objc func presentNotesNavigation() {
+        let vc = NoteController()
+        let nc = UINavigationController(rootViewController: vc)
+        present(nc, animated: true, completion: nil)
     }
     
     @objc func condButtonTapped() {
@@ -1271,7 +1273,7 @@ extension DiaryViewController {
             _button.setImage(UIImage(named: "item-pin-line")!.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
             _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action:#selector(noteButtonTapped), for: .touchUpInside)
+            _button.addTarget(self, action:#selector(presentNotesNavigation), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()

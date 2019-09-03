@@ -51,6 +51,8 @@ struct LangPack {
     var titleLogGroups: [String]!
     var titleMyAvtCond: String!
     var titleNo: String!
+    var titleNote: String!
+    var titleNotes: String!
     var titlePassword: String!
     var titlePasswordChange: String!
     var titlePasswordChangeCompl: String!
@@ -67,7 +69,6 @@ struct LangPack {
     var titleSignIn: String!
     var titleSignOut: String!
     var titleSignUp: String!
-    var titleSimpleNote: String!
     var titleSpread: String!
     var titleStartDate: String!
     var titleStay: String!
@@ -382,6 +383,18 @@ struct LangPack {
             case LanguageId.kor: return "아니오"
             default: fatalError()}
         }()
+        self.titleNote = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Note"
+            case LanguageId.kor: return "메모"
+            default: fatalError()}
+        }()
+        self.titleNotes = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Notes"
+            case LanguageId.kor: return "메모"
+            default: fatalError()}
+        }()
         self.titlePassword = {
             switch currentLanguageId {
             case LanguageId.eng: return "Password"
@@ -476,12 +489,6 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Sign up"
             case LanguageId.kor: return "가입하기"
-            default: fatalError()}
-        }()
-        self.titleSimpleNote = {
-            switch currentLanguageId {
-            case LanguageId.eng: return "Note"
-            case LanguageId.kor: return "노트"
             default: fatalError()}
         }()
         self.titleSpread = {
