@@ -25,7 +25,6 @@ class ProfileViewController: UIViewController {
     var emailContainer: UIView!
     var phNumberContainer: UIView!
     var introContainer: UIView!
-    var passwordContainer: UIView!
     
     // UICollectionView
     var tagCollection: UICollectionView!
@@ -60,7 +59,6 @@ class ProfileViewController: UIViewController {
     var introGuideLabel: UILabel!
     var introLabel: UILabel!
     var introPlaceHolderLabel: UILabel!
-    var passwordPlaceHolderLabel: UILabel!
     
     // Non-view properties
     var lang: LangPack!
@@ -393,7 +391,7 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
             case LanguageId.jpn: cell.label.text = profileTag.jpn_name
             default: cell.label.text = profileTag.eng_name}
             if profileTag.is_selected == false {
-                cell.label.textColor = UIColor.darkGray
+                cell.label.textColor = UIColor.lightGray
                 return cell
             }
             cell.label.textColor = UIColor.black
@@ -404,13 +402,16 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
     // MARK: - UICollectionViewDelegate
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedCollectionItem = indexPath.item
-        
-        if profile?.profile_tags[indexPath.item].tag_id == TagId.dateOfBirth {
+        switch profile?.profile_tags[indexPath.item].tag_id {
+        case TagId.dateOfBirth:
             alertDatePicker()
             return
+        case TagId.changePassword:
+            alertChangePassword()
+            return
+        default:
+            loadProfileTagsOnPicker()
         }
-        
-        loadProfileTagsOnPicker()
     }
     
     // MARK: - UICollectionView DelegateFlowLayout
@@ -517,7 +518,7 @@ extension ProfileViewController {
         
         // Initialize subveiw properties
         topBarContainer = getAddtionalTopBarView()
-        signOutButton = getBasicTextButton(UIColor.tomato)
+        signOutButton = getBasicTextButton()
         signOutButton.addTarget(self, action: #selector(signOutButtonTapped), for: .touchUpInside)
         closeButton = getCloseButton()
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
@@ -535,8 +536,6 @@ extension ProfileViewController {
         phNumberContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.phNumContainerTapped(_:))))
         introContainer = getProfileLabelContainerView()
         introContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertIntroTextView(_:))))
-        passwordContainer = getProfileLabelContainerView()
-        passwordContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertChangePassword(_:))))
         firstNameGuideLabel = getProfileGuideLabel()
         lastNameGuideLabel = getProfileGuideLabel()
         emailGuideLabel = getProfileGuideLabel()
@@ -548,14 +547,6 @@ extension ProfileViewController {
         phNumberLabel = getProfileLabel()
         phNumberPlaceHolderLabel = getProfilePlaceHolderLabel()
         introPlaceHolderLabel = getProfilePlaceHolderLabel()
-        passwordPlaceHolderLabel = {
-            let _label = UILabel()
-            _label.font = .systemFont(ofSize: 15, weight: .thin)
-            _label.textColor = .tomato
-            _label.textAlignment = .center
-            _label.translatesAutoresizingMaskIntoConstraints = false
-            return _label
-        }()
         mailConfContainer = {
             let _view = UIView()
             _view.backgroundColor = UIColor.white
@@ -650,7 +641,6 @@ extension ProfileViewController {
         infoContainer.addSubview(emailContainer)
         infoContainer.addSubview(phNumberContainer)
         infoContainer.addSubview(introContainer)
-        infoContainer.addSubview(passwordContainer)
         
         infoImageContainer.addSubview(infoImageView)
         infoImageContainer.addSubview(infoImageLabel)
@@ -666,7 +656,6 @@ extension ProfileViewController {
         introContainer.addSubview(introGuideLabel)
         introContainer.addSubview(introLabel)
         introContainer.addSubview(introPlaceHolderLabel)
-        passwordContainer.addSubview(passwordPlaceHolderLabel)
         
         setupLangProperties()
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
@@ -702,7 +691,7 @@ extension ProfileViewController {
         infoContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt)).isActive = true
         infoContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         infoContainer.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        infoContainer.heightAnchor.constraint(equalToConstant: 325).isActive = true
+        infoContainer.heightAnchor.constraint(equalToConstant: 280).isActive = true
         
         infoImageContainer.topAnchor.constraint(equalTo: infoContainer.topAnchor, constant: 20).isActive = true
         infoImageContainer.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
@@ -778,15 +767,6 @@ extension ProfileViewController {
         introContainer.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         introContainer.heightAnchor.constraint(equalToConstant: 80).isActive = true
         
-        passwordContainer.topAnchor.constraint(equalTo: introContainer.bottomAnchor, constant: 3).isActive = true
-        passwordContainer.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
-        passwordContainer.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        passwordContainer.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        
-        passwordPlaceHolderLabel.leadingAnchor.constraint(equalTo: passwordContainer.leadingAnchor, constant: 0).isActive = true
-        passwordPlaceHolderLabel.trailingAnchor.constraint(equalTo: passwordContainer.trailingAnchor, constant: 0).isActive = true
-        passwordPlaceHolderLabel.centerYAnchor.constraint(equalTo: passwordContainer.centerYAnchor, constant: 0).isActive = true
-        
         introGuideLabel.topAnchor.constraint(equalTo: introContainer.topAnchor, constant: 2).isActive = true
         introGuideLabel.leadingAnchor.constraint(equalTo: introContainer.leadingAnchor, constant: 6).isActive = true
         introGuideLabel.trailingAnchor.constraint(equalTo: introContainer.trailingAnchor, constant: 0).isActive = true
@@ -815,7 +795,6 @@ extension ProfileViewController {
         introGuideLabel.text = lang.titleIntroUpper
         phNumberPlaceHolderLabel.text = lang.titlePhoneNum
         introPlaceHolderLabel.text = lang.titleIntro
-        passwordPlaceHolderLabel.text = lang.titlePasswordChange
         signOutButton.setTitle(lang.titleSignOut, for: .normal)
         sendAgainButton.setTitle(lang.titleSendAgain, for: .normal)
     }
