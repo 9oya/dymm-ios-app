@@ -107,6 +107,9 @@ struct TagId {
     static let diary = 17
     static let bookmarks = 18
     static let language = 20
+    static let dateOfBirth = 23
+    static let subscription = 14641
+    static let changePassword = 14642
 }
 
 struct CountryId {

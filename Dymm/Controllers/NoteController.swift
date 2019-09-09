@@ -30,7 +30,7 @@ class NoteController: UIViewController {
     var lastContentOffset: CGFloat = 0.0
     var isScrollToLoading: Bool = false
     var currPageNum: Int = 1
-    var minimumCnt: Int = 40
+    var minimumCnt: Int = 20
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,6 +82,10 @@ class NoteController: UIViewController {
         alert.setValue(controller, forKey: "contentViewController")
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let text = noteTextView.text {
+                self.currPageNum = 1
+                self.minimumCnt = 20
+                self.lastContentOffset = 0.0
+                self.isScrollToLoading = false
                 self.newNote = text
                 if let oldNote = self.selectedLogGroup?.note {
                     if oldNote != self.newNote {
@@ -140,6 +144,10 @@ extension NoteController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        currPageNum = 1
+        minimumCnt = 20
+        lastContentOffset = 0.0
+        isScrollToLoading = false
         selectedLogGroup = logGroups![indexPath.row]
         newNote = ""
         updateLogGroupNote()
@@ -177,7 +185,7 @@ extension NoteController: UITableViewDataSource, UITableViewDelegate {
             if _logGroups.count == minimumCnt {
                 isScrollToLoading = true
                 currPageNum += 1
-                minimumCnt += 40
+                minimumCnt += 20
                 loadLogGroupNotes()
             }
         }
@@ -236,7 +244,7 @@ extension NoteController {
                 return
             } else {
                 self.logGroups = logGroups
-                UIView.transition(with: self.noteTableView, duration: 0.7, options: .transitionCrossDissolve, animations: {
+                UIView.animate(withDuration: 0.5, animations: {
                     self.noteTableView.reloadData()
                 })
             }

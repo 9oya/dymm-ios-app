@@ -113,6 +113,27 @@ class ProfileViewController: UIViewController {
         self.present(alert, animated: true, completion: nil )
     }
     
+    @objc func alertDatePicker() {
+        let datePicker: UIDatePicker = UIDatePicker()
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: getUserCountryCode())
+            formatter.dateFormat = "yyyy-MM-dd"
+            return formatter
+        }()
+        datePicker.timeZone = NSTimeZone.local
+        datePicker.datePickerMode = .date
+        datePicker.frame = CGRect(x: 0, y: 15, width: 270, height: 200)
+        let alert = UIAlertController(title: "\n\n\n\n\n\n\n\n", message: nil, preferredStyle: UIAlertController.Style.alert)
+        alert.view.addSubview(datePicker)
+        alert.addAction(UIAlertAction(title: lang.titleDone, style: UIAlertAction.Style.default, handler: { _ in
+            print("Selected Date: \(dateFormatter.string(from: datePicker.date))")
+        }))
+        alert.addAction(UIAlertAction(title: lang.titleCancel, style: UIAlertAction.Style.cancel, handler: nil))
+        alert.view.tintColor = UIColor.cornflowerBlue
+        present(alert, animated: true, completion:{})
+    }
+    
     @objc func closeButtonTapped() {
         dismiss(animated: true, completion: nil)
     }
@@ -360,23 +381,35 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: tagCellId, for: indexPath) as? TagCollectionCell else {
             fatalError()
         }
-        let avatar_fact: BaseModel.ProfileTag = profile!.profile_tags[indexPath.item]
-        switch lang.currentLanguageId {
-        case LanguageId.eng: cell.label.text = avatar_fact.eng_name
-        case LanguageId.kor: cell.label.text = avatar_fact.kor_name
-        case LanguageId.jpn: cell.label.text = avatar_fact.jpn_name
-        default: cell.label.text = avatar_fact.eng_name}
-        if avatar_fact.is_selected == false {
-            cell.label.textColor = UIColor.darkGray
-            return cell
+        let profileTag = profile!.profile_tags[indexPath.item]
+        switch profileTag.tag_id {
+        case TagId.subscription:
+            cell.label.text = lang.titleSubscribe
+            cell.label.textColor = .orange
+        default:
+            switch lang.currentLanguageId {
+            case LanguageId.eng: cell.label.text = profileTag.eng_name
+            case LanguageId.kor: cell.label.text = profileTag.kor_name
+            case LanguageId.jpn: cell.label.text = profileTag.jpn_name
+            default: cell.label.text = profileTag.eng_name}
+            if profileTag.is_selected == false {
+                cell.label.textColor = UIColor.darkGray
+                return cell
+            }
+            cell.label.textColor = UIColor.black
         }
-        cell.label.textColor = UIColor.black
         return cell
     }
     
     // MARK: - UICollectionViewDelegate
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        selectedCollectionItem = indexPath.row
+        selectedCollectionItem = indexPath.item
+        
+        if profile?.profile_tags[indexPath.item].tag_id == TagId.dateOfBirth {
+            alertDatePicker()
+            return
+        }
+        
         loadProfileTagsOnPicker()
     }
     

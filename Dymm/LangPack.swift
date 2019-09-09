@@ -65,6 +65,7 @@ struct LangPack {
     var titleProfileUpper: String!
     var titleRetry: String!
     var titleSearch: String!
+    var titleSend: String!
     var titleSendAgain: String!
     var titleSignIn: String!
     var titleSignOut: String!
@@ -72,8 +73,8 @@ struct LangPack {
     var titleSpread: String!
     var titleStartDate: String!
     var titleStay: String!
-    var titleSend: String!
     var titleSubmit: String!
+    var titleSubscribe: String!
     var titleToday: String!
     var titleVerifCode: String!
     var titleWeekdays: [String]!
@@ -467,6 +468,12 @@ struct LangPack {
             case LanguageId.kor: return "검색"
             default: fatalError()}
         }()
+        self.titleSend = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Send"
+            case LanguageId.kor: return "전송"
+            default: fatalError()}
+        }()
         self.titleSendAgain = {
             switch currentLanguageId {
             case LanguageId.eng: return "Send Again"
@@ -509,16 +516,16 @@ struct LangPack {
             case LanguageId.kor: return "머무르기"
             default: fatalError()}
         }()
-        self.titleSend = {
-            switch currentLanguageId {
-            case LanguageId.eng: return "Send"
-            case LanguageId.kor: return "전송"
-            default: fatalError()}
-        }()
         self.titleSubmit = {
             switch currentLanguageId {
             case LanguageId.eng: return "Submit"
             case LanguageId.kor: return "보내기"
+            default: fatalError()}
+        }()
+        self.titleSubscribe = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Subscribe"
+            case LanguageId.kor: return "구독하기"
             default: fatalError()}
         }()
         self.titleToday = {
