@@ -16,7 +16,7 @@ private let condCollectionCellId = "CondCollectionCell"
 
 private let logGroupCellHeightInt = 52
 private let logGroupSectionHeightInt = 45
-private let logGroupFooterHeightInt = 50
+let logGroupFooterHeightInt = 50
 private let logTableCellHeightInt = 45
 private let logCollectionCellHeightInt = 30
 private let pickerCollectionHeightInt = 32
@@ -1005,7 +1005,6 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 updateAvatarCondRemove()
                 return
             }
-            condLeftButtonTapped()
             let vc = CategoryViewController()
             vc.topLeftButtonType = ButtonType.close
             vc.superTagId = avtCondList![indexPath.item].tag_id

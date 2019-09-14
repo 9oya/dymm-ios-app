@@ -68,9 +68,9 @@ class ProfileViewController: UIViewController {
     var pickedTag: BaseModel.Tag?
     var mailMessage: String?
     var newMailAddress: String?
+    var avatarInfoTarget: Int?
     var newInfoStr: String?
     var selectedCollectionItem: Int?
-    var avatarInfoTarget: Int?
     var oldPassword: String?
     var newPassword: String?
     var confPassword: String?
@@ -122,10 +122,15 @@ class ProfileViewController: UIViewController {
         datePicker.timeZone = NSTimeZone.local
         datePicker.datePickerMode = .date
         datePicker.frame = CGRect(x: 0, y: 15, width: 270, height: 200)
+        if let dateOfBirth = self.profile!.avatar.date_of_birth {
+            datePicker.setDate(dateFormatter.date(from: dateOfBirth)!, animated: true)
+        }
         let alert = UIAlertController(title: "\n\n\n\n\n\n\n\n", message: nil, preferredStyle: UIAlertController.Style.alert)
         alert.view.addSubview(datePicker)
         alert.addAction(UIAlertAction(title: lang.titleDone, style: UIAlertAction.Style.default, handler: { _ in
-            print("Selected Date: \(dateFormatter.string(from: datePicker.date))")
+            self.newInfoStr = dateFormatter.string(from: datePicker.date)
+            self.avatarInfoTarget = TagId.dateOfBirth
+            self.updateAvatarInfo()
         }))
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: UIAlertAction.Style.cancel, handler: nil))
         alert.view.tintColor = UIColor.cornflowerBlue
@@ -141,7 +146,7 @@ class ProfileViewController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc func mailConfAddressBtnTapped() {
+    @objc func alertMailConfAddressTextField() {
         let alert = UIAlertController(title: lang.titleEditEmail, message: nil, preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let txtField = alert.textFields?.first, let text = txtField.text {
@@ -164,7 +169,7 @@ class ProfileViewController: UIViewController {
         sendMailAgain()
     }
     
-    @objc func firstNameContainerTapped(_ sender: UITapGestureRecognizer? = nil) {
+    @objc func alertFirstNameTextField(_ sender: UITapGestureRecognizer? = nil) {
         let alert = UIAlertController(title: lang.titleEditFirstName, message: nil, preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let txtField = alert.textFields?.first, let text = txtField.text {
@@ -192,7 +197,7 @@ class ProfileViewController: UIViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    @objc func lastNameContainerTapped(_ sender: UITapGestureRecognizer? = nil) {
+    @objc func alertLastNameTextField(_ sender: UITapGestureRecognizer? = nil) {
         let alert = UIAlertController(title: lang.titleEditLastName, message: nil, preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let txtField = alert.textFields?.first, let text = txtField.text {
@@ -212,7 +217,7 @@ class ProfileViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    @objc func emailContainerTapped(_ sender: UITapGestureRecognizer? = nil) {
+    @objc func alertEmailTextField(_ sender: UITapGestureRecognizer? = nil) {
         let alert = UIAlertController(title: lang.titleEditEmail, message: nil, preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let txtField = alert.textFields?.first, let text = txtField.text {
@@ -233,7 +238,7 @@ class ProfileViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    @objc func phNumContainerTapped(_ sender: UITapGestureRecognizer? = nil) {
+    @objc func alertPhoneNumberTextField(_ sender: UITapGestureRecognizer? = nil) {
         let alert = UIAlertController(title: lang.titleEditPhoneNum, message: nil, preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let txtField = alert.textFields?.first, let text = txtField.text {
@@ -295,7 +300,7 @@ class ProfileViewController: UIViewController {
         let alert = UIAlertController(title: title, message: "\n" + lang.msgShortPassword, preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleSubmit, style: .default) { _ in
             self.newInfoStr = self.newPassword
-            self.avatarInfoTarget = AvatarInfoTarget.password
+            self.avatarInfoTarget = TagId.password
             self.updateAvatarInfo()
         }
         let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in
@@ -384,6 +389,14 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
         case TagId.subscription:
             cell.label.text = lang.titleSubscribe
             cell.label.textColor = .orange
+        case TagId.dateOfBirth:
+            if let dateOfBirth = profile?.avatar.date_of_birth {
+                cell.label.text = dateOfBirth
+                cell.label.textColor = .black
+            } else {
+                cell.label.text = profileTag.eng_name
+                cell.label.textColor = .lightGray
+            }
         default:
             switch lang.currentLanguageId {
             case LanguageId.eng: cell.label.text = profileTag.eng_name
@@ -391,10 +404,10 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
             case LanguageId.jpn: cell.label.text = profileTag.jpn_name
             default: cell.label.text = profileTag.eng_name}
             if profileTag.is_selected == false {
-                cell.label.textColor = UIColor.lightGray
+                cell.label.textColor = .lightGray
                 return cell
             }
-            cell.label.textColor = UIColor.black
+            cell.label.textColor = .black
         }
         return cell
     }
@@ -402,11 +415,11 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
     // MARK: - UICollectionViewDelegate
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedCollectionItem = indexPath.item
-        switch profile?.profile_tags[indexPath.item].tag_id {
+        switch profile!.profile_tags[indexPath.item].tag_id {
         case TagId.dateOfBirth:
             alertDatePicker()
             return
-        case TagId.changePassword:
+        case TagId.password:
             alertChangePassword()
             return
         default:
@@ -523,17 +536,17 @@ extension ProfileViewController {
         closeButton = getCloseButton()
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         mailConfAddressButton = getBasicTextButton()
-        mailConfAddressButton.addTarget(self, action: #selector(mailConfAddressBtnTapped), for: .touchUpInside)
+        mailConfAddressButton.addTarget(self, action: #selector(alertMailConfAddressTextField), for: .touchUpInside)
         sendAgainButton = getBasicTextButton()
         sendAgainButton.addTarget(self, action: #selector(sendMailAgainBtnTapped), for: .touchUpInside)
         firstNameContainer = getProfileLabelContainerView()
-        firstNameContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.firstNameContainerTapped(_:))))
+        firstNameContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertFirstNameTextField(_:))))
         lastNameContainer = getProfileLabelContainerView()
-        lastNameContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.lastNameContainerTapped(_:))))
+        lastNameContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertLastNameTextField(_:))))
         emailContainer = getProfileLabelContainerView()
-        emailContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.emailContainerTapped(_:))))
+        emailContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertEmailTextField(_:))))
         phNumberContainer = getProfileLabelContainerView()
-        phNumberContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.phNumContainerTapped(_:))))
+        phNumberContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertPhoneNumberTextField(_:))))
         introContainer = getProfileLabelContainerView()
         introContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertIntroTextView(_:))))
         firstNameGuideLabel = getProfileGuideLabel()
@@ -922,7 +935,7 @@ extension ProfileViewController {
             self.newPassword = nil
             self.confPassword = nil
             self.isOldPasswordCorrect = true
-            if self.avatarInfoTarget == AvatarInfoTarget.password {
+            if self.avatarInfoTarget == TagId.password {
                 self.alertChangePasswordCompl()
                 self.avatarInfoTarget = nil
                 return
@@ -934,7 +947,7 @@ extension ProfileViewController {
     
     private func sendMailAgain() {
         UIView.transition(with: mailConfMsgLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            self.mailConfMsgLabel.text = "u/{027B9}"
+            self.mailConfMsgLabel.text = "u/{02059}"
             self.mailConfMsgLabel.textColor = UIColor.black
             self.mailConfAddressButton.isHidden = true
             self.sendAgainButton.isHidden = true

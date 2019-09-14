@@ -117,25 +117,23 @@ class CategoryViewController: UIViewController {
         datePicker.timeZone = NSTimeZone.local
         datePicker.frame = CGRect(x: 0, y: 15, width: 270, height: 200)
         datePicker.datePickerMode = .date
-        var _title = ""
+        var title = ""
         if cond_log_type == CondLogType.startDate {
-            _title = "\(lang.titleStartDate!)\n\n\n\n\n\n\n\n"
+            title = "\(lang.titleStartDate!)\n\n\n\n\n\n\n\n"
         } else {
-            _title = "\(lang.titleEndDate!)\n\n\n\n\n\n\n\n"
+            title = "\(lang.titleEndDate!)\n\n\n\n\n\n\n\n"
         }
-        let alertController = UIAlertController(title: _title, message: nil, preferredStyle: UIAlertController.Style.alert)
-        alertController.view.addSubview(datePicker)
-        let selectAction = UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: { _ in
+        let alert = UIAlertController(title: title, message: nil, preferredStyle: UIAlertController.Style.alert)
+        alert.view.addSubview(datePicker)
+        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: { _ in
             self.selectedDate = self.dateFormatter.string(from: datePicker.date)
             UIView.transition(with: self.detailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.detailContainer.isHidden = true
             })
             self.createAConditionLog()
-        })
-        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil)
-        alertController.addAction(selectAction)
-        alertController.addAction(cancelAction)
-        present(alertController, animated: true, completion:{})
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil))
+        present(alert, animated: true, completion:{})
     }
     
     @objc func alertLangPicker() {
@@ -364,6 +362,9 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         if collectionView == tagCollection {
             let selected_tag = subTags[indexPath.item]
             stepTags.append(superTag!)
+            UIView.transition(with: stepCollection, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.stepCollection.reloadData()
+            })
             superTag = selected_tag
             loadCategories()
         } else if collectionView == stepCollection {
@@ -371,6 +372,9 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
             while stepTags.count > indexPath.item {
                 stepTags.remove(at: indexPath.item)
             }
+            UIView.transition(with: stepCollection, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.stepCollection.reloadData()
+            })
             loadCategories()
         } else {
             fatalError()
@@ -599,6 +603,7 @@ extension CategoryViewController {
             _view.backgroundColor = UIColor.white
             _view.addShadowView()
             _view.layer.cornerRadius = 10
+            _view.isHidden = true
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
@@ -945,7 +950,6 @@ extension CategoryViewController {
     }
     
     private func afterFetchCategoriesTransition(_ _superTag: BaseModel.Tag, _ _subTags: [BaseModel.Tag]) {
-        
         self.superTag = _superTag
         if isScrollToLoading {
             isScrollToLoading = false
@@ -1063,17 +1067,20 @@ extension CategoryViewController {
         // For all tag_types
         subTags = _subTags
         tagCollection.reloadData()
-        UIView.transition(with: stepCollection, duration: 0.7, options: .transitionCrossDissolve, animations: {
-            self.stepCollection.reloadData()
-        }) { _ in
-            if self.subTags.count > 0 {
-                let indexPath = IndexPath(row: 0, section: 0)
-                self.tagCollection.scrollToItem(at: indexPath, at: .top, animated: true)
-            }
+        if self.subTags.count > 0 {
+            let indexPath = IndexPath(row: 0, section: 0)
+            self.tagCollection.scrollToItem(at: indexPath, at: .top, animated: true)
         }
+        UIView.transition(with: tagCollection, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.tagCollection.isHidden = false
+        })
     }
     
     private func loadCategories() {
+        UIView.transition(with: detailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.detailContainer.isHidden = true
+            self.tagCollection.isHidden = true
+        })
         if superTag != nil {
             superTagId = superTag!.id
         }

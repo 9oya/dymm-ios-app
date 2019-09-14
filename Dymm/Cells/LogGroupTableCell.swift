@@ -10,7 +10,7 @@ import UIKit
 import Alamofire
 
 private let logTableCellId = "LogTableCell"
-private let logTableCellHeightVal = 45
+private let logTableCellHeightInt = 45
 
 class LogGroupTableCell: UITableViewCell {
     var containerView: UIView!
@@ -170,7 +170,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
     // MARK: UITableView Delegate
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return CGFloat(logTableCellHeightVal)
+        return CGFloat(logTableCellHeightInt)
     }
 }
 
@@ -214,7 +214,7 @@ extension LogGroupTableCell {
         noteImageView = {
             let _imageView = UIImageView()
             _imageView.contentMode = .scaleAspectFit
-            _imageView.image = UIImage(named: "item-pin-colored")
+            _imageView.image = .itemPinColored
             _imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
             _imageView.addShadowView()
             _imageView.isHidden = true
@@ -222,8 +222,9 @@ extension LogGroupTableCell {
             return _imageView
         }()
         condScoreButton = {
-            let _button = UIButton(frame: CGRect(x: 0, y: 0, width: 21, height: 21))
+            let _button = UIButton()
             _button.addShadowView()
+            _button.adjustsImageSizeForAccessibilityContentSizeCategory = true
             _button.showsTouchWhenHighlighted = true
             _button.isHidden = true
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -231,9 +232,9 @@ extension LogGroupTableCell {
         }()
         noteButton = {
             let _button = UIButton()
-            _button.setImage(UIImage(named: "item-pin-gray"), for: .normal)
-            _button.adjustsImageSizeForAccessibilityContentSizeCategory = true
             _button.addShadowView()
+            _button.setImage(.itemPinGray, for: .normal)
+            _button.adjustsImageSizeForAccessibilityContentSizeCategory = true
             _button.showsTouchWhenHighlighted = true
             _button.isHidden = true
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -321,7 +322,7 @@ extension LogGroupTableCell {
         condScoreImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -((frame.width / 4) + 10)).isActive = true
         
         noteImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12).isActive = true
-        noteImageView.leadingAnchor.constraint(equalTo: condScoreImageView.trailingAnchor, constant: 10).isActive = true
+        noteImageView.leadingAnchor.constraint(equalTo: condScoreImageView.trailingAnchor, constant: 12).isActive = true
         
         foodLogBulletView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 20).isActive = true
         foodLogBulletView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20).isActive = true
@@ -346,9 +347,13 @@ extension LogGroupTableCell {
         groupOfLogsTableHeight.isActive = true
         
         condScoreButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor, constant: 0).isActive = true
-        condScoreButton.topAnchor.constraint(equalTo: groupOfLogsTableView.bottomAnchor, constant: 15).isActive = true
+        condScoreButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: 0).isActive = true
+        condScoreButton.widthAnchor.constraint(equalToConstant: CGFloat(logGroupFooterHeightInt)).isActive = true
+        condScoreButton.heightAnchor.constraint(equalToConstant: CGFloat(logGroupFooterHeightInt)).isActive = true
         
-        noteButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20).isActive = true
-        noteButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 10).isActive = true
+        noteButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: 0).isActive = true
+        noteButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 0).isActive = true
+        noteButton.widthAnchor.constraint(equalToConstant: CGFloat(logTableCellHeightInt)).isActive = true
+        noteButton.heightAnchor.constraint(equalToConstant: CGFloat(logTableCellHeightInt)).isActive = true
     }
 }

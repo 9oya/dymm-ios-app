@@ -333,7 +333,9 @@ extension HomeViewController {
     }
     
     private func retryFunctionSet() {
-        loadAvatar()
+        if UserDefaults.standard.isSignIn() {
+            loadAvatar()
+        }
         loadBanners()
         loadCategories()
     }

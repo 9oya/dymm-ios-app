@@ -9,9 +9,11 @@
 import Foundation
 import UIKit
 
+private let localHost = "http://127.0.0.1:5000"
+private let productHost = "https://dymm-api-01.appspot.com/"
+
 struct URI {
-    static let host = "http://127.0.0.1:5000"
-    // static let apiServerHost = "https://flava-api-test4.herokuapp.com"
+    static let host = localHost
     static let avatar = "/api/avatar"
     static let banner = "/api/banner"
     static let mail = "/api/mail"
@@ -98,7 +100,6 @@ struct AvatarInfoTarget {
     static let phNumber = 14
     static let intro = 15
     static let profile_type = 16
-    static let password = 17
 }
 
 struct TagId {
@@ -109,7 +110,7 @@ struct TagId {
     static let language = 20
     static let dateOfBirth = 23
     static let subscription = 14641
-    static let changePassword = 14642
+    static let password = 14642
 }
 
 struct CountryId {

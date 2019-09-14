@@ -105,7 +105,7 @@ class AuthViewController: UIViewController {
     }
     
     @objc func alertFoundEmailCompl() {
-        let alert = UIAlertController(title: lang.titleEmailFound(emailToFind!), message: "\n" + lang.msgMailSendValidCode(emailToFind!), preferredStyle: .alert)
+        let alert = UIAlertController(title: lang.titleEmailFound, message: "\n" + lang.msgMailSendValidCode(emailToFind!), preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleSend, style: .default) { _ in
             self.sendVerificationCodeToMail()
         }
@@ -116,7 +116,7 @@ class AuthViewController: UIViewController {
     }
     
     @objc func alertVerificationCode() {
-        var title = lang.titleEmailValidCode(emailToFind!)
+        var title = lang.titleEmailValidCode
         if !isCodeCorrect {
             title = lang.titleIncorrectEmailCode
         }
@@ -798,7 +798,7 @@ extension AuthViewController {
         }
         let params: Parameters = [
             "avatar_id": avatarId,
-            "target": AvatarInfoTarget.password,
+            "target": TagId.password,
             "new_info": confPassword!
         ]
         let service = Service(lang: lang)

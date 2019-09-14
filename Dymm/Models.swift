@@ -92,6 +92,7 @@ struct BaseModel {
         let ph_number: String?
         let profile_type: Int
         let introudction: String?
+        let date_of_birth: String?
         let access_token: String?
         let refresh_token: String?
         
@@ -105,6 +106,7 @@ struct BaseModel {
             case ph_number
             case profile_type
             case introudction
+            case date_of_birth
             case access_token
             case refresh_token
         }
@@ -120,6 +122,7 @@ struct BaseModel {
             self.ph_number = try? valueContainer.decode(String.self, forKey: CodingKeys.ph_number)
             self.profile_type = try valueContainer.decode(Int.self, forKey: CodingKeys.profile_type)
             self.introudction = try? valueContainer.decode(String.self, forKey: CodingKeys.introudction)
+            self.date_of_birth = try? valueContainer.decode(String.self, forKey: CodingKeys.date_of_birth)
             self.access_token = try? valueContainer.decode(String.self, forKey: CodingKeys.access_token)
             self.refresh_token = try? valueContainer.decode(String.self, forKey: CodingKeys.refresh_token)
         }

@@ -30,10 +30,10 @@ struct LangPack {
     var titleEditLastName: String!
     var titleEditPhoneNum: String!
     var titleEmail: String!
-    var titleEmailFound: ((String) -> String)!
+    var titleEmailFound: String!
     var titleEmailNotFound: String!
     var titleEmailUpper: String!
-    var titleEmailValidCode: ((String) -> String)!
+    var titleEmailValidCode: String!
     var titleEndDate: String!
     var titleFirstName: String!
     var titleFirstNameUpper: String!
@@ -254,13 +254,12 @@ struct LangPack {
             case LanguageId.kor: return "메일주소"
             default: fatalError()}
         }()
-        func _titleEmailFound(_ email: String) -> String {
+        self.titleEmailFound = {
             switch currentLanguageId {
-            case LanguageId.eng: return "We found an account associated with \"\(email)\""
-            case LanguageId.kor: return "\"\(email)\" (으)로 등록된 계정을 찾았습니다."
+            case LanguageId.eng: return "We found a matching account."
+            case LanguageId.kor: return "일치하는 계정을 찾았습니다."
             default: fatalError()}
-        }
-        self.titleEmailFound = _titleEmailFound
+        }()
         self.titleEmailNotFound = {
             switch currentLanguageId {
             case LanguageId.eng: return "\u{26A0}Email address not found."
@@ -273,13 +272,12 @@ struct LangPack {
             case LanguageId.kor: return "메일주소"
             default: fatalError()}
         }()
-        func _titleEmailValidCode(_ email: String) -> String {
+        self.titleEmailValidCode = {
             switch currentLanguageId {
-            case LanguageId.eng: return "A verification code was sent to \(email)"
-            case LanguageId.kor: return "인증 코드를 발송하였습니다. \(email)"
+            case LanguageId.eng: return "A verification code has been sent."
+            case LanguageId.kor: return "인증 코드를 발송하였습니다."
             default: fatalError()}
-        }
-        self.titleEmailValidCode = _titleEmailValidCode
+        }()
         self.titleEndDate = {
             switch currentLanguageId {
             case LanguageId.eng: return "End date"

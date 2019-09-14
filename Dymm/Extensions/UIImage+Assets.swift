@@ -26,4 +26,6 @@ extension UIImage {
     static let itemScoreGood = UIImage(named: "item-score-good")!
     static let itemScoreAwesome = UIImage(named: "item-score-awesome")!
     static let itemPolyLeft = UIImage(named: "item-poly-left")!
+    static let itemPinGray = UIImage(named: "item-pin-gray")!
+    static let itemPinColored = UIImage(named: "item-pin-colored")!
 }
