@@ -48,7 +48,7 @@ class HomeViewController: UIViewController {
             UIView.transition(with: profileButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.profileButton.setTitleColor(UIColor.clear, for: .normal)
                 self.profileButton.backgroundColor = UIColor.clear
-                self.profileButton.setBackgroundImage(UIImage(named: "button-profile"), for: .normal)
+                self.profileButton.setBackgroundImage(.itemProfileDef, for: .normal)
             })
         }
     }
@@ -147,17 +147,15 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             cell.backgroundColor = UIColor(hex: banners![indexPath.item].bg_color)
             cell.titleLabel.textColor = UIColor(hex: banners![indexPath.item].txt_color)
             cell.subtitleLabel.textColor = UIColor(hex: banners![indexPath.item].txt_color)
+            cell.imageView.image = UIImage.itemRectangleLine.withRenderingMode(.alwaysOriginal)
             switch lang.currentLanguageId {
             case LanguageId.eng:
-                cell.imageView.image = UIImage(named: "item-rectangle")!.withRenderingMode(.alwaysOriginal)
                 cell.titleLabel.text = banners![indexPath.item].eng_title
                 cell.subtitleLabel.text = banners![indexPath.item].eng_subtitle
             case LanguageId.kor:
-                cell.imageView.image = UIImage(named: "item-rectangle")!.withRenderingMode(.alwaysOriginal)
                 cell.titleLabel.text = banners![indexPath.item].kor_title
                 cell.subtitleLabel.text = banners![indexPath.item].kor_subtitle
             case LanguageId.jpn:
-                cell.imageView.image = UIImage(named: "item-rectangle")!.withRenderingMode(.alwaysOriginal)
                 cell.titleLabel.text = banners![indexPath.item].jpn_title
                 cell.subtitleLabel.text = banners![indexPath.item].jpn_subtitle
             default:
@@ -173,7 +171,7 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
                 case LanguageId.eng: cell.label.text = tag.eng_name
                 case LanguageId.kor: cell.label.text = tag.kor_name
                 default: fatalError()}
-                cell.imageView.image = UIImage(named: "tagId-\(tag.id)")
+                cell.imageView.image = UIImage(named: "tag-\(tag.id)")!.withRenderingMode(.alwaysOriginal)
             }
             return cell
         default:
@@ -256,7 +254,7 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
 extension HomeViewController {
     
     // MARK: - Private methods
-
+    
     private func setupLayout() {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
@@ -286,14 +284,14 @@ extension HomeViewController {
             return _pageControl
         }()
         titleImageView = {
-            let _imageView = UIImageView(image: UIImage.symbolLogoSmall)
+            let _imageView = UIImageView(image: .itemLogoS)
             _imageView.frame = CGRect(x: 0, y: 0, width: 26, height: 26)
             _imageView.contentMode = .scaleAspectFit
             return _imageView
         }()
         profileButton = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage.btnProfile.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.itemProfileDef.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 31, height: 31)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(profileButtonTapped), for: .touchUpInside)
@@ -327,7 +325,7 @@ extension HomeViewController {
         tagCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
         tagCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
     }
-
+    
     private func startTimer() {
         Timer.scheduledTimer(timeInterval: 6.0, target: self, selector: #selector(handleNextBanner), userInfo: nil, repeats: true)
     }

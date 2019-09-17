@@ -105,7 +105,7 @@ class ProfileViewController: UIViewController {
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             self.updateProfileTag()
         })
-        let height:NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 250)
+        let height:NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 260)
         alert.view.addConstraint(height)
         alert.view.tintColor = UIColor.cornflowerBlue
         self.present(alert, animated: true, completion: nil )
@@ -700,7 +700,7 @@ extension ProfileViewController {
         
         mailConfAddressButton.bottomAnchor.constraint(equalTo: sendAgainButton.topAnchor, constant: -15).isActive = true
         mailConfAddressButton.centerXAnchor.constraint(equalTo: mailConfContainer.centerXAnchor, constant: 0).isActive = true
-
+        
         infoContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt)).isActive = true
         infoContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         infoContainer.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true

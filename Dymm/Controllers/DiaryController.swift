@@ -46,7 +46,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     // UIPickerView
     var groupTypePickerView: UIPickerView!
     var condScorePickerView: UIPickerView!
-
+    
     // UIImageView
     var loadingImageView: UIImageView!
     
@@ -155,7 +155,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     @objc func alertCondScorePicker() {
-        let alert = UIAlertController(title: lang.titleCondScore, message: "\n\n\n\n\n\n\n\n\n", preferredStyle: .alert)
+        let alert = UIAlertController(title: lang.titleCondScore, message: "\n\n\n\n\n\n\n\n\n\n", preferredStyle: .alert)
         alert.isModalInPopover = true
         if let condScore = selectedLogGroup?.cond_score {
             condScorePickerView.selectRow(10 - condScore, inComponent: 0, animated: false)
@@ -200,19 +200,19 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         controller.view.addSubview(noteTextView)
         alert.setValue(controller, forKey: "contentViewController")
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
-                if let text = noteTextView.text {
-                    self.newNote = text
-                    if let oldNote = self.selectedLogGroup?.note {
-                        if oldNote != self.newNote {
-                            self.updateLogGroupNote()
-                        }
-                    } else {
-                        if self.newNote!.count > 0 {
-                            self.updateLogGroupNote()
-                        }
+            if let text = noteTextView.text {
+                self.newNote = text
+                if let oldNote = self.selectedLogGroup?.note {
+                    if oldNote != self.newNote {
+                        self.updateLogGroupNote()
+                    }
+                } else {
+                    if self.newNote!.count > 0 {
+                        self.updateLogGroupNote()
                     }
                 }
-            })
+            }
+        })
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
         alert.view.tintColor = UIColor.cornflowerBlue
         self.present(alert, animated: true, completion: nil)
@@ -225,6 +225,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         switch lang.currentLanguageId {
         case LanguageId.eng:
             month = LangHelper.getEngNameOfMM(monthNumber: monthNumber!)
+            month += "."
             heightInt = 210
         case LanguageId.kor:
             month = LangHelper.getKorNameOfMonth(monthNumber: monthNumber!, engMMM: nil)
@@ -247,18 +248,18 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         }()
         if thisMonthAvgScore! < lastMonthAvgScore! {
             message = lang.msgAvgScoreDown
-            imageView.image = UIImage(named: "item-diagonal-down")!.withRenderingMode(.alwaysOriginal)
+            imageView.image = UIImage.itemTrendDown.withRenderingMode(.alwaysOriginal)
             changedScorelabel.text = String(format: "-%.1f", (lastMonthAvgScore! - thisMonthAvgScore!))
         } else if thisMonthAvgScore! == lastMonthAvgScore! {
             message = lang.msgAvgScoreEqual
-            imageView.image = UIImage(named: "item-diagonal-up-gray")!.withRenderingMode(.alwaysOriginal)
+            imageView.image = UIImage.itemTrendUpGray.withRenderingMode(.alwaysOriginal)
             changedScorelabel.text = "+0.0"
         } else {
             message = lang.msgAvgScoreUp
-            imageView.image = UIImage(named: "item-diagonal-up")!.withRenderingMode(.alwaysOriginal)
+            imageView.image = UIImage.itemTrendUp.withRenderingMode(.alwaysOriginal)
             changedScorelabel.text = String(format: "+%.1f", (thisMonthAvgScore! - lastMonthAvgScore!))
         }
-        let alert = UIAlertController(title: lang.titleAvgScore(month + "."), message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: lang.titleAvgScore(month), message: message, preferredStyle: .alert)
         let thisMonthlabel: UILabel = {
             let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
             label.text = String(format: "%.1f", thisMonthAvgScore!)
@@ -305,13 +306,13 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         isToggleBtnTapped = true
         if calendarView.scope == .month {
             calendarView.setScope(.week, animated: true)
-            toggleButton.setImage(UIImage(named: "button-maximize")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            toggleButton.setImage(UIImage.itemArrowMaximize.withRenderingMode(.alwaysOriginal), for: .normal)
             selectedCalScope = CalScope.week
             selectedWeekOfYear = Calendar.current.component(.weekOfYear, from: calendarView.currentPage)
             loadLogGroups()
         } else {
             calendarView.setScope(.month, animated: true)
-            toggleButton.setImage(UIImage(named: "button-minimize")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            toggleButton.setImage(UIImage.itemArrowMinimize.withRenderingMode(.alwaysOriginal), for: .normal)
             selectedCalScope = CalScope.month
             selectedWeekOfYear = nil
             loadLogGroups()
@@ -353,7 +354,9 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             isCondEditBtnTapped = false
             condRightButton.setTitle(lang.titleEdit, for: .normal)
             condRightButton.setTitleColor(UIColor.cornflowerBlue, for: .normal)
-            condCollectionView.reloadData()
+            UIView.animate(withDuration: 0.5) {
+                self.condCollectionView.reloadData()
+            }
         } else {
             isCondEditBtnTapped = true
             condRightButton.setTitle(lang.titleDone, for: .normal)
@@ -396,6 +399,14 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     @objc func removeAvatarCondBtnTapped() {
         updateAvatarCondRemove()
+    }
+    
+    @objc func presentCategoryWhenGroupOfALogCellTapped(sender: UIButton) {
+        let vc = CategoryViewController()
+        vc.topLeftButtonType = ButtonType.close
+        vc.superTagId = sender.tag
+        let nc = UINavigationController(rootViewController: vc)
+        present(nc, animated: true, completion: nil)
     }
     
     // MARK: - UIGestureRecognizerDelegate
@@ -564,18 +575,21 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.condScoreImageView.image = getCondScoreImage(condScore)
                 cell.condScoreButton.setImage(getCondScoreImage(condScore), for: .normal)
             } else {
-                cell.condScoreImageView.image = UIImage.btnDottedCircle
-                cell.condScoreButton.setImage(UIImage.btnDottedCircle, for: .normal)
+                cell.condScoreImageView.image = .itemScoreNone
+                cell.condScoreButton.setImage(.itemScoreNone, for: .normal)
             }
             if logGroup.note != nil {
                 cell.noteImageView.isHidden = false
-                cell.noteButton.setImage(UIImage(named: "item-pin-colored"), for: .normal)
+                cell.noteButton.setImage(.itemPinYellow, for: .normal)
             } else {
                 cell.noteImageView.isHidden = true
-                cell.noteButton.setImage(UIImage(named: "item-pin-gray"), for: .normal)
+                cell.noteButton.setImage(.itemPinGray, for: .normal)
             }
             cell.condScoreButton.addTarget(self, action: #selector(alertCondScorePicker), for: .touchUpInside)
             cell.noteButton.addTarget(self, action: #selector(alertNoteTextView(_:)), for: .touchUpInside)
+            
+            cell.logCellButton.addTarget(self, action: #selector(presentCategoryWhenGroupOfALogCellTapped(sender:)), for: .touchUpInside)
+            
             return cell
         case DiaryMode.logger:
             if indexPath.row == 0 {
@@ -950,7 +964,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
         case condCollectionView:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: condCollectionCellId, for: indexPath) as? CondCollectionCell,
                 let avtCond = avtCondList?[indexPath.item] else {
-                fatalError()
+                    fatalError()
             }
             if self.isCondEditBtnTapped {
                 cell.titleLabel.textColor = UIColor.lightGray
@@ -1135,7 +1149,7 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
 extension DiaryViewController {
     
     // MARK: Private methods
-
+    
     private func setupLayout() {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
@@ -1251,7 +1265,7 @@ extension DiaryViewController {
         pickerCheckButton.addTarget(self, action: #selector(pickerCheckButtonTapped), for: .touchUpInside)
         toggleButton = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage(named: "button-maximize")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.itemArrowMaximize.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 25, height: 25)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(toggleButtonTapped), for: .touchUpInside)
@@ -1260,7 +1274,7 @@ extension DiaryViewController {
         }()
         homeButton = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage(named: "button-home")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.itemHome.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
@@ -1269,8 +1283,8 @@ extension DiaryViewController {
         }()
         notesButton = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage(named: "item-pin-line")!.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+            _button.setImage(UIImage.itemPinLine.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 45, height: 32)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action:#selector(presentNotesNavigation), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -1278,7 +1292,7 @@ extension DiaryViewController {
         }()
         avgScoreButton = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage(named: "button-avg-score")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.itemScoreAvg.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action:#selector(avgScoreButtonTapped), for: .touchUpInside)
@@ -1287,7 +1301,7 @@ extension DiaryViewController {
         }()
         condButton = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage(named: "button-heartbeat")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.itemHeartbeat.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 27, height: 25)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action:#selector(condButtonTapped), for: .touchUpInside)
@@ -1298,8 +1312,8 @@ extension DiaryViewController {
         condLeftButton = {
             let _button = UIButton(type: .system)
             _button.setTitle(lang.titleClose, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
             _button.setTitleColor(UIColor.clear, for: .normal)
-            _button.frame = CGRect(x: 0, y: 0, width: 21, height: 21)
             _button.showsTouchWhenHighlighted = false
             _button.isHidden = true
             _button.addTarget(self, action:#selector(condLeftButtonTapped), for: .touchUpInside)
@@ -1309,8 +1323,8 @@ extension DiaryViewController {
         condRightButton = {
             let _button = UIButton(type: .system)
             _button.setTitle(lang.titleEdit, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
             _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
-            _button.frame = CGRect(x: 0, y: 0, width: 21, height: 21)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(condRightButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -1431,17 +1445,25 @@ extension DiaryViewController {
         pickerGrayLineView.bottomAnchor.constraint(equalTo: pickerContainerView.bottomAnchor, constant: -50).isActive = true
         pickerGrayLineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
         
-        pickerCancelButton.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: (view.frame.width / 10)).isActive = true
-        pickerCancelButton.bottomAnchor.constraint(equalTo: pickerContainerView.bottomAnchor, constant: -15).isActive = true
+        pickerCancelButton.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: 0).isActive = true
+        pickerCancelButton.bottomAnchor.constraint(equalTo: pickerContainerView.bottomAnchor, constant: 0).isActive = true
+        pickerCancelButton.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
+        pickerCancelButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        pickerCheckButton.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
-        pickerCheckButton.bottomAnchor.constraint(equalTo: pickerContainerView.bottomAnchor, constant: -15).isActive = true
+        pickerCheckButton.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: 0).isActive = true
+        pickerCheckButton.bottomAnchor.constraint(equalTo: pickerContainerView.bottomAnchor, constant: 0).isActive = true
+        pickerCheckButton.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
+        pickerCheckButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        condLeftButton.leadingAnchor.constraint(equalTo: condContainerView.leadingAnchor, constant: (view.frame.width / 10)).isActive = true
-        condLeftButton.bottomAnchor.constraint(equalTo: condContainerView.bottomAnchor, constant: -15).isActive = true
+        condLeftButton.leadingAnchor.constraint(equalTo: condContainerView.leadingAnchor, constant: 0).isActive = true
+        condLeftButton.bottomAnchor.constraint(equalTo: condContainerView.bottomAnchor, constant: -5).isActive = true
+        condLeftButton.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
+        condLeftButton.heightAnchor.constraint(equalToConstant: 45).isActive = true
         
-        condRightButton.trailingAnchor.constraint(equalTo: condContainerView.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
-        condRightButton.bottomAnchor.constraint(equalTo: condContainerView.bottomAnchor, constant: -15).isActive = true
+        condRightButton.trailingAnchor.constraint(equalTo: condContainerView.trailingAnchor, constant: 0).isActive = true
+        condRightButton.bottomAnchor.constraint(equalTo: condContainerView.bottomAnchor, constant: -5).isActive = true
+        condRightButton.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
+        condRightButton.heightAnchor.constraint(equalToConstant: 45).isActive = true
         
         calendarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         calendarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
@@ -1450,11 +1472,11 @@ extension DiaryViewController {
         calendarViewHeight.priority = UILayoutPriority(rawValue: 999)
         calendarViewHeight.isActive = true
         
-        condButton.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 8).isActive = true
-        condButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
+        condButton.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
+        condButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         
-        toggleButton.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 8).isActive = true
-        toggleButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
+        toggleButton.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
+        toggleButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
         
         logGroupTableView.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
         logGroupTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true

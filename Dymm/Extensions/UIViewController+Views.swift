@@ -27,7 +27,7 @@ extension UIViewController {
     
     func getAlertBlindView() -> UIView {
         let _view = UIView()
-        _view.backgroundColor = UIColor.black.withAlphaComponent(0.2)
+        _view.backgroundColor = UIColor.black.withAlphaComponent(0.35)
         _view.isHidden = true
         _view.translatesAutoresizingMaskIntoConstraints = false
         return _view
@@ -51,7 +51,7 @@ extension UIViewController {
         return _label
     }
     func getLoadingImageView(isHidden: Bool? = nil) -> UIImageView {
-        let _imageView = UIImageView(image: UIImage(named: "item-loading"))
+        let _imageView = UIImageView(image: .itemBlackhole)
         _imageView.startRotating()
         if let isHidden = isHidden {
             _imageView.isHidden = isHidden
@@ -96,7 +96,7 @@ extension UIViewController {
     }
     func getCloseButton() -> UIButton {
         let _button = UIButton(type: .system)
-        _button.setImage(UIImage(named: "button-close")!.withRenderingMode(.alwaysOriginal), for: .normal)
+        _button.setImage(UIImage.itemCloseThin.withRenderingMode(.alwaysOriginal), for: .normal)
         _button.frame = CGRect(x: 0, y: 0, width: 22, height: 22)
         _button.showsTouchWhenHighlighted = true
         _button.translatesAutoresizingMaskIntoConstraints = false
@@ -104,23 +104,23 @@ extension UIViewController {
     }
     func getCancelButton() -> UIButton {
         let _button = UIButton(type: .system)
-        _button.setImage(UIImage(named: "button-cancel")!.withRenderingMode(.alwaysOriginal), for: .normal)
-        _button.frame = CGRect(x: 0, y: 0, width: 21, height: 21)
+        _button.setImage(UIImage.itemClose.withRenderingMode(.alwaysOriginal), for: .normal)
+        //        _button.frame = CGRect(x: 0, y: 0, width: 21, height: 21)
         _button.showsTouchWhenHighlighted = true
         _button.translatesAutoresizingMaskIntoConstraints = false
         return _button
     }
     func getCheckButton() -> UIButton {
         let _button = UIButton(type: .system)
-        _button.setImage(UIImage(named: "button-check")!.withRenderingMode(.alwaysOriginal), for: .normal)
-        _button.frame = CGRect(x: 0, y: 0, width: 26, height: 21)
+        _button.setImage(UIImage.itemCheck.withRenderingMode(.alwaysOriginal), for: .normal)
+        //        _button.frame = CGRect(x: 0, y: 0, width: 26, height: 21)
         _button.showsTouchWhenHighlighted = true
         _button.translatesAutoresizingMaskIntoConstraints = false
         return _button
     }
     func getGrayLineView() -> UIView {
         let _view = UIView(frame: CGRect.zero)
-        _view.backgroundColor = UIColor(hex: "WhiteSmoke")
+        _view.backgroundColor = .whiteSmoke
         _view.translatesAutoresizingMaskIntoConstraints = false
         return _view
     }

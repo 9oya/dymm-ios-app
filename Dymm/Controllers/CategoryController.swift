@@ -88,7 +88,7 @@ class CategoryViewController: UIViewController {
     var bookmark_id: Int?
     var typedKeyword: String?
     let hangulChars = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ".unicodeScalars
-//    let engChars = "abcdefghijklmnopqrstuvwxygABCDEFGHIJKLMNOPQRSTUVWXYZ".unicodeScalars
+    //    let engChars = "abcdefghijklmnopqrstuvwxygABCDEFGHIJKLMNOPQRSTUVWXYZ".unicodeScalars
     var lastContentOffset: CGFloat = 0.0
     var isScrollToLoading: Bool = false
     var currPageNum: Int = 1
@@ -157,7 +157,7 @@ class CategoryViewController: UIViewController {
             self.tagCollection.reloadData()
             self.stepCollection.reloadData()
         })
-        let height:NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 250)
+        let height:NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 260)
         alert.view.addConstraint(height)
         alert.view.tintColor = UIColor.cornflowerBlue
         self.present(alert, animated: true, completion: nil )
@@ -332,7 +332,7 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
             } else {
                 cell.label.text = _text
             }
-            cell.imageView.image = UIImage(named: "tagId-\(tag.id)")
+            cell.imageView.image = UIImage(named: "tag-\(tag.id)")
             return cell
         } else if collectionView == stepCollection {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: stepCellId, for: indexPath) as? StepCollectionCell else {
@@ -496,7 +496,7 @@ extension CategoryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
                 numberLabel.text = "\(portion)"
                 numberLabel.font = .systemFont(ofSize: 20, weight: .regular)
                 numberLabel.textAlignment = .center
-                bottomImage.image = UIImage(named: "item-div-big")
+                bottomImage.image = .itemDivBig
                 containerView.addSubview(numberLabel)
                 containerView.addSubview(bottomImage)
                 if row == selectedSizePickerRow {
@@ -507,27 +507,27 @@ extension CategoryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
             } else {
                 let midImage = UIImageView(frame: CGRect(x: 0, y: 22, width: 33, height: 10))
                 let bottomImage = UIImageView(frame: CGRect(x: 0, y: 47, width: 33, height: 10))
-                bottomImage.image = UIImage(named: "item-div-small")
+                bottomImage.image = .itemDivSmall
                 containerView.addSubview(midImage)
                 containerView.addSubview(bottomImage)
                 switch remainder {
                 case 1:
                     if row == selectedSizePickerRow {
-                        midImage.image = UIImage(named: "item-quarter-filled")
+                        midImage.image = .itemCircleQuarterFilled
                     } else {
-                        midImage.image = UIImage(named: "item-quarter-empty")
+                        midImage.image = .itemCircleQuarterEmpty
                     }
                 case 2:
                     if row == selectedSizePickerRow {
-                        midImage.image = UIImage(named: "item-half-filled")
+                        midImage.image = .itemCircleHalfFilled
                     } else {
-                        midImage.image = UIImage(named: "item-half-empty")
+                        midImage.image = .itemCircleHalfEmpty
                     }
                 case 3:
                     if row == selectedSizePickerRow {
-                        midImage.image = UIImage(named: "item-almost-filled")
+                        midImage.image = .itemCircleAlmostFilled
                     } else {
-                        midImage.image = UIImage(named: "item-almost-empty")
+                        midImage.image = .itemCircleAlmostEmpty
                     }
                 default:
                     break
@@ -591,7 +591,7 @@ extension CategoryViewController: UITextFieldDelegate {
 extension CategoryViewController {
     
     // MARK: Private methods
-
+    
     private func setupLayout() {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
@@ -672,14 +672,14 @@ extension CategoryViewController {
         }()
         fingerImageView = {
             let _imageView = UIImageView()
-            _imageView.image = UIImage(named: "item-finger-click")
+            _imageView.image = .itemFingerClick
             _imageView.contentMode = .scaleAspectFit
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
         downArrowImageView = {
             let _imageView = UIImageView()
-            _imageView.image = UIImage(named: "item-arrow-down")
+            _imageView.image = .itemTriangleDown
             _imageView.contentMode = .scaleAspectFit
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
@@ -706,9 +706,9 @@ extension CategoryViewController {
             let _button = UIButton(type: .system)
             switch topLeftButtonType {
             case ButtonType.home:
-                _button.setImage(UIImage(named: "button-home")!.withRenderingMode(.alwaysOriginal), for: .normal)
+                _button.setImage(UIImage.itemHome.withRenderingMode(.alwaysOriginal), for: .normal)
             case ButtonType.close:
-                _button.setImage(UIImage(named: "button-close")!.withRenderingMode(.alwaysOriginal), for: .normal)
+                _button.setImage(UIImage.itemCloseThin.withRenderingMode(.alwaysOriginal), for: .normal)
             default: fatalError()}
             _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
             _button.showsTouchWhenHighlighted = true
@@ -718,7 +718,7 @@ extension CategoryViewController {
         }()
         starButton = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage(named: "button-star-empty")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.itemStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.addTarget(self, action:#selector(starButtonTapped), for: .touchUpInside)
             _button.frame = CGRect(x: 0, y: 0, width: 27, height: 25)
             _button.showsTouchWhenHighlighted = true
@@ -747,7 +747,7 @@ extension CategoryViewController {
         }()
         startDateButton = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage(named: "button-circle-arrow")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.itemArrowCircle.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 16, height: 17)
             _button.setTitleColor(UIColor.dimGray, for: .normal)
             _button.setTitle(lang.titleStartDate, for: .normal)
@@ -758,7 +758,7 @@ extension CategoryViewController {
         }()
         endDateButton = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage(named: "button-thin-check")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.itemCheckThin.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 16, height: 17)
             _button.setTitleColor(UIColor.dimGray, for: .normal)
             _button.setTitle(lang.titleEndDate, for: .normal)
@@ -823,7 +823,7 @@ extension CategoryViewController {
         searchTextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         searchTextField.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) + CGFloat(marginInt)).isActive = true
         searchTextField.heightAnchor.constraint(equalToConstant: CGFloat(searchBarHeightInt)).isActive = true
-
+        
         langPickButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
         langPickButton.leadingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
         langPickButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 28).isActive = true
@@ -1011,8 +1011,11 @@ extension CategoryViewController {
                 self.timePicker.isHidden = true
                 self.startDateButton.isHidden = true
                 self.endDateButton.isHidden = true
-                
-                self.photoImageView.image = UIImage(named: "photo-pills")
+                if _superTag.tag_type == TagType.food {
+                    self.photoImageView.image = UIImage(named: "photo-meat")
+                } else {
+                    self.photoImageView.image = UIImage(named: "photo-pills")
+                }
             }
         } else if _superTag.tag_type == TagType.activity {
             // Execute activity tag_type exclusive
@@ -1060,7 +1063,7 @@ extension CategoryViewController {
                 self.startDateButton.isHidden = false
                 self.endDateButton.isHidden = false
                 
-                self.photoImageView.image = UIImage(named: "photo-walking")
+                self.photoImageView.image = UIImage(named: "photo-condition")
             }
         }
         
@@ -1077,10 +1080,12 @@ extension CategoryViewController {
     }
     
     private func loadCategories() {
-        UIView.transition(with: detailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            self.detailContainer.isHidden = true
-            self.tagCollection.isHidden = true
-        })
+        if !isScrollToLoading {
+            UIView.transition(with: detailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.detailContainer.isHidden = true
+                self.tagCollection.isHidden = true
+            })
+        }
         if superTag != nil {
             superTagId = superTag!.id
         }
@@ -1091,10 +1096,10 @@ extension CategoryViewController {
         }) { (tagSet) in
             if tagSet.bookmark_id != nil {
                 self.bookmark_id = tagSet.bookmark_id
-                self.starButton.setImage(UIImage.btnStarFilled.withRenderingMode(.alwaysOriginal), for: .normal)
+                self.starButton.setImage(UIImage.itemStarFilled.withRenderingMode(.alwaysOriginal), for: .normal)
             } else {
                 self.bookmark_id = nil
-                self.starButton.setImage(UIImage.btnStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
+                self.starButton.setImage(UIImage.itemStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
             }
             self.afterFetchCategoriesTransition(tagSet.tag, tagSet.sub_tags)
         }
@@ -1158,9 +1163,10 @@ extension CategoryViewController {
             self.alertError(message)
         }, tokenRefreshCompletion: {
             self.createABookmark()
-        }) {
+        }) { (bookmarkId) in
+            self.bookmark_id = bookmarkId
             UIView.animate(withDuration: 0.5, animations: {
-                self.starButton.setImage(UIImage.btnStarFilled.withRenderingMode(.alwaysOriginal), for: .normal)
+                self.starButton.setImage(UIImage.itemStarFilled.withRenderingMode(.alwaysOriginal), for: .normal)
             })
         }
     }
@@ -1173,8 +1179,9 @@ extension CategoryViewController {
         }, tokenRefreshCompletion: {
             self.updateABookmark()
         }) {
+            self.bookmark_id = nil
             UIView.animate(withDuration: 0.5, animations: {
-                self.starButton.setImage(UIImage.btnStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
+                self.starButton.setImage(UIImage.itemStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
             })
         }
     }

@@ -63,7 +63,7 @@ extension CondCollectionCell {
         }()
         removeImageView = {
             let _imageView = UIImageView()
-            _imageView.image = UIImage.btnRemove
+            _imageView.image = .itemRemove
             _imageView.isHidden = true
             _imageView.contentMode = .scaleAspectFit
             _imageView.translatesAutoresizingMaskIntoConstraints = false

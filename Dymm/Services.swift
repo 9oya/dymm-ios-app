@@ -12,7 +12,7 @@ import Alamofire
 struct Service {
     var lang: LangPack!
     let decoder = JSONDecoder()
-   
+    
     init(lang: LangPack) {
         self.lang = lang
     }
@@ -615,7 +615,7 @@ struct Service {
         }
     }
     
-    func postABookmark(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+    func postABookmark(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ bookmarkId: Int) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             print("Load UserDefaults.standard.getAccessToken() failed")
             return
@@ -632,11 +632,11 @@ struct Service {
                 }
                 switch statusCode {
                 case 200:
-                    guard let decodedData = try? self.decoder.decode(Ok<String>.self, from: responseData) else {
+                    guard let decodedData = try? self.decoder.decode(Ok<Int>.self, from: responseData) else {
                         fatalError()
                     }
-                    print(decodedData.message)
-                    completion()
+                    //                    print(decodedData.message)
+                    completion(decodedData.data!)
                 case 400:
                     self.badRequest(responseData)
                 case 403:

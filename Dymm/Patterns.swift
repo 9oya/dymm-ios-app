@@ -14,6 +14,7 @@ private let productHost = "https://dymm-api-01.appspot.com/"
 
 struct URI {
     static let host = localHost
+    //    static let host = productHost
     static let avatar = "/api/avatar"
     static let banner = "/api/banner"
     static let mail = "/api/mail"
@@ -140,25 +141,25 @@ func getUserCountryCode() -> String {
 
 func getLogGroupTypeImage(_ groupType: Int) -> UIImage? {
     switch groupType {
-    case LogGroupType.morning: return UIImage(named: "item-gt-sunrise")
-    case LogGroupType.daytime: return UIImage(named: "item-gt-sun")
-    case LogGroupType.evening: return UIImage(named: "item-gt-sunset")
-    case LogGroupType.nighttime: return UIImage(named: "item-gt-moon")
+    case LogGroupType.morning: return .itemGtSunrise
+    case LogGroupType.daytime: return .itemGtSun
+    case LogGroupType.evening: return .itemGtSunset
+    case LogGroupType.nighttime: return .itemGtMoon
     default: return nil
     }
 }
 
 func getCondScoreImage(_ condScore: Int) -> UIImage? {
     if condScore < 3 {
-        return UIImage.itemScoreAwful
+        return .itemScoreAwful
     } else if condScore < 5 {
-        return UIImage.itemScoreBad
+        return .itemScoreBad
     } else if condScore < 7 {
-        return UIImage.itemScoreSoso
+        return .itemScoreSoso
     } else if condScore < 9 {
-        return UIImage.itemScoreGood
+        return .itemScoreGood
     } else {
-        return UIImage.itemScoreAwesome
+        return .itemScoreExcellent
     }
 }
 

@@ -27,13 +27,14 @@ class LogGroupTableCell: UITableViewCell {
     var groupOfLogsTableHeight: NSLayoutConstraint!
     var condScoreButton: UIButton!
     var noteButton: UIButton!
+    var logCellButton: UIButton!
     
     var lang: LangPack!
     var selectedLogGroup: BaseModel.LogGroup?
     var groupOfLogSetForCnt: CustomModel.GroupOfLogSet?
     var groupOfLogSetForPop: CustomModel.GroupOfLogSet?
     var logsArray: [BaseModel.TagLog] = []
-
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupLayout()
@@ -169,6 +170,11 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
     
     // MARK: UITableView Delegate
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        logCellButton.tag = logsArray[indexPath.row].tag_id
+        logCellButton.sendActions(for: .touchUpInside)
+    }
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return CGFloat(logTableCellHeightInt)
     }
@@ -189,7 +195,7 @@ extension LogGroupTableCell {
         }()
         arrowImageView = {
             let _imageView = UIImageView()
-            _imageView.image = UIImage.itemPolyLeft
+            _imageView.image = .itemArrowRight
             _imageView.contentMode = .scaleAspectFit
             _imageView.isHidden = true
             _imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -214,7 +220,7 @@ extension LogGroupTableCell {
         noteImageView = {
             let _imageView = UIImageView()
             _imageView.contentMode = .scaleAspectFit
-            _imageView.image = .itemPinColored
+            _imageView.image = .itemPinYellow
             _imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
             _imageView.addShadowView()
             _imageView.isHidden = true
@@ -284,6 +290,12 @@ extension LogGroupTableCell {
             _tableView.isHidden = true
             _tableView.translatesAutoresizingMaskIntoConstraints = false
             return _tableView
+        }()
+        logCellButton = {
+            let _button = UIButton()
+            _button.isHidden = true
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
         }()
         
         groupOfLogsTableView.delegate = self

@@ -31,8 +31,9 @@ extension TagCollectionCell {
         addShadowView()
         
         imageView = {
-            let _imageView = UIImageView()
+            let _imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
             _imageView.contentMode = .scaleAspectFit
+            _imageView.clipsToBounds = true
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
@@ -51,8 +52,8 @@ extension TagCollectionCell {
         addSubview(imageView)
         addSubview(label)
         
-        imageView.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        imageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        //        imageView.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        //        imageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
         imageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
         imageView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
         
