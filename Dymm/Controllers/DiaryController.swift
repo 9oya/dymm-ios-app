@@ -127,6 +127,10 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         loadLogGroups()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        condLeftButtonTapped()
+    }
+    
     // MARK: - Actions
     
     @objc func alertError(_ message: String) {
@@ -368,14 +372,14 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     @objc func condLeftButtonTapped() {
-        isCondEditBtnTapped = false
-        condRightButton.setTitle(lang.titleEdit, for: .normal)
-        condRightButton.setTitleColor(UIColor.cornflowerBlue, for: .normal)
         UIView.transition(with: self.blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.blindView.isHidden = true
             self.condLeftButton.setTitleColor(UIColor.clear, for: .normal)
         }, completion: { (_) in
             self.condLeftButton.isHidden = true
+            self.isCondEditBtnTapped = false
+            self.condRightButton.setTitle(self.lang.titleEdit, for: .normal)
+            self.condRightButton.setTitleColor(.cornflowerBlue, for: .normal)
         })
     }
     
@@ -1026,6 +1030,37 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             present(nc, animated: true, completion: nil)
         default:
             fatalError()
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        // Prevent the display of non-existent dateLabels.
+        if collectionView == condCollectionView {
+            guard let cell = cell as? CondCollectionCell,
+                let avtCond = avtCondList?[indexPath.item] else {
+                return
+            }
+            if self.isCondEditBtnTapped {
+                cell.titleLabel.textColor = UIColor.lightGray
+                cell.stackView.isHidden = true
+                cell.removeImageView.isHidden = false
+            } else {
+                cell.titleLabel.textColor = UIColor.black
+                cell.stackView.isHidden = false
+                cell.removeImageView.isHidden = true
+            }
+            if let startDate = avtCond.start_date {
+                cell.startDateLabel.text = "\u{021E2}\(startDate)"
+                cell.startDateLabel.isHidden = false
+            } else {
+                cell.startDateLabel.isHidden = true
+            }
+            if let endDate = avtCond.end_date {
+                cell.endDateLabel.text = "\u{2713}\(endDate)"
+                cell.endDateLabel.isHidden = false
+            } else {
+                cell.endDateLabel.isHidden = true
+            }
         }
     }
     
