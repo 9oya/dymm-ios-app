@@ -964,11 +964,12 @@ extension CategoryViewController {
             // Execute category tag_type exclusive
             switch lang.currentLanguageId {
             case LanguageId.eng: navigationItem.title = _superTag.eng_name
-            case LanguageId.kor: navigationItem.title = _superTag.kor_name!
+            case LanguageId.kor: navigationItem.title = _superTag.kor_name
+            case LanguageId.jpn: navigationItem.title = _superTag.jpn_name
             default: fatalError()}
             UIView.animate(withDuration: 0.5) {
                 self.detailContainer.isHidden = true
-                if self.superTag!.id == TagId.bookmarks {
+                if _superTag.id == TagId.bookmarks {
                     self.searchTextField.isHidden = true
                     self.langPickButton.isHidden = true
                     self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt)
@@ -1070,12 +1071,16 @@ extension CategoryViewController {
         // For all tag_types
         subTags = _subTags
         tagCollection.reloadData()
-        if self.subTags.count > 0 {
-            let indexPath = IndexPath(row: 0, section: 0)
-            self.tagCollection.scrollToItem(at: indexPath, at: .top, animated: true)
-        }
         UIView.transition(with: tagCollection, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            if _superTag.tag_type == TagType.category {
+                self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt)
+            }
             self.tagCollection.isHidden = false
+        }, completion: { (_) in
+            if self.subTags.count > 0 {
+                let indexPath = IndexPath(row: 0, section: 0)
+                self.tagCollection.scrollToItem(at: indexPath, at: .top, animated: true)
+            }
         })
     }
     
