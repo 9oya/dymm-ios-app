@@ -34,6 +34,7 @@ class ProfileViewController: UIViewController {
     
     // UIImageView
     var infoImageView: UIImageView!
+    var loadingImageView: UIImageView!
     
     // UITextView
     var introTextView: UITextView!
@@ -143,6 +144,7 @@ class ProfileViewController: UIViewController {
     
     @objc func signOutButtonTapped() {
         UserDefaults.standard.setIsSignIn(value: false)
+        UserDefaults.standard.setAvatarId(value: 0)
         dismiss(animated: true, completion: nil)
     }
     
@@ -611,6 +613,7 @@ extension ProfileViewController {
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
+        loadingImageView = getLoadingImageView(isHidden: false)
         infoImageLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 35, weight: .medium)
@@ -641,6 +644,7 @@ extension ProfileViewController {
         view.addSubview(mailConfContainer)
         view.addSubview(infoContainer)
         view.addSubview(tagCollection)
+        view.addSubview(loadingImageView)
         
         topBarContainer.addSubview(signOutButton)
         
@@ -796,6 +800,9 @@ extension ProfileViewController {
         tagCollection.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         tagCollection.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         tagCollection.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+        
+        loadingImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        loadingImageView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: 0).isActive = true
     }
     
     private func setupLangProperties() {
@@ -813,6 +820,11 @@ extension ProfileViewController {
     }
     
     private func loadProfile() {
+        if loadingImageView.isHidden {
+            UIView.transition(with: loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.loadingImageView.isHidden = false
+            })
+        }
         let service = Service(lang: lang)
         service.getProfile(popoverAlert: { (message) in
             self.retryFunction = self.loadProfile
@@ -864,6 +876,7 @@ extension ProfileViewController {
             UIView.transition(with: self.tagCollection, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.infoContainer.isHidden = false
                 self.tagCollection.isHidden = false
+                self.loadingImageView.isHidden = true
             })
         }
     }

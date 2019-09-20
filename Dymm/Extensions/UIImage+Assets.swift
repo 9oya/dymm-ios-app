@@ -38,6 +38,7 @@ extension UIImage {
     static let itemGtSunset = UIImage(named: "item-gt-sunset")!
     static let itemHeartbeat = UIImage(named: "item-heartbeat")!
     static let itemHome = UIImage(named: "item-home")!
+    static let itemLoading = UIImage(named: "item-loading")!
     static let itemLogoM = UIImage(named: "item-logo-m")!
     static let itemLogoS = UIImage(named: "item-logo-s")!
     static let itemPinGray = UIImage(named: "item-pin-gray")!

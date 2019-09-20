@@ -615,7 +615,7 @@ struct Service {
         }
     }
     
-    func postABookmark(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ bookmarkId: Int) -> Void) {
+    func postABookmark(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ postBookmark: CustomModel.PostBookmark) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             print("Load UserDefaults.standard.getAccessToken() failed")
             return
@@ -632,11 +632,13 @@ struct Service {
                 }
                 switch statusCode {
                 case 200:
-                    guard let decodedData = try? self.decoder.decode(Ok<Int>.self, from: responseData) else {
+                    guard let decodedData = try? self.decoder.decode(Ok<CustomModel.PostBookmark>.self, from: responseData) else {
                         fatalError()
                     }
-                    //                    print(decodedData.message)
-                    completion(decodedData.data!)
+                    guard let postBookmark = decodedData.data else {
+                        fatalError()
+                    }
+                    completion(postBookmark)
                 case 400:
                     self.badRequest(responseData)
                 case 403:
@@ -884,7 +886,7 @@ struct Service {
         }
     }
     
-    func putABookmark(bookmark_id: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+    func putABookmark(bookmark_id: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ bookmarksTotal: Int) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             print("Load UserDefaults.standard.getAccessToken() failed")
             return
@@ -905,11 +907,11 @@ struct Service {
                 }
                 switch statusCode {
                 case 200:
-                    guard let decodedData = try? self.decoder.decode(Ok<String>.self, from: responseData) else {
+                    guard let decodedData = try? self.decoder.decode(Ok<Int>.self, from: responseData) else {
                         fatalError()
                     }
                     print(decodedData.message)
-                    completion()
+                    completion(decodedData.data!)
                 case 400:
                     self.badRequest(responseData)
                 case 403:

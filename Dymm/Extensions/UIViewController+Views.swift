@@ -51,7 +51,9 @@ extension UIViewController {
         return _label
     }
     func getLoadingImageView(isHidden: Bool? = nil) -> UIImageView {
-        let _imageView = UIImageView(image: .itemBlackhole)
+        let _imageView = UIImageView(image: .itemLoading)
+        _imageView.frame = CGRect(x: 0, y: 0, width: 60, height: 60)
+        _imageView.contentMode = .scaleAspectFit
         _imageView.startRotating()
         if let isHidden = isHidden {
             _imageView.isHidden = isHidden

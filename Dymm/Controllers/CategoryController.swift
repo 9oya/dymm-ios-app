@@ -38,12 +38,14 @@ class CategoryViewController: UIViewController {
     var fingerImageView: UIImageView!
     var downArrowImageView: UIImageView!
     var photoImageView: UIImageView!
+    var loadingImageView: UIImageView!
     
     // UITextField
     var searchTextField: UITextField!
     
     // UILabels
     var titleLabel: UILabel!
+    var bookmarksTotalLabel: UILabel!
     
     // UIButtons
     var homeButton: UIButton!
@@ -690,10 +692,11 @@ extension CategoryViewController {
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
+        loadingImageView = getLoadingImageView(isHidden: false)
         titleLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 20, weight: .regular)
-            _label.textColor = UIColor.black
+            _label.textColor = .black
             _label.textAlignment = .left
             _label.numberOfLines = 2
             _label.adjustsFontSizeToFitWidth = true
@@ -702,6 +705,17 @@ extension CategoryViewController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
+        bookmarksTotalLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 12, weight: .regular)
+            _label.textColor = .lightGray
+            _label.textAlignment = .right
+            _label.numberOfLines = 1
+            _label.text = "0"
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+
         homeButton = {
             let _button = UIButton(type: .system)
             switch topLeftButtonType {
@@ -798,9 +812,11 @@ extension CategoryViewController {
         view.addSubview(langPickButton)
         view.addSubview(detailContainer)
         view.addSubview(tagCollection)
+        view.addSubview(loadingImageView)
         
         detailContainer.addSubview(titleLabel)
         detailContainer.addSubview(starButton)
+        detailContainer.addSubview(bookmarksTotalLabel)
         detailContainer.addSubview(photoImageView)
         detailContainer.addSubview(logSizeButton)
         detailContainer.addSubview(logTimeButton)
@@ -860,6 +876,9 @@ extension CategoryViewController {
         starButton.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 7).isActive = true
         starButton.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -7).isActive = true
         
+        bookmarksTotalLabel.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 1).isActive = true
+        bookmarksTotalLabel.trailingAnchor.constraint(equalTo: starButton.leadingAnchor, constant: -2).isActive = true
+        
         sizePickerContainer.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: 0).isActive = true
         sizePickerContainer.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: 0).isActive = true
         sizePickerContainer.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: 0).isActive = true
@@ -887,6 +906,9 @@ extension CategoryViewController {
         tagCollection.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         tagCollection.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         tagCollection.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+        
+        loadingImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        loadingImageView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: 0).isActive = true
     }
     
     private func didSelectSizePickerRow(row: Int) {
@@ -1072,10 +1094,13 @@ extension CategoryViewController {
         subTags = _subTags
         tagCollection.reloadData()
         UIView.transition(with: tagCollection, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            if _superTag.tag_type == TagType.category {
+            if _superTag.id == TagId.bookmarks {
+                self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt)
+            } else if _superTag.tag_type == TagType.category {
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt)
             }
             self.tagCollection.isHidden = false
+            self.loadingImageView.isHidden = true
         }, completion: { (_) in
             if self.subTags.count > 0 {
                 let indexPath = IndexPath(row: 0, section: 0)
@@ -1089,6 +1114,7 @@ extension CategoryViewController {
             UIView.transition(with: detailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.detailContainer.isHidden = true
                 self.tagCollection.isHidden = true
+                self.loadingImageView.isHidden = false
             })
         }
         if superTag != nil {
@@ -1106,6 +1132,7 @@ extension CategoryViewController {
                 self.bookmark_id = nil
                 self.starButton.setImage(UIImage.itemStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
             }
+            self.bookmarksTotalLabel.text = "\(tagSet.bookmarks_total ?? 0)"
             self.afterFetchCategoriesTransition(tagSet.tag, tagSet.sub_tags)
         }
     }
@@ -1168,10 +1195,11 @@ extension CategoryViewController {
             self.alertError(message)
         }, tokenRefreshCompletion: {
             self.createABookmark()
-        }) { (bookmarkId) in
-            self.bookmark_id = bookmarkId
+        }) { (postBookmark) in
+            self.bookmark_id = postBookmark.bookmark_id
             UIView.animate(withDuration: 0.5, animations: {
                 self.starButton.setImage(UIImage.itemStarFilled.withRenderingMode(.alwaysOriginal), for: .normal)
+                self.bookmarksTotalLabel.text = "\(postBookmark.bookmarks_total)"
             })
         }
     }
@@ -1183,10 +1211,11 @@ extension CategoryViewController {
             self.alertError(message)
         }, tokenRefreshCompletion: {
             self.updateABookmark()
-        }) {
+        }) { (bookmakrsTotal) in
             self.bookmark_id = nil
             UIView.animate(withDuration: 0.5, animations: {
                 self.starButton.setImage(UIImage.itemStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
+                self.bookmarksTotalLabel.text = "\(bookmakrsTotal)"
             })
         }
     }

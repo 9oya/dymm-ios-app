@@ -400,6 +400,22 @@ struct CustomModel {
         }
     }
     
+    struct PostBookmark: Codable {
+        let bookmark_id: Int
+        let bookmarks_total: Int
+        
+        enum CodingKeys: String, CodingKey {
+            case bookmark_id
+            case bookmarks_total
+        }
+        
+        init(from decoder: Decoder) throws {
+            let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
+            self.bookmark_id = try valueContainer.decode(Int.self, forKey: CodingKeys.bookmark_id)
+            self.bookmarks_total = try valueContainer.decode(Int.self, forKey: CodingKeys.bookmarks_total)
+        }
+    }
+    
     struct GroupOfLogSet: Codable {
         let group_id: Int
         var food_logs: [BaseModel.TagLog]?
@@ -466,11 +482,13 @@ struct CustomModel {
         let tag: BaseModel.Tag
         let sub_tags: [BaseModel.Tag]
         let bookmark_id: Int?
+        let bookmarks_total: Int?
         
         enum CodingKeys: String, CodingKey {
             case tag
             case sub_tags
             case bookmark_id
+            case bookmarks_total
         }
         
         init(from decoder: Decoder) throws {
@@ -478,6 +496,7 @@ struct CustomModel {
             self.tag = try valueContainer.decode(BaseModel.Tag.self, forKey: CodingKeys.tag)
             self.sub_tags = try valueContainer.decode([BaseModel.Tag].self, forKey: CodingKeys.sub_tags)
             self.bookmark_id = try? valueContainer.decode(Int.self, forKey: CodingKeys.bookmark_id)
+            self.bookmarks_total = try? valueContainer.decode(Int.self, forKey: CodingKeys.bookmarks_total)
         }
     }
 }

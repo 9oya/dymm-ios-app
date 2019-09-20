@@ -21,6 +21,7 @@ class HomeViewController: UIViewController {
     var pageControl: UIPageControl!
     var titleImageView: UIImageView!
     var profileButton: UIButton!
+    var loadingImageView: UIImageView!
     
     var lang: LangPack!
     var retryFunction: (() -> Void)?
@@ -298,6 +299,7 @@ extension HomeViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
+        loadingImageView = getLoadingImageView(isHidden: false)
         
         navigationItem.titleView = titleImageView
         navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: profileButton)]
@@ -310,6 +312,7 @@ extension HomeViewController {
         view.addSubview(bannerCollectionView)
         view.addSubview(tagCollectionView)
         view.addSubview(pageControl)
+        view.addSubview(loadingImageView)
         
         // Setup constraints
         bannerCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 1).isActive = true
@@ -324,6 +327,9 @@ extension HomeViewController {
         tagCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
         tagCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
         tagCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+        
+        loadingImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        loadingImageView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: 0).isActive = true
     }
     
     private func startTimer() {
@@ -360,6 +366,7 @@ extension HomeViewController {
             self.tags = tagSet.sub_tags
             UIView.transition(with: self.tagCollectionView, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.tagCollectionView.reloadData()
+                self.loadingImageView.isHidden = true
             })
         }
     }
