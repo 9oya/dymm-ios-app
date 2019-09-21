@@ -405,7 +405,6 @@ extension HomeViewController {
                 if let imgPath = avatar.photo_url {
                     let imgUrl = "\(URI.host)\(imgPath)"
                     Alamofire.request(imgUrl).responseImage { response in
-                        debugPrint(response)
                         if let data = response.data {
                             self.profileImageView.image = UIImage(data: data)
                         }

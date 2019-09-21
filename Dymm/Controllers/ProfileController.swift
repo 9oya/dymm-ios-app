@@ -88,12 +88,10 @@ class ProfileViewController: UIViewController {
     
     @objc func alertError(_ message: String) {
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.titleYes, style: .default) { _ in
-            self.retryFunction!()
-        }
-        let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
-        alertController.addAction(confirmAction)
-        alertController.addAction(cancelAction)
+        alertController.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
+                self.retryFunction!()
+            })
+        alertController.addAction(UIAlertAction(title: lang.titleClose, style: .cancel) { _ in })
         alertController.view.tintColor = UIColor.cornflowerBlue
         present(alertController, animated: true, completion: nil)
     }
@@ -380,7 +378,7 @@ class ProfileViewController: UIViewController {
                 imagePickerController.sourceType = .camera
                 self.present(imagePickerController, animated: true, completion: nil)
             } else {
-                // TODO: Alert camera not available
+                self.alertCameraError()
             }
         })
         alert.addAction(UIAlertAction(title: lang.titlePhotolibrary, style: .default) { _ in
@@ -389,6 +387,13 @@ class ProfileViewController: UIViewController {
         })
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
         self.present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func alertCameraError() {
+        let alertController = UIAlertController(title: lang.titleSorry, message: lang.msgCameraDisable, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: lang.titleDone, style: .cancel) { _ in })
+        alertController.view.tintColor = UIColor.cornflowerBlue
+        present(alertController, animated: true, completion: nil)
     }
 }
 
@@ -527,7 +532,6 @@ extension ProfileViewController: UIImagePickerControllerDelegate, UINavigationCo
         }
         resizedImage = selectedImage.resizedTo1MB()
         uploadProfilePhoto()
-//        infoImageView.image = selectedImage.resizedTo1MB()
         picker.dismiss(animated: true, completion: nil)
     }
 }

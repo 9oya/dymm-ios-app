@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 private let localHost = "http://127.0.0.1:5000"
-private let productHost = "https://dymm-api-01.appspot.com/"
+private let productHost = "https://dymm-api-01.appspot.com"
 
 struct URI {
     static let host = localHost

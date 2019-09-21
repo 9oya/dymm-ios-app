@@ -74,6 +74,7 @@ struct LangPack {
     var titleSignIn: String!
     var titleSignOut: String!
     var titleSignUp: String!
+    var titleSorry: String!
     var titleSpread: String!
     var titleStartDate: String!
     var titleStay: String!
@@ -87,6 +88,7 @@ struct LangPack {
     var msgAvgScoreDown: String!
     var msgAvgScoreEqual: String!
     var msgAvgScoreUp: String!
+    var msgCameraDisable: String!
     var msgChangePasswordCompl: String!
     var msgEmptyEmail: String!
     var msgEmptyName: String!
@@ -524,6 +526,12 @@ struct LangPack {
             case LanguageId.kor: return "가입하기"
             default: fatalError()}
         }()
+        self.titleSorry = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "\u{1F62E}Sorry."
+            case LanguageId.kor: return "\u{1F62E}죄송합니다."
+            default: fatalError()}
+        }()
         self.titleSpread = {
             switch currentLanguageId {
             case LanguageId.eng: return "Spread"
@@ -599,6 +607,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Your condition score for this month has gone up."
             case LanguageId.kor: return "당신의 이번 달 컨디션 점수가 상승했습니다."
+            default: fatalError()}
+        }()
+        self.msgCameraDisable = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Camera not available."
+            case LanguageId.kor: return "카메라를 사용할 수 없습니다."
             default: fatalError()}
         }()
         self.msgChangePasswordCompl = {
