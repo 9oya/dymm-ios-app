@@ -19,7 +19,7 @@ class ProfileViewController: UIViewController {
     var topBarContainer: UIView!
     var mailConfContainer: UIView!
     var infoContainer: UIView!
-    var infoImageContainer: UIView!
+//    var infoImageContainer: UIView!
     var firstNameContainer: UIView!
     var lastNameContainer: UIView!
     var emailContainer: UIView!
@@ -76,6 +76,7 @@ class ProfileViewController: UIViewController {
     var newPassword: String?
     var confPassword: String?
     var isOldPasswordCorrect = true
+    var resizedImage: UIImage?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -365,6 +366,30 @@ class ProfileViewController: UIViewController {
         alert.addAction(cancelAction)
         self.present(alert, animated: true, completion: nil)
     }
+    
+    @objc func alertChangeProfileImage(_ sender: UITapGestureRecognizer? = nil) {
+        let alert = UIAlertController(title: lang.titleChangeProfileImg, message: nil, preferredStyle: .actionSheet)
+        let imagePickerController = UIImagePickerController()
+        imagePickerController.delegate = self
+        
+        alert.addAction(UIAlertAction(title: lang.titleChangeColor, style: .default) { _ in
+            return
+        })
+        alert.addAction(UIAlertAction(title: lang.titleCamera, style: .default) { _ in
+            if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                imagePickerController.sourceType = .camera
+                self.present(imagePickerController, animated: true, completion: nil)
+            } else {
+                // TODO: Alert camera not available
+            }
+        })
+        alert.addAction(UIAlertAction(title: lang.titlePhotolibrary, style: .default) { _ in
+            imagePickerController.sourceType = .photoLibrary
+            self.present(imagePickerController, animated: true, completion: nil)
+        })
+        alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
+        self.present(alert, animated: true, completion: nil)
+    }
 }
 
 extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
@@ -488,6 +513,25 @@ extension ProfileViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     }
 }
 
+extension ProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    // MARK: - UIImagePickerControllerDelegate
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        guard let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else {
+            fatalError()
+        }
+        resizedImage = selectedImage.resizedTo1MB()
+        uploadProfilePhoto()
+//        infoImageView.image = selectedImage.resizedTo1MB()
+        picker.dismiss(animated: true, completion: nil)
+    }
+}
+
 extension ProfileViewController {
     
     // MARK: Private methods
@@ -601,15 +645,13 @@ extension ProfileViewController {
             _pickerView.translatesAutoresizingMaskIntoConstraints = false
             return _pickerView
         }()
-        infoImageContainer = {
-            let _view = UIView()
-            _view.backgroundColor = UIColor.white
-            _view.translatesAutoresizingMaskIntoConstraints = false
-            return _view
-        }()
         infoImageView = {
             let _imageView = UIImageView()
             _imageView.layer.cornerRadius = 70 / 2
+            _imageView.contentMode = .scaleAspectFill
+            _imageView.clipsToBounds = true
+            _imageView.isUserInteractionEnabled = true
+            _imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(alertChangeProfileImage(_:))))
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
@@ -652,15 +694,14 @@ extension ProfileViewController {
         mailConfContainer.addSubview(mailConfAddressButton)
         mailConfContainer.addSubview(sendAgainButton)
         
-        infoContainer.addSubview(infoImageContainer)
+        infoContainer.addSubview(infoImageView)
+        infoContainer.addSubview(infoImageLabel)
         infoContainer.addSubview(firstNameContainer)
         infoContainer.addSubview(lastNameContainer)
         infoContainer.addSubview(emailContainer)
         infoContainer.addSubview(phNumberContainer)
         infoContainer.addSubview(introContainer)
         
-        infoImageContainer.addSubview(infoImageView)
-        infoImageContainer.addSubview(infoImageLabel)
         firstNameContainer.addSubview(firstNameGuideLabel)
         firstNameContainer.addSubview(firstNameLabel)
         lastNameContainer.addSubview(lastNameGuideLabel)
@@ -709,22 +750,17 @@ extension ProfileViewController {
         infoContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         infoContainer.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         infoContainer.heightAnchor.constraint(equalToConstant: 280).isActive = true
+
+        infoImageView.topAnchor.constraint(equalTo: infoContainer.topAnchor, constant: 20).isActive = true
+        infoImageView.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
+        infoImageView.widthAnchor.constraint(equalToConstant: 70).isActive = true
+        infoImageView.heightAnchor.constraint(equalToConstant: 70).isActive = true
         
-        infoImageContainer.topAnchor.constraint(equalTo: infoContainer.topAnchor, constant: 20).isActive = true
-        infoImageContainer.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
-        infoImageContainer.widthAnchor.constraint(equalToConstant: 70).isActive = true
-        infoImageContainer.heightAnchor.constraint(equalToConstant: 70).isActive = true
-        
-        infoImageView.topAnchor.constraint(equalTo: infoImageContainer.topAnchor, constant: 0).isActive = true
-        infoImageView.leadingAnchor.constraint(equalTo: infoImageContainer.leadingAnchor, constant: 0).isActive = true
-        infoImageView.trailingAnchor.constraint(equalTo: infoImageContainer.trailingAnchor, constant: 0).isActive = true
-        infoImageView.bottomAnchor.constraint(equalTo: infoImageContainer.bottomAnchor, constant: 0).isActive = true
-        
-        infoImageLabel.centerXAnchor.constraint(equalTo: infoImageContainer.centerXAnchor, constant: 0).isActive = true
-        infoImageLabel.centerYAnchor.constraint(equalTo: infoImageContainer.centerYAnchor, constant: 0).isActive = true
+        infoImageLabel.centerXAnchor.constraint(equalTo: infoImageView.centerXAnchor, constant: 0).isActive = true
+        infoImageLabel.centerYAnchor.constraint(equalTo: infoImageView.centerYAnchor, constant: 0).isActive = true
         
         firstNameContainer.topAnchor.constraint(equalTo: infoContainer.topAnchor, constant: 15).isActive = true
-        firstNameContainer.leadingAnchor.constraint(equalTo: infoImageContainer.trailingAnchor, constant: 20).isActive = true
+        firstNameContainer.leadingAnchor.constraint(equalTo: infoImageView.trailingAnchor, constant: 20).isActive = true
         firstNameContainer.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         firstNameContainer.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
@@ -737,7 +773,7 @@ extension ProfileViewController {
         firstNameLabel.trailingAnchor.constraint(equalTo: firstNameContainer.trailingAnchor, constant: 0).isActive = true
         
         lastNameContainer.topAnchor.constraint(equalTo: firstNameContainer.bottomAnchor, constant: 3).isActive = true
-        lastNameContainer.leadingAnchor.constraint(equalTo: infoImageContainer.trailingAnchor, constant: 20).isActive = true
+        lastNameContainer.leadingAnchor.constraint(equalTo: infoImageView.trailingAnchor, constant: 20).isActive = true
         lastNameContainer.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         lastNameContainer.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
@@ -843,10 +879,15 @@ extension ProfileViewController {
             UserDefaults.standard.setIsEmailConfirmed(value: profile.avatar.is_confirmed)
             UserDefaults.standard.setIsSignIn(value: true)
             let firstName = profile.avatar.first_name
-            let index = firstName.index(firstName.startIndex, offsetBy: 0)
-            self.infoImageLabel.text = String(firstName[index])
-            self.infoImageLabel.textColor = UIColor.white
-            self.infoImageView.backgroundColor = getProfileUIColor(key: profile.avatar.profile_type)
+            if let imgPath = profile.avatar.photo_url {
+                let imgUrl = "\(URI.host)\(imgPath)"
+                self.infoImageView.downloadImage(from: URL(string: imgUrl)!)
+            } else {
+                let index = firstName.index(firstName.startIndex, offsetBy: 0)
+                self.infoImageLabel.text = String(firstName[index])
+                self.infoImageLabel.textColor = UIColor.white
+                self.infoImageView.backgroundColor = getProfileUIColor(key: profile.avatar.profile_type)
+            }
             self.firstNameLabel.text = firstName
             self.lastNameLabel.text = profile.avatar.last_name
             self.emailLabel.text = profile.avatar.email
@@ -986,6 +1027,28 @@ extension ProfileViewController {
             UIView.transition(with: self.sendAgainButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.mailConfAddressButton.isHidden = false
                 self.sendAgainButton.isHidden = false
+            })
+        }
+    }
+    
+    private func uploadProfilePhoto() {
+        if loadingImageView.isHidden {
+            UIView.transition(with: loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.loadingImageView.isHidden = false
+            })
+        }
+        guard let avatarId = UserDefaults.standard.getAvatarId() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let service = Service(lang: lang)
+        service.postProfilePhoto(avatarId: avatarId, image: resizedImage!.pngData()!, popoverAlert: { (message) in
+            self.retryFunction = self.uploadProfilePhoto
+            self.alertError(message)
+        }) {
+            self.infoImageView.image = self.resizedImage!
+            UIView.transition(with: self.loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.loadingImageView.isHidden = true
             })
         }
     }

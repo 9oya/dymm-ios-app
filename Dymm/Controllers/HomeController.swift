@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Alamofire
+import AlamofireImage
 
 private let bannerCellId = "BannerCollectionCell"
 private let bannerHeightInt = 250
@@ -20,7 +22,8 @@ class HomeViewController: UIViewController {
     var bannerCollectionView: UICollectionView!
     var pageControl: UIPageControl!
     var titleImageView: UIImageView!
-    var profileButton: UIButton!
+    var profileImageView: UIImageView!
+    var profileImageLabel: UILabel!
     var loadingImageView: UIImageView!
     
     var lang: LangPack!
@@ -46,10 +49,12 @@ class HomeViewController: UIViewController {
         if UserDefaults.standard.isSignIn() {
             loadAvatar()
         } else {
-            UIView.transition(with: profileButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
-                self.profileButton.setTitleColor(UIColor.clear, for: .normal)
-                self.profileButton.backgroundColor = UIColor.clear
-                self.profileButton.setBackgroundImage(.itemProfileDef, for: .normal)
+            UIView.transition(with: profileImageView, duration: 0.7, options: .transitionCrossDissolve, animations: {
+//                self.profileButton.setTitleColor(UIColor.clear, for: .normal)
+                self.profileImageLabel.backgroundColor = .clear
+                self.profileImageView.backgroundColor = UIColor.clear
+//                self.profileButton.setBackgroundImage(.itemProfileDef, for: .normal)
+                self.profileImageView.image = .itemProfileDef
             })
         }
     }
@@ -290,19 +295,34 @@ extension HomeViewController {
             _imageView.contentMode = .scaleAspectFit
             return _imageView
         }()
-        profileButton = {
-            let _button = UIButton(type: .system)
-            _button.setImage(UIImage.itemProfileDef.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.frame = CGRect(x: 0, y: 0, width: 31, height: 31)
-            _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(profileButtonTapped), for: .touchUpInside)
-            _button.translatesAutoresizingMaskIntoConstraints = false
-            return _button
+        profileImageView = {
+            let _imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 31, height: 31))
+            _imageView.layer.cornerRadius = 31 / 2
+            _imageView.contentMode = .scaleAspectFill
+            _imageView.clipsToBounds = true
+            _imageView.image = UIImage.itemProfileDef
+            _imageView.isUserInteractionEnabled = true
+            _imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileButtonTapped)))
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        profileImageLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 12, weight: .medium)
+            _label.textColor = UIColor.white
+            _label.textAlignment = .center
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
         }()
         loadingImageView = getLoadingImageView(isHidden: false)
         
         navigationItem.titleView = titleImageView
-        navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: profileButton)]
+        profileImageView.addSubview(profileImageLabel)
+        profileImageView.widthAnchor.constraint(equalToConstant: 31).isActive = true
+        profileImageView.heightAnchor.constraint(equalToConstant: 31).isActive = true
+        profileImageLabel.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor, constant: 0).isActive = true
+        profileImageLabel.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor, constant: 0).isActive = true
+        navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: profileImageView)]
         bannerCollectionView.dataSource = self
         bannerCollectionView.delegate = self
         tagCollectionView.dataSource = self
@@ -381,14 +401,21 @@ extension HomeViewController {
         }) { (avatar) in
             self.avatar = avatar
             let firstName = avatar.first_name
-            let index = firstName.index(firstName.startIndex, offsetBy: 0)
             UIView.animate(withDuration: 0.5, animations: {
-                self.profileButton.setImage(nil, for: .normal)
-                self.profileButton.setTitle(String(firstName[index]), for: .normal)
-                self.profileButton.setTitleColor(UIColor.white, for: .normal)
-                self.profileButton.layer.cornerRadius = self.profileButton.frame.width/2
-                self.profileButton.backgroundColor = getProfileUIColor(key: avatar.profile_type)
-                self.profileButton.setBackgroundImage(nil, for: .normal)
+                if let imgPath = avatar.photo_url {
+                    let imgUrl = "\(URI.host)\(imgPath)"
+                    Alamofire.request(imgUrl).responseImage { response in
+                        debugPrint(response)
+                        if let data = response.data {
+                            self.profileImageView.image = UIImage(data: data)
+                        }
+                    }
+                } else {
+                    let index = firstName.index(firstName.startIndex, offsetBy: 0)
+                    self.profileImageLabel.text = String(firstName[index])
+                    self.profileImageLabel.textColor = UIColor.white
+                    self.profileImageView.backgroundColor = getProfileUIColor(key: avatar.profile_type)
+                }
             })
         }
     }

@@ -507,8 +507,6 @@ extension AuthViewController {
         formContainerView.addSubview(formGrayLineView)
         
         // Setup constraints
-        loadingImageView.widthAnchor.constraint(equalToConstant: 62).isActive = true
-        loadingImageView.heightAnchor.constraint(equalToConstant: 62).isActive = true
         loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
         loadingImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0).isActive = true
         

@@ -983,7 +983,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             case LanguageId.eng:
                 cell.titleLabel.text = avtCond.eng_name
                 if let startDate = avtCond.start_date {
-                    cell.startDateLabel.text = "\u{021E2}\(startDate)"
+                    cell.startDateLabel.text = "\(startDate)\u{021E2}"
                 }
                 if let endDate = avtCond.end_date {
                     cell.endDateLabel.text = "\u{2713}\(endDate)"
@@ -993,7 +993,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 if let startDate = avtCond.start_date {
                     let dateArr = startDate.split(separator: "/")
                     let month = LangHelper.getKorNameOfMonth(monthNumber: nil, engMMM: String(dateArr[0]))
-                    cell.startDateLabel.text = "\u{021E2}\(month)/\(dateArr[1])/\(dateArr[2])"
+                    cell.startDateLabel.text = "\(month)/\(dateArr[1])/\(dateArr[2])\u{021E2}"
                 }
                 if let endDate = avtCond.end_date {
                     let dateArr = endDate.split(separator: "/")
@@ -1049,14 +1049,12 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 cell.stackView.isHidden = false
                 cell.removeImageView.isHidden = true
             }
-            if let startDate = avtCond.start_date {
-                cell.startDateLabel.text = "\u{021E2}\(startDate)"
+            if avtCond.start_date != nil  {
                 cell.startDateLabel.isHidden = false
             } else {
                 cell.startDateLabel.isHidden = true
             }
-            if let endDate = avtCond.end_date {
-                cell.endDateLabel.text = "\u{2713}\(endDate)"
+            if avtCond.end_date != nil  {
                 cell.endDateLabel.isHidden = false
             } else {
                 cell.endDateLabel.isHidden = true

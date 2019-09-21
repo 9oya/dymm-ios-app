@@ -192,9 +192,9 @@ class CategoryViewController: UIViewController {
     @objc func starButtonTapped() {
         if UserDefaults.standard.isSignIn() {
             if bookmark_id != nil {
-                updateABookmark()
+                removeBookmark()
             } else {
-                createABookmark()
+                createBookmark()
             }
         } else {
             presentAuthNavigation()
@@ -1179,7 +1179,7 @@ extension CategoryViewController {
         }
     }
     
-    private func createABookmark() {
+    private func createBookmark() {
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -1191,10 +1191,10 @@ extension CategoryViewController {
         ]
         let service = Service(lang: lang)
         service.postABookmark(params: params, popoverAlert: { (message) in
-            self.retryFunction = self.createABookmark
+            self.retryFunction = self.createBookmark
             self.alertError(message)
         }, tokenRefreshCompletion: {
-            self.createABookmark()
+            self.createBookmark()
         }) { (postBookmark) in
             self.bookmark_id = postBookmark.bookmark_id
             UIView.animate(withDuration: 0.5, animations: {
@@ -1204,13 +1204,13 @@ extension CategoryViewController {
         }
     }
     
-    private func updateABookmark() {
+    private func removeBookmark() {
         let service = Service(lang: lang)
         service.putABookmark(bookmark_id: self.bookmark_id!, popoverAlert: { (message) in
-            self.retryFunction = self.updateABookmark
+            self.retryFunction = self.removeBookmark
             self.alertError(message)
         }, tokenRefreshCompletion: {
-            self.updateABookmark()
+            self.removeBookmark()
         }) { (bookmakrsTotal) in
             self.bookmark_id = nil
             UIView.animate(withDuration: 0.5, animations: {

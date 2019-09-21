@@ -14,6 +14,7 @@ class CondCollectionCell: UICollectionViewCell {
     var startDateLabel: UILabel!
     var endDateLabel: UILabel!
     var removeImageView: UIImageView!
+    var lineView: UIView!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -69,15 +70,22 @@ extension CondCollectionCell {
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
+        lineView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor(hex: "#F2F3F6")
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
         
         addSubview(stackView)
         addSubview(titleLabel)
         addSubview(removeImageView)
+        addSubview(lineView)
+        
         stackView.addArrangedSubview(startDateLabel)
         stackView.addArrangedSubview(endDateLabel)
         
-        stackView.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
-        stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0).isActive = true
+        stackView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
         stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0).isActive = true
         
         titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
@@ -87,5 +95,10 @@ extension CondCollectionCell {
         
         removeImageView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
         removeImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20).isActive = true
+        
+        lineView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0).isActive = true
+        lineView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
+        lineView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0).isActive = true
+        lineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
     }
 }

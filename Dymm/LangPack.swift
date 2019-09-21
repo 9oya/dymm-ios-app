@@ -14,7 +14,10 @@ struct LangPack {
     var titleAll: String!
     var titleAvgScore: ((String) -> String)!
     var titleBackHome: String!
+    var titleCamera: String!
     var titleCancel: String!
+    var titleChangeColor: String!
+    var titleChangeProfileImg: String!
     var titleClose: String!
     var titleCondScore: String!
     var titleCondScores: [String]!
@@ -61,6 +64,7 @@ struct LangPack {
     var titlePasswordOld: String!
     var titlePhoneNum: String!
     var titlePhoneNumUpper: String!
+    var titlePhotolibrary: String!
     var titleProfile: String!
     var titleProfileUpper: String!
     var titleRetry: String!
@@ -158,10 +162,28 @@ struct LangPack {
             case LanguageId.kor: return "홈으로 돌아가기"
             default: fatalError()}
         }()
+        self.titleCamera = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Camera"
+            case LanguageId.kor: return "카메라"
+            default: fatalError()}
+        }()
         self.titleCancel = {
             switch currentLanguageId {
             case LanguageId.eng: return "Cancel"
             case LanguageId.kor: return "취소"
+            default: fatalError()}
+        }()
+        self.titleChangeColor = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Change color"
+            case LanguageId.kor: return "컬러 변경"
+            default: fatalError()}
+        }()
+        self.titleChangeProfileImg = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Change profile image"
+            case LanguageId.kor: return "프로파일 이미지를 변경합니다"
             default: fatalError()}
         }()
         self.titleClose = {
@@ -440,6 +462,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "PHONE NUMBER"
             case LanguageId.kor: return "전화번호"
+            default: fatalError()}
+        }()
+        self.titlePhotolibrary = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Photo library"
+            case LanguageId.kor: return "사진 앨범"
             default: fatalError()}
         }()
         self.titleProfile = {
