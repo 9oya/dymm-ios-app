@@ -44,7 +44,6 @@ extension UIImage {
     static let itemArrowMaximize = UIImage(named: "item-arrow-maximize")!
     static let itemArrowMinimize = UIImage(named: "item-arrow-minimize")!
     static let itemArrowRight = UIImage(named: "item-arrow-right")!
-    static let itemBlackhole = UIImage(named: "item-blackhole")!
     static let itemCheckThin = UIImage(named: "item-check-thin")!
     static let itemCheck = UIImage(named: "item-check")!
     static let itemCircleAlmostEmpty = UIImage(named: "item-circle-almost-empty")!
@@ -67,9 +66,9 @@ extension UIImage {
     static let itemLoading = UIImage(named: "item-loading")!
     static let itemLogoM = UIImage(named: "item-logo-m")!
     static let itemLogoS = UIImage(named: "item-logo-s")!
-    static let itemPinGray = UIImage(named: "item-pin-gray")!
-    static let itemPinLine = UIImage(named: "item-pin-line")!
-    static let itemPinYellow = UIImage(named: "item-pin-yellow")!
+    static let itemNoteGray = UIImage(named: "item-note-gray")!
+    static let itemNoteYellow = UIImage(named: "item-note-yellow")!
+    static let itemNotes = UIImage(named: "item-notes")!
     static let itemProfileDef = UIImage(named: "item-profile-def")!
     static let itemRemove = UIImage(named: "item-remove")!
     static let itemScoreAvg = UIImage(named: "item-score-avg")!

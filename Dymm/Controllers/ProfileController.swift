@@ -417,10 +417,12 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
             fatalError()
         }
         let profileTag = profile!.profile_tags[indexPath.item]
+        cell.imageView.image = UIImage(named: "tag-\(profileTag.tag_id)")
         switch profileTag.tag_id {
         case TagId.subscription:
             cell.label.text = lang.titleSubscribe
-            cell.label.textColor = .orange
+            cell.label.font = .systemFont(ofSize: 14, weight: .medium)
+            cell.label.textColor = UIColor(hex: "#5A3737")
         case TagId.dateOfBirth:
             if let dateOfBirth = profile?.avatar.date_of_birth {
                 cell.label.text = dateOfBirth
@@ -883,14 +885,23 @@ extension ProfileViewController {
             UserDefaults.standard.setIsEmailConfirmed(value: profile.avatar.is_confirmed)
             UserDefaults.standard.setIsSignIn(value: true)
             let firstName = profile.avatar.first_name
-            if let imgPath = profile.avatar.photo_url {
-                let imgUrl = "\(URI.host)\(imgPath)"
-                self.infoImageView.downloadImage(from: URL(string: imgUrl)!)
+            if let photoName = profile.avatar.photo_name {
+//                let imgUrl = "\(URI.storage)\(imgPath)?walkthrough_tutorial_id=toc"
+//                self.infoImageView.downloadImage(from: URL(string: imgUrl)!)
+                print(photoName)
+//                URLCache.shared.removeAllCachedResponses()
+                let url = "\(URI.host)\(URI.avatar)/\(profile.avatar.id)/profile/photo/\(photoName)"
+                Alamofire.request(url).responseImage { response in
+                    if let data = response.data {
+                        self.infoImageView.image = UIImage(data: data)
+                    }
+                }
+                
             } else {
                 let index = firstName.index(firstName.startIndex, offsetBy: 0)
                 self.infoImageLabel.text = String(firstName[index])
                 self.infoImageLabel.textColor = UIColor.white
-                self.infoImageView.backgroundColor = getProfileUIColor(key: profile.avatar.profile_type)
+                self.infoImageView.backgroundColor = getProfileUIColor(key: profile.avatar.color_code)
             }
             self.firstNameLabel.text = firstName
             self.lastNameLabel.text = profile.avatar.last_name

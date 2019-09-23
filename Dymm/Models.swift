@@ -90,10 +90,10 @@ struct BaseModel {
         let first_name: String
         let last_name: String
         let ph_number: String?
-        let profile_type: Int
+        let color_code: Int
         let introudction: String?
         let date_of_birth: String?
-        let photo_url: String?
+        let photo_name: String?
         let access_token: String?
         let refresh_token: String?
         
@@ -105,10 +105,10 @@ struct BaseModel {
             case first_name
             case last_name
             case ph_number
-            case profile_type
+            case color_code
             case introudction
             case date_of_birth
-            case photo_url
+            case photo_name
             case access_token
             case refresh_token
         }
@@ -122,10 +122,10 @@ struct BaseModel {
             self.first_name = try valueContainer.decode(String.self, forKey: CodingKeys.first_name)
             self.last_name = try valueContainer.decode(String.self, forKey: CodingKeys.last_name)
             self.ph_number = try? valueContainer.decode(String.self, forKey: CodingKeys.ph_number)
-            self.profile_type = try valueContainer.decode(Int.self, forKey: CodingKeys.profile_type)
+            self.color_code = try valueContainer.decode(Int.self, forKey: CodingKeys.color_code)
             self.introudction = try? valueContainer.decode(String.self, forKey: CodingKeys.introudction)
             self.date_of_birth = try? valueContainer.decode(String.self, forKey: CodingKeys.date_of_birth)
-            self.photo_url = try? valueContainer.decode(String.self, forKey: CodingKeys.photo_url)
+            self.photo_name = try? valueContainer.decode(String.self, forKey: CodingKeys.photo_name)
             self.access_token = try? valueContainer.decode(String.self, forKey: CodingKeys.access_token)
             self.refresh_token = try? valueContainer.decode(String.self, forKey: CodingKeys.refresh_token)
         }

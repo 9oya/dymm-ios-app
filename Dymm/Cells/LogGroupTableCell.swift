@@ -220,7 +220,7 @@ extension LogGroupTableCell {
         noteImageView = {
             let _imageView = UIImageView()
             _imageView.contentMode = .scaleAspectFit
-            _imageView.image = .itemPinYellow
+            _imageView.image = .itemNoteYellow
             _imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
             _imageView.addShadowView()
             _imageView.isHidden = true
@@ -238,8 +238,7 @@ extension LogGroupTableCell {
         }()
         noteButton = {
             let _button = UIButton()
-            _button.addShadowView()
-            _button.setImage(.itemPinGray, for: .normal)
+            _button.setImage(.itemNoteGray, for: .normal)
             _button.adjustsImageSizeForAccessibilityContentSizeCategory = true
             _button.showsTouchWhenHighlighted = true
             _button.isHidden = true

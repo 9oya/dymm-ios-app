@@ -11,10 +11,12 @@ import UIKit
 
 private let localHost = "http://127.0.0.1:5000"
 private let productHost = "https://dymm-api-01.appspot.com"
+private let productStorage = "https://www.googleapis.com/storage/v1/b/dymm-api-01.appspot.com/o"
 
 struct URI {
-    static let host = localHost
-//    static let host = productHost
+//    static let host = localHost
+    static let host = productHost
+    static let storage = productStorage
     static let avatar = "/api/avatar"
     static let banner = "/api/banner"
     static let mail = "/api/mail"
@@ -100,7 +102,7 @@ struct AvatarInfoTarget {
     static let email = 13
     static let phNumber = 14
     static let intro = 15
-    static let profile_type = 16
+    static let color_code = 16
 }
 
 struct TagId {
@@ -180,5 +182,5 @@ func getProfileUIColor(key: Int) -> UIColor {
     case 13: return UIColor.hex_9999ff
     case 14: return UIColor.hex_cccc66
     // TODO: case 999 -> Photo
-    default: fatalError()}
+    default: return UIColor.hex_cccc66}
 }

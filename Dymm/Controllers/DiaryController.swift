@@ -584,10 +584,10 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             }
             if logGroup.note != nil {
                 cell.noteImageView.isHidden = false
-                cell.noteButton.setImage(.itemPinYellow, for: .normal)
+                cell.noteButton.setImage(.itemNoteYellow, for: .normal)
             } else {
                 cell.noteImageView.isHidden = true
-                cell.noteButton.setImage(.itemPinGray, for: .normal)
+                cell.noteButton.setImage(.itemNoteGray, for: .normal)
             }
             cell.condScoreButton.addTarget(self, action: #selector(alertCondScorePicker), for: .touchUpInside)
             cell.noteButton.addTarget(self, action: #selector(alertNoteTextView(_:)), for: .touchUpInside)
@@ -1316,7 +1316,7 @@ extension DiaryViewController {
         }()
         notesButton = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage.itemPinLine.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.itemNotes.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 45, height: 32)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action:#selector(presentNotesNavigation), for: .touchUpInside)

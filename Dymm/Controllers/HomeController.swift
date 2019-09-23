@@ -402,9 +402,9 @@ extension HomeViewController {
             self.avatar = avatar
             let firstName = avatar.first_name
             UIView.animate(withDuration: 0.5, animations: {
-                if let imgPath = avatar.photo_url {
-                    let imgUrl = "\(URI.host)\(imgPath)"
-                    Alamofire.request(imgUrl).responseImage { response in
+                if let photoName = avatar.photo_name {
+                    print(photoName)
+                    Alamofire.request("\(URI.host)\(URI.avatar)/\(avatar.id)/profile/photo/\(photoName)").responseImage { response in
                         if let data = response.data {
                             self.profileImageView.image = UIImage(data: data)
                         }
@@ -413,7 +413,7 @@ extension HomeViewController {
                     let index = firstName.index(firstName.startIndex, offsetBy: 0)
                     self.profileImageLabel.text = String(firstName[index])
                     self.profileImageLabel.textColor = UIColor.white
-                    self.profileImageView.backgroundColor = getProfileUIColor(key: avatar.profile_type)
+                    self.profileImageView.backgroundColor = getProfileUIColor(key: avatar.color_code)
                 }
             })
         }
