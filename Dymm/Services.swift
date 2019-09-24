@@ -39,7 +39,7 @@ struct Service {
         for logGroup in logGroups {
             logGroupSectArr.append(CustomModel.LogGroupSection(dayOfYear: logGroup.day_of_year, logGroup: logGroup))
         }
-        var groupedLogGroupSectArr = Dictionary(grouping: logGroupSectArr) { (element) -> Int in
+        let groupedLogGroupSectArr = Dictionary(grouping: logGroupSectArr) { (element) -> Int in
             return element.dayOfYear
         }
         var sortedLogGroupSectTwoDimArr = [[CustomModel.LogGroupSection]]()

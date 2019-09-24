@@ -50,10 +50,8 @@ class HomeViewController: UIViewController {
             loadAvatar()
         } else {
             UIView.transition(with: profileImageView, duration: 0.7, options: .transitionCrossDissolve, animations: {
-//                self.profileButton.setTitleColor(UIColor.clear, for: .normal)
                 self.profileImageLabel.backgroundColor = .clear
                 self.profileImageView.backgroundColor = UIColor.clear
-//                self.profileButton.setBackgroundImage(.itemProfileDef, for: .normal)
                 self.profileImageView.image = .itemProfileDef
             })
         }
@@ -76,6 +74,7 @@ class HomeViewController: UIViewController {
     @objc func presentDiaryNavigation() {
         let vc = DiaryViewController()
         let nc = UINavigationController(rootViewController: vc)
+        nc.modalPresentationStyle = .fullScreen
         present(nc, animated: true, completion: nil)
     }
     
@@ -83,18 +82,21 @@ class HomeViewController: UIViewController {
         let vc = CategoryViewController()
         vc.superTag = self.selectedTag!
         let nc = UINavigationController(rootViewController: vc)
+        nc.modalPresentationStyle = .fullScreen
         present(nc, animated: true, completion: nil)
     }
     
     @objc func presentAuthNavigation() {
         let vc = AuthViewController()
         let nc = UINavigationController(rootViewController: vc)
+        nc.modalPresentationStyle = .fullScreen
         present(nc, animated: true, completion: nil)
     }
     
     @objc func presentProfileNavigation() {
         let vc = ProfileViewController()
         let nc = UINavigationController(rootViewController: vc)
+        nc.modalPresentationStyle = .fullScreen
         present(nc, animated: true, completion: nil)
     }
     

@@ -138,7 +138,9 @@ func getDeviceLanguage() -> Int {
 }
 
 func getUserCountryCode() -> String {
-    return ((Locale.current as NSLocale).object(forKey: .countryCode) as? String)!
+    let locale = NSLocale.autoupdatingCurrent
+    return locale.regionCode ?? "US"
+//    return ((Locale.current as NSLocale).object(forKey: .countryCode) as? String)!
 }
 
 func getLogGroupTypeImage(_ groupType: Int) -> UIImage? {

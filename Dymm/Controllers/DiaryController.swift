@@ -64,6 +64,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var condButton: UIButton!
     var condLeftButton: UIButton!
     var condRightButton: UIButton!
+    var condRefreshButton: UIButton!
     
     // NSLayoutConstraint
     var calendarViewHeight: NSLayoutConstraint!
@@ -251,19 +252,19 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             return label
         }()
         if thisMonthAvgScore! < lastMonthAvgScore! {
-            message = lang.msgAvgScoreDown
+            message = lang.msgAvgScoreDownWeek
             imageView.image = UIImage.itemTrendDown.withRenderingMode(.alwaysOriginal)
             changedScorelabel.text = String(format: "-%.1f", (lastMonthAvgScore! - thisMonthAvgScore!))
         } else if thisMonthAvgScore! == lastMonthAvgScore! {
-            message = lang.msgAvgScoreEqual
+            message = lang.msgAvgScoreEqualWeek
             imageView.image = UIImage.itemTrendUpGray.withRenderingMode(.alwaysOriginal)
             changedScorelabel.text = "+0.0"
         } else {
-            message = lang.msgAvgScoreUp
+            message = lang.msgAvgScoreUpWeek
             imageView.image = UIImage.itemTrendUp.withRenderingMode(.alwaysOriginal)
             changedScorelabel.text = String(format: "+%.1f", (thisMonthAvgScore! - lastMonthAvgScore!))
         }
-        let alert = UIAlertController(title: lang.titleAvgScore(month), message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: lang.titleAvgScore, message: message, preferredStyle: .alert)
         let thisMonthlabel: UILabel = {
             let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
             label.text = String(format: "%.1f", thisMonthAvgScore!)
@@ -381,6 +382,10 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             self.condRightButton.setTitle(self.lang.titleEdit, for: .normal)
             self.condRightButton.setTitleColor(.cornflowerBlue, for: .normal)
         })
+    }
+    
+    @objc func condRefreshButtonTapped() {
+        loadAvatarCondList()
     }
     
     @objc func homeButtonTapped() {
@@ -1363,6 +1368,14 @@ extension DiaryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
+        condRefreshButton = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage(named: "item-refresh")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(condRefreshButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
         refreshControler = {
             let _refresh = UIRefreshControl()
             _refresh.tintColor = UIColor.whiteSmoke
@@ -1420,10 +1433,9 @@ extension DiaryViewController {
         condContainerView.addSubview(condTitleLabel)
         condContainerView.addSubview(condCollectionView)
         condContainerView.addSubview(condRightButton)
+        condContainerView.addSubview(condRefreshButton)
         
         // Setup constraints
-        loadingImageView.widthAnchor.constraint(equalToConstant: 62).isActive = true
-        loadingImageView.heightAnchor.constraint(equalToConstant: 62).isActive = true
         loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
         loadingImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0).isActive = true
         
@@ -1497,6 +1509,9 @@ extension DiaryViewController {
         condRightButton.bottomAnchor.constraint(equalTo: condContainerView.bottomAnchor, constant: -5).isActive = true
         condRightButton.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
         condRightButton.heightAnchor.constraint(equalToConstant: 45).isActive = true
+        
+        condRefreshButton.topAnchor.constraint(equalTo: condContainerView.topAnchor, constant: 0).isActive = true
+        condRefreshButton.trailingAnchor.constraint(equalTo: condContainerView.trailingAnchor, constant: 0).isActive = true
         
         calendarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         calendarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true

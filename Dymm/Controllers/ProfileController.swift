@@ -19,7 +19,6 @@ class ProfileViewController: UIViewController {
     var topBarContainer: UIView!
     var mailConfContainer: UIView!
     var infoContainer: UIView!
-//    var infoImageContainer: UIView!
     var firstNameContainer: UIView!
     var lastNameContainer: UIView!
     var emailContainer: UIView!
@@ -864,6 +863,8 @@ extension ProfileViewController {
     private func loadProfile() {
         if loadingImageView.isHidden {
             UIView.transition(with: loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.infoContainer.isHidden = true
+                self.tagCollection.isHidden = true
                 self.loadingImageView.isHidden = false
             })
         }
@@ -886,17 +887,13 @@ extension ProfileViewController {
             UserDefaults.standard.setIsSignIn(value: true)
             let firstName = profile.avatar.first_name
             if let photoName = profile.avatar.photo_name {
-//                let imgUrl = "\(URI.storage)\(imgPath)?walkthrough_tutorial_id=toc"
-//                self.infoImageView.downloadImage(from: URL(string: imgUrl)!)
                 print(photoName)
-//                URLCache.shared.removeAllCachedResponses()
                 let url = "\(URI.host)\(URI.avatar)/\(profile.avatar.id)/profile/photo/\(photoName)"
                 Alamofire.request(url).responseImage { response in
                     if let data = response.data {
                         self.infoImageView.image = UIImage(data: data)
                     }
                 }
-                
             } else {
                 let index = firstName.index(firstName.startIndex, offsetBy: 0)
                 self.infoImageLabel.text = String(firstName[index])
@@ -957,6 +954,11 @@ extension ProfileViewController {
     }
     
     private func updateProfileTag() {
+        UIView.transition(with: loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.infoContainer.isHidden = true
+            self.tagCollection.isHidden = true
+            self.loadingImageView.isHidden = false
+        })
         let profileTagId = profile!.profile_tags[selectedCollectionItem!].id
         let service = Service(lang: lang)
         service.putProfileTag(profile_tag_id: profileTagId, tag_id: pickedTag!.id, popoverAlert: { (message) in
@@ -975,6 +977,11 @@ extension ProfileViewController {
     }
     
     private func updateAvatarInfo() {
+        UIView.transition(with: loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.infoContainer.isHidden = true
+            self.tagCollection.isHidden = true
+            self.loadingImageView.isHidden = false
+        })
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -1049,6 +1056,8 @@ extension ProfileViewController {
     private func uploadProfilePhoto() {
         if loadingImageView.isHidden {
             UIView.transition(with: loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.infoContainer.isHidden = true
+                self.tagCollection.isHidden = true
                 self.loadingImageView.isHidden = false
             })
         }
@@ -1063,6 +1072,8 @@ extension ProfileViewController {
         }) {
             self.infoImageView.image = self.resizedImage!
             UIView.transition(with: self.loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.infoContainer.isHidden = false
+                self.tagCollection.isHidden = false
                 self.loadingImageView.isHidden = true
             })
         }
