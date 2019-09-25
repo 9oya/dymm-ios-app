@@ -11,12 +11,10 @@ import UIKit
 
 private let localHost = "http://127.0.0.1:5000"
 private let productHost = "https://dymm-api-01.appspot.com"
-private let productStorage = "https://www.googleapis.com/storage/v1/b/dymm-api-01.appspot.com/o"
 
 struct URI {
-//    static let host = localHost
-    static let host = productHost
-    static let storage = productStorage
+    static let host = localHost
+//    static let host = productHost
     static let avatar = "/api/avatar"
     static let banner = "/api/banner"
     static let mail = "/api/mail"

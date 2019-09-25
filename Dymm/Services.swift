@@ -336,7 +336,7 @@ struct Service {
         }
     }
     
-    func getAvgCondScorePerMonth(yearNumber: String, monthNumber: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.AvgCondScoreSet) -> Void) {
+    func getAvgCondScore(yearNumber: String, monthNumber: Int, weekOfYear: Int?, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.AvgCondScoreSet) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -348,7 +348,11 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        let url = "\(URI.host)\(URI.avatar)/\(avatarId)/group/\(yearNumber)/\(monthNumber)/avg-score"
+        var url = "\(URI.host)\(URI.avatar)/\(avatarId)/group/\(yearNumber)/\(monthNumber)/avg-score"
+        if weekOfYear != nil && weekOfYear! > 0 {
+            url = "\(URI.host)\(URI.avatar)/\(avatarId)/group/\(yearNumber)/\(monthNumber)/\(weekOfYear!)/avg-score"
+        }
+        
         Alamofire.request(url, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in

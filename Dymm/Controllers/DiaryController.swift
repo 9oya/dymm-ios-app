@@ -115,8 +115,8 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var xVal: Int?
     var yVal: Int?
     var newNote: String?
-    var thisMonthAvgScore: Float?
-    var lastMonthAvgScore: Float?
+    var thisAvgScore: Float?
+    var lastAvgScore: Float?
     var isToggleBtnTapped: Bool = false
     var isPullToRefresh: Bool = false
     var isLogGroupTableEdited: Bool = false
@@ -229,8 +229,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         var heightInt = 0
         switch lang.currentLanguageId {
         case LanguageId.eng:
-            month = LangHelper.getEngNameOfMM(monthNumber: monthNumber!)
-            month += "."
+            month = LangHelper.getEngNameOfMonth(monthNumber: monthNumber!)
             heightInt = 210
         case LanguageId.kor:
             month = LangHelper.getKorNameOfMonth(monthNumber: monthNumber!, engMMM: nil)
@@ -242,46 +241,111 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         let imageView: UIImageView = {
             let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 12))
             imageView.translatesAutoresizingMaskIntoConstraints = false
+            imageView.addShadowView()
             return imageView
         }()
         let changedScorelabel: UILabel = {
             let label = UILabel(frame: CGRect(x: 0, y: 0, width: 25, height: 15))
-            label.font = .systemFont(ofSize: 12, weight: .regular)
+            label.font = .systemFont(ofSize: 15, weight: .regular)
             label.textColor = .lightGray
+            label.addShadowView()
             label.translatesAutoresizingMaskIntoConstraints = false
             return label
         }()
-        if thisMonthAvgScore! < lastMonthAvgScore! {
-            message = lang.msgAvgScoreDownWeek
+        if thisAvgScore! < lastAvgScore! {
+            if calendarView.scope == .month {
+                message = lang.msgAvgScoreDownMonth(month)
+            } else {
+                message = lang.msgAvgScoreDownWeek
+            }
             imageView.image = UIImage.itemTrendDown.withRenderingMode(.alwaysOriginal)
-            changedScorelabel.text = String(format: "-%.1f", (lastMonthAvgScore! - thisMonthAvgScore!))
-        } else if thisMonthAvgScore! == lastMonthAvgScore! {
-            message = lang.msgAvgScoreEqualWeek
+            changedScorelabel.text = String(format: "-%.1f", (lastAvgScore! - thisAvgScore!))
+        } else if thisAvgScore! == lastAvgScore! {
+            if calendarView.scope == .month {
+                message = lang.msgAvgScoreEqualMonth(month)
+            } else {
+                message = lang.msgAvgScoreEqualWeek
+            }
             imageView.image = UIImage.itemTrendUpGray.withRenderingMode(.alwaysOriginal)
             changedScorelabel.text = "+0.0"
         } else {
-            message = lang.msgAvgScoreUpWeek
+            if calendarView.scope == .month {
+                message = lang.msgAvgScoreUpMonth(month)
+            } else {
+                message = lang.msgAvgScoreUpWeek
+            }
             imageView.image = UIImage.itemTrendUp.withRenderingMode(.alwaysOriginal)
-            changedScorelabel.text = String(format: "+%.1f", (thisMonthAvgScore! - lastMonthAvgScore!))
+            changedScorelabel.text = String(format: "+%.1f", (thisAvgScore! - lastAvgScore!))
         }
         let alert = UIAlertController(title: lang.titleAvgScore, message: message, preferredStyle: .alert)
-        let thisMonthlabel: UILabel = {
-            let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-            label.text = String(format: "%.1f", thisMonthAvgScore!)
+        let thisAvgScorelabel: UILabel = {
+            let label = UILabel()
+            label.font = .systemFont(ofSize: 40, weight: .regular)
+            label.text = String(format: "%.1f", thisAvgScore!)
+            label.addShadowView()
             label.translatesAutoresizingMaskIntoConstraints = false
             return label
         }()
-        let lastMonthlabel: UILabel = {
+        let lastAvgScorelabel: UILabel = {
             let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-            label.text = String(format: "%.1f", lastMonthAvgScore!)
+            label.font = .systemFont(ofSize: 30, weight: .regular)
+            label.text = String(format: "%.1f", lastAvgScore!)
+            label.textColor = UIColor.black.withAlphaComponent(0.6)
+            label.addShadowView()
+            label.translatesAutoresizingMaskIntoConstraints = false
+            return label
+        }()
+        let thisAvgNamelabel: UILabel = {
+            let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 15))
+            label.font = .systemFont(ofSize: 13, weight: .medium)
+            label.textAlignment = .center
+            label.textColor = .black
+            label.addShadowView()
+            if calendarView.scope == .month {
+//                label.text = month
+                label.text = lang.titleThisMonth
+            } else {
+                label.text = lang.titleThisWeek
+            }
+            label.translatesAutoresizingMaskIntoConstraints = false
+            return label
+        }()
+        let lastAvgNamelabel: UILabel = {
+            let label = UILabel()
+            label.font = .systemFont(ofSize: 13, weight: .medium)
+            label.textAlignment = .center
+            label.textColor = .darkGray
+            label.addShadowView()
+            if calendarView.scope == .month {
+//                var _monthNumber = monthNumber!
+//                if _monthNumber == 1 {
+//                    _monthNumber = 12
+//                } else {
+//                    _monthNumber -= 1
+//                }
+//                switch lang.currentLanguageId {
+//                case LanguageId.eng:
+//                    label.text = LangHelper.getEngNameOfMonth(monthNumber: _monthNumber)
+//                case LanguageId.kor:
+//                    label.text = LangHelper.getKorNameOfMonth(monthNumber: _monthNumber, engMMM: nil)
+//                case LanguageId.jpn:
+//                    // TODO
+//                    print("")
+//                default: fatalError() }
+                label.text = lang.titleLastMonth
+            } else {
+                label.text = lang.titleLastWeek
+            }
             label.translatesAutoresizingMaskIntoConstraints = false
             return label
         }()
         
         alert.view.addSubview(imageView)
         alert.view.addSubview(changedScorelabel)
-        alert.view.addSubview(thisMonthlabel)
-        alert.view.addSubview(lastMonthlabel)
+        alert.view.addSubview(thisAvgScorelabel)
+        alert.view.addSubview(lastAvgScorelabel)
+        alert.view.addSubview(thisAvgNamelabel)
+        alert.view.addSubview(lastAvgNamelabel)
         
         imageView.centerXAnchor.constraint(equalTo: alert.view.centerXAnchor, constant: 0).isActive = true
         imageView.centerYAnchor.constraint(equalTo: alert.view.centerYAnchor, constant: 10).isActive = true
@@ -289,17 +353,21 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         changedScorelabel.centerXAnchor.constraint(equalTo: alert.view.centerXAnchor, constant: 0).isActive = true
         changedScorelabel.bottomAnchor.constraint(equalTo: imageView.topAnchor, constant: -1).isActive = true
         
-        thisMonthlabel.centerYAnchor.constraint(equalTo: alert.view.centerYAnchor, constant: 10).isActive = true
-        thisMonthlabel.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 10).isActive = true
+        thisAvgScorelabel.centerYAnchor.constraint(equalTo: alert.view.centerYAnchor, constant: 10).isActive = true
+        thisAvgScorelabel.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 10).isActive = true
         
-        lastMonthlabel.centerYAnchor.constraint(equalTo: alert.view.centerYAnchor, constant: 10).isActive = true
-        lastMonthlabel.trailingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: -10).isActive = true
+        thisAvgNamelabel.centerYAnchor.constraint(equalTo: alert.view.centerYAnchor, constant: 35).isActive = true
+        thisAvgNamelabel.centerXAnchor.constraint(equalTo: thisAvgScorelabel.centerXAnchor, constant: 0).isActive = true
+        
+        lastAvgScorelabel.trailingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: -10).isActive = true
+        lastAvgScorelabel.bottomAnchor.constraint(equalTo: thisAvgScorelabel.bottomAnchor, constant: -5).isActive = true
+        
+        lastAvgNamelabel.centerYAnchor.constraint(equalTo: alert.view.centerYAnchor, constant: 35).isActive = true
+        lastAvgNamelabel.centerXAnchor.constraint(equalTo: lastAvgScorelabel.centerXAnchor, constant: -2).isActive = true
         
         let height = NSLayoutConstraint(item: alert.view!, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: CGFloat(heightInt))
         alert.view.addConstraint(height)
-        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
-            
-        })
+        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in })
         alert.view.tintColor = UIColor.cornflowerBlue
         self.present(alert, animated: true, completion: nil)
     }
@@ -1771,19 +1839,24 @@ extension DiaryViewController {
     }
     
     private func loadAvgCondScore() {
+        if calendarView.scope == .week {
+            weekOfYear = Calendar.current.component(.weekOfYear, from: calendarView.currentPage)
+        } else {
+            weekOfYear = nil
+        }
         let selectedDateArr = dateFormatter.string(from: calendarView.currentPage).components(separatedBy: "-")
         yearNumber = Int(selectedDateArr[0])!
         monthNumber = Int(selectedDateArr[1])!
         let service = Service(lang: lang)
-        service.getAvgCondScorePerMonth(yearNumber: selectedDateArr[0], monthNumber: Int(selectedDateArr[1])!, popoverAlert: { (message) in
+        service.getAvgCondScore(yearNumber: selectedDateArr[0], monthNumber: Int(selectedDateArr[1])!, weekOfYear: weekOfYear, popoverAlert: { (message) in
             self.retryFunction = self.loadAvgCondScore
             self.alertError(message)
         }, tokenRefreshCompletion: {
             self.loadAvgCondScore()
         }) { (avgScoreSet) in
             let formatter = NumberFormatter()
-            self.thisMonthAvgScore = formatter.number(from: avgScoreSet.this_month_score)!.floatValue
-            self.lastMonthAvgScore = formatter.number(from: avgScoreSet.last_month_score)!.floatValue
+            self.thisAvgScore = formatter.number(from: avgScoreSet.this_avg_score)!.floatValue
+            self.lastAvgScore = formatter.number(from: avgScoreSet.last_avg_score)!.floatValue
             self.alertAvgCondScore()
         }
     }

@@ -49,8 +49,10 @@ struct LangPack {
     var titleIncorrectOldPassword: String!
     var titleIntro: String!
     var titleIntroUpper: String!
+    var titleLastMonth: String!
     var titleLastName: String!
     var titleLastNameUpper: String!
+    var titleLastWeek: String!
     var titleLogGroups: [String]!
     var titleMyAvtCond: String!
     var titleNo: String!
@@ -81,6 +83,8 @@ struct LangPack {
     var titleSubmit: String!
     var titleSubscribe: String!
     var titleToday: String!
+    var titleThisMonth: String!
+    var titleThisWeek: String!
     var titleVerifCode: String!
     var titleWeekdays: [String]!
     var titleYes: String!
@@ -382,6 +386,12 @@ struct LangPack {
             case LanguageId.kor: return "자기소개"
             default: fatalError()}
         }()
+        self.titleLastMonth = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Last month"
+            case LanguageId.kor: return "지난 달"
+            default: fatalError()}
+        }()
         self.titleLastName = {
             switch currentLanguageId {
             case LanguageId.eng: return "Last Name"
@@ -392,6 +402,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "LAST NAME"
             case LanguageId.kor: return "성씨"
+            default: fatalError()}
+        }()
+        self.titleLastWeek = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Last week"
+            case LanguageId.kor: return "지난 주"
             default: fatalError()}
         }()
         self.titleLogGroups = {
@@ -576,6 +592,18 @@ struct LangPack {
             case LanguageId.kor: return "오늘"
             default: fatalError()}
         }()
+        self.titleThisMonth = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "This month"
+            case LanguageId.kor: return "이번 달"
+            default: fatalError()}
+        }()
+        self.titleThisWeek = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "This week"
+            case LanguageId.kor: return "이번 주"
+            default: fatalError()}
+        }()
         self.titleVerifCode = {
             switch currentLanguageId {
             case LanguageId.eng: return "Verification Code"
@@ -601,42 +629,42 @@ struct LangPack {
         
         self.msgAvgScoreDownWeek = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your condition score has gone down this week."
-            case LanguageId.kor: return "당신의 이번 주 컨디션 점수가 하락했습니다."
+            case LanguageId.eng: return "Your score has gone down this week."
+            case LanguageId.kor: return "당신의 이번 주 점수가 하락했습니다."
             default: fatalError()}
         }()
         func _msgAvgScoreDownMonth(_ month: String) -> String {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your \(month) condition score has gone down."
-            case LanguageId.kor: return "당신의 \(month) 컨디션 점수가 하락했습니다."
+            case LanguageId.eng: return "Your \(month) score has gone down."
+            case LanguageId.kor: return "당신의 \(month) 점수가 하락했습니다."
             case LanguageId.jpn: return ""
             default: fatalError()}
         }
         self.msgAvgScoreDownMonth = _msgAvgScoreDownMonth
         self.msgAvgScoreEqualWeek = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your condition score has been maintained this week."
-            case LanguageId.kor: return "당신의 이번 주 컨디션 점수가 유지되었습니다."
+            case LanguageId.eng: return "Your score has been maintained this week."
+            case LanguageId.kor: return "당신의 이번 주 점수가 유지되었습니다."
             default: fatalError()}
         }()
         func _msgAvgScoreEqualMonth(_ month: String) -> String {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your \(month) condition score has been maintained."
-            case LanguageId.kor: return "당신의 \(month) 컨디션 점수가 유지되었습니다."
+            case LanguageId.eng: return "Your \(month) score has been maintained."
+            case LanguageId.kor: return "당신의 \(month) 점수가 유지되었습니다."
             case LanguageId.jpn: return ""
             default: fatalError()}
         }
         self.msgAvgScoreEqualMonth = _msgAvgScoreEqualMonth
         self.msgAvgScoreUpWeek = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your condition score has gone up this week."
-            case LanguageId.kor: return "당신의 이번 주 컨디션 점수가 상승했습니다."
+            case LanguageId.eng: return "Your score has gone up this week."
+            case LanguageId.kor: return "당신의 이번 주 점수가 상승했습니다."
             default: fatalError()}
         }()
         func _msgAvgScoreUpMonth(_ month: String) -> String {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your \(month) condition score has gone up."
-            case LanguageId.kor: return "당신의 \(month) 컨디션 점수가 상승했습니다."
+            case LanguageId.eng: return "Your \(month) score has gone up."
+            case LanguageId.kor: return "당신의 \(month) 점수가 상승했습니다."
             case LanguageId.jpn: return ""
             default: fatalError()}
         }
