@@ -80,7 +80,7 @@ extension UIViewController {
     }
     func getAddtionalTopBarView() -> UIView {
         let _view = UIView()
-        _view.backgroundColor = UIColor.white
+        _view.backgroundColor = .white
         _view.translatesAutoresizingMaskIntoConstraints = false
         return _view
     }
@@ -89,7 +89,7 @@ extension UIViewController {
         if let titleColor = titleColor {
             _button.setTitleColor(titleColor, for: .normal)
         } else {
-            _button.setTitleColor(UIColor.black, for: .normal)
+            _button.setTitleColor(.black, for: .normal)
         }
         _button.titleLabel?.font = .systemFont(ofSize: 15)
         _button.showsTouchWhenHighlighted = true

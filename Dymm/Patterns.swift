@@ -167,20 +167,20 @@ func getCondScoreImage(_ condScore: Int) -> UIImage? {
 
 func getProfileUIColor(key: Int) -> UIColor {
     switch key {
-    case 1: return UIColor.dodgerBlue
-    case 2: return UIColor.indianRed
-    case 3: return UIColor.coral
-    case 4: return UIColor.tomato
-    case 5: return UIColor.yellowGreen
-    case 6: return UIColor.darkTurquoise
-    case 7: return UIColor.cadetBlue
-    case 8: return UIColor.rosyBrown
-    case 9: return UIColor.darkGray
-    case 10: return UIColor.hex_666699
-    case 11: return UIColor.hex_6699cc
-    case 12: return UIColor.hex_99cc99
-    case 13: return UIColor.hex_9999ff
-    case 14: return UIColor.hex_cccc66
-    // TODO: case 999 -> Photo
-    default: return UIColor.hex_cccc66}
+    case 1: return .coral
+    case 2: return UIColor(hex: "#FFB757")
+    case 3: return .indianRed
+    case 4: return .rosyBrown
+    case 5: return UIColor(hex: "#989CFB")
+    case 6: return UIColor(hex: "#54AEFD")
+    case 7: return .cornflowerBlue
+    case 8: return UIColor(hex: "#666797")
+    case 9: return .darkGray
+    case 10: return UIColor(hex: "#679ACA")
+    case 11: return UIColor(hex: "#B6D878")
+    case 12: return UIColor(hex: "#CCCB6E")
+    case 13: return UIColor(hex: "#9ACB9C")
+    case 14: return UIColor(hex: "#7FD9D9")
+    case 15: return UIColor(hex: "#609EA0")
+    default: return UIColor(hex: "#FF7F50")}
 }

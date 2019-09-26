@@ -18,13 +18,20 @@ class HomeViewController: UIViewController {
     
     // MARK: - Properties
     
+    // UICollectionView
     var tagCollectionView: UICollectionView!
     var bannerCollectionView: UICollectionView!
+    
+    // UIPageControl
     var pageControl: UIPageControl!
+    
+    // UIImageView
     var titleImageView: UIImageView!
     var profileImageView: UIImageView!
-    var profileImageLabel: UILabel!
     var loadingImageView: UIImageView!
+    
+    // UIButton
+    var profileButton: UIButton!
     
     var lang: LangPack!
     var retryFunction: (() -> Void)?
@@ -49,11 +56,12 @@ class HomeViewController: UIViewController {
         if UserDefaults.standard.isSignIn() {
             loadAvatar()
         } else {
-            UIView.transition(with: profileImageView, duration: 0.7, options: .transitionCrossDissolve, animations: {
-                self.profileImageLabel.backgroundColor = .clear
-                self.profileImageView.backgroundColor = UIColor.clear
-                self.profileImageView.image = .itemProfileDef
+            UIView.transition(with: profileButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
+                self.profileButton.setTitleColor(UIColor.clear, for: .normal)
+                self.profileButton.backgroundColor = UIColor.clear
+                self.profileButton.setBackgroundImage(.itemProfileDef, for: .normal)
             })
+            navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: profileButton)]
         }
     }
     
@@ -308,22 +316,21 @@ extension HomeViewController {
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
-        profileImageLabel = {
-            let _label = UILabel()
-            _label.font = .systemFont(ofSize: 12, weight: .medium)
-            _label.textColor = UIColor.white
-            _label.textAlignment = .center
-            _label.translatesAutoresizingMaskIntoConstraints = false
-            return _label
+        profileButton = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemProfileDef.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 31, height: 31)
+            _button.layer.cornerRadius = _button.frame.width/2
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(profileButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
         }()
         loadingImageView = getLoadingImageView(isHidden: false)
         
         navigationItem.titleView = titleImageView
-        profileImageView.addSubview(profileImageLabel)
         profileImageView.widthAnchor.constraint(equalToConstant: 31).isActive = true
         profileImageView.heightAnchor.constraint(equalToConstant: 31).isActive = true
-        profileImageLabel.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor, constant: 0).isActive = true
-        profileImageLabel.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor, constant: 0).isActive = true
         navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: profileImageView)]
         bannerCollectionView.dataSource = self
         bannerCollectionView.delegate = self
@@ -404,18 +411,24 @@ extension HomeViewController {
             self.avatar = avatar
             let firstName = avatar.first_name
             UIView.animate(withDuration: 0.5, animations: {
-                if let photoName = avatar.photo_name {
-                    print(photoName)
-                    Alamofire.request("\(URI.host)\(URI.avatar)/\(avatar.id)/profile/photo/\(photoName)").responseImage { response in
+                if avatar.photo_name != nil && avatar.color_code != 0 {
+                    print(avatar.photo_name!)
+                    let url = "\(URI.host)\(URI.avatar)/\(avatar.id)/profile/photo/\(avatar.photo_name!)"
+                    Alamofire.request(url).responseImage { response in
                         if let data = response.data {
                             self.profileImageView.image = UIImage(data: data)
+                            self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: self.profileImageView)]
                         }
                     }
                 } else {
                     let index = firstName.index(firstName.startIndex, offsetBy: 0)
-                    self.profileImageLabel.text = String(firstName[index])
-                    self.profileImageLabel.textColor = UIColor.white
-                    self.profileImageView.backgroundColor = getProfileUIColor(key: avatar.color_code)
+                    self.profileButton.setImage(nil, for: .normal)
+                    self.profileButton.setTitle(String(firstName[index]), for: .normal)
+                    self.profileButton.setTitleColor(.white, for: .normal)
+                    self.profileButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .medium)
+                    self.profileButton.backgroundColor = getProfileUIColor(key: avatar.color_code)
+                    self.profileButton.setBackgroundImage(nil, for: .normal)
+                    self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: self.profileButton)]
                 }
             })
         }

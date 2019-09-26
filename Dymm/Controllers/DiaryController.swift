@@ -302,7 +302,6 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             label.textColor = .black
             label.addShadowView()
             if calendarView.scope == .month {
-//                label.text = month
                 label.text = lang.titleThisMonth
             } else {
                 label.text = lang.titleThisWeek
@@ -317,21 +316,6 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             label.textColor = .darkGray
             label.addShadowView()
             if calendarView.scope == .month {
-//                var _monthNumber = monthNumber!
-//                if _monthNumber == 1 {
-//                    _monthNumber = 12
-//                } else {
-//                    _monthNumber -= 1
-//                }
-//                switch lang.currentLanguageId {
-//                case LanguageId.eng:
-//                    label.text = LangHelper.getEngNameOfMonth(monthNumber: _monthNumber)
-//                case LanguageId.kor:
-//                    label.text = LangHelper.getKorNameOfMonth(monthNumber: _monthNumber, engMMM: nil)
-//                case LanguageId.jpn:
-//                    // TODO
-//                    print("")
-//                default: fatalError() }
                 label.text = lang.titleLastMonth
             } else {
                 label.text = lang.titleLastWeek

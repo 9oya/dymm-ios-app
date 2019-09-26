@@ -16,6 +16,7 @@ class ProfileViewController: UIViewController {
     // MARK: - Properties
     
     // UIView
+    var blindView: UIView!
     var topBarContainer: UIView!
     var mailConfContainer: UIView!
     var infoContainer: UIView!
@@ -24,9 +25,11 @@ class ProfileViewController: UIViewController {
     var emailContainer: UIView!
     var phNumberContainer: UIView!
     var introContainer: UIView!
+    var colorContainer: UIView!
     
     // UICollectionView
     var tagCollection: UICollectionView!
+    var colorCollection: UICollectionView!
     
     // UIPickerView
     var profileTagPicker: UIPickerView!
@@ -43,6 +46,8 @@ class ProfileViewController: UIViewController {
     var closeButton: UIButton!
     var mailConfAddressButton: UIButton!
     var sendAgainButton: UIButton!
+    var colorLeftButton: UIButton!
+    var colorRightButton: UIButton!
     
     // UILabel
     var infoImageLabel: UILabel!
@@ -59,6 +64,7 @@ class ProfileViewController: UIViewController {
     var introGuideLabel: UILabel!
     var introLabel: UILabel!
     var introPlaceHolderLabel: UILabel!
+    var colorTitleLabel: UILabel!
     
     // Non-view properties
     var lang: LangPack!
@@ -76,6 +82,8 @@ class ProfileViewController: UIViewController {
     var confPassword: String?
     var isOldPasswordCorrect = true
     var resizedImage: UIImage?
+    let colorCodeArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    var selectedColorItem: Int?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -369,7 +377,16 @@ class ProfileViewController: UIViewController {
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
         
-        alert.addAction(UIAlertAction(title: lang.titleChangeColor, style: .default) { _ in
+        alert.addAction(UIAlertAction(title: lang.titleChooseColor, style: .default) { _ in
+            self.colorLeftButton.setTitleColor(UIColor.cornflowerBlue, for: .normal)
+            UIView.transition(with: self.colorLeftButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.colorLeftButton.isHidden = false
+            })
+            UIView.transition(with: self.blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.blindView.isHidden = false
+            }) { (_) in
+                print("")
+            }
             return
         })
         alert.addAction(UIAlertAction(title: lang.titleCamera, style: .default) { _ in
@@ -394,6 +411,24 @@ class ProfileViewController: UIViewController {
         alertController.view.tintColor = UIColor.cornflowerBlue
         present(alertController, animated: true, completion: nil)
     }
+    
+    @objc func colorRightButtonTapped() {
+        if selectedColorItem == nil {
+            return
+        }
+        self.newInfoStr = "\(colorCodeArr[selectedColorItem!])"
+        self.avatarInfoTarget = AvatarInfoTarget.color_code
+        self.updateAvatarInfo()
+    }
+    
+    @objc func colorLeftButtonTapped() {
+        UIView.transition(with: self.blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.blindView.isHidden = true
+            self.colorLeftButton.setTitleColor(UIColor.clear, for: .normal)
+        }, completion: { (_) in
+            self.colorLeftButton.isHidden = true
+        })
+    }
 }
 
 extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
@@ -405,58 +440,101 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let number = profile?.profile_tags.count else {
+        switch collectionView {
+        case tagCollection:
+            guard let number = profile?.profile_tags.count else {
+                return 0
+            }
+            return number
+        case colorCollection:
+            return colorCodeArr.count
+        default:
             return 0
         }
-        return number
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: tagCellId, for: indexPath) as? TagCollectionCell else {
+        switch collectionView {
+        case tagCollection:
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: tagCellId, for: indexPath) as? TagCollectionCell else {
+                fatalError()
+            }
+            let profileTag = profile!.profile_tags[indexPath.item]
+            cell.imageView.image = UIImage(named: "tag-\(profileTag.tag_id)")
+            switch profileTag.tag_id {
+            case TagId.subscription:
+                cell.label.text = lang.titleSubscribe
+                cell.label.font = .systemFont(ofSize: 14, weight: .medium)
+                cell.label.textColor = UIColor(hex: "#5A3737")
+            case TagId.dateOfBirth:
+                if let dateOfBirth = profile?.avatar.date_of_birth {
+                    cell.label.text = dateOfBirth
+                    cell.label.textColor = .black
+                } else {
+                    cell.label.text = profileTag.eng_name
+                    cell.label.textColor = .lightGray
+                }
+            default:
+                switch lang.currentLanguageId {
+                case LanguageId.eng: cell.label.text = profileTag.eng_name
+                case LanguageId.kor: cell.label.text = profileTag.kor_name
+                case LanguageId.jpn: cell.label.text = profileTag.jpn_name
+                default: cell.label.text = profileTag.eng_name}
+                if profileTag.is_selected == false {
+                    cell.label.textColor = .lightGray
+                    return cell
+                }
+                cell.label.textColor = .black
+            }
+            return cell
+        case colorCollection:
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: colorCellId, for: indexPath) as? ColorCollectionCell else {
+                fatalError()
+            }
+            cell.colorView.backgroundColor = getProfileUIColor(key: colorCodeArr[indexPath.item])
+            if indexPath.item == selectedColorItem {
+                cell.backgroundColor = .lightGray
+            }
+            return cell
+        default:
             fatalError()
         }
-        let profileTag = profile!.profile_tags[indexPath.item]
-        cell.imageView.image = UIImage(named: "tag-\(profileTag.tag_id)")
-        switch profileTag.tag_id {
-        case TagId.subscription:
-            cell.label.text = lang.titleSubscribe
-            cell.label.font = .systemFont(ofSize: 14, weight: .medium)
-            cell.label.textColor = UIColor(hex: "#5A3737")
-        case TagId.dateOfBirth:
-            if let dateOfBirth = profile?.avatar.date_of_birth {
-                cell.label.text = dateOfBirth
-                cell.label.textColor = .black
-            } else {
-                cell.label.text = profileTag.eng_name
-                cell.label.textColor = .lightGray
-            }
-        default:
-            switch lang.currentLanguageId {
-            case LanguageId.eng: cell.label.text = profileTag.eng_name
-            case LanguageId.kor: cell.label.text = profileTag.kor_name
-            case LanguageId.jpn: cell.label.text = profileTag.jpn_name
-            default: cell.label.text = profileTag.eng_name}
-            if profileTag.is_selected == false {
-                cell.label.textColor = .lightGray
-                return cell
-            }
-            cell.label.textColor = .black
-        }
-        return cell
+        
     }
     
     // MARK: - UICollectionViewDelegate
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        selectedCollectionItem = indexPath.item
-        switch profile!.profile_tags[indexPath.item].tag_id {
-        case TagId.dateOfBirth:
-            alertDatePicker()
-            return
-        case TagId.password:
-            alertChangePassword()
-            return
+        switch collectionView {
+        case tagCollection:
+            selectedCollectionItem = indexPath.item
+            switch profile!.profile_tags[indexPath.item].tag_id {
+            case TagId.dateOfBirth:
+                alertDatePicker()
+                return
+            case TagId.password:
+                alertChangePassword()
+                return
+            default:
+                loadProfileTagsOnPicker()
+            }
+        case colorCollection:
+            selectedColorItem = indexPath.item
+            colorCollection.reloadData()
         default:
-            loadProfileTagsOnPicker()
+            fatalError()
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if collectionView == colorCollection {
+            guard let cell = cell as? ColorCollectionCell else {
+                return
+            }
+            if indexPath.item == selectedColorItem {
+                cell.backgroundColor = .lightGray
+            } else {
+                cell.backgroundColor = .white
+            }
         }
     }
     
@@ -468,15 +546,36 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenWidth = UIScreen.main.bounds.width
-        return CGSize(width: (screenWidth / 2) - 10.5, height: CGFloat(tagCellHeightInt))
+        switch collectionView {
+        case tagCollection:
+            return CGSize(width: (screenWidth / 2) - 10.5, height: CGFloat(tagCellHeightInt))
+        case colorCollection:
+            return CGSize(width: (screenWidth - 34) / 6, height: (screenWidth - 34) / 6)
+        default:
+            fatalError()
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 7
+        switch collectionView {
+        case tagCollection:
+            return 7
+        case colorCollection:
+            return 0
+        default:
+            fatalError()
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 7
+        switch collectionView {
+        case tagCollection:
+            return 7
+        case colorCollection:
+            return 0
+        default:
+            fatalError()
+        }
     }
 }
 
@@ -581,6 +680,7 @@ extension ProfileViewController {
         view.backgroundColor = UIColor.whiteSmoke
         
         // Initialize subveiw properties
+        blindView = getAlertBlindView()
         topBarContainer = getAddtionalTopBarView()
         signOutButton = getBasicTextButton()
         signOutButton.addTarget(self, action: #selector(signOutButtonTapped), for: .touchUpInside)
@@ -637,6 +737,13 @@ extension ProfileViewController {
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
+        colorContainer = {
+            let _view = UIView()
+            _view.backgroundColor = .white
+            _view.layer.cornerRadius = 10.0
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
         tagCollection = {
             let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
             _collectionView.backgroundColor = UIColor.clear
@@ -644,6 +751,22 @@ extension ProfileViewController {
             _collectionView.isHidden = true
             _collectionView.translatesAutoresizingMaskIntoConstraints = false
             return _collectionView
+        }()
+        colorCollection = {
+            let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
+            _collectionView.backgroundColor = UIColor.clear
+            _collectionView.register(ColorCollectionCell.self, forCellWithReuseIdentifier: colorCellId)
+            _collectionView.translatesAutoresizingMaskIntoConstraints = false
+            return _collectionView
+        }()
+        colorTitleLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 18, weight: .regular)
+            _label.textColor = .black
+            _label.textAlignment = .left
+            _label.text = lang.titleChooseColor
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
         }()
         profileTagPicker = {
             let _pickerView = UIPickerView()
@@ -685,6 +808,27 @@ extension ProfileViewController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
+        colorLeftButton = {
+            let _button = UIButton(type: .system)
+            _button.setTitle(lang.titleClose, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+            _button.setTitleColor(UIColor.clear, for: .normal)
+            _button.showsTouchWhenHighlighted = false
+            _button.isHidden = true
+            _button.addTarget(self, action:#selector(colorLeftButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        colorRightButton = {
+            let _button = UIButton(type: .system)
+            _button.setTitle(lang.titleDone, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+            _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(colorRightButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
         
         // Setup subviews
         view.addSubview(topBarContainer)
@@ -692,6 +836,8 @@ extension ProfileViewController {
         view.addSubview(infoContainer)
         view.addSubview(tagCollection)
         view.addSubview(loadingImageView)
+        view.addSubview(blindView)
+        view.addSubview(colorLeftButton)
         
         topBarContainer.addSubview(signOutButton)
         
@@ -720,10 +866,17 @@ extension ProfileViewController {
         introContainer.addSubview(introLabel)
         introContainer.addSubview(introPlaceHolderLabel)
         
+        blindView.addSubview(colorContainer)
+        colorContainer.addSubview(colorTitleLabel)
+        colorContainer.addSubview(colorCollection)
+        colorContainer.addSubview(colorRightButton)
+        
         setupLangProperties()
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
         tagCollection.dataSource = self
         tagCollection.delegate = self
+        colorCollection.dataSource = self
+        colorCollection.delegate = self
         profileTagPicker.delegate = self
         
         // Setup constraints
@@ -844,6 +997,36 @@ extension ProfileViewController {
         
         loadingImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
         loadingImageView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: 0).isActive = true
+        
+        blindView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+        blindView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
+        blindView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+        blindView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+        
+        colorContainer.leadingAnchor.constraint(equalTo: blindView.leadingAnchor, constant: 7).isActive = true
+        colorContainer.trailingAnchor.constraint(equalTo: blindView.trailingAnchor, constant: -7).isActive = true
+        colorContainer.centerXAnchor.constraint(equalTo: blindView.centerXAnchor, constant: 0).isActive = true
+        colorContainer.centerYAnchor.constraint(equalTo: blindView.centerYAnchor, constant: 0).isActive = true
+        colorContainer.heightAnchor.constraint(equalToConstant: (60 * 3) + 100).isActive = true
+        
+        colorCollection.topAnchor.constraint(equalTo: colorContainer.topAnchor, constant: 40).isActive = true
+        colorCollection.centerXAnchor.constraint(equalTo: colorContainer.centerXAnchor, constant: 0).isActive = true
+        colorCollection.leadingAnchor.constraint(equalTo: colorContainer.leadingAnchor, constant: 15).isActive = true
+        colorCollection.trailingAnchor.constraint(equalTo: colorContainer.trailingAnchor, constant: -15).isActive = true
+        colorCollection.heightAnchor.constraint(equalToConstant: 60 * 3).isActive = true
+        
+        colorTitleLabel.topAnchor.constraint(equalTo: colorContainer.topAnchor, constant: 10).isActive = true
+        colorTitleLabel.centerXAnchor.constraint(equalTo: colorContainer.centerXAnchor, constant: 0).isActive = true
+        
+        colorLeftButton.leadingAnchor.constraint(equalTo: colorContainer.leadingAnchor, constant: 0).isActive = true
+        colorLeftButton.bottomAnchor.constraint(equalTo: colorContainer.bottomAnchor, constant: -5).isActive = true
+        colorLeftButton.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
+        colorLeftButton.heightAnchor.constraint(equalToConstant: 45).isActive = true
+        
+        colorRightButton.trailingAnchor.constraint(equalTo: colorContainer.trailingAnchor, constant: 0).isActive = true
+        colorRightButton.bottomAnchor.constraint(equalTo: colorContainer.bottomAnchor, constant: -5).isActive = true
+        colorRightButton.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
+        colorRightButton.heightAnchor.constraint(equalToConstant: 45).isActive = true
     }
     
     private func setupLangProperties() {
@@ -878,6 +1061,7 @@ extension ProfileViewController {
                 self.infoContainer.isHidden = true
                 self.mailConfAddressButton.setTitle(email, for: .normal)
                 self.mailConfContainer.isHidden = false
+                self.loadingImageView.isHidden = true
             })
         }, tokenRefreshCompletion: {
             self.loadProfile()
@@ -886,9 +1070,9 @@ extension ProfileViewController {
             UserDefaults.standard.setIsEmailConfirmed(value: profile.avatar.is_confirmed)
             UserDefaults.standard.setIsSignIn(value: true)
             let firstName = profile.avatar.first_name
-            if let photoName = profile.avatar.photo_name {
-                print(photoName)
-                let url = "\(URI.host)\(URI.avatar)/\(profile.avatar.id)/profile/photo/\(photoName)"
+            if profile.avatar.photo_name != nil && profile.avatar.color_code != 0 {
+                print(profile.avatar.photo_name!)
+                let url = "\(URI.host)\(URI.avatar)/\(profile.avatar.id)/profile/photo/\(profile.avatar.photo_name!)"
                 Alamofire.request(url).responseImage { response in
                     if let data = response.data {
                         self.infoImageView.image = UIImage(data: data)
@@ -897,7 +1081,7 @@ extension ProfileViewController {
             } else {
                 let index = firstName.index(firstName.startIndex, offsetBy: 0)
                 self.infoImageLabel.text = String(firstName[index])
-                self.infoImageLabel.textColor = UIColor.white
+                self.infoImageLabel.textColor = .white
                 self.infoImageView.backgroundColor = getProfileUIColor(key: profile.avatar.color_code)
             }
             self.firstNameLabel.text = firstName
@@ -1015,6 +1199,8 @@ extension ProfileViewController {
                 self.alertChangePasswordCompl()
                 self.avatarInfoTarget = nil
                 return
+            } else if self.avatarInfoTarget == AvatarInfoTarget.color_code {
+                self.colorLeftButtonTapped()
             }
             self.avatarInfoTarget = nil
             self.loadProfile()

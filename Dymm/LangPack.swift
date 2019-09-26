@@ -16,7 +16,7 @@ struct LangPack {
     var titleBackHome: String!
     var titleCamera: String!
     var titleCancel: String!
-    var titleChangeColor: String!
+    var titleChooseColor: String!
     var titleChangeProfileImg: String!
     var titleClose: String!
     var titleCondScore: String!
@@ -188,10 +188,10 @@ struct LangPack {
             case LanguageId.kor: return "취소"
             default: fatalError()}
         }()
-        self.titleChangeColor = {
+        self.titleChooseColor = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Change color"
-            case LanguageId.kor: return "컬러 변경"
+            case LanguageId.eng: return "Choose color"
+            case LanguageId.kor: return "컬러 선택"
             default: fatalError()}
         }()
         self.titleChangeProfileImg = {
@@ -726,7 +726,7 @@ struct LangPack {
         self.msgInactiveFood = {
             switch currentLanguageId {
             case LanguageId.eng: return "You have tried to inactive food."
-            case LanguageId.kor: return "사용이 정지된 음식에 접근을 시도하였습니다."
+            case LanguageId.kor: return "사용이 정지된 푸드에 접근을 시도하였습니다."
             default: fatalError()}
         }()
         self.msgLogComplete = {
@@ -738,7 +738,7 @@ struct LangPack {
         self.msgMailEnter = {
             switch currentLanguageId {
             case LanguageId.eng: return "Enter your account email address"
-            case LanguageId.kor: return "이메일 주소를 입력하십시오."
+            case LanguageId.kor: return "이메일 주소를 입력해 주세요."
             default: fatalError()}
         }()
         self.msgMailModified = {

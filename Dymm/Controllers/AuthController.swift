@@ -361,7 +361,7 @@ extension AuthViewController {
         // Initialize subveiw properties
         loadingImageView = getLoadingImageView(isHidden: true)
         topBarView = getAddtionalTopBarView()
-        forgotButton = getBasicTextButton(UIColor.tomato)
+        forgotButton = getBasicTextButton()
         forgotButton.setTitle(lang.titleForgotPassword, for: .normal)
         forgotButton.addTarget(self, action: #selector(alertFindEmail), for: .touchUpInside)
         closeButton = getCloseButton()

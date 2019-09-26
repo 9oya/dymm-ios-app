@@ -52,8 +52,6 @@ extension TagCollectionCell {
         addSubview(imageView)
         addSubview(label)
         
-        //        imageView.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        //        imageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
         imageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
         imageView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
         
