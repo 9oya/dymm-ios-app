@@ -29,6 +29,7 @@ extension TagCollectionCell {
     private func setupLayout() {
         backgroundColor = UIColor.white
         addShadowView()
+        layer.cornerRadius = 10.0
         
         imageView = {
             let _imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))

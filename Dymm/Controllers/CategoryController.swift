@@ -741,20 +741,22 @@ extension CategoryViewController {
         }()
         logSizeButton = {
             let _button = UIButton(type: .system)
-            _button.setTitleColor(UIColor.tomato, for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 25)
+            _button.setTitleColor(.hex_fe4c4c, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 35, weight: .bold)
             _button.frame = CGRect(x: 0, y: 0, width: 59, height: 59)
             _button.showsTouchWhenHighlighted = true
+            _button.addShadowView()
             _button.addTarget(self, action: #selector(logButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
         logTimeButton = {
             let _button = UIButton(type: .system)
-            _button.setTitleColor(UIColor.tomato, for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 23)
+            _button.setTitleColor(.hex_fe4c4c, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 25, weight: .bold)
             _button.frame = CGRect(x: 0, y: 0, width: 59, height: 59)
             _button.showsTouchWhenHighlighted = true
+            _button.addShadowView()
             _button.addTarget(self, action: #selector(logButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
@@ -867,7 +869,7 @@ extension CategoryViewController {
         timePicker.heightAnchor.constraint(equalToConstant: 125).isActive = true
         
         logTimeButton.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -40).isActive = true
-        logTimeButton.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
+        logTimeButton.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 18)).isActive = true
         
         titleLabel.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 10).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: 10).isActive = true
@@ -892,8 +894,8 @@ extension CategoryViewController {
         downArrowImageView.centerXAnchor.constraint(equalTo: detailContainer.centerXAnchor, constant: 0).isActive = true
         downArrowImageView.topAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -1).isActive = true
         
-        logSizeButton.bottomAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -15).isActive = true
-        logSizeButton.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 5)).isActive = true
+        logSizeButton.bottomAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -10).isActive = true
+        logSizeButton.trailingAnchor.constraint(equalTo: photoImageView.trailingAnchor, constant: 0).isActive = true
         
         fingerImageBottom = fingerImageView.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -75)
         fingerImageBottom.priority = UILayoutPriority(rawValue: 999)

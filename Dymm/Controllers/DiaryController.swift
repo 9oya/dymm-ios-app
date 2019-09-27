@@ -166,6 +166,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             condScorePickerView.selectRow(10 - condScore, inComponent: 0, animated: false)
         } else {
             condScorePickerView.selectRow(3, inComponent: 0, animated: false)
+            selectedCondScore = 7
         }
         alert.view.addSubview(condScorePickerView)
         condScorePickerView.widthAnchor.constraint(equalTo: alert.view.widthAnchor, constant: 0).isActive = true
@@ -596,7 +597,9 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             let strTodayDateArr = dateFormatter.string(from: calendarView.today!).components(separatedBy: "-")
             if Int(strTodayDateArr[1]) == logGroup.month_number && Int(strTodayDateArr[2]) == logGroup.day_number {
                 // If the date of the currently selected section is today add the ✨ emoji in it to prefix
-                weekday = "\u{2728}" + weekday
+//                weekday = "\u{2728}" + weekday
+                weekday = "\u{26A1}" + weekday
+//                weekday = "\u{1F31F}" + weekday
             }
             
             // Set view layout

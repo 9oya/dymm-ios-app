@@ -166,8 +166,8 @@ struct LangPack {
 //        }
         self.titleAvgScore = {
             switch currentLanguageId {
-            case LanguageId.eng: return "My Condition Score"
-            case LanguageId.kor: return "나의 컨디션 점수"
+            case LanguageId.eng: return "Debug Condition Score"
+            case LanguageId.kor: return "디버그 컨디션 스코어"
             default: fatalError()}
         }()
         self.titleBackHome = {
@@ -238,8 +238,8 @@ struct LangPack {
         }()
         self.titleDiary = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Diary"
-            case LanguageId.kor: return "다이어리"
+            case LanguageId.eng: return "Lifestyle"
+            case LanguageId.kor: return "라이프스타일"
             default: fatalError()}
         }()
         self.titleDone = {

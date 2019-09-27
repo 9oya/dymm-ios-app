@@ -188,6 +188,15 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
                 case LanguageId.kor: cell.label.text = tag.kor_name
                 default: fatalError()}
                 cell.imageView.image = UIImage(named: "tag-\(tag.id)")!.withRenderingMode(.alwaysOriginal)
+                
+                switch tag.id {
+                case TagId.diary:
+                    cell.label.textColor = .hex_fe4c4c
+                case TagId.bookmarks:
+                    cell.label.textColor = .gold
+                default:
+                    cell.label.textColor = .black
+                }
             }
             return cell
         default:
@@ -411,7 +420,7 @@ extension HomeViewController {
             self.avatar = avatar
             let firstName = avatar.first_name
             UIView.animate(withDuration: 0.5, animations: {
-                if avatar.photo_name != nil && avatar.color_code != 0 {
+                if avatar.photo_name != nil && avatar.color_code == 0 {
                     print(avatar.photo_name!)
                     let url = "\(URI.host)\(URI.avatar)/\(avatar.id)/profile/photo/\(avatar.photo_name!)"
                     Alamofire.request(url).responseImage { response in

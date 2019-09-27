@@ -298,6 +298,7 @@ extension UIColor {
     
     // Yellow
     static let hex_fffede = UIColor(hex: "#FFFEDE")
+    static let gold = UIColor(hex: "#FFD700")
     
     // Blue
     static let dodgerBlue = UIColor(hex: "DodgerBlue")

@@ -1070,7 +1070,7 @@ extension ProfileViewController {
             UserDefaults.standard.setIsEmailConfirmed(value: profile.avatar.is_confirmed)
             UserDefaults.standard.setIsSignIn(value: true)
             let firstName = profile.avatar.first_name
-            if profile.avatar.photo_name != nil && profile.avatar.color_code != 0 {
+            if profile.avatar.photo_name != nil && profile.avatar.color_code == 0 {
                 print(profile.avatar.photo_name!)
                 let url = "\(URI.host)\(URI.avatar)/\(profile.avatar.id)/profile/photo/\(profile.avatar.photo_name!)"
                 Alamofire.request(url).responseImage { response in

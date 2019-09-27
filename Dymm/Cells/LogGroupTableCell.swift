@@ -190,6 +190,7 @@ extension LogGroupTableCell {
             let _view = UIView()
             _view.backgroundColor = UIColor.white
             _view.addShadowView()
+            _view.layer.cornerRadius = 10.0
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
