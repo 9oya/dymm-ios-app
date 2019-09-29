@@ -451,7 +451,7 @@ struct CustomModel {
     
     struct AvgCondScoreSet: Codable {
         let this_avg_score: String
-        let last_avg_score: String
+        let last_avg_score: String?
         
         enum CodingKeys: String, CodingKey {
             case this_avg_score
@@ -461,7 +461,7 @@ struct CustomModel {
         init(from decoder: Decoder) throws {
             let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
             self.this_avg_score = try valueContainer.decode(String.self, forKey: CodingKeys.this_avg_score)
-            self.last_avg_score = try valueContainer.decode(String.self, forKey: CodingKeys.last_avg_score)
+            self.last_avg_score = try? valueContainer.decode(String.self, forKey: CodingKeys.last_avg_score)
         }
     }
     

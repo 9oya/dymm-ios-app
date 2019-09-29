@@ -121,6 +121,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var isPullToRefresh: Bool = false
     var isLogGroupTableEdited: Bool = false
     var isCondEditBtnTapped: Bool = false
+    var superTag: BaseModel.Tag?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -636,8 +637,8 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.drugLogBulletView.isHidden = false
             }
             if let condScore = logGroup.cond_score {
-                cell.condScoreImageView.image = getCondScoreImage(condScore)
-                cell.condScoreButton.setImage(getCondScoreImage(condScore), for: .normal)
+                cell.condScoreImageView.image = getCondScoreImageSmall(condScore)
+                cell.condScoreButton.setImage(getCondScoreImageSmall(condScore), for: .normal)
             } else {
                 cell.condScoreImageView.image = .itemScoreNone
                 cell.condScoreButton.setImage(.itemScoreNone, for: .normal)
@@ -1246,7 +1247,17 @@ extension DiaryViewController {
     private func setupLayout() {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
-        navigationItem.title = lang.titleDiary
+        switch lang.currentLanguageId {
+        case LanguageId.eng:
+            navigationItem.title = superTag?.eng_name
+        case LanguageId.kor:
+            navigationItem.title = superTag?.kor_name
+        case LanguageId.jpn:
+            navigationItem.title = superTag?.jpn_name
+        default:
+            return
+        }
+//        navigationItem.title = lang.titleDiary
         view.backgroundColor = UIColor(hex: "WhiteSmoke")
         
         // Initialize subveiw properties
@@ -1843,7 +1854,7 @@ extension DiaryViewController {
         }) { (avgScoreSet) in
             let formatter = NumberFormatter()
             self.thisAvgScore = formatter.number(from: avgScoreSet.this_avg_score)!.floatValue
-            self.lastAvgScore = formatter.number(from: avgScoreSet.last_avg_score)!.floatValue
+            self.lastAvgScore = formatter.number(from: avgScoreSet.last_avg_score!)!.floatValue
             self.alertAvgCondScore()
         }
     }

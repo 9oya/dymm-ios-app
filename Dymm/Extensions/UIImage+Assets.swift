@@ -84,4 +84,11 @@ extension UIImage {
     static let itemTrendUpGray = UIImage(named: "item-trend-up-gray")!
     static let itemTrendUp = UIImage(named: "item-trend-up")!
     static let itemTriangleDown = UIImage(named: "item-triangle-down")!
+    
+    static let itemScoreAwfulL = UIImage(named: "item-score-awful-l")!
+    static let itemScoreBadL = UIImage(named: "item-score-bad-l")!
+    static let itemScoreExcellentL = UIImage(named: "item-score-excellent-l")!
+    static let itemScoreGoodL = UIImage(named: "item-score-good-l")!
+    static let itemScoreNoneL = UIImage(named: "item-score-none-l")!
+    static let itemScoreSosoL = UIImage(named: "item-score-soso-l")!
 }

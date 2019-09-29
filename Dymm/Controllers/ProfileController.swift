@@ -686,9 +686,9 @@ extension ProfileViewController {
         signOutButton.addTarget(self, action: #selector(signOutButtonTapped), for: .touchUpInside)
         closeButton = getCloseButton()
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
-        mailConfAddressButton = getBasicTextButton()
+        mailConfAddressButton = getBasicTextButton(.cornflowerBlue)
         mailConfAddressButton.addTarget(self, action: #selector(alertMailConfAddressTextField), for: .touchUpInside)
-        sendAgainButton = getBasicTextButton()
+        sendAgainButton = getBasicTextButton(.cornflowerBlue)
         sendAgainButton.addTarget(self, action: #selector(sendMailAgainBtnTapped), for: .touchUpInside)
         firstNameContainer = getProfileLabelContainerView()
         firstNameContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertFirstNameTextField(_:))))
@@ -713,7 +713,8 @@ extension ProfileViewController {
         introPlaceHolderLabel = getProfilePlaceHolderLabel()
         mailConfContainer = {
             let _view = UIView()
-            _view.backgroundColor = UIColor.white
+            _view.backgroundColor = .white
+            _view.layer.cornerRadius = 10
             _view.addShadowView()
             _view.isHidden = true
             _view.translatesAutoresizingMaskIntoConstraints = false
@@ -730,7 +731,7 @@ extension ProfileViewController {
         }()
         infoContainer = {
             let _view = UIView()
-            _view.backgroundColor = UIColor.white
+            _view.backgroundColor = .white
             _view.layer.cornerRadius = 10
             _view.addShadowView()
             _view.isHidden = true
@@ -746,7 +747,7 @@ extension ProfileViewController {
         }()
         tagCollection = {
             let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
-            _collectionView.backgroundColor = UIColor.clear
+            _collectionView.backgroundColor = .clear
             _collectionView.register(TagCollectionCell.self, forCellWithReuseIdentifier: tagCellId)
             _collectionView.isHidden = true
             _collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -754,7 +755,7 @@ extension ProfileViewController {
         }()
         colorCollection = {
             let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
-            _collectionView.backgroundColor = UIColor.clear
+            _collectionView.backgroundColor = .clear
             _collectionView.register(ColorCollectionCell.self, forCellWithReuseIdentifier: colorCellId)
             _collectionView.translatesAutoresizingMaskIntoConstraints = false
             return _collectionView
@@ -787,7 +788,7 @@ extension ProfileViewController {
         infoImageLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 35, weight: .medium)
-            _label.textColor = UIColor.white
+            _label.textColor = .white
             _label.textAlignment = .center
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
