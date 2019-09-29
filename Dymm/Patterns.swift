@@ -166,7 +166,9 @@ func getCondScoreImageSmall(_ condScore: Int) -> UIImage? {
 }
 
 func getCondScoreImageLarge(_ condScore: Float) -> UIImage? {
-    if condScore < 3 {
+    if condScore == 0.0 {
+        return .itemScoreNoneL
+    } else if condScore < 3 {
         return .itemScoreAwfulL
     } else if condScore < 5 {
         return .itemScoreBadL
@@ -180,7 +182,9 @@ func getCondScoreImageLarge(_ condScore: Float) -> UIImage? {
 }
 
 func getCondScoreColor(_ condScore: Float) -> UIColor? {
-    if condScore < 3 {
+    if condScore == 0.0 {
+        return .lightGray
+    } else if condScore < 3 {
         return .hex_a45fac
     } else if condScore < 5 {
         return .tomato

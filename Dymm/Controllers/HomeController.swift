@@ -28,6 +28,9 @@ class HomeViewController: UIViewController {
     // UIPageControl
 //    var pageControl: UIPageControl!
     
+    // UIPicker
+    var yearPicker: UIPickerView!
+    
     // UILabel
     var scoreTitleLabel: UILabel!
     var scoreNumberLabel: UILabel!
@@ -48,6 +51,8 @@ class HomeViewController: UIViewController {
     var tags: [BaseModel.Tag]?
     var avatar: BaseModel.Avatar?
     var selectedTag: BaseModel.Tag?
+    var yearArr: [Int]!
+    var selectedYear: Int?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -336,6 +341,35 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
 //    }
 }
 
+extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
+    
+    // MARK: - UIPickerViewDataSource
+    
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return yearArr.count
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
+        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 90, height: 20))
+        label.textColor = .white
+        label.font = .systemFont(ofSize: 20, weight: .regular)
+        label.textAlignment = .center
+        label.text = "\(yearArr[row])"
+        return label
+    }
+    
+    // MARK: - UIPickerViewDelegate
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        selectedYear = yearArr[row]
+        loadScoreboard()
+    }
+}
+
 extension HomeViewController {
     
     // MARK: - Private methods
@@ -374,6 +408,11 @@ extension HomeViewController {
             _view.addShadowView()
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
+        }()
+        yearPicker = {
+            let _pickerView = UIPickerView()
+            _pickerView.translatesAutoresizingMaskIntoConstraints = false
+            return _pickerView
         }()
         scoreEmoImageView = {
             let _imageView = UIImageView()
@@ -438,6 +477,19 @@ extension HomeViewController {
             return _button
         }()
         loadingImageView = getLoadingImageView(isHidden: false)
+        yearArr = {
+            let date = Date()
+            let calendar = Calendar.current
+            var year = calendar.component(.year, from: date)
+            selectedYear = year
+            let lastYear = year - 10
+            var years = [Int]()
+            while year > lastYear {
+                years.append(year)
+                year -= 1
+            }
+            return years
+        }()
         
         navigationItem.titleView = titleImageView
         profileImageView.widthAnchor.constraint(equalToConstant: 31).isActive = true
@@ -447,6 +499,8 @@ extension HomeViewController {
 //        bannerCollectionView.delegate = self
         tagCollectionView.dataSource = self
         tagCollectionView.delegate = self
+        yearPicker.dataSource = self
+        yearPicker.delegate = self
         
         // Setup subviews
 //        view.addSubview(bannerCollectionView)
@@ -459,6 +513,7 @@ extension HomeViewController {
         scoreboardView.addSubview(scoreEmoImageView)
         scoreboardView.addSubview(scoreNumberLabel)
         scoreboardView.addSubview(scoreMessageLabel)
+        scoreboardView.addSubview(yearPicker)
         
         // Setup constraints
 //        bannerCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 1).isActive = true
@@ -474,6 +529,11 @@ extension HomeViewController {
         scoreboardView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         scoreboardView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
         scoreboardView.heightAnchor.constraint(equalToConstant: CGFloat(bannerHeightInt)).isActive = true
+        
+        yearPicker.topAnchor.constraint(equalTo: scoreboardView.topAnchor, constant: 0).isActive = true
+        yearPicker.leadingAnchor.constraint(equalTo: scoreboardView.leadingAnchor, constant: 7).isActive = true
+        yearPicker.widthAnchor.constraint(equalToConstant: 90).isActive = true
+        yearPicker.heightAnchor.constraint(equalToConstant: 130).isActive = true
         
         scoreTitleLabel.centerXAnchor.constraint(equalTo: scoreboardView.centerXAnchor, constant: 0).isActive = true
         scoreTitleLabel.topAnchor.constraint(equalTo: scoreboardView.topAnchor, constant: 20).isActive = true
@@ -524,7 +584,7 @@ extension HomeViewController {
     
     private func loadScoreboard() {
         let service = Service(lang: lang)
-        service.getAvgCondScore(yearNumber: "2019", monthNumber: nil, weekOfYear: nil, popoverAlert: { (message) in
+        service.getAvgCondScore(yearNumber: "\(selectedYear!)", monthNumber: nil, weekOfYear: nil, popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }, tokenRefreshCompletion: {

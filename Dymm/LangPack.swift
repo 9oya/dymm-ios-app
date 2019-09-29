@@ -129,16 +129,18 @@ struct LangPack {
     }
     func getCondScoreName(_ key: Float) -> String {
         var idx = 0
-        if key < 3 {
+        if key == 0.0 {
             idx = 0
-        } else if key < 5 {
+        } else if key < 3 {
             idx = 1
-        } else if key < 7 {
+        } else if key < 5 {
             idx = 2
-        } else if key < 9 {
+        } else if key < 7 {
             idx = 3
-        } else {
+        } else if key < 9 {
             idx = 4
+        } else {
+            idx = 5
         }
         return titleCondScores[idx]
     }
@@ -216,8 +218,8 @@ struct LangPack {
         }()
         self.titleCondScores = {
             switch currentLanguageId {
-            case LanguageId.eng: return ["Awful", "Bad", "Soso", "Good", "Excellent!"]
-            case LanguageId.kor: return ["최악", "나쁨", "보통", "좋음", "최고!"]
+            case LanguageId.eng: return ["Empty", "Awful", "Bad", "Soso", "Good", "Excellent!"]
+            case LanguageId.kor: return ["빈", "최악", "나쁨", "보통", "좋음", "최고!"]
             default: fatalError()}
         }()
         self.titleContinue = {
