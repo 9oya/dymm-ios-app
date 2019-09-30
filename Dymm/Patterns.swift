@@ -13,8 +13,8 @@ private let localHost = "http://127.0.0.1:5000"
 private let productHost = "https://dymm-api-01.appspot.com"
 
 struct URI {
-    static let host = localHost
-//    static let host = productHost
+//    static let host = localHost
+    static let host = productHost
     static let avatar = "/api/avatar"
     static let banner = "/api/banner"
     static let mail = "/api/mail"
@@ -166,15 +166,15 @@ func getCondScoreImageSmall(_ condScore: Int) -> UIImage? {
 }
 
 func getCondScoreImageLarge(_ condScore: Float) -> UIImage? {
-    if condScore == 0.0 {
+    if condScore < 1 {
         return .itemScoreNoneL
-    } else if condScore < 3 {
+    } else if condScore < 2.5 {
         return .itemScoreAwfulL
-    } else if condScore < 5 {
+    } else if condScore < 4.5 {
         return .itemScoreBadL
-    } else if condScore < 7 {
+    } else if condScore < 6.5 {
         return .itemScoreSosoL
-    } else if condScore < 9 {
+    } else if condScore < 8.5 {
         return .itemScoreGoodL
     } else {
         return .itemScoreExcellentL
@@ -182,15 +182,15 @@ func getCondScoreImageLarge(_ condScore: Float) -> UIImage? {
 }
 
 func getCondScoreColor(_ condScore: Float) -> UIColor? {
-    if condScore == 0.0 {
+    if condScore < 1 {
         return .lightGray
-    } else if condScore < 3 {
+    } else if condScore < 2.5 {
         return .hex_a45fac
-    } else if condScore < 5 {
+    } else if condScore < 4.5 {
         return .tomato
-    } else if condScore < 7 {
+    } else if condScore < 6.5 {
         return UIColor(hex: "#FEA32A")
-    } else if condScore < 9 {
+    } else if condScore < 8.5 {
         return .hex_41b275
     } else {
         return .dodgerBlue

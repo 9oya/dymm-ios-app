@@ -55,6 +55,7 @@ struct LangPack {
     var titleLastWeek: String!
     var titleLogGroups: [String]!
     var titleMyAvtCond: String!
+    var titleMyCondScore: String!
     var titleNo: String!
     var titleNote: String!
     var titleNotes: String!
@@ -129,15 +130,15 @@ struct LangPack {
     }
     func getCondScoreName(_ key: Float) -> String {
         var idx = 0
-        if key == 0.0 {
+        if key < 1 {
             idx = 0
-        } else if key < 3 {
+        } else if key < 2.5 {
             idx = 1
-        } else if key < 5 {
+        } else if key < 4.5 {
             idx = 2
-        } else if key < 7 {
+        } else if key < 6.5 {
             idx = 3
-        } else if key < 9 {
+        } else if key < 8.5 {
             idx = 4
         } else {
             idx = 5
@@ -428,6 +429,12 @@ struct LangPack {
             case LanguageId.kor: return "나의 컨디션 히스토리"
             default: fatalError()}
         }()
+        self.titleMyCondScore = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "My Condtion Score"
+            case LanguageId.kor: return "나의 컨디션 점수"
+            default: fatalError()}
+        }()
         self.titleNo = {
             switch currentLanguageId {
             case LanguageId.eng: return "No"
@@ -436,14 +443,14 @@ struct LangPack {
         }()
         self.titleNote = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Note"
-            case LanguageId.kor: return "메모"
+            case LanguageId.eng: return "#Note"
+            case LanguageId.kor: return "#메모"
             default: fatalError()}
         }()
         self.titleNotes = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Notes"
-            case LanguageId.kor: return "메모"
+            case LanguageId.eng: return "#Notes"
+            case LanguageId.kor: return "#메모"
             default: fatalError()}
         }()
         self.titlePassword = {

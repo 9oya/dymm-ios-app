@@ -30,6 +30,7 @@ class HomeViewController: UIViewController {
     
     // UIPicker
     var yearPicker: UIPickerView!
+    var monthPicker: UIPickerView!
     
     // UILabel
     var scoreTitleLabel: UILabel!
@@ -52,7 +53,11 @@ class HomeViewController: UIViewController {
     var avatar: BaseModel.Avatar?
     var selectedTag: BaseModel.Tag?
     var yearArr: [Int]!
+    var monthArr: [Int]!
     var selectedYear: Int?
+    var selectedMonth: Int?
+    var currentYear: Int!
+    var currentMonth: Int!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -60,19 +65,42 @@ class HomeViewController: UIViewController {
 //        loadBanners()
         loadScoreboard()
         loadCategories()
+        
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         UIView.transition(with: tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
 //            self.bannerCollectionView.reloadData()
+            self.monthPicker.reloadAllComponents()
             self.tagCollectionView.reloadData()
         })
         if UserDefaults.standard.isSignIn() {
+            selectedYear = currentYear
+            selectedMonth = nil
+            monthArr = {
+                var month = currentMonth
+                var months = [Int]()
+                while month! > 0 {
+                    months.append(month!)
+                    month! -= 1
+                }
+                return months
+            }()
+            yearPicker.selectRow(0, inComponent: 0, animated: true)
+            monthPicker.selectRow(0, inComponent: 0, animated: true)
+            
             loadScoreboard()
             loadAvatar()
         } else {
             UIView.transition(with: profileButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
+                self.scoreboardView.backgroundColor = getCondScoreColor(0)
+                self.scoreTitleLabel.text = self.lang.getCondScoreName(0)
+                self.scoreEmoImageView.image = getCondScoreImageLarge(0)
+                self.scoreNumberLabel.text = String(format: "%.1f", 0.0)
+                self.scoreMessageLabel.text = self.lang.titleMyCondScore
+                
                 self.profileButton.setTitleColor(UIColor.clear, for: .normal)
                 self.profileButton.backgroundColor = UIColor.clear
                 self.profileButton.setBackgroundImage(.itemProfileDef, for: .normal)
@@ -350,23 +378,80 @@ extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return yearArr.count
+        switch pickerView {
+        case yearPicker:
+            return yearArr.count
+        case monthPicker:
+            return monthArr.count + 1
+        default:
+            return 0
+        }
     }
     
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
-        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 90, height: 20))
+        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 90, height: 30))
         label.textColor = .white
         label.font = .systemFont(ofSize: 20, weight: .regular)
         label.textAlignment = .center
-        label.text = "\(yearArr[row])"
+        switch pickerView {
+        case yearPicker:
+            label.text = "\(yearArr[row])"
+        case monthPicker:
+            if row == 0 {
+                label.text = "-"
+            } else {
+                switch lang.currentLanguageId {
+                case LanguageId.eng:
+                    label.text = LangHelper.getEngNameOfMM(monthNumber: monthArr[row - 1])
+                case LanguageId.kor:
+                    label.text = LangHelper.getKorNameOfMonth(monthNumber: monthArr[row - 1], engMMM: nil)
+                default:
+                    fatalError()
+                }
+            }
+        default:
+            fatalError()
+        }
         return label
     }
     
     // MARK: - UIPickerViewDelegate
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        selectedYear = yearArr[row]
-        loadScoreboard()
+        switch pickerView {
+        case yearPicker:
+            selectedYear = yearArr[row]
+            selectedMonth = nil
+            if selectedYear == currentYear {
+                var month = currentMonth
+                var months = [Int]()
+                while month! > 0 {
+                    months.append(month!)
+                    month! -= 1
+                }
+                monthArr = months
+            } else {
+                monthArr = [12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+            }
+            monthPicker.reloadAllComponents()
+            monthPicker.selectRow(0, inComponent: 0, animated: true)
+        case monthPicker:
+            if row == 0 {
+                selectedMonth = nil
+            } else {
+                selectedMonth = monthArr[row - 1]
+            }
+        default:
+            fatalError()
+        }
+        
+        if UserDefaults.standard.isSignIn() {
+            loadScoreboard()
+        }
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+        return 30
     }
 }
 
@@ -378,6 +463,11 @@ extension HomeViewController {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = UIColor.whiteSmoke
+        
+        let date = Date()
+        let calendar = Calendar.current
+        currentYear = calendar.component(.year, from: date)
+        currentMonth = calendar.component(.month, from: date)
         
         // Initialize subveiw properties
         tagCollectionView = getCategoryCollectionView()
@@ -411,6 +501,13 @@ extension HomeViewController {
         }()
         yearPicker = {
             let _pickerView = UIPickerView()
+            _pickerView.isHidden = true
+            _pickerView.translatesAutoresizingMaskIntoConstraints = false
+            return _pickerView
+        }()
+        monthPicker = {
+            let _pickerView = UIPickerView()
+            _pickerView.isHidden = true
             _pickerView.translatesAutoresizingMaskIntoConstraints = false
             return _pickerView
         }()
@@ -478,17 +575,27 @@ extension HomeViewController {
         }()
         loadingImageView = getLoadingImageView(isHidden: false)
         yearArr = {
-            let date = Date()
-            let calendar = Calendar.current
-            var year = calendar.component(.year, from: date)
+//            let date = Date()
+//            let calendar = Calendar.current
+//            var year = calendar.component(.year, from: date)
+            var year = currentYear
             selectedYear = year
-            let lastYear = year - 10
+            let lastYear = year! - 4
             var years = [Int]()
-            while year > lastYear {
-                years.append(year)
-                year -= 1
+            while year! > lastYear {
+                years.append(year!)
+                year! -= 1
             }
             return years
+        }()
+        monthArr = {
+            var month = currentMonth
+            var months = [Int]()
+            while month! > 0 {
+                months.append(month!)
+                month! -= 1
+            }
+            return months
         }()
         
         navigationItem.titleView = titleImageView
@@ -501,6 +608,8 @@ extension HomeViewController {
         tagCollectionView.delegate = self
         yearPicker.dataSource = self
         yearPicker.delegate = self
+        monthPicker.dataSource = self
+        monthPicker.delegate = self
         
         // Setup subviews
 //        view.addSubview(bannerCollectionView)
@@ -514,6 +623,7 @@ extension HomeViewController {
         scoreboardView.addSubview(scoreNumberLabel)
         scoreboardView.addSubview(scoreMessageLabel)
         scoreboardView.addSubview(yearPicker)
+        scoreboardView.addSubview(monthPicker)
         
         // Setup constraints
 //        bannerCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 1).isActive = true
@@ -533,7 +643,12 @@ extension HomeViewController {
         yearPicker.topAnchor.constraint(equalTo: scoreboardView.topAnchor, constant: 0).isActive = true
         yearPicker.leadingAnchor.constraint(equalTo: scoreboardView.leadingAnchor, constant: 7).isActive = true
         yearPicker.widthAnchor.constraint(equalToConstant: 90).isActive = true
-        yearPicker.heightAnchor.constraint(equalToConstant: 130).isActive = true
+        yearPicker.heightAnchor.constraint(equalToConstant: 150).isActive = true
+        
+        monthPicker.centerYAnchor.constraint(equalTo: scoreboardView.centerYAnchor, constant: 0).isActive = true
+        monthPicker.trailingAnchor.constraint(equalTo: scoreboardView.trailingAnchor, constant: -7).isActive = true
+        monthPicker.widthAnchor.constraint(equalToConstant: 90).isActive = true
+        monthPicker.heightAnchor.constraint(equalToConstant: 200).isActive = true
         
         scoreTitleLabel.centerXAnchor.constraint(equalTo: scoreboardView.centerXAnchor, constant: 0).isActive = true
         scoreTitleLabel.topAnchor.constraint(equalTo: scoreboardView.topAnchor, constant: 20).isActive = true
@@ -584,7 +699,7 @@ extension HomeViewController {
     
     private func loadScoreboard() {
         let service = Service(lang: lang)
-        service.getAvgCondScore(yearNumber: "\(selectedYear!)", monthNumber: nil, weekOfYear: nil, popoverAlert: { (message) in
+        service.getAvgCondScore(yearNumber: "\(selectedYear!)", monthNumber: selectedMonth, weekOfYear: nil, popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }, tokenRefreshCompletion: {
@@ -592,12 +707,16 @@ extension HomeViewController {
         }) { (avgCondScoreSet) in
             let formatter = NumberFormatter()
             let thisAvgScore = formatter.number(from: avgCondScoreSet.this_avg_score)!.floatValue
+            if self.yearPicker.isHidden {
+                self.yearPicker.isHidden = false
+                self.monthPicker.isHidden = false
+            }
             UIView.animate(withDuration: 0.5) {
                 self.scoreboardView.backgroundColor = getCondScoreColor(thisAvgScore)
                 self.scoreTitleLabel.text = self.lang.getCondScoreName(thisAvgScore)
                 self.scoreEmoImageView.image = getCondScoreImageLarge(thisAvgScore)
                 self.scoreNumberLabel.text = String(format: "%.1f", thisAvgScore)
-                self.scoreMessageLabel.text = "My Condition Score"
+                self.scoreMessageLabel.text = self.lang.titleMyCondScore
             }
         }
     }
