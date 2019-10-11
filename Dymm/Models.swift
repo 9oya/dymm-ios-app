@@ -387,6 +387,25 @@ struct CustomModel {
         }
     }
     
+    struct Profile: Codable {
+        let avatar: BaseModel.Avatar
+        let language_id: Int
+        let profile_tags: [BaseModel.ProfileTag]
+        
+        enum CodingKeys: String, CodingKey {
+            case avatar
+            case language_id
+            case profile_tags
+        }
+        
+        init(from decoder: Decoder) throws {
+            let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
+            self.avatar = try valueContainer.decode(BaseModel.Avatar.self, forKey: CodingKeys.avatar)
+            self.language_id = try valueContainer.decode(Int.self, forKey: CodingKeys.language_id)
+            self.profile_tags = try valueContainer.decode([BaseModel.ProfileTag].self, forKey: CodingKeys.profile_tags)
+        }
+    }
+    
     struct ProfileTagSet: Codable {
         let sub_tags: [BaseModel.Tag]
         let select_idx: Int
@@ -462,22 +481,6 @@ struct CustomModel {
             let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
             self.this_avg_score = try valueContainer.decode(String.self, forKey: CodingKeys.this_avg_score)
             self.last_avg_score = try? valueContainer.decode(String.self, forKey: CodingKeys.last_avg_score)
-        }
-    }
-    
-    struct Profile: Codable {
-        let avatar: BaseModel.Avatar
-        let profile_tags: [BaseModel.ProfileTag]
-        
-        enum CodingKeys: String, CodingKey {
-            case avatar
-            case profile_tags
-        }
-        
-        init(from decoder: Decoder) throws {
-            let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
-            self.avatar = try valueContainer.decode(BaseModel.Avatar.self, forKey: CodingKeys.avatar)
-            self.profile_tags = try valueContainer.decode([BaseModel.ProfileTag].self, forKey: CodingKeys.profile_tags)
         }
     }
     

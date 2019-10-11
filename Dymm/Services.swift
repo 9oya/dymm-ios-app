@@ -116,7 +116,7 @@ struct Service {
     
     // MARK: - GET services
     
-    func getAvatar(popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ data: BaseModel.Avatar) -> Void) {
+    func getAvatar(popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ data: CustomModel.Auth) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -137,7 +137,7 @@ struct Service {
                 }
                 switch statusCode {
                 case 200:
-                    guard let decodedData = try? self.decoder.decode(Ok<BaseModel.Avatar>.self, from: responseData) else {
+                    guard let decodedData = try? self.decoder.decode(Ok<CustomModel.Auth>.self, from: responseData) else {
                         fatalError("jsonDecoder.decode(Ok<[UserModel.Avatar]>.self, from: responseData)")
                     }
                     guard let data = decodedData.data else {

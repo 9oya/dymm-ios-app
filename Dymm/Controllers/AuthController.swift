@@ -462,7 +462,7 @@ extension AuthViewController {
         }()
         formSwapButton = {
             let _button = UIButton(type: .system)
-            _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
+            _button.setTitleColor(.hex_40b174, for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 16)
             _button.setTitle(lang.titleSignUp, for: .normal)
             _button.showsTouchWhenHighlighted = true
@@ -472,7 +472,7 @@ extension AuthViewController {
         }()
         submitButton = {
             let _button = UIButton(type: .system)
-            _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
+            _button.setTitleColor(.hex_40b174, for: .normal)
             _button.setTitle(lang.titleSubmit, for: .normal)
             _button.addTarget(self, action: #selector(submitButtonTapped), for: .touchUpInside)
             _button.titleLabel?.font = .systemFont(ofSize: 16)
@@ -565,14 +565,24 @@ extension AuthViewController {
         
         formGrayLineView.leadingAnchor.constraint(equalTo: formContainerView.leadingAnchor, constant: (view.frame.width / 13)).isActive = true
         formGrayLineView.trailingAnchor.constraint(equalTo: formContainerView.trailingAnchor, constant: -(view.frame.width / 13)).isActive = true
-        formGrayLineView.bottomAnchor.constraint(equalTo: formSwapButton.topAnchor, constant: -10).isActive = true
+        formGrayLineView.bottomAnchor.constraint(equalTo: formContainerView.bottomAnchor, constant: -60).isActive = true
         formGrayLineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
         
-        formSwapButton.leadingAnchor.constraint(equalTo: formContainerView.leadingAnchor, constant: view.frame.width / 8).isActive = true
-        formSwapButton.bottomAnchor.constraint(equalTo: formContainerView.bottomAnchor, constant: -10).isActive = true
+        formSwapButton.leadingAnchor.constraint(equalTo: formContainerView.leadingAnchor, constant: 0).isActive = true
+        formSwapButton.bottomAnchor.constraint(equalTo: formContainerView.bottomAnchor, constant: 0).isActive = true
+        formSwapButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 14).isActive = true
+        formSwapButton.heightAnchor.constraint(equalToConstant: 59).isActive = true
         
-        submitButton.trailingAnchor.constraint(equalTo: formContainerView.trailingAnchor, constant: -(view.frame.width / 8)).isActive = true
-        submitButton.bottomAnchor.constraint(equalTo: formContainerView.bottomAnchor, constant: -10).isActive = true
+        submitButton.trailingAnchor.constraint(equalTo: formContainerView.trailingAnchor, constant: 0).isActive = true
+        submitButton.bottomAnchor.constraint(equalTo: formContainerView.bottomAnchor, constant: 0).isActive = true
+        submitButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 14).isActive = true
+        submitButton.heightAnchor.constraint(equalToConstant: 59).isActive = true
+        
+//        formSwapButton.leadingAnchor.constraint(equalTo: formContainerView.leadingAnchor, constant: view.frame.width / 8).isActive = true
+//        formSwapButton.bottomAnchor.constraint(equalTo: formContainerView.bottomAnchor, constant: -10).isActive = true
+//
+//        submitButton.trailingAnchor.constraint(equalTo: formContainerView.trailingAnchor, constant: -(view.frame.width / 8)).isActive = true
+//        submitButton.bottomAnchor.constraint(equalTo: formContainerView.bottomAnchor, constant: -10).isActive = true
     }
     
     private func displayErrorMessage(_ message: String) {

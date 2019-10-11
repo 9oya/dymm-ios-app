@@ -91,4 +91,11 @@ extension UIImage {
     static let itemScoreGoodL = UIImage(named: "item-score-good-l")!
     static let itemScoreNoneL = UIImage(named: "item-score-none-l")!
     static let itemScoreSosoL = UIImage(named: "item-score-soso-l")!
+    
+    static let itemAgingGray = UIImage(named: "item-aging-gray")!
+    static let itemAgingPurple = UIImage(named: "item-aging-purple")!
+    static let itemAgingTomato = UIImage(named: "item-aging-tomato")!
+    static let itemAgingOrange = UIImage(named: "item-aging-orange")!
+    static let itemAgingGreen = UIImage(named: "item-aging-green")!
+    static let itemAgingBlue = UIImage(named: "item-aging-blue")!
 }

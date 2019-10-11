@@ -501,45 +501,50 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         if monthPosition == .next || monthPosition == .previous {
             calendar.setCurrentPage(date, animated: true)
         }
-        if diaryMode == DiaryMode.editor {
+        
+        switch diaryMode {
+        case DiaryMode.editor:
             return
-        }
-        let selectedDateArr = dateFormatter.string(from: date).components(separatedBy: "-")
-        yearNumber = Int(selectedDateArr[0])
-        monthNumber = Int(selectedDateArr[1])
-        dayNumber = Int(selectedDateArr[2])
-        weekOfYear = Calendar.current.component(.weekOfYear, from: date)
-        dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: date)!
-        selectedDate = dateFormatter.string(from: date)
-        // logGrouDictArr: [groupType:LogGroup]
-        if let logGroupDictArr = logGroupDictTwoDimArr[dayOfYear!] {
-            // Case found some logGroups in section.
-            // Display last log group.
-            let sortedGroupTypes = logGroupDictArr.keys.sorted(by: >)
-            var sortedLogGourpArr = [BaseModel.LogGroup]()
-            sortedGroupTypes.forEach { (key) in
-                sortedLogGourpArr.append(logGroupDictArr[key]!)
+        case DiaryMode.logger:
+            let selectedDateArr = dateFormatter.string(from: date).components(separatedBy: "-")
+            yearNumber = Int(selectedDateArr[0])
+            monthNumber = Int(selectedDateArr[1])
+            dayNumber = Int(selectedDateArr[2])
+            weekOfYear = Calendar.current.component(.weekOfYear, from: date)
+            dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: date)!
+            selectedDate = dateFormatter.string(from: date)
+            // logGrouDictArr: [groupType:LogGroup]
+            if let logGroupDictArr = logGroupDictTwoDimArr[dayOfYear!] {
+                // Case found some logGroups in section.
+                // Display last log group.
+                let sortedGroupTypes = logGroupDictArr.keys.sorted(by: >)
+                var sortedLogGourpArr = [BaseModel.LogGroup]()
+                sortedGroupTypes.forEach { (key) in
+                    sortedLogGourpArr.append(logGroupDictArr[key]!)
+                }
+                let logGroup = sortedLogGourpArr.first!
+                selectedLogGroupId = logGroup.id
+                selectedLogGroup = logGroup
+                groupType = logGroup.group_type
+                loadGroupOfLogs { (groupOfLogSet) in
+                    let collectionViewHeight = logCollectionCellHeightInt * self.getGroupOfLogsTotalCnt(groupOfLogSet)
+                    self.afterLoadGroupOfLogs(collectionViewHeight)
+                }
+            } else {
+                // Case no logGroups are found in the section
+                groupOfLogSet = nil
+                groupType = LogGroupType.morning
+                pickerContainerTransition(pickerCollectionHeightInt)
             }
-            let logGroup = sortedLogGourpArr.first!
-            selectedLogGroupId = logGroup.id
-            selectedLogGroup = logGroup
-            groupType = logGroup.group_type
-            loadGroupOfLogs { (groupOfLogSet) in
-                let collectionViewHeight = logCollectionCellHeightInt * self.getGroupOfLogsTotalCnt(groupOfLogSet)
-                self.afterLoadGroupOfLogs(collectionViewHeight)
-            }
-        } else {
-            // Case no logGroups are found in the section
-            groupOfLogSet = nil
-            groupType = LogGroupType.morning
-            pickerContainerTransition(pickerCollectionHeightInt)
+            groupTypePickerView.selectRow(LogGroupType.nighttime - groupType!, inComponent: 0, animated: true)
+            UIView.transition(with: self.pickerContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.pickerDateLabel.text = "\(self.monthNumber!)월 \(self.dayNumber!)일"
+                self.blindView.isHidden = false
+                self.pickerContainerView.isHidden = false
+            })
+        default:
+            fatalError()
         }
-        groupTypePickerView.selectRow(LogGroupType.nighttime - groupType!, inComponent: 0, animated: true)
-        UIView.transition(with: self.pickerContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            self.pickerDateLabel.text = "\(self.monthNumber!)월 \(self.dayNumber!)일"
-            self.blindView.isHidden = false
-            self.pickerContainerView.isHidden = false
-        })
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {

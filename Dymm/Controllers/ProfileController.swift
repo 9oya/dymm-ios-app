@@ -1068,6 +1068,7 @@ extension ProfileViewController {
             self.loadProfile()
         }) { (profile) in
             self.profile = profile
+            UserDefaults.standard.setCurrentLanguageId(value: profile.language_id)
             UserDefaults.standard.setIsEmailConfirmed(value: profile.avatar.is_confirmed)
             UserDefaults.standard.setIsSignIn(value: true)
             let firstName = profile.avatar.first_name

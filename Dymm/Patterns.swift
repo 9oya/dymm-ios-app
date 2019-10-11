@@ -112,6 +112,7 @@ struct TagId {
     static let dateOfBirth = 23
     static let subscription = 14641
     static let password = 14642
+    static let ranking = 14644
 }
 
 struct CountryId {
@@ -181,9 +182,25 @@ func getCondScoreImageLarge(_ condScore: Float) -> UIImage? {
     }
 }
 
+func getAgingHumanImage(_ condScore: Float) -> UIImage? {
+    if condScore < 1 {
+        return .itemAgingGray
+    } else if condScore < 2.5 {
+        return .itemAgingPurple
+    } else if condScore < 4.5 {
+        return .itemAgingTomato
+    } else if condScore < 6.5 {
+        return .itemAgingOrange
+    } else if condScore < 8.5 {
+        return .itemAgingGreen
+    } else {
+        return .itemAgingBlue
+    }
+}
+
 func getCondScoreColor(_ condScore: Float) -> UIColor? {
     if condScore < 1 {
-        return .lightGray
+        return .dimGray
     } else if condScore < 2.5 {
         return .hex_a45fac
     } else if condScore < 4.5 {
