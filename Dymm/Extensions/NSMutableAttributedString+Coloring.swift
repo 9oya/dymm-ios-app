@@ -16,5 +16,4 @@ extension NSMutableAttributedString {
         // Swift 4.2 and above
         self.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: range)
     }
-    
 }

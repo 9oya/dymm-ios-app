@@ -98,4 +98,10 @@ extension UIImage {
     static let itemAgingOrange = UIImage(named: "item-aging-orange")!
     static let itemAgingGreen = UIImage(named: "item-aging-green")!
     static let itemAgingBlue = UIImage(named: "item-aging-blue")!
+    
+    static let itemAiGray = UIImage(named: "item-ai-gray")!
+    static let itemAiGreen = UIImage(named: "item-ai-green")!
+    
+    static let itemBatteryGray = UIImage(named: "item-battery-gray")
+    static let itemBatteryGreen = UIImage(named: "item-battery-green")
 }

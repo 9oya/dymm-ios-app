@@ -156,7 +156,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         alertController.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.dismiss(animated: true, completion: nil)
         })
-        alertController.view.tintColor = UIColor.cornflowerBlue
+        alertController.view.tintColor = .mediumSeaGreen
         self.present(alertController, animated: true, completion: nil)
     }
     
@@ -175,7 +175,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             self.updateLogGroupCondScore()
         })
-        alert.view.tintColor = UIColor.cornflowerBlue
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil )
     }
     
@@ -221,7 +221,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             }
         })
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
-        alert.view.tintColor = UIColor.cornflowerBlue
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -354,7 +354,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         let height = NSLayoutConstraint(item: alert.view!, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: CGFloat(heightInt))
         alert.view.addConstraint(height)
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in })
-        alert.view.tintColor = UIColor.cornflowerBlue
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -412,7 +412,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         if isCondEditBtnTapped {
             isCondEditBtnTapped = false
             condRightButton.setTitle(lang.titleEdit, for: .normal)
-            condRightButton.setTitleColor(UIColor.cornflowerBlue, for: .normal)
+            condRightButton.setTitleColor(.mediumSeaGreen, for: .normal)
             UIView.animate(withDuration: 0.5) {
                 self.condCollectionView.reloadData()
             }
@@ -434,7 +434,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             self.condLeftButton.isHidden = true
             self.isCondEditBtnTapped = false
             self.condRightButton.setTitle(self.lang.titleEdit, for: .normal)
-            self.condRightButton.setTitleColor(.cornflowerBlue, for: .normal)
+            self.condRightButton.setTitleColor(.mediumSeaGreen, for: .normal)
         })
     }
     
@@ -665,7 +665,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             if indexPath.row == 0 {
                 // Case 'Create new group' cell
                 cell.nameLabel.text = lang.titleCreateNewGroup
-                cell.nameLabel.textColor = UIColor.cornflowerBlue
+                cell.nameLabel.textColor = .mediumSeaGreen
                 cell.groupTypeImageView.image = nil
                 cell.foodLogBulletView.isHidden = true
                 cell.actLogBulletView.isHidden = true
@@ -676,7 +676,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row - 1].logGroup
                 cell.nameLabel.text = lang.getLogGroupTypeName(logGroup.group_type)
                 cell.groupTypeImageView.image = nil
-                cell.nameLabel.textColor = UIColor.cornflowerBlue
+                cell.nameLabel.textColor = .mediumSeaGreen
                 return cell
             }
         default:
@@ -993,7 +993,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 }
             } else if ((groupOfLogSet!.act_logs?.count) != nil && ((groupOfLogSet!.act_logs?.count)!) > 0) {
                 let actLog = groupOfLogSet!.act_logs!.popLast()
-                cell.bulletView.backgroundColor = UIColor.cornflowerBlue
+                cell.bulletView.backgroundColor = .cornflowerBlue
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.nameLabel.text = actLog!.eng_name
                 case LanguageId.kor: cell.nameLabel.text = actLog!.kor_name
@@ -1010,7 +1010,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 cell.quantityLabel.text = "\(hr)\(min)"
             } else if ((groupOfLogSet!.drug_logs?.count) != nil && ((groupOfLogSet!.drug_logs?.count)!) > 0) {
                 let drugLog = groupOfLogSet!.drug_logs!.popLast()
-                cell.bulletView.backgroundColor = UIColor.hex_72e5Ea
+                cell.bulletView.backgroundColor = .hex_72e5Ea
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.nameLabel.text = drugLog!.eng_name
                 case LanguageId.kor: cell.nameLabel.text = drugLog!.kor_name
@@ -1287,19 +1287,19 @@ extension DiaryViewController {
         }()
         calendarView = {
             let _calendar = FSCalendar()
-            _calendar.appearance.headerTitleColor = UIColor.black
-            _calendar.appearance.weekdayTextColor = UIColor.black
-            _calendar.appearance.titleDefaultColor = UIColor.cornflowerBlue
-            _calendar.appearance.titlePlaceholderColor = UIColor.lightGray
-            _calendar.appearance.eventDefaultColor = UIColor.tomato
-            _calendar.appearance.eventSelectionColor = UIColor.hex_fe4c4c
-            _calendar.appearance.selectionColor = UIColor.hex_fe4c4c
+            _calendar.appearance.headerTitleColor = .black
+            _calendar.appearance.weekdayTextColor = .black
+            _calendar.appearance.titleDefaultColor = .mediumSeaGreen
+            _calendar.appearance.titlePlaceholderColor = .lightGray
+            _calendar.appearance.eventDefaultColor = .tomato
+            _calendar.appearance.eventSelectionColor = .hex_fe4c4c
+            _calendar.appearance.selectionColor = .hex_fe4c4c
             _calendar.appearance.headerDateFormat = lang.calendarHeaderDateFormat
             _calendar.appearance.caseOptions = FSCalendarCaseOptions.weekdayUsesUpperCase
             _calendar.scope = .week
             _calendar.select(Date())
             _calendar.addShadowView()
-            _calendar.backgroundColor = UIColor.white
+            _calendar.backgroundColor = .white
             _calendar.clipsToBounds = true
             _calendar.translatesAutoresizingMaskIntoConstraints = false
             return _calendar
@@ -1433,7 +1433,7 @@ extension DiaryViewController {
             let _button = UIButton(type: .system)
             _button.setTitle(lang.titleEdit, for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
+            _button.setTitleColor(.mediumSeaGreen, for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(condRightButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -1724,7 +1724,7 @@ extension DiaryViewController {
         }) { (avtCondList) in
             self.avtCondList = avtCondList
             self.condCollectionView.reloadData()
-            self.condLeftButton.setTitleColor(UIColor.cornflowerBlue, for: .normal)
+            self.condLeftButton.setTitleColor(.mediumSeaGreen, for: .normal)
             UIView.transition(with: self.condLeftButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.condLeftButton.isHidden = false
                 self.condCollectionHeight.constant = CGFloat(45 * self.avtCondList!.count)

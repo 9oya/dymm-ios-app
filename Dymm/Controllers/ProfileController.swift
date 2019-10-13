@@ -465,7 +465,7 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
             case TagId.subscription:
                 cell.label.text = lang.titleSubscribe
                 cell.label.font = .systemFont(ofSize: 14, weight: .medium)
-                cell.label.textColor = UIColor(hex: "#5A3737")
+                cell.label.textColor = .mediumSeaGreen
             case TagId.dateOfBirth:
                 if let dateOfBirth = profile?.avatar.date_of_birth {
                     cell.label.text = dateOfBirth
@@ -484,7 +484,11 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
                     cell.label.textColor = .lightGray
                     return cell
                 }
-                cell.label.textColor = .black
+                if profileTag.tag_id == TagId.password {
+                    cell.label.textColor = .gray
+                } else {
+                    cell.label.textColor = .black
+                }
             }
             return cell
         case colorCollection:

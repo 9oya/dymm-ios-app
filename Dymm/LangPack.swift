@@ -219,7 +219,7 @@ struct LangPack {
         }()
         self.titleCondScores = {
             switch currentLanguageId {
-            case LanguageId.eng: return ["Empty", "Awful", "Bad", "Soso", "Good", "Excellent!"]
+            case LanguageId.eng: return ["EMPTY", "AWFUL", "BAD", "SOSO", "GOOD", "EXCELLENT!"]
             case LanguageId.kor: return ["빈", "최악", "나쁨", "보통", "좋음", "최고!"]
             default: fatalError()}
         }()
@@ -431,7 +431,7 @@ struct LangPack {
         }()
         self.titleMyCondScore = {
             switch currentLanguageId {
-            case LanguageId.eng: return "My Condtion Score"
+            case LanguageId.eng: return "MY CONDITION SCORE"
             case LanguageId.kor: return "나의 컨디션 점수"
             default: fatalError()}
         }()
