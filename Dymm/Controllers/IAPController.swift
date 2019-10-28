@@ -13,19 +13,26 @@ class IAPController: UIViewController {
     
     // MARK - Properties
     
+    // UIView
+    var blackBoardView: UIView!
+    
     // UIButton
     var purchaseButton: UIButton!
     var restoreButton: UIButton!
     
     // UILabel
+    var logoLabel: UILabel!
+    var productDscLabel: UILabel!
     var lblPurchaseDone: UILabel!
     
     // UIImageView
     var loadingImageView: UIImageView!
+    var logoImageView: UIImageView!
     
+    // UIActivityIndicatorView
     var activityIndicator: UIActivityIndicatorView!
     
-    var PRODUCT_ID = "com.9oya.dymm.premium2"
+    var PRODUCT_ID = "V1APcEPXKg1fPCUULWtZ1cuCcEGOleI3"
     var SHARED_SECRET = "6be41dc52be84d78ba58cf74d3b13af0"
     
     var productID = ""
@@ -38,9 +45,6 @@ class IAPController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
         if let isPurchased = UserDefaults.standard.value(forKey: "isPurchased") as? Bool, isPurchased == true {
             // TODO: Product is purchased and make sure the functionality/availability of purchased product
             lblPurchaseDone.isHidden = false
@@ -53,6 +57,10 @@ class IAPController: UIViewController {
             self.fetchAvailableProducts()
         }
     }
+    
+//    override func viewWillAppear(_ animated: Bool) {
+//
+//    }
     
     // MARK - Actions
     
@@ -92,7 +100,14 @@ extension IAPController: SKProductsRequestDelegate, SKPaymentTransactionObserver
             let price = numberFormatter.string(from: purchasingProduct.price)
             
             // Show description
-            purchaseButton.setTitle("Get " + purchasingProduct.localizedDescription + " for \(price!)", for: .normal)
+//            UIView.transition(with: purchaseButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
+//                self.purchaseButton.setTitle("Get " + purchasingProduct.localizedDescription + " for \(price!)", for: .normal)
+//            })
+            DispatchQueue.main.async {
+                self.purchaseButton.setTitle(purchasingProduct.localizedTitle.uppercased(), for: .normal)
+                self.productDscLabel.text = "\(price!) / \(purchasingProduct.localizedDescription)"
+//                self.purchaseButton.setTitle("Get " + purchasingProduct.localizedDescription + " for \(price!)", for: .normal)
+            }
         }
     }
     
@@ -141,22 +156,47 @@ extension IAPController {
 //        navigationItem.title = lang.titleNotes
         view.backgroundColor = UIColor.whiteSmoke
         
+        logoImageView = {
+            let _imageView = UIImageView()
+            _imageView.image = .itemLogoM
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.clipsToBounds = true
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        logoLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 15, weight: .medium)
+            _label.textColor = .mediumSeaGreen
+            _label.textAlignment = .center
+            _label.text = "+1 Month Free Trial"
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
         purchaseButton = {
             let _button = UIButton(type: .system)
             _button.setTitleColor(.white, for: .normal)
-            _button.backgroundColor = .tomato
-            _button.titleLabel?.font = .systemFont(ofSize: 15)
-            _button.setTitle("Get Dymm Premium", for: .normal)
+            _button.backgroundColor = .hex_fe4c4c
+            _button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+            _button.layer.cornerRadius = 10.0
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(purchaseButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
+        productDscLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 15, weight: .regular)
+            _label.textColor = .black
+            _label.textAlignment = .center
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
         restoreButton = {
             let _button = UIButton(type: .system)
             _button.setTitleColor(.black, for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 15)
-            _button.setTitle("Restore Purchase", for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 16)
+            _button.setTitle("RESTORE PREMIUM", for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(restoreButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -167,6 +207,12 @@ extension IAPController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
+        blackBoardView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor(hex: "#26312B")
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
         activityIndicator = {
             let _indicator = UIActivityIndicatorView()
             _indicator.center = view.center
@@ -175,18 +221,39 @@ extension IAPController {
             return _indicator
         }()
         
+        view.addSubview(logoImageView)
         view.addSubview(purchaseButton)
+        view.addSubview(productDscLabel)
+        view.addSubview(logoLabel)
         view.addSubview(restoreButton)
         view.addSubview(lblPurchaseDone)
+        view.addSubview(blackBoardView)
+        
+        logoImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        logoImageView.bottomAnchor.constraint(equalTo: purchaseButton.topAnchor, constant: -20).isActive = true
         
         purchaseButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        purchaseButton.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: 0).isActive = true
+        purchaseButton.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: -20).isActive = true
+        purchaseButton.widthAnchor.constraint(equalToConstant: 250).isActive = true
+        purchaseButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        
+        productDscLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        productDscLabel.topAnchor.constraint(equalTo: purchaseButton.bottomAnchor, constant: 10).isActive = true
+        
+        logoLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        logoLabel.topAnchor.constraint(equalTo: productDscLabel.bottomAnchor, constant: 2).isActive = true
         
         restoreButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        restoreButton.topAnchor.constraint(equalTo: purchaseButton.bottomAnchor, constant: 10).isActive = true
+        restoreButton.bottomAnchor.constraint(equalTo: blackBoardView.topAnchor, constant: -7).isActive = true
         
         lblPurchaseDone.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
         lblPurchaseDone.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: 0).isActive = true
+        
+        blackBoardView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+        blackBoardView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
+        blackBoardView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+        blackBoardView.heightAnchor.constraint(equalToConstant: view.frame.height / 3.5).isActive = true
+        
     }
     
     func purchaseProduct(product: SKProduct) {
