@@ -145,19 +145,20 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             }
             self.retryFunction!()
         })
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
     @objc func alertCompl(_ title: String, _ message: String) {
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: lang.titleNo, style: .cancel) { _ in
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: lang.titleNo, style: .cancel) { _ in
             _ = self.navigationController?.popViewController(animated: true)
         })
-        alertController.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
+        alert.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.dismiss(animated: true, completion: nil)
         })
-        alertController.view.tintColor = .mediumSeaGreen
-        self.present(alertController, animated: true, completion: nil)
+        alert.view.tintColor = .mediumSeaGreen
+        self.present(alert, animated: true, completion: nil)
     }
     
     @objc func alertCondScorePicker() {

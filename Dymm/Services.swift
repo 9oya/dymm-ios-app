@@ -180,17 +180,17 @@ struct Service {
                 switch statusCode {
                 case 200:
                     guard let decodedData = try? self.decoder.decode(Ok<CustomModel.Profile>.self, from: responseData) else {
-                        fatalError("jsonDecoder.decode(Ok<UserModel.Profile>.self, from: responseData)")
+                        fatalError()
                     }
                     guard let data = decodedData.data else {
-                        fatalError("decodedData.data")
+                        fatalError()
                     }
                     completion(data)
                 case 400:
                     self.badRequest(responseData)
                 case 401:
                     guard let decodedData = try? self.decoder.decode(Unauthorized.self, from: responseData) else {
-                        fatalError("Decode \(Unauthorized.self) failed")
+                        fatalError()
                     }
                     emailNotConfirmed(decodedData.message)
                     return
@@ -228,14 +228,61 @@ struct Service {
                 switch statusCode {
                 case 200:
                     guard let decodedData = try? self.decoder.decode(Ok<[BaseModel.AvatarCond]>.self, from: responseData) else {
-                        fatalError("jsonDecoder.decode(Ok<[UserModel.Avatar]>.self, from: responseData)")
+                        fatalError()
                     }
                     guard let data = decodedData.data else {
-                        fatalError("decodedData.data")
+                        fatalError()
                     }
                     completion(data)
                 case 400:
                     self.badRequest(responseData)
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "validateUser()")
+                    return
+                }
+        }
+    }
+    
+    func getRemainingLifeSpan(popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, unauthorized: @escaping (_ pattern: Int) -> Void, completion: @escaping (_ lifeSpan: Int) -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        guard let avatarId = UserDefaults.standard.getAvatarId() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)"
+        ]
+        Alamofire.request("\(URI.host)\(URI.avatar)/\(avatarId)/life-span", method: .get, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<Int>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    guard let lifeSpan = decodedData.data else {
+                        fatalError()
+                    }
+                    completion(lifeSpan)
+                case 400:
+                    self.badRequest(responseData)
+                case 401:
+                    guard let decodedData = try? self.decoder.decode(Unauthorized.self, from: responseData) else {
+                        fatalError()
+                    }
+                    unauthorized(decodedData.pattern)
                 case 403:
                     _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
                         tokenRefreshCompletion()
@@ -380,7 +427,54 @@ struct Service {
                     }
                     return
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "getAvgCondScorePerMonth()")
+                    self.unexpectedResponse(statusCode, responseData, "getAvgCondScore()")
+                    return
+                }
+        }
+    }
+    
+    func getScoreBoard(yearNumber: String, monthNumber: Int?, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.ScoreBoardSet) -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        guard let avatarId = UserDefaults.standard.getAvatarId() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)",
+        ]
+        var url = "\(URI.host)\(URI.avatar)/\(avatarId)/group/\(yearNumber)/score-board"
+        if monthNumber != nil {
+            url = "\(URI.host)\(URI.avatar)/\(avatarId)/group/\(yearNumber)/\(monthNumber!)/score-board"
+        }
+        
+        Alamofire.request(url, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<CustomModel.ScoreBoardSet>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    guard let scoreBoardSet = decodedData.data else {
+                        fatalError()
+                    }
+                    completion(scoreBoardSet)
+                case 400:
+                    self.badRequest(responseData)
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "getScoreBoard()")
                     return
                 }
         }

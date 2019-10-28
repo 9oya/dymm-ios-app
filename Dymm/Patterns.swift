@@ -34,6 +34,9 @@ struct UnauthType {
     static let userInvalid = 31
     static let mailInvalid = 32
     static let passwordInvalid = 33
+    
+    static let scoreNone = 41
+    static let birthNone = 42
 }
 
 struct TagType {

@@ -34,6 +34,7 @@ class HomeViewController: UIViewController {
     var scoreMessageLabel: UILabel!
     var ageLabel: UILabel!
     var genderLabel: UILabel!
+    var lifespanMsgLabel: UILabel!
     var lifespanLabel: UILabel!
     
     // UIImageView
@@ -41,9 +42,6 @@ class HomeViewController: UIViewController {
     var profileImageView: UIImageView!
     var loadingImageView: UIImageView!
     var scoreEmoImageView: UIImageView!
-    var agingHumansImageView: UIImageView!
-    var robotImageView: UIImageView!
-    var batteryImageView: UIImageView!
     
     // UIButton
     var profileButton: UIButton!
@@ -65,7 +63,6 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
-//        loadScoreboard()
         loadCategories()
     }
     
@@ -92,6 +89,7 @@ class HomeViewController: UIViewController {
             
             loadScoreboard()
             loadAvatar()
+            loadRemainingLifeSpan()
         } else {
             monthArr = {
                 var month = currentMonth
@@ -106,27 +104,24 @@ class HomeViewController: UIViewController {
             monthPicker.selectRow(0, inComponent: 0, animated: true)
             
             UIView.transition(with: profileButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
-//                self.scoreboardView.backgroundColor = getCondScoreColor(0)
                 self.scoreEmoImageView.image = getCondScoreImageLarge(0)
-                self.agingHumansImageView.image = getAgingHumanImage(0)
-                self.robotImageView.image = .itemAiGray
                 
                 self.scoreTitleLabel.text = self.lang.getCondScoreName(0)
                 self.scoreNumberLabel.text = String(format: "%.1f", 0.0)
                 self.scoreMessageLabel.text = self.lang.titleMyCondScore
                 
-                self.ageLabel.text = "AGE"
-                self.genderLabel.text = "GENDER"
+                self.ageLabel.text = self.lang.titleAge
+                self.genderLabel.text = self.lang.titleGender
                 
-//                self.lifespanLabel.text = "Your remaining lifespan \nestimated approx. \n126Y 112D"
-                self.lifespanLabel.text = "당신의 남은 수명을 \n예측합니다. \n약 71년 112일"
+                self.lifespanMsgLabel.text = "You have not Signed in yet"
+                self.lifespanLabel.text = ""
                 
                 self.scoreTitleLabel.textColor = getCondScoreColor(0)
                 self.scoreNumberLabel.textColor = getCondScoreColor(0)
                 self.scoreMessageLabel.textColor = getCondScoreColor(0)
-                self.lifespanLabel.textColor = .dimGray
                 self.ageLabel.textColor = getCondScoreColor(0)
                 self.genderLabel.textColor = getCondScoreColor(0)
+                self.lifespanMsgLabel.textColor = .webOrange
                 
                 self.profileButton.setTitleColor(UIColor.clear, for: .normal)
                 self.profileButton.backgroundColor = UIColor.clear
@@ -146,7 +141,7 @@ class HomeViewController: UIViewController {
         let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
-        alertController.view.tintColor = UIColor.cornflowerBlue
+        alertController.view.tintColor = .mediumSeaGreen
         present(alertController, animated: true, completion: nil)
     }
     
@@ -404,7 +399,6 @@ extension HomeViewController {
         scoreEmoImageView = {
             let _imageView = UIImageView()
             _imageView.contentMode = .scaleAspectFit
-            _imageView.addShadowView()
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
@@ -413,7 +407,6 @@ extension HomeViewController {
             _label.font = .systemFont(ofSize: 30, weight: .medium)
             _label.textColor = .dimGray
             _label.textAlignment = .center
-            _label.addShadowView()
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -422,7 +415,6 @@ extension HomeViewController {
             _label.font = .systemFont(ofSize: 40, weight: .medium)
             _label.textColor = .dimGray
             _label.textAlignment = .center
-            _label.addShadowView()
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -432,7 +424,6 @@ extension HomeViewController {
             _label.textColor = .dimGray
             _label.textAlignment = .center
             _label.numberOfLines = 2
-            _label.addShadowView()
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -442,7 +433,6 @@ extension HomeViewController {
             _label.textColor = .dimGray
             _label.textAlignment = .right
             _label.numberOfLines = 1
-            _label.addShadowView()
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -452,14 +442,22 @@ extension HomeViewController {
             _label.textColor = .dimGray
             _label.textAlignment = .right
             _label.numberOfLines = 1
-            _label.addShadowView()
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        lifespanMsgLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 16, weight: .regular)
+            _label.textColor = .mediumSeaGreen
+            _label.textAlignment = .center
+            _label.numberOfLines = 3
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
         lifespanLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 16, weight: .regular)
-            _label.textColor = .dimGray
+            _label.textColor = .tomato
             _label.textAlignment = .center
             _label.numberOfLines = 3
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -479,28 +477,6 @@ extension HomeViewController {
             _imageView.image = UIImage.itemProfileDef
             _imageView.isUserInteractionEnabled = true
             _imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileButtonTapped)))
-            _imageView.translatesAutoresizingMaskIntoConstraints = false
-            return _imageView
-        }()
-        agingHumansImageView = {
-            let _imageView = UIImageView(image: .itemLogoS)
-            _imageView.contentMode = .scaleAspectFit
-            _imageView.image = .itemAgingGray
-            _imageView.addShadowView()
-            _imageView.translatesAutoresizingMaskIntoConstraints = false
-            return _imageView
-        }()
-        robotImageView = {
-            let _imageView = UIImageView(image: .itemLogoS)
-            _imageView.contentMode = .scaleAspectFit
-            _imageView.image = .itemAiGray
-            _imageView.translatesAutoresizingMaskIntoConstraints = false
-            return _imageView
-        }()
-        batteryImageView = {
-            let _imageView = UIImageView(image: .itemLogoS)
-            _imageView.contentMode = .scaleAspectFit
-            _imageView.image = .itemBatteryGray
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
@@ -559,13 +535,11 @@ extension HomeViewController {
         scoreboardView.addSubview(scoreMessageLabel)
         scoreboardView.addSubview(yearPicker)
         scoreboardView.addSubview(monthPicker)
-        scoreboardView.addSubview(agingHumansImageView)
         scoreboardView.addSubview(ageLabel)
         scoreboardView.addSubview(genderLabel)
         
-        lifespanBoardView.addSubview(robotImageView)
+        lifespanBoardView.addSubview(lifespanMsgLabel)
         lifespanBoardView.addSubview(lifespanLabel)
-        lifespanBoardView.addSubview(batteryImageView)
         
         // Setup constraints
         scoreboardView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 7).isActive = true
@@ -595,9 +569,6 @@ extension HomeViewController {
         scoreMessageLabel.centerXAnchor.constraint(equalTo: scoreboardView.centerXAnchor, constant: 0).isActive = true
         scoreMessageLabel.bottomAnchor.constraint(equalTo: scoreboardView.bottomAnchor, constant: -(view.frame.height / 33)).isActive = true
         
-        agingHumansImageView.leadingAnchor.constraint(equalTo: scoreboardView.leadingAnchor, constant: 14).isActive = true
-        agingHumansImageView.bottomAnchor.constraint(equalTo: scoreMessageLabel.topAnchor, constant: -(view.frame.height / 34)).isActive = true
-        
         ageLabel.topAnchor.constraint(equalTo: scoreboardView.topAnchor, constant: 10).isActive = true
         ageLabel.trailingAnchor.constraint(equalTo: scoreboardView.trailingAnchor, constant: -10).isActive = true
         
@@ -609,14 +580,11 @@ extension HomeViewController {
         lifespanBoardView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
         lifespanBoardView.heightAnchor.constraint(equalToConstant: view.frame.height / 8.2).isActive = true
         
-        robotImageView.centerYAnchor.constraint(equalTo: lifespanBoardView.centerYAnchor, constant: 0).isActive = true
-        robotImageView.leadingAnchor.constraint(equalTo: lifespanBoardView.leadingAnchor, constant: 20).isActive = true
+        lifespanMsgLabel.centerYAnchor.constraint(equalTo: lifespanBoardView.centerYAnchor, constant: -10).isActive = true
+        lifespanMsgLabel.centerXAnchor.constraint(equalTo: lifespanBoardView.centerXAnchor, constant: 0).isActive = true
         
-        lifespanLabel.centerYAnchor.constraint(equalTo: lifespanBoardView.centerYAnchor, constant: 0).isActive = true
+        lifespanLabel.topAnchor.constraint(equalTo: lifespanMsgLabel.bottomAnchor, constant: 2).isActive = true
         lifespanLabel.centerXAnchor.constraint(equalTo: lifespanBoardView.centerXAnchor, constant: 0).isActive = true
-        
-        batteryImageView.centerYAnchor.constraint(equalTo: lifespanBoardView.centerYAnchor, constant: 0).isActive = true
-        batteryImageView.trailingAnchor.constraint(equalTo: lifespanBoardView.trailingAnchor, constant: -20).isActive = true
         
         tagCollectionView.topAnchor.constraint(equalTo: lifespanBoardView.bottomAnchor, constant: 7).isActive = true
         tagCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
@@ -630,6 +598,7 @@ extension HomeViewController {
     private func retryFunctionSet() {
         if UserDefaults.standard.isSignIn() {
             loadAvatar()
+            loadRemainingLifeSpan()
         }
         loadScoreboard()
         loadCategories()
@@ -637,49 +606,69 @@ extension HomeViewController {
     
     private func loadScoreboard() {
         let service = Service(lang: lang)
-        service.getAvgCondScore(yearNumber: "\(selectedYear!)", monthNumber: selectedMonth, weekOfYear: nil, popoverAlert: { (message) in
+        
+        service.getScoreBoard(yearNumber: "\(selectedYear!)", monthNumber: selectedMonth, popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }, tokenRefreshCompletion: {
             self.loadScoreboard()
-        }) { (avgCondScoreSet) in
+        }) { (scoreBoardSet) in
             let formatter = NumberFormatter()
-            self.thisAvgScore = formatter.number(from: avgCondScoreSet.this_avg_score)!.floatValue
+            self.thisAvgScore = formatter.number(from: scoreBoardSet.avg_score)!.floatValue
             UIView.animate(withDuration: 0.5) {
-//                self.scoreboardView.backgroundColor = getCondScoreColor(thisAvgScore)
                 self.scoreEmoImageView.image = getCondScoreImageLarge(self.thisAvgScore)
-                self.agingHumansImageView.image = getAgingHumanImage(self.thisAvgScore)
-                self.robotImageView.image = .itemAiGreen
-                self.batteryImageView.image = .itemBatteryGreen
                 
                 self.scoreTitleLabel.text = self.lang.getCondScoreName(self.thisAvgScore)
                 self.scoreNumberLabel.text = String(format: "%.1f", self.thisAvgScore)
                 self.scoreMessageLabel.text = self.lang.titleMyCondScore
                 
-                self.ageLabel.text = "나이 29"
-                self.genderLabel.text = "남성"
-                
-//                self.lifespanLabel.text = "당신의 남은 수명을 \n예측합니다. \n약 71년 112일"
-                self.lifespanLabel.textColor = .mediumSeaGreen
-                let lifespanNumber = "126Y 112D"
-                let lifespanMessage = "Your remaining lifespan \nestimated approx. \n\(lifespanNumber)"
-                
-                let attributedString: NSMutableAttributedString = NSMutableAttributedString(string: lifespanMessage)
-                attributedString.setColorForText(textForAttribute: lifespanNumber, withColor: .tomato)
-                self.lifespanLabel.attributedText = attributedString
-                
-//                let range = (lifespanMessage as NSString).range(of: "lifespan")
-//                let attribute = NSMutableAttributedString.init(string: lifespanMessage)
-//                attribute.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.red , range: range)
-//                self.lifespanLabel.attributedText = attribute
+                if let genderTag = scoreBoardSet.gender_tag {
+                    switch self.lang.currentLanguageId {
+                    case LanguageId.eng:
+                        self.genderLabel.text = genderTag.eng_name.uppercased()
+                    case LanguageId.kor:
+                        self.genderLabel.text = genderTag.kor_name
+                    default: fatalError()}
+                } else {
+                    switch self.lang.currentLanguageId {
+                    case LanguageId.eng:
+                        self.genderLabel.text = "GENDER"
+                    case LanguageId.kor:
+                        self.genderLabel.text = "성별"
+                    default: fatalError()}
+                }
                 
                 self.scoreTitleLabel.textColor = getCondScoreColor(self.thisAvgScore)
                 self.scoreNumberLabel.textColor = getCondScoreColor(self.thisAvgScore)
                 self.scoreMessageLabel.textColor = getCondScoreColor(self.thisAvgScore)
                 self.ageLabel.textColor = getCondScoreColor(self.thisAvgScore)
                 self.genderLabel.textColor = getCondScoreColor(self.thisAvgScore)
-//                self.lifespanLabel.textColor = .mediumSeaGreen
             }
+        }
+    }
+    
+    private func loadRemainingLifeSpan() {
+        let service = Service(lang: lang)
+        
+        service.getRemainingLifeSpan(popoverAlert: { (message) in
+            self.retryFunction = self.retryFunctionSet
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.loadRemainingLifeSpan()
+        }, unauthorized: { (pattern) in
+            self.lifespanMsgLabel.textColor = .webOrange
+            switch pattern {
+            case UnauthType.scoreNone:
+                self.lifespanMsgLabel.text = "You do not have any \nCondition Score log yet."
+            case UnauthType.birthNone:
+                self.lifespanMsgLabel.text = "You need to fill \nYour \"Date of birth\" at top right \"Profile\""
+            default: fatalError()}
+        }) { (lifeSpan) in
+            let year = lifeSpan / 365
+            let days = lifeSpan % 365
+            self.lifespanLabel.text = "\(year)Y \(days)D"
+            self.lifespanMsgLabel.textColor = .mediumSeaGreen
+            self.lifespanMsgLabel.text = self.lang.msgLifeSpan
         }
     }
     
@@ -705,9 +694,33 @@ extension HomeViewController {
         }, tokenRefreshCompletion: {
             self.loadAvatar()
         }) { (auth) in
+            
+            if let dateOfBirth = auth.avatar.date_of_birth {
+                let dateFormatter : DateFormatter = {
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "yyyy-MM-dd"
+                    formatter.locale = Locale(identifier: "en_US_POSIX")
+                    return formatter
+                }()
+                let birthday = dateFormatter.date(from: dateOfBirth)
+                let timeInterval = birthday?.timeIntervalSinceNow
+                switch self.lang.currentLanguageId {
+                case LanguageId.eng:
+                    self.ageLabel.text = "AGE \(abs(Int(timeInterval! / 31556926.0)))"
+                case LanguageId.kor:
+                    self.ageLabel.text = "나이 \(abs(Int(timeInterval! / 31556926.0)))"
+                default: fatalError()}
+            } else {
+                switch self.lang.currentLanguageId {
+                case LanguageId.eng:
+                    self.ageLabel.text = "AGE"
+                case LanguageId.kor:
+                    self.ageLabel.text = "나이"
+                default: fatalError()}
+            }
+            
             self.avatar = auth.avatar
             UserDefaults.standard.setCurrentLanguageId(value: auth.language_id)
-            let firstName = auth.avatar.first_name
             UIView.animate(withDuration: 0.5, animations: {
                 if auth.avatar.photo_name != nil && auth.avatar.color_code == 0 {
                     print(auth.avatar.photo_name!)
@@ -719,6 +732,7 @@ extension HomeViewController {
                         }
                     }
                 } else {
+                    let firstName = auth.avatar.first_name
                     let index = firstName.index(firstName.startIndex, offsetBy: 0)
                     self.profileButton.setImage(nil, for: .normal)
                     self.profileButton.setTitle(String(firstName[index]), for: .normal)

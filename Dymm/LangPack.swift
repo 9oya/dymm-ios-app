@@ -11,6 +11,7 @@ import Foundation
 struct LangPack {
     var currentLanguageId: Int!
     
+    var titleAge: String!
     var titleAll: String!
     var titleAvgScore: String!
     var titleBackHome: String!
@@ -44,6 +45,7 @@ struct LangPack {
     var titleFoodLog: String!
     var titleForgotPassword: String!
     var titleForgotPasswordAlert: String!
+    var titleGender: String!
     var titleGuest: String!
     var titleIncorrectEmailCode: String!
     var titleIncorrectOldPassword: String!
@@ -106,6 +108,7 @@ struct LangPack {
     var msgFloatingMismatchConfirmPassword: String!
     var msgInactiveFood: String!
     var msgInvalidEmail: String!
+    var msgLifeSpan: String!
     var msgLogComplete: String!
     var msgMailEnter: String!
     var msgMailModified: String!
@@ -155,6 +158,13 @@ struct LangPack {
         
         // MARK: Titles
         
+        self.titleAge = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "AGE"
+            case LanguageId.kor: return "나이"
+            case LanguageId.jpn: return ""
+            default: fatalError()}
+        }()
         self.titleAll = {
             switch currentLanguageId {
             case LanguageId.eng: return "ALL"
@@ -219,8 +229,8 @@ struct LangPack {
         }()
         self.titleCondScores = {
             switch currentLanguageId {
-            case LanguageId.eng: return ["EMPTY", "AWFUL", "BAD", "SOSO", "GOOD", "EXCELLENT!"]
-            case LanguageId.kor: return ["빈", "최악", "나쁨", "보통", "좋음", "최고!"]
+            case LanguageId.eng: return ["", "AWFUL", "BAD", "SOSO", "GOOD", "EXCELLENT!"]
+            case LanguageId.kor: return ["", "최악", "나쁨", "보통", "좋음", "최고!"]
             default: fatalError()}
         }()
         self.titleContinue = {
@@ -361,6 +371,12 @@ struct LangPack {
             case LanguageId.kor: return "Dymm 패스워드를 분실하였습니다."
             default: fatalError()}
         }()
+        self.titleGender = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "GENDER"
+            case LanguageId.kor: return "성별"
+            default: fatalError()}
+        }()
         self.titleGuest = {
             switch currentLanguageId {
             case LanguageId.eng: return "Guest"
@@ -443,14 +459,14 @@ struct LangPack {
         }()
         self.titleNote = {
             switch currentLanguageId {
-            case LanguageId.eng: return "#Note"
-            case LanguageId.kor: return "#메모"
+            case LanguageId.eng: return "Note"
+            case LanguageId.kor: return "메모"
             default: fatalError()}
         }()
         self.titleNotes = {
             switch currentLanguageId {
-            case LanguageId.eng: return "#Notes"
-            case LanguageId.kor: return "#메모"
+            case LanguageId.eng: return "Notes"
+            case LanguageId.kor: return "메모"
             default: fatalError()}
         }()
         self.titlePassword = {
@@ -738,6 +754,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "You have tried to inactive food."
             case LanguageId.kor: return "사용이 정지된 푸드에 접근을 시도하였습니다."
+            default: fatalError()}
+        }()
+        self.msgLifeSpan = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Your remaining life span \nestimated approx."
+            case LanguageId.kor: return "당신의 남은 수명을 \n예측합니다. 약"
             default: fatalError()}
         }()
         self.msgLogComplete = {

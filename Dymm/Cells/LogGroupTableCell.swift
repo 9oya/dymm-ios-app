@@ -333,7 +333,7 @@ extension LogGroupTableCell {
         condScoreImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12).isActive = true
         condScoreImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -((frame.width / 4) + 10)).isActive = true
         
-        noteImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12).isActive = true
+        noteImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 13).isActive = true
         noteImageView.leadingAnchor.constraint(equalTo: condScoreImageView.trailingAnchor, constant: 12).isActive = true
         
         foodLogBulletView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 20).isActive = true

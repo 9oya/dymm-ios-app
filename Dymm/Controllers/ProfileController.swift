@@ -23,7 +23,7 @@ class ProfileViewController: UIViewController {
     var firstNameContainer: UIView!
     var lastNameContainer: UIView!
     var emailContainer: UIView!
-    var phNumberContainer: UIView!
+//    var phNumberContainer: UIView!
     var introContainer: UIView!
     var colorContainer: UIView!
     
@@ -58,9 +58,9 @@ class ProfileViewController: UIViewController {
     var lastNameLabel: UILabel!
     var emailGuideLabel: UILabel!
     var emailLabel: UILabel!
-    var phNumberGuideLabel: UILabel!
-    var phNumberLabel: UILabel!
-    var phNumberPlaceHolderLabel: UILabel!
+//    var phNumberGuideLabel: UILabel!
+//    var phNumberLabel: UILabel!
+//    var phNumberPlaceHolderLabel: UILabel!
     var introGuideLabel: UILabel!
     var introLabel: UILabel!
     var introPlaceHolderLabel: UILabel!
@@ -99,7 +99,7 @@ class ProfileViewController: UIViewController {
                 self.retryFunction!()
             })
         alertController.addAction(UIAlertAction(title: lang.titleClose, style: .cancel) { _ in })
-        alertController.view.tintColor = UIColor.cornflowerBlue
+        alertController.view.tintColor = .mediumSeaGreen
         present(alertController, animated: true, completion: nil)
     }
     
@@ -114,7 +114,7 @@ class ProfileViewController: UIViewController {
         })
         let height:NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 260)
         alert.view.addConstraint(height)
-        alert.view.tintColor = UIColor.cornflowerBlue
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil )
     }
     
@@ -140,7 +140,7 @@ class ProfileViewController: UIViewController {
             self.updateAvatarInfo()
         }))
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: UIAlertAction.Style.cancel, handler: nil))
-        alert.view.tintColor = UIColor.cornflowerBlue
+        alert.view.tintColor = .mediumSeaGreen
         present(alert, animated: true, completion:{})
     }
     
@@ -170,6 +170,7 @@ class ProfileViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -202,6 +203,7 @@ class ProfileViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
+        alert.view.tintColor = .mediumSeaGreen
         present(alert, animated: true, completion: nil)
     }
     
@@ -222,6 +224,7 @@ class ProfileViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -243,28 +246,29 @@ class ProfileViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
-    @objc func alertPhoneNumberTextField(_ sender: UITapGestureRecognizer? = nil) {
-        let alert = UIAlertController(title: lang.titleEditPhoneNum, message: nil, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
-            if let txtField = alert.textFields?.first, let text = txtField.text {
-                self.newInfoStr = text
-                self.avatarInfoTarget = AvatarInfoTarget.phNumber
-                self.updateAvatarInfo()
-            }
-        }
-        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
-        alert.addTextField { textField in
-            textField.autocapitalizationType = UITextAutocapitalizationType.words
-            textField.placeholder = self.lang.titlePhoneNum
-            textField.text = self.profile!.avatar.ph_number ?? nil
-        }
-        alert.addAction(confirmAction)
-        alert.addAction(cancelAction)
-        self.present(alert, animated: true, completion: nil)
-    }
+//    @objc func alertPhoneNumberTextField(_ sender: UITapGestureRecognizer? = nil) {
+//        let alert = UIAlertController(title: lang.titleEditPhoneNum, message: nil, preferredStyle: .alert)
+//        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
+//            if let txtField = alert.textFields?.first, let text = txtField.text {
+//                self.newInfoStr = text
+//                self.avatarInfoTarget = AvatarInfoTarget.phNumber
+//                self.updateAvatarInfo()
+//            }
+//        }
+//        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
+//        alert.addTextField { textField in
+//            textField.autocapitalizationType = UITextAutocapitalizationType.words
+//            textField.placeholder = self.lang.titlePhoneNum
+//            textField.text = self.profile!.avatar.ph_number ?? nil
+//        }
+//        alert.addAction(confirmAction)
+//        alert.addAction(cancelAction)
+//        self.present(alert, animated: true, completion: nil)
+//    }
     
     @objc func alertIntroTextView(_ sender: UITapGestureRecognizer? = nil) {
         let alert = UIAlertController(title: lang.titleEditIntro, message: nil, preferredStyle: .actionSheet)
@@ -286,6 +290,7 @@ class ProfileViewController: UIViewController {
         let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -297,6 +302,7 @@ class ProfileViewController: UIViewController {
             return
         }
         alert.addAction(confirmAction)
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -369,6 +375,7 @@ class ProfileViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -378,7 +385,7 @@ class ProfileViewController: UIViewController {
         imagePickerController.delegate = self
         
         alert.addAction(UIAlertAction(title: lang.titleChooseColor, style: .default) { _ in
-            self.colorLeftButton.setTitleColor(UIColor.cornflowerBlue, for: .normal)
+            self.colorLeftButton.setTitleColor(.mediumSeaGreen, for: .normal)
             UIView.transition(with: self.colorLeftButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.colorLeftButton.isHidden = false
             })
@@ -408,7 +415,7 @@ class ProfileViewController: UIViewController {
     @objc func alertCameraError() {
         let alertController = UIAlertController(title: lang.titleSorry, message: lang.msgCameraDisable, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: lang.titleDone, style: .cancel) { _ in })
-        alertController.view.tintColor = UIColor.cornflowerBlue
+        alertController.view.tintColor = .mediumSeaGreen
         present(alertController, animated: true, completion: nil)
     }
     
@@ -428,6 +435,12 @@ class ProfileViewController: UIViewController {
         }, completion: { (_) in
             self.colorLeftButton.isHidden = true
         })
+    }
+    
+    @objc func presentSubscriptionController() {
+        let vc = IAPController()
+//        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: UIBarButtonItem.Style.plain, target: self, action: nil)
+        self.navigationController?.pushViewController(vc, animated: true)
     }
 }
 
@@ -463,7 +476,11 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
             cell.imageView.image = UIImage(named: "tag-\(profileTag.tag_id)")
             switch profileTag.tag_id {
             case TagId.subscription:
-                cell.label.text = lang.titleSubscribe
+                switch lang.currentLanguageId {
+                case LanguageId.eng: cell.label.text = profileTag.eng_name
+                case LanguageId.kor: cell.label.text = profileTag.kor_name
+                case LanguageId.jpn: cell.label.text = profileTag.jpn_name
+                default: cell.label.text = profileTag.eng_name}
                 cell.label.font = .systemFont(ofSize: 14, weight: .medium)
                 cell.label.textColor = .mediumSeaGreen
             case TagId.dateOfBirth:
@@ -480,15 +497,13 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
                 case LanguageId.kor: cell.label.text = profileTag.kor_name
                 case LanguageId.jpn: cell.label.text = profileTag.jpn_name
                 default: cell.label.text = profileTag.eng_name}
-                if profileTag.is_selected == false {
+                if profileTag.tag_id == TagId.password {
+                    cell.label.textColor = .black
+                } else if profileTag.is_selected == false {
                     cell.label.textColor = .lightGray
                     return cell
                 }
-                if profileTag.tag_id == TagId.password {
-                    cell.label.textColor = .gray
-                } else {
-                    cell.label.textColor = .black
-                }
+                cell.label.textColor = .black
             }
             return cell
         case colorCollection:
@@ -517,6 +532,9 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
                 return
             case TagId.password:
                 alertChangePassword()
+                return
+            case TagId.subscription:
+                presentSubscriptionController()
                 return
             default:
                 loadProfileTagsOnPicker()
@@ -690,9 +708,9 @@ extension ProfileViewController {
         signOutButton.addTarget(self, action: #selector(signOutButtonTapped), for: .touchUpInside)
         closeButton = getCloseButton()
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
-        mailConfAddressButton = getBasicTextButton(.cornflowerBlue)
+        mailConfAddressButton = getBasicTextButton(.mediumSeaGreen)
         mailConfAddressButton.addTarget(self, action: #selector(alertMailConfAddressTextField), for: .touchUpInside)
-        sendAgainButton = getBasicTextButton(.cornflowerBlue)
+        sendAgainButton = getBasicTextButton(.mediumSeaGreen)
         sendAgainButton.addTarget(self, action: #selector(sendMailAgainBtnTapped), for: .touchUpInside)
         firstNameContainer = getProfileLabelContainerView()
         firstNameContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertFirstNameTextField(_:))))
@@ -700,20 +718,20 @@ extension ProfileViewController {
         lastNameContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertLastNameTextField(_:))))
         emailContainer = getProfileLabelContainerView()
         emailContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertEmailTextField(_:))))
-        phNumberContainer = getProfileLabelContainerView()
-        phNumberContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertPhoneNumberTextField(_:))))
+//        phNumberContainer = getProfileLabelContainerView()
+//        phNumberContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertPhoneNumberTextField(_:))))
         introContainer = getProfileLabelContainerView()
         introContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertIntroTextView(_:))))
         firstNameGuideLabel = getProfileGuideLabel()
         lastNameGuideLabel = getProfileGuideLabel()
         emailGuideLabel = getProfileGuideLabel()
-        phNumberGuideLabel = getProfileGuideLabel()
+//        phNumberGuideLabel = getProfileGuideLabel()
         introGuideLabel = getProfileGuideLabel()
         firstNameLabel = getProfileLabel()
         lastNameLabel = getProfileLabel()
         emailLabel = getProfileLabel()
-        phNumberLabel = getProfileLabel()
-        phNumberPlaceHolderLabel = getProfilePlaceHolderLabel()
+//        phNumberLabel = getProfileLabel()
+//        phNumberPlaceHolderLabel = getProfilePlaceHolderLabel()
         introPlaceHolderLabel = getProfilePlaceHolderLabel()
         mailConfContainer = {
             let _view = UIView()
@@ -828,7 +846,7 @@ extension ProfileViewController {
             let _button = UIButton(type: .system)
             _button.setTitle(lang.titleDone, for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            _button.setTitleColor(UIColor.cornflowerBlue, for: .normal)
+            _button.setTitleColor(.mediumSeaGreen, for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(colorRightButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -855,7 +873,7 @@ extension ProfileViewController {
         infoContainer.addSubview(firstNameContainer)
         infoContainer.addSubview(lastNameContainer)
         infoContainer.addSubview(emailContainer)
-        infoContainer.addSubview(phNumberContainer)
+//        infoContainer.addSubview(phNumberContainer)
         infoContainer.addSubview(introContainer)
         
         firstNameContainer.addSubview(firstNameGuideLabel)
@@ -864,9 +882,9 @@ extension ProfileViewController {
         lastNameContainer.addSubview(lastNameLabel)
         emailContainer.addSubview(emailGuideLabel)
         emailContainer.addSubview(emailLabel)
-        phNumberContainer.addSubview(phNumberGuideLabel)
-        phNumberContainer.addSubview(phNumberLabel)
-        phNumberContainer.addSubview(phNumberPlaceHolderLabel)
+//        phNumberContainer.addSubview(phNumberGuideLabel)
+//        phNumberContainer.addSubview(phNumberLabel)
+//        phNumberContainer.addSubview(phNumberPlaceHolderLabel)
         introContainer.addSubview(introGuideLabel)
         introContainer.addSubview(introLabel)
         introContainer.addSubview(introPlaceHolderLabel)
@@ -912,7 +930,7 @@ extension ProfileViewController {
         infoContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt)).isActive = true
         infoContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         infoContainer.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        infoContainer.heightAnchor.constraint(equalToConstant: 280).isActive = true
+        infoContainer.heightAnchor.constraint(equalToConstant: 240).isActive = true
 
         infoImageView.topAnchor.constraint(equalTo: infoContainer.topAnchor, constant: 20).isActive = true
         infoImageView.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
@@ -961,24 +979,24 @@ extension ProfileViewController {
         emailLabel.leadingAnchor.constraint(equalTo: emailContainer.leadingAnchor, constant: 6).isActive = true
         emailLabel.trailingAnchor.constraint(equalTo: emailContainer.trailingAnchor, constant: 0).isActive = true
         
-        phNumberContainer.topAnchor.constraint(equalTo: emailContainer.bottomAnchor, constant: 3).isActive = true
-        phNumberContainer.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
-        phNumberContainer.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        phNumberContainer.heightAnchor.constraint(equalToConstant: 40).isActive = true
+//        phNumberContainer.topAnchor.constraint(equalTo: emailContainer.bottomAnchor, constant: 3).isActive = true
+//        phNumberContainer.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
+//        phNumberContainer.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+//        phNumberContainer.heightAnchor.constraint(equalToConstant: 40).isActive = true
+//
+//        phNumberGuideLabel.topAnchor.constraint(equalTo: phNumberContainer.topAnchor, constant: 2).isActive = true
+//        phNumberGuideLabel.leadingAnchor.constraint(equalTo: phNumberContainer.leadingAnchor, constant: 6).isActive = true
+//        phNumberGuideLabel.trailingAnchor.constraint(equalTo: phNumberContainer.trailingAnchor, constant: 0).isActive = true
+//
+//        phNumberLabel.topAnchor.constraint(equalTo: phNumberGuideLabel.bottomAnchor, constant: 2).isActive = true
+//        phNumberLabel.leadingAnchor.constraint(equalTo: phNumberContainer.leadingAnchor, constant: 6).isActive = true
+//        phNumberLabel.trailingAnchor.constraint(equalTo: phNumberContainer.trailingAnchor, constant: 0).isActive = true
+//
+//        phNumberPlaceHolderLabel.leadingAnchor.constraint(equalTo: phNumberContainer.leadingAnchor, constant: 0).isActive = true
+//        phNumberPlaceHolderLabel.trailingAnchor.constraint(equalTo: phNumberContainer.trailingAnchor, constant: 0).isActive = true
+//        phNumberPlaceHolderLabel.centerYAnchor.constraint(equalTo: phNumberContainer.centerYAnchor, constant: 0).isActive = true
         
-        phNumberGuideLabel.topAnchor.constraint(equalTo: phNumberContainer.topAnchor, constant: 2).isActive = true
-        phNumberGuideLabel.leadingAnchor.constraint(equalTo: phNumberContainer.leadingAnchor, constant: 6).isActive = true
-        phNumberGuideLabel.trailingAnchor.constraint(equalTo: phNumberContainer.trailingAnchor, constant: 0).isActive = true
-        
-        phNumberLabel.topAnchor.constraint(equalTo: phNumberGuideLabel.bottomAnchor, constant: 2).isActive = true
-        phNumberLabel.leadingAnchor.constraint(equalTo: phNumberContainer.leadingAnchor, constant: 6).isActive = true
-        phNumberLabel.trailingAnchor.constraint(equalTo: phNumberContainer.trailingAnchor, constant: 0).isActive = true
-        
-        phNumberPlaceHolderLabel.leadingAnchor.constraint(equalTo: phNumberContainer.leadingAnchor, constant: 0).isActive = true
-        phNumberPlaceHolderLabel.trailingAnchor.constraint(equalTo: phNumberContainer.trailingAnchor, constant: 0).isActive = true
-        phNumberPlaceHolderLabel.centerYAnchor.constraint(equalTo: phNumberContainer.centerYAnchor, constant: 0).isActive = true
-        
-        introContainer.topAnchor.constraint(equalTo: phNumberContainer.bottomAnchor, constant: 3).isActive = true
+        introContainer.topAnchor.constraint(equalTo: emailContainer.bottomAnchor, constant: 3).isActive = true
         introContainer.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
         introContainer.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         introContainer.heightAnchor.constraint(equalToConstant: 80).isActive = true
@@ -1040,9 +1058,9 @@ extension ProfileViewController {
         firstNameGuideLabel.text = lang.titleFirstNameUpper
         lastNameGuideLabel.text = lang.titleLastNameUpper
         emailGuideLabel.text = lang.titleEmailUpper
-        phNumberGuideLabel.text = lang.titlePhoneNumUpper
+//        phNumberGuideLabel.text = lang.titlePhoneNumUpper
         introGuideLabel.text = lang.titleIntroUpper
-        phNumberPlaceHolderLabel.text = lang.titlePhoneNum
+//        phNumberPlaceHolderLabel.text = lang.titlePhoneNum
         introPlaceHolderLabel.text = lang.titleIntro
         signOutButton.setTitle(lang.titleSignOut, for: .normal)
         sendAgainButton.setTitle(lang.titleSendAgain, for: .normal)
@@ -1078,12 +1096,12 @@ extension ProfileViewController {
             let firstName = profile.avatar.first_name
             if profile.avatar.photo_name != nil && profile.avatar.color_code == 0 {
                 print(profile.avatar.photo_name!)
-                let url = "\(URI.host)\(URI.avatar)/\(profile.avatar.id)/profile/photo/\(profile.avatar.photo_name!)"
-                Alamofire.request(url).responseImage { response in
-                    if let data = response.data {
-                        self.infoImageView.image = UIImage(data: data)
-                    }
-                }
+//                let url = "\(URI.host)\(URI.avatar)/\(profile.avatar.id)/profile/photo/\(profile.avatar.photo_name!)"
+//                Alamofire.request(url).responseImage { response in
+//                    if let data = response.data {
+//                        self.infoImageView.image = UIImage(data: data)
+//                    }
+//                }
             } else {
                 let index = firstName.index(firstName.startIndex, offsetBy: 0)
                 self.infoImageLabel.text = String(firstName[index])
@@ -1093,17 +1111,17 @@ extension ProfileViewController {
             self.firstNameLabel.text = firstName
             self.lastNameLabel.text = profile.avatar.last_name
             self.emailLabel.text = profile.avatar.email
-            if let phoneNumber = profile.avatar.ph_number {
-                self.phNumberLabel.text = phoneNumber
-                self.phNumberLabel.isHidden = false
-                self.phNumberGuideLabel.isHidden = false
-                self.phNumberPlaceHolderLabel.isHidden = true
-            } else {
-                self.phNumberLabel.text = nil
-                self.phNumberLabel.isHidden = true
-                self.phNumberGuideLabel.isHidden = true
-                self.phNumberPlaceHolderLabel.isHidden = false
-            }
+//            if let phoneNumber = profile.avatar.ph_number {
+//                self.phNumberLabel.text = phoneNumber
+//                self.phNumberLabel.isHidden = false
+//                self.phNumberGuideLabel.isHidden = false
+//                self.phNumberPlaceHolderLabel.isHidden = true
+//            } else {
+//                self.phNumberLabel.text = nil
+//                self.phNumberLabel.isHidden = true
+//                self.phNumberGuideLabel.isHidden = true
+//                self.phNumberPlaceHolderLabel.isHidden = false
+//            }
             if let introduction = profile.avatar.introudction {
                 self.introLabel.text = introduction
                 self.introLabel.isHidden = false

@@ -38,6 +38,9 @@
 		F5344083231E5D9A00FAC84B /* NoteController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5344082231E5D9A00FAC84B /* NoteController.swift */; };
 		F5344085231E5F2A00FAC84B /* NoteTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5344084231E5F2A00FAC84B /* NoteTableCell.swift */; };
 		F5451EED233593A80094B3D9 /* UIImageView+Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5451EEC233593A80094B3D9 /* UIImageView+Download.swift */; };
+		F56B8036235B132800D3300D /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F56B8035235B132800D3300D /* StoreKit.framework */; };
+		F59C14DD235BC418004A3B41 /* IAPController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59C14DC235BC418004A3B41 /* IAPController.swift */; };
+		F59C14E1235BF993004A3B41 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59C14E0235BF992004A3B41 /* Utilities.swift */; };
 		F5FC19CB233C4D2600116F71 /* ColorCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FC19CA233C4D2600116F71 /* ColorCollectionCell.swift */; };
 /* End PBXBuildFile section */
 
@@ -77,6 +80,9 @@
 		F5344082231E5D9A00FAC84B /* NoteController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteController.swift; sourceTree = "<group>"; };
 		F5344084231E5F2A00FAC84B /* NoteTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTableCell.swift; sourceTree = "<group>"; };
 		F5451EEC233593A80094B3D9 /* UIImageView+Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+Download.swift"; sourceTree = "<group>"; };
+		F56B8035235B132800D3300D /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		F59C14DC235BC418004A3B41 /* IAPController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPController.swift; sourceTree = "<group>"; };
+		F59C14E0235BF992004A3B41 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		F5FC19CA233C4D2600116F71 /* ColorCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCollectionCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -86,6 +92,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8B0DD06DDA438DCAC06682BF /* Pods_Dymm.framework in Frameworks */,
+				F56B8036235B132800D3300D /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,6 +102,7 @@
 		18D694621290DE5EE65EC40B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F56B8035235B132800D3300D /* StoreKit.framework */,
 				186AB4BB5141940DAA4A5647 /* Pods_Dymm.framework */,
 			);
 			name = Frameworks;
@@ -128,6 +136,7 @@
 				6A8D89A822F88A3B00A7F333 /* Services.swift */,
 				6A8D89A622F88A3A00A7F333 /* Models.swift */,
 				6A8D89A722F88A3B00A7F333 /* Patterns.swift */,
+				F59C14E0235BF992004A3B41 /* Utilities.swift */,
 				6A8D896222F8874000A7F333 /* AppDelegate.swift */,
 				6A8D896922F8874100A7F333 /* Assets.xcassets */,
 				6A8D896B22F8874100A7F333 /* LaunchScreen.storyboard */,
@@ -145,6 +154,7 @@
 				6A8D897722F8888B00A7F333 /* CategoryController.swift */,
 				6A8D897B22F888B200A7F333 /* DiaryController.swift */,
 				F5344082231E5D9A00FAC84B /* NoteController.swift */,
+				F59C14DC235BC418004A3B41 /* IAPController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -309,12 +319,14 @@
 				6A8D896522F8874000A7F333 /* HomeController.swift in Sources */,
 				6A8D89A922F88A3B00A7F333 /* LangPack.swift in Sources */,
 				6A8D898422F8892D00A7F333 /* LogCollectionCell.swift in Sources */,
+				F59C14E1235BF993004A3B41 /* Utilities.swift in Sources */,
 				F5344083231E5D9A00FAC84B /* NoteController.swift in Sources */,
 				6A62B36D230C75C20012C83D /* NSMutableAttributedString+Coloring.swift in Sources */,
 				6A8D898022F8891E00A7F333 /* LogGroupTableCell.swift in Sources */,
 				6A8D89A322F8898B00A7F333 /* UserDefaults+GetSet.swift in Sources */,
 				6A62B36B230750E60012C83D /* UIImage+Assets.swift in Sources */,
 				6A8D89A122F8898B00A7F333 /* String+Validation.swift in Sources */,
+				F59C14DD235BC418004A3B41 /* IAPController.swift in Sources */,
 				6A8D896322F8874000A7F333 /* AppDelegate.swift in Sources */,
 				6A8D89AC22F88A3B00A7F333 /* Services.swift in Sources */,
 				6A8D897822F8888B00A7F333 /* CategoryController.swift in Sources */,
@@ -473,12 +485,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = G99VW8TP32;
 				INFOPLIST_FILE = Dymm/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.01;
 				PRODUCT_BUNDLE_IDENTIFIER = com.9oya.Dymm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -492,12 +506,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = G99VW8TP32;
 				INFOPLIST_FILE = Dymm/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.01;
 				PRODUCT_BUNDLE_IDENTIFIER = com.9oya.Dymm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

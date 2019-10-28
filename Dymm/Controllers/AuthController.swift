@@ -71,7 +71,7 @@ class AuthViewController: UIViewController {
         let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
-        alertController.view.tintColor = UIColor.cornflowerBlue
+        alertController.view.tintColor = .mediumSeaGreen
         present(alertController, animated: true, completion: nil)
     }
     

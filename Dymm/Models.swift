@@ -484,6 +484,25 @@ struct CustomModel {
         }
     }
     
+    struct ScoreBoardSet: Codable {
+        let avg_score: String
+        let date_of_birth: String?
+        let gender_tag: BaseModel.Tag?
+        
+        enum CodingKeys: String, CodingKey {
+            case avg_score
+            case date_of_birth
+            case gender_tag
+        }
+        
+        init(from decoder: Decoder) throws {
+            let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
+            self.avg_score = try valueContainer.decode(String.self, forKey: CodingKeys.avg_score)
+            self.date_of_birth = try? valueContainer.decode(String.self, forKey: CodingKeys.date_of_birth)
+            self.gender_tag = try? valueContainer.decode(BaseModel.Tag.self, forKey: CodingKeys.gender_tag)
+        }
+    }
+    
     struct TagSet: Codable {
         let tag: BaseModel.Tag
         let sub_tags: [BaseModel.Tag]
