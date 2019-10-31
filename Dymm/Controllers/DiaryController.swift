@@ -280,7 +280,11 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             imageView.image = UIImage.itemTrendUp.withRenderingMode(.alwaysOriginal)
             changedScorelabel.text = String(format: "+%.1f", (thisAvgScore! - lastAvgScore!))
         }
-        let alert = UIAlertController(title: lang.titleAvgScore, message: message, preferredStyle: .alert)
+        var title = lang.titleAvgScoreWeek
+        if calendarView.scope == .month {
+            title = lang.titleAvgScoreMonth
+        }
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let thisAvgScorelabel: UILabel = {
             let label = UILabel()
             label.font = .systemFont(ofSize: 40, weight: .regular)

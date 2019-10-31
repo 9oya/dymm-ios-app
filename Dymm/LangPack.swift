@@ -13,7 +13,8 @@ struct LangPack {
     
     var titleAge: String!
     var titleAll: String!
-    var titleAvgScore: String!
+    var titleAvgScoreWeek: String!
+    var titleAvgScoreMonth: String!
     var titleBackHome: String!
     var titleCamera: String!
     var titleCancel: String!
@@ -179,10 +180,16 @@ struct LangPack {
 //            case LanguageId.jpn: return ""
 //            default: fatalError()}
 //        }
-        self.titleAvgScore = {
+        self.titleAvgScoreMonth = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Debug Condition Score"
-            case LanguageId.kor: return "디버그 컨디션 스코어"
+            case LanguageId.eng: return "My Monthly Condition Score"
+            case LanguageId.kor: return "나의 월간 컨디션 점수"
+            default: fatalError()}
+        }()
+        self.titleAvgScoreWeek = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "My Weekly Condition Score"
+            case LanguageId.kor: return "나의 주간 컨디션 점수"
             default: fatalError()}
         }()
         self.titleBackHome = {
@@ -441,8 +448,8 @@ struct LangPack {
         }()
         self.titleMyAvtCond = {
             switch currentLanguageId {
-            case LanguageId.eng: return "My Condtion History"
-            case LanguageId.kor: return "나의 컨디션 히스토리"
+            case LanguageId.eng: return "My Disease History"
+            case LanguageId.kor: return "나의 질병 히스토리"
             default: fatalError()}
         }()
         self.titleMyCondScore = {
