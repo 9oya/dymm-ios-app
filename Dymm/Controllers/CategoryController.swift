@@ -334,6 +334,12 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
             } else {
                 cell.label.text = _text
             }
+            switch tag.id {
+            case TagId.supplements:
+                cell.label.textColor = .mediumSeaGreen
+            default:
+                cell.label.textColor = .black
+            }
             cell.imageView.image = UIImage(named: "tag-\(tag.id)")
             return cell
         } else if collectionView == stepCollection {
@@ -715,7 +721,6 @@ extension CategoryViewController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-
         homeButton = {
             let _button = UIButton(type: .system)
             switch topLeftButtonType {

@@ -175,6 +175,13 @@ class HomeViewController: UIViewController {
         present(nc, animated: true, completion: nil)
     }
     
+    @objc func presentRankingNavigation() {
+        let vc = RankingViewController()
+        let nc = UINavigationController(rootViewController: vc)
+        nc.modalPresentationStyle = .fullScreen
+        present(nc, animated: true, completion: nil)
+    }
+    
     @objc func profileButtonTapped() {
         if UserDefaults.standard.isSignIn() {
             presentProfileNavigation()
@@ -230,18 +237,26 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             return
         }
         self.selectedTag = tag
-        if tag.id == TagId.diary {
+        switch tag.id {
+        case TagId.diary:
             if UserDefaults.standard.isSignIn() {
                 presentDiaryNavigation()
             } else {
                 presentAuthNavigation()
             }
-        } else if tag.id == TagId.bookmarks {
+        case TagId.bookmarks:
             if UserDefaults.standard.isSignIn() == false {
                 presentAuthNavigation()
             }
+        case TagId.ranking:
+            if UserDefaults.standard.isSignIn() {
+                presentRankingNavigation()
+            } else {
+                presentAuthNavigation()
+            }
+        default:
+            presentCategoryNavigation()
         }
-        presentCategoryNavigation()
     }
     
     // MARK: - UICollectionView DelegateFlowLayout
@@ -737,7 +752,7 @@ extension HomeViewController {
                     self.profileButton.setImage(nil, for: .normal)
                     self.profileButton.setTitle(String(firstName[index]), for: .normal)
                     self.profileButton.setTitleColor(.white, for: .normal)
-                    self.profileButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .medium)
+                    self.profileButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
                     self.profileButton.backgroundColor = getProfileUIColor(key: auth.avatar.color_code)
                     self.profileButton.setBackgroundImage(nil, for: .normal)
                     self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: self.profileButton)]

@@ -1096,12 +1096,12 @@ extension ProfileViewController {
             let firstName = profile.avatar.first_name
             if profile.avatar.photo_name != nil && profile.avatar.color_code == 0 {
                 print(profile.avatar.photo_name!)
-//                let url = "\(URI.host)\(URI.avatar)/\(profile.avatar.id)/profile/photo/\(profile.avatar.photo_name!)"
-//                Alamofire.request(url).responseImage { response in
-//                    if let data = response.data {
-//                        self.infoImageView.image = UIImage(data: data)
-//                    }
-//                }
+                let url = "\(URI.host)\(URI.avatar)/\(profile.avatar.id)/profile/photo/\(profile.avatar.photo_name!)"
+                Alamofire.request(url).responseImage { response in
+                    if let data = response.data {
+                        self.infoImageView.image = UIImage(data: data)
+                    }
+                }
             } else {
                 let index = firstName.index(firstName.startIndex, offsetBy: 0)
                 self.infoImageLabel.text = String(firstName[index])

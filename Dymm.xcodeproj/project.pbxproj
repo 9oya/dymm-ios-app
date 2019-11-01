@@ -41,6 +41,8 @@
 		F56B8036235B132800D3300D /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F56B8035235B132800D3300D /* StoreKit.framework */; };
 		F59C14DD235BC418004A3B41 /* IAPController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59C14DC235BC418004A3B41 /* IAPController.swift */; };
 		F59C14E1235BF993004A3B41 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59C14E0235BF992004A3B41 /* Utilities.swift */; };
+		F5D6A653236AC19C00E9CDE9 /* RankingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D6A652236AC19C00E9CDE9 /* RankingController.swift */; };
+		F5D6A655236AC27600E9CDE9 /* RankingTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D6A654236AC27600E9CDE9 /* RankingTableCell.swift */; };
 		F5FC19CB233C4D2600116F71 /* ColorCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FC19CA233C4D2600116F71 /* ColorCollectionCell.swift */; };
 /* End PBXBuildFile section */
 
@@ -83,6 +85,8 @@
 		F56B8035235B132800D3300D /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		F59C14DC235BC418004A3B41 /* IAPController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPController.swift; sourceTree = "<group>"; };
 		F59C14E0235BF992004A3B41 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		F5D6A652236AC19C00E9CDE9 /* RankingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingController.swift; sourceTree = "<group>"; };
+		F5D6A654236AC27600E9CDE9 /* RankingTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingTableCell.swift; sourceTree = "<group>"; };
 		F5FC19CA233C4D2600116F71 /* ColorCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCollectionCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -155,6 +159,7 @@
 				6A8D897B22F888B200A7F333 /* DiaryController.swift */,
 				F5344082231E5D9A00FAC84B /* NoteController.swift */,
 				F59C14DC235BC418004A3B41 /* IAPController.swift */,
+				F5D6A652236AC19C00E9CDE9 /* RankingController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -171,6 +176,7 @@
 				6A8D898322F8892D00A7F333 /* LogCollectionCell.swift */,
 				6A665F4523005C960065DC79 /* StepCollectionCell.swift */,
 				6A8D897D22F8890900A7F333 /* TagCollectionCell.swift */,
+				F5D6A654236AC27600E9CDE9 /* RankingTableCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -315,6 +321,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5D6A653236AC19C00E9CDE9 /* RankingController.swift in Sources */,
 				F5451EED233593A80094B3D9 /* UIImageView+Download.swift in Sources */,
 				6A8D896522F8874000A7F333 /* HomeController.swift in Sources */,
 				6A8D89A922F88A3B00A7F333 /* LangPack.swift in Sources */,
@@ -329,6 +336,7 @@
 				F59C14DD235BC418004A3B41 /* IAPController.swift in Sources */,
 				6A8D896322F8874000A7F333 /* AppDelegate.swift in Sources */,
 				6A8D89AC22F88A3B00A7F333 /* Services.swift in Sources */,
+				F5D6A655236AC27600E9CDE9 /* RankingTableCell.swift in Sources */,
 				6A8D897822F8888B00A7F333 /* CategoryController.swift in Sources */,
 				6A8D897E22F8890900A7F333 /* TagCollectionCell.swift in Sources */,
 				6A8D899F22F8898B00A7F333 /* UIDevice+Model.swift in Sources */,

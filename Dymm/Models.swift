@@ -524,4 +524,54 @@ struct CustomModel {
             self.bookmarks_total = try? valueContainer.decode(Int.self, forKey: CodingKeys.bookmarks_total)
         }
     }
+    
+    struct Ranking: Codable {
+        let avatar_id: Int
+        let first_name: String
+        let last_name: String
+        let color_code: Int
+        let introudction: String?
+        let date_of_birth: String?
+        let photo_name: String?
+        let rank_num: Int
+        let full_lifespan: Int
+        
+        enum CodingKeys: String, CodingKey {
+            case avatar_id
+            case first_name
+            case last_name
+            case color_code
+            case introudction
+            case date_of_birth
+            case photo_name
+            case rank_num
+            case full_lifespan
+        }
+        
+        init(from decoder: Decoder) throws {
+            let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
+            self.avatar_id = try valueContainer.decode(Int.self, forKey: CodingKeys.avatar_id)
+            self.first_name = try valueContainer.decode(String.self, forKey: CodingKeys.first_name)
+            self.last_name = try valueContainer.decode(String.self, forKey: CodingKeys.last_name)
+            self.color_code = try valueContainer.decode(Int.self, forKey: CodingKeys.color_code)
+            self.introudction = try? valueContainer.decode(String.self, forKey: CodingKeys.introudction)
+            self.date_of_birth = try? valueContainer.decode(String.self, forKey: CodingKeys.date_of_birth)
+            self.photo_name = try? valueContainer.decode(String.self, forKey: CodingKeys.photo_name)
+            self.rank_num = try valueContainer.decode(Int.self, forKey: CodingKeys.rank_num)
+            self.full_lifespan = try valueContainer.decode(Int.self, forKey: CodingKeys.full_lifespan)
+        }
+    }
+    
+    struct RankingSet: Codable {
+        let rankings: [CustomModel.Ranking]
+        
+        enum CodingKeys: String, CodingKey {
+            case rankings
+        }
+        
+        init(from decoder: Decoder) throws {
+            let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
+            self.rankings = try valueContainer.decode([CustomModel.Ranking].self, forKey: CodingKeys.rankings)
+        }
+    }
 }

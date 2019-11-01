@@ -1325,7 +1325,7 @@ extension DiaryViewController {
             }()
         logGroupTableView = {
             let _tableView = UITableView(frame: CGRect.zero, style: .grouped)
-            _tableView.backgroundColor = UIColor.clear
+            _tableView.backgroundColor = .clear
             _tableView.separatorStyle = .none
             _tableView.register(LogGroupTableCell.self, forCellReuseIdentifier: logGroupTableCellId)
             _tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -1603,8 +1603,8 @@ extension DiaryViewController {
         toggleButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
         
         logGroupTableView.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
-        logGroupTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
-        logGroupTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
+        logGroupTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        logGroupTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         logGroupTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
         logGroupTableView.panGestureRecognizer.require(toFail: scopeGesture)
     }

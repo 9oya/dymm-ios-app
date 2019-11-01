@@ -116,6 +116,7 @@ struct TagId {
     static let subscription = 14641
     static let password = 14642
     static let ranking = 14644
+    static let supplements = 1040
 }
 
 struct CountryId {
