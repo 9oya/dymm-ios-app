@@ -96,20 +96,18 @@ extension RankingTableCell {
         containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
         containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0).isActive = true
         containerView.heightAnchor.constraint(equalToConstant: 60).isActive = true
-        
-//        rankNumLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: 0).isActive = true
-        rankNumLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 7).isActive = true
-        rankNumLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 7).isActive = true
-        
+
         profileImgView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: 0).isActive = true
-        profileImgView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 30).isActive = true
+        profileImgView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20).isActive = true
         profileImgView.widthAnchor.constraint(equalToConstant: 31).isActive = true
         profileImgView.heightAnchor.constraint(equalToConstant: 31).isActive = true
         
         profileImgLabel.centerXAnchor.constraint(equalTo: profileImgView.centerXAnchor, constant: 0).isActive = true
         profileImgLabel.centerYAnchor.constraint(equalTo: profileImgView.centerYAnchor, constant: 0).isActive = true
         
-        nameLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: 0).isActive = true
+        rankNumLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: -10).isActive = true
+        rankNumLabel.leadingAnchor.constraint(equalTo: profileImgView.trailingAnchor, constant: 10).isActive = true
+        nameLabel.topAnchor.constraint(equalTo: rankNumLabel.bottomAnchor, constant: 2).isActive = true
         nameLabel.leadingAnchor.constraint(equalTo: profileImgView.trailingAnchor, constant: 10).isActive = true
         
         lifespanLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: 0).isActive = true

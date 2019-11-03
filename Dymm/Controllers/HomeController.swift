@@ -245,7 +245,9 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
                 presentAuthNavigation()
             }
         case TagId.bookmarks:
-            if UserDefaults.standard.isSignIn() == false {
+            if UserDefaults.standard.isSignIn() {
+                presentCategoryNavigation()
+            } else {
                 presentAuthNavigation()
             }
         case TagId.ranking:

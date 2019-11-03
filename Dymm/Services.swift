@@ -616,7 +616,7 @@ struct Service {
         }
     }
     
-    func getRankings(ageRange: Int, startPoint: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ profileTagSet: CustomModel.RankingSet) -> Void) {
+    func getRankings(ageRange: Int, startPoint: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ rankingSet: CustomModel.RankingSet) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -648,7 +648,49 @@ struct Service {
                     }
                     return
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "getProfileTagSets()")
+                    self.unexpectedResponse(statusCode, responseData, "getRankings()")
+                    return
+                }
+        }
+    }
+    
+    func getARanking(ageRange: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ ranking: CustomModel.Ranking) -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)"
+        ]
+        guard let avatarId = UserDefaults.standard.getAvatarId() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        Alamofire.request("\(URI.host)\(URI.avatar)/\(avatarId)/ranking/\(ageRange)", method: .get, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<CustomModel.Ranking>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    guard let data = decodedData.data else {
+                        fatalError()
+                    }
+                    completion(data)
+                case 400:
+                    self.badRequest(responseData)
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "getARanking()")
                     return
                 }
         }

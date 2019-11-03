@@ -14,7 +14,7 @@ class RankingViewController: UIViewController {
     // MARK: - Properties
     
     // UIView
-    var myRankingView: UIView!
+    var myRankingContainer: UIView!
     
     // UITableView
     var rankingTableView: UITableView!
@@ -30,6 +30,14 @@ class RankingViewController: UIViewController {
     
     // UILabel
     var headerRankLabel: UILabel!
+    var headerLifespanLabel: UILabel!
+    var myProfileImgLabel: UILabel!
+    var myRankNumLabel: UILabel!
+    var myNameLabel: UILabel!
+    var myLifespanLabel: UILabel!
+    
+    // UIImageView
+    var myProfileImgView: UIImageView!
     
     // Non-view properties
     var lang: LangPack!
@@ -41,6 +49,7 @@ class RankingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
+        loadMyRanking()
         loadRankings()
     }
     
@@ -200,7 +209,7 @@ extension RankingViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        myRankingView = {
+        myRankingContainer = {
             let _view = UIView()
             _view.backgroundColor = .white
             _view.layer.cornerRadius = 10.0
@@ -214,6 +223,15 @@ extension RankingViewController {
             _label.textAlignment = .left
             _label.textColor = .lightGray
             _label.text = "#Ranking"
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        headerLifespanLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 14, weight: .regular)
+            _label.textAlignment = .right
+            _label.textColor = .lightGray
+            _label.text = "Remaining lifespan + Age"
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -251,38 +269,106 @@ extension RankingViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
+        myProfileImgView = {
+            let _imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 31, height: 31))
+            _imageView.layer.cornerRadius = 31 / 2
+            _imageView.contentMode = .scaleAspectFill
+            _imageView.clipsToBounds = true
+            _imageView.isUserInteractionEnabled = true
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        myProfileImgLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 17, weight: .medium)
+            _label.textColor = .white
+            _label.textAlignment = .center
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        myRankNumLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 14, weight: .regular)
+            _label.textAlignment = .left
+            _label.textColor = .dimGray
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        myNameLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 14, weight: .regular)
+            _label.textAlignment = .left
+            _label.textColor = .dimGray
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        myLifespanLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 14, weight: .regular)
+            _label.textAlignment = .right
+            _label.textColor = .dimGray
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
         rankingTableView.dataSource = self
         rankingTableView.delegate = self
         
         // Setup subviews
-        view.addSubview(myRankingView)
+        view.addSubview(myRankingContainer)
         view.addSubview(ageRangePickButton)
         view.addSubview(startPtPickButton)
         view.addSubview(headerRankLabel)
+        view.addSubview(headerLifespanLabel)
         view.addSubview(rankingTableView)
         
-        // Setup constraints
-        myRankingView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 7).isActive = true
-        myRankingView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
-        myRankingView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
-        myRankingView.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        myRankingContainer.addSubview(myProfileImgView)
+        myRankingContainer.addSubview(myProfileImgLabel)
+        myRankingContainer.addSubview(myRankNumLabel)
+        myRankingContainer.addSubview(myNameLabel)
+        myRankingContainer.addSubview(myLifespanLabel)
         
-        ageRangePickButton.topAnchor.constraint(equalTo: myRankingView.bottomAnchor, constant: 7).isActive = true
+        // Setup constraints
+        myRankingContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 7).isActive = true
+        myRankingContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
+        myRankingContainer.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
+        myRankingContainer.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        
+        myProfileImgView.centerYAnchor.constraint(equalTo: myRankingContainer.centerYAnchor, constant: 0).isActive = true
+        myProfileImgView.leadingAnchor.constraint(equalTo: myRankingContainer.leadingAnchor, constant: 20).isActive = true
+        myProfileImgView.widthAnchor.constraint(equalToConstant: 31).isActive = true
+        myProfileImgView.heightAnchor.constraint(equalToConstant: 31).isActive = true
+        
+        myProfileImgLabel.centerXAnchor.constraint(equalTo: myProfileImgView.centerXAnchor, constant: 0).isActive = true
+        myProfileImgLabel.centerYAnchor.constraint(equalTo: myProfileImgView.centerYAnchor, constant: 0).isActive = true
+        
+        myRankNumLabel.centerYAnchor.constraint(equalTo: myRankingContainer.centerYAnchor, constant: -10).isActive = true
+        myRankNumLabel.leadingAnchor.constraint(equalTo: myProfileImgView.trailingAnchor, constant: 10).isActive = true
+        
+        myNameLabel.topAnchor.constraint(equalTo: myRankNumLabel.bottomAnchor, constant: 2).isActive = true
+        myNameLabel.leadingAnchor.constraint(equalTo: myProfileImgView.trailingAnchor, constant: 10).isActive = true
+        
+        myLifespanLabel.centerYAnchor.constraint(equalTo: myRankingContainer.centerYAnchor, constant: 0).isActive = true
+        myLifespanLabel.trailingAnchor.constraint(equalTo: myRankingContainer.trailingAnchor, constant: -10).isActive = true
+        
+        ageRangePickButton.topAnchor.constraint(equalTo: myRankingContainer.bottomAnchor, constant: 7).isActive = true
         ageRangePickButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
         ageRangePickButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 10.5).isActive = true
         ageRangePickButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
-        startPtPickButton.topAnchor.constraint(equalTo: myRankingView.bottomAnchor, constant: 7).isActive = true
+        startPtPickButton.topAnchor.constraint(equalTo: myRankingContainer.bottomAnchor, constant: 7).isActive = true
         startPtPickButton.leadingAnchor.constraint(equalTo: ageRangePickButton.trailingAnchor, constant: 7).isActive = true
         startPtPickButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 10.5).isActive = true
         startPtPickButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
-        headerRankLabel.topAnchor.constraint(equalTo: ageRangePickButton.bottomAnchor, constant: 10).isActive = true
-        headerRankLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
+        headerRankLabel.topAnchor.constraint(equalTo: ageRangePickButton.bottomAnchor, constant: 15).isActive = true
+        headerRankLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 40).isActive = true
         
-        rankingTableView.topAnchor.constraint(equalTo: headerRankLabel.bottomAnchor, constant: 0).isActive = true
+        headerLifespanLabel.topAnchor.constraint(equalTo: ageRangePickButton.bottomAnchor, constant: 15).isActive = true
+        headerLifespanLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
+        
+        rankingTableView.topAnchor.constraint(equalTo: headerRankLabel.bottomAnchor, constant: 8).isActive = true
         rankingTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         rankingTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         rankingTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
@@ -298,6 +384,69 @@ extension RankingViewController {
         }) { (rankingSet) in
             self.rankings = rankingSet.rankings
             self.rankingTableView.reloadData()
+        }
+    }
+    
+    private func loadMyRanking() {
+        let service = Service(lang: lang)
+        service.getARanking(ageRange: 1, popoverAlert: { (message) in
+            self.retryFunction = self.loadMyRanking
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.loadMyRanking()
+        }) { (ranking) in
+            if ranking.photo_name != nil && ranking.color_code == 0 {
+                let url = "\(URI.host)\(URI.avatar)/\(ranking.avatar_id)/profile/photo/\(ranking.photo_name!)"
+                Alamofire.request(url).responseImage { response in
+                    if let data = response.data {
+                        self.myProfileImgView.image = UIImage(data: data)
+                        UIView.transition(with: self.myProfileImgLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                            self.myProfileImgLabel.textColor = .clear
+                        })
+                    }
+                }
+            } else {
+                let firstName = ranking.first_name
+                let index = firstName.index(firstName.startIndex, offsetBy: 0)
+                self.myProfileImgLabel.text = String(firstName[index])
+                self.myProfileImgLabel.textColor = .white
+                self.myProfileImgView.backgroundColor = getProfileUIColor(key: ranking.color_code)
+            }
+            self.myRankNumLabel.text = "#\(ranking.rank_num)"
+            self.myNameLabel.text = "\(ranking.first_name) \(ranking.last_name)"
+            let year = ranking.full_lifespan / 365
+            let days = ranking.full_lifespan % 365
+            self.myLifespanLabel.text = "\(year)Y \(days)D"
+            
+            if ranking.rank_num <= 100 {
+                self.myRankNumLabel.textColor = .dodgerBlue
+                self.myNameLabel.textColor = .dodgerBlue
+                self.myLifespanLabel.textColor = .dodgerBlue
+            } else if ranking.rank_num <= 200 {
+                self.myRankNumLabel.textColor = .mediumSeaGreen
+                self.myNameLabel.textColor = .mediumSeaGreen
+                self.myLifespanLabel.textColor = .mediumSeaGreen
+            } else if ranking.rank_num <= 300 {
+               self.myRankNumLabel.textColor = .webOrange
+               self.myNameLabel.textColor = .webOrange
+               self.myLifespanLabel.textColor = .webOrange
+            } else if ranking.rank_num <= 300 {
+                self.myRankNumLabel.textColor = .webOrange
+                self.myNameLabel.textColor = .webOrange
+                self.myLifespanLabel.textColor = .webOrange
+            } else if ranking.rank_num <= 400 {
+               self.myRankNumLabel.textColor = .tomato
+               self.myNameLabel.textColor = .tomato
+               self.myLifespanLabel.textColor = .tomato
+            } else if ranking.rank_num <=  500 {
+                self.myRankNumLabel.textColor = .hex_a45fac
+                self.myNameLabel.textColor = .hex_a45fac
+                self.myLifespanLabel.textColor = .hex_a45fac
+            } else {
+                self.myRankNumLabel.textColor = .dimGray
+                self.myNameLabel.textColor = .dimGray
+                self.myLifespanLabel.textColor = .dimGray
+            }
         }
     }
 }
