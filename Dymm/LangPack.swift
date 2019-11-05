@@ -12,6 +12,7 @@ struct LangPack {
     var currentLanguageId: Int!
     
     var titleAge: String!
+    var titleAgeGroup: String!
     var titleAll: String!
     var titleAvgScoreWeek: String!
     var titleAvgScoreMonth: String!
@@ -73,6 +74,8 @@ struct LangPack {
     var titlePhotolibrary: String!
     var titleProfile: String!
     var titleProfileUpper: String!
+    var titleRanking: String!
+    var titleReLifespanAndAge: String!
     var titleRetry: String!
     var titleSearch: String!
     var titleSend: String!
@@ -83,6 +86,7 @@ struct LangPack {
     var titleSorry: String!
     var titleSpread: String!
     var titleStartDate: String!
+    var titleStartingPoint: String!
     var titleStay: String!
     var titleSubmit: String!
     var titleSubscribe: String!
@@ -163,6 +167,13 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "AGE"
             case LanguageId.kor: return "나이"
+            case LanguageId.jpn: return ""
+            default: fatalError()}
+        }()
+        self.titleAgeGroup = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Age Group"
+            case LanguageId.kor: return "나이 그룹"
             case LanguageId.jpn: return ""
             default: fatalError()}
         }()
@@ -542,6 +553,18 @@ struct LangPack {
             case LanguageId.kor: return "프로필"
             default: fatalError()}
         }()
+        self.titleRanking = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Ranking"
+            case LanguageId.kor: return "랭킹"
+            default: fatalError()}
+        }()
+        self.titleReLifespanAndAge = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Remaining lifespan + Age"
+            case LanguageId.kor: return "남은 수명 + 나이"
+            default: fatalError()}
+        }()
         self.titleRetry = {
             switch currentLanguageId {
             case LanguageId.eng: return "Retry"
@@ -600,6 +623,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Start date"
             case LanguageId.kor: return "시작 일자"
+            default: fatalError()}
+        }()
+        self.titleStartingPoint = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Range of Ranking"
+            case LanguageId.kor: return "랭킹 범위"
             default: fatalError()}
         }()
         self.titleStay = {
@@ -771,7 +800,7 @@ struct LangPack {
         }()
         self.msgLogComplete = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Has been successfully recored!\n\nWant to back Home?"
+            case LanguageId.eng: return "Successfully recorded!\n\nWant to back Home?"
             case LanguageId.kor: return "성공적으로 기록되었습니다!\n\n홈으로 이동하시겠습니까?"
             default: fatalError()}
         }()
@@ -955,6 +984,35 @@ struct LangHelper {
         case "Oct": return "10월"
         case "Nov": return "11월"
         case "Dec": return "12월"
+        default: fatalError()}
+    }
+    
+    static func getStartingPickName(key: Int) -> String {
+        switch key {
+        case 1: return "#1 ~ "
+        case 2: return "#100 ~ "
+        case 3: return "#500 ~ "
+        case 4: return "#1000 ~ "
+        default: fatalError()}
+    }
+    
+    static func getAgeGroupEngPickName(key: Int) -> String {
+        switch key {
+        case 1: return "All Ages"
+        case 2: return "   ~ 30"
+        case 3: return "30 ~ 50"
+        case 4: return "50 ~ 70"
+        case 5: return "70 ~   "
+        default: fatalError()}
+    }
+    
+    static func getAgeGroupKorPickName(key: Int) -> String {
+        switch key {
+        case 1: return "모든 나이"
+        case 2: return "   ~ 30"
+        case 3: return "30 ~ 50"
+        case 4: return "50 ~ 70"
+        case 5: return "70 ~   "
         default: fatalError()}
     }
 }

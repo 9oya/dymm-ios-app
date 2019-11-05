@@ -616,7 +616,7 @@ struct Service {
         }
     }
     
-    func getRankings(ageRange: Int, startPoint: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ rankingSet: CustomModel.RankingSet) -> Void) {
+    func getRankings(ageRange: Int, startPoint: Int, pageNum: Int, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ rankingSet: CustomModel.RankingSet) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -624,7 +624,7 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)"
         ]
-        Alamofire.request("\(URI.host)\(URI.avatar)/ranking/\(ageRange)/\(startPoint)", method: .get, headers: headers)
+        Alamofire.request("\(URI.host)\(URI.avatar)/ranking/\(ageRange)/\(startPoint)/\(pageNum)", method: .get, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {

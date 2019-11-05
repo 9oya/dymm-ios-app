@@ -683,7 +683,12 @@ extension HomeViewController {
         }) { (lifeSpan) in
             let year = lifeSpan / 365
             let days = lifeSpan % 365
-            self.lifespanLabel.text = "\(year)Y \(days)D"
+            switch self.lang.currentLanguageId {
+            case LanguageId.eng:
+                self.lifespanLabel.text = "\(year)Y \(days)D"
+            case LanguageId.kor:
+                self.lifespanLabel.text = "\(year)년 \(days)일"
+            default: fatalError()}
             self.lifespanMsgLabel.textColor = .mediumSeaGreen
             self.lifespanMsgLabel.text = self.lang.msgLifeSpan
         }

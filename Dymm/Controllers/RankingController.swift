@@ -20,13 +20,13 @@ class RankingViewController: UIViewController {
     var rankingTableView: UITableView!
     
     // UIPickerView
-    var ageRangePickerView: UIPickerView!
-    var startPtPickerView: UIPickerView!
+    var ageGroupPickerView: UIPickerView!
+    var startingPickerView: UIPickerView!
     
     // UIButton
     var homeButton: UIButton!
-    var ageRangePickButton: UIButton!
-    var startPtPickButton: UIButton!
+    var ageGroupPickButton: UIButton!
+    var startingPickButton: UIButton!
     
     // UILabel
     var headerRankLabel: UILabel!
@@ -45,6 +45,15 @@ class RankingViewController: UIViewController {
     
 //    var myRanking:
     var rankings: [CustomModel.Ranking]?
+    var lastContentOffset: CGFloat = 0.0
+    var isScrollToLoading: Bool = false
+    var currPageNum: Int = 1
+    var minimumCnt: Int = 15
+    
+    var startingPickKeys = [1, 2, 3, 4]
+    var ageGroupPickKeys = [1, 2, 3, 4, 5]
+    var selectedStartingKey = 1
+    var selectedAgeGroupKey = 1
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,21 +74,38 @@ class RankingViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    @objc func alertAgeRanePicker() {
-        let alert = UIAlertController(title: lang.titleCondScore, message: "\n\n\n\n\n\n\n\n\n\n", preferredStyle: .alert)
+    @objc func alertStartingPicker() {
+        let alert = UIAlertController(title: lang.titleStartingPoint, message: "\n\n\n\n\n\n\n\n\n\n", preferredStyle: .alert)
         alert.isModalInPopover = true
-//        if let condScore = selectedLogGroup?.cond_score {
-//            condScorePickerView.selectRow(10 - condScore, inComponent: 0, animated: false)
-//        } else {
-//            condScorePickerView.selectRow(3, inComponent: 0, animated: false)
-//            selectedCondScore = 7
-//        }
-//        alert.view.addSubview(condScorePickerView)
-//        condScorePickerView.widthAnchor.constraint(equalTo: alert.view.widthAnchor, constant: 0).isActive = true
-//        alert.addAction(UIAlertAction(title: lang.titleClose, style: .cancel) { _ in })
-//        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
-//            self.updateLogGroupCondScore()
-//        })
+        startingPickerView.selectRow(selectedStartingKey - 1, inComponent: 0, animated: false)
+        alert.view.addSubview(startingPickerView)
+        startingPickerView.widthAnchor.constraint(equalTo: alert.view.widthAnchor, constant: 0).isActive = true
+        alert.addAction(UIAlertAction(title: lang.titleClose, style: .cancel) { _ in })
+        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
+            self.startingPickButton.setTitle(LangHelper.getStartingPickName(key: self.selectedStartingKey), for: .normal)
+            self.loadRankings()
+        })
+        alert.view.tintColor = .mediumSeaGreen
+        self.present(alert, animated: true, completion: nil )
+    }
+    
+    @objc func alertAgeGroupPicker() {
+        let alert = UIAlertController(title: lang.titleAgeGroup, message: "\n\n\n\n\n\n\n\n\n\n", preferredStyle: .alert)
+        alert.isModalInPopover = true
+        ageGroupPickerView.selectRow(selectedAgeGroupKey - 1, inComponent: 0, animated: false)
+        alert.view.addSubview(ageGroupPickerView)
+        ageGroupPickerView.widthAnchor.constraint(equalTo: alert.view.widthAnchor, constant: 0).isActive = true
+        alert.addAction(UIAlertAction(title: lang.titleClose, style: .cancel) { _ in })
+        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
+            switch self.lang.currentLanguageId {
+            case LanguageId.eng:
+                self.ageGroupPickButton.setTitle(LangHelper.getAgeGroupEngPickName(key: self.selectedAgeGroupKey), for: .normal)
+            case LanguageId.kor:
+                self.ageGroupPickButton.setTitle(LangHelper.getAgeGroupKorPickName(key: self.selectedAgeGroupKey), for: .normal)
+            default: fatalError()}
+            self.loadMyRanking()
+            self.loadRankings()
+        })
         alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil )
     }
@@ -130,7 +156,12 @@ extension RankingViewController: UITableViewDataSource, UITableViewDelegate {
         cell.nameLabel.text = "\(ranking.first_name) \(ranking.last_name)"
         let year = ranking.full_lifespan / 365
         let days = ranking.full_lifespan % 365
-        cell.lifespanLabel.text = "\(year)Y \(days)D"
+        switch self.lang.currentLanguageId {
+        case LanguageId.eng:
+            cell.lifespanLabel.text = "\(year)Y \(days)D"
+        case LanguageId.kor:
+            cell.lifespanLabel.text = "\(year)년 \(days)일"
+        default: fatalError()}
         
         if ranking.rank_num <= 100 {
             cell.rankNumLabel.textColor = .dodgerBlue
@@ -173,26 +204,93 @@ extension RankingViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 67
     }
+    
+    // MARK: - UIScrollViewDelegate
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard let _rankings = rankings else {
+            return
+        }
+        
+        if lastContentOffset > scrollView.contentOffset.y {
+            // If scolled up
+            return
+        }
+        if scrollView.contentSize.height < 0 {
+            // If view did initialized
+            return
+        } else {
+            lastContentOffset = scrollView.contentOffset.y
+        }
+        if (scrollView.frame.size.height + scrollView.contentOffset.y) > (scrollView.contentSize.height - 70) {
+            if _rankings.count == minimumCnt {
+                isScrollToLoading = true
+                currPageNum += 1
+                minimumCnt += 15
+                loadRankings()
+            }
+        }
+    }
 }
 
-//extension RankingViewController: UIPickerViewDataSource, UIPickerViewDelegate {
-//    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-//        <#code#>
-//    }
-//
-//    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-//        if pickerView == startPtPickerView {
-//
-//        } else if pickerView == ageRangePickerView {
-//           let label = UILabel(frame: CGRect(x: pickerView.bounds.midX - 15, y: 0, width: 20, height: 40))
-//           label.textAlignment = .center
-//           label.text = "\(condScores[9 - row])"
-//           return label
-//       } else {
-//           fatalError()
-//       }
-//    }
-//}
+extension RankingViewController: UIPickerViewDataSource, UIPickerViewDelegate {
+    
+    // MARK: - UIPickerViewDataSource
+    
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        switch pickerView {
+        case startingPickerView:
+            return startingPickKeys.count
+        case ageGroupPickerView:
+            return ageGroupPickKeys.count
+        default:
+            fatalError()
+        }
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
+        switch pickerView {
+        case startingPickerView:
+            let label = UILabel(frame: CGRect(x: pickerView.bounds.midX - 15, y: 0, width: 150, height: 40))
+            label.textAlignment = .center
+            label.text = LangHelper.getStartingPickName(key: row + 1)
+            return label
+        case ageGroupPickerView:
+            let label = UILabel(frame: CGRect(x: pickerView.bounds.midX - 15, y: 0, width: 150, height: 40))
+            label.textAlignment = .center
+            switch self.lang.currentLanguageId {
+            case LanguageId.eng:
+                label.text = LangHelper.getAgeGroupEngPickName(key: row + 1)
+            case LanguageId.kor:
+                label.text = LangHelper.getAgeGroupKorPickName(key: row + 1)
+            default: fatalError()}
+            return label
+        default:
+            fatalError()
+        }
+    }
+    
+    // MARK: UIPickerViewDelegate
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        switch pickerView {
+        case startingPickerView:
+            selectedStartingKey = startingPickKeys[row]
+        case ageGroupPickerView:
+            selectedAgeGroupKey = ageGroupPickKeys[row]
+        default:
+            fatalError()
+        }
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+        return 40
+    }
+}
 
 extension RankingViewController {
     private func setupLayout() {
@@ -222,7 +320,7 @@ extension RankingViewController {
             _label.font = .systemFont(ofSize: 14, weight: .regular)
             _label.textAlignment = .left
             _label.textColor = .lightGray
-            _label.text = "#Ranking"
+            _label.text = "#\(lang.titleRanking!)"
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -231,7 +329,7 @@ extension RankingViewController {
             _label.font = .systemFont(ofSize: 14, weight: .regular)
             _label.textAlignment = .right
             _label.textColor = .lightGray
-            _label.text = "Remaining lifespan + Age"
+            _label.text = lang.titleReLifespanAndAge
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -243,26 +341,31 @@ extension RankingViewController {
             _tableView.translatesAutoresizingMaskIntoConstraints = false
             return _tableView
         }()
-        ageRangePickButton = {
+        ageGroupPickButton = {
             let _button = UIButton(type: .system)
             _button.setTitleColor(.black, for: .normal)
-            _button.setTitle("All Age", for: .normal)
+            switch self.lang.currentLanguageId {
+            case LanguageId.eng:
+                _button.setTitle(LangHelper.getAgeGroupEngPickName(key: self.selectedAgeGroupKey), for: .normal)
+            case LanguageId.kor:
+                _button.setTitle(LangHelper.getAgeGroupKorPickName(key: self.selectedAgeGroupKey), for: .normal)
+            default: fatalError()}
             _button.titleLabel?.font = .systemFont(ofSize: 15)
             _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(alertAgeRanePicker), for: .touchUpInside)
+            _button.addTarget(self, action: #selector(alertAgeGroupPicker), for: .touchUpInside)
             _button.backgroundColor = .white
             _button.layer.cornerRadius = 10.0
             _button.addShadowView()
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        startPtPickButton = {
+        startingPickButton = {
             let _button = UIButton(type: .system)
             _button.setTitleColor(.black, for: .normal)
-            _button.setTitle("#1 ~ ", for: .normal)
+            _button.setTitle(LangHelper.getStartingPickName(key: selectedStartingKey), for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 15)
             _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(alertAgeRanePicker), for: .touchUpInside)
+            _button.addTarget(self, action: #selector(alertStartingPicker), for: .touchUpInside)
             _button.backgroundColor = .white
             _button.layer.cornerRadius = 10.0
             _button.addShadowView()
@@ -310,15 +413,29 @@ extension RankingViewController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
+        startingPickerView = {
+            let _pickerView = UIPickerView(frame: CGRect(x: 5, y: 20, width: 250, height: 140))
+            _pickerView.translatesAutoresizingMaskIntoConstraints = false
+            return _pickerView
+        }()
+        ageGroupPickerView = {
+            let _pickerView = UIPickerView(frame: CGRect(x: 5, y: 20, width: 250, height: 140))
+            _pickerView.translatesAutoresizingMaskIntoConstraints = false
+            return _pickerView
+        }()
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
         rankingTableView.dataSource = self
         rankingTableView.delegate = self
+        startingPickerView.dataSource = self
+        startingPickerView.delegate = self
+        ageGroupPickerView.dataSource = self
+        ageGroupPickerView.delegate = self
         
         // Setup subviews
         view.addSubview(myRankingContainer)
-        view.addSubview(ageRangePickButton)
-        view.addSubview(startPtPickButton)
+        view.addSubview(ageGroupPickButton)
+        view.addSubview(startingPickButton)
         view.addSubview(headerRankLabel)
         view.addSubview(headerLifespanLabel)
         view.addSubview(rankingTableView)
@@ -352,20 +469,20 @@ extension RankingViewController {
         myLifespanLabel.centerYAnchor.constraint(equalTo: myRankingContainer.centerYAnchor, constant: 0).isActive = true
         myLifespanLabel.trailingAnchor.constraint(equalTo: myRankingContainer.trailingAnchor, constant: -10).isActive = true
         
-        ageRangePickButton.topAnchor.constraint(equalTo: myRankingContainer.bottomAnchor, constant: 7).isActive = true
-        ageRangePickButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
-        ageRangePickButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 10.5).isActive = true
-        ageRangePickButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        ageGroupPickButton.topAnchor.constraint(equalTo: myRankingContainer.bottomAnchor, constant: 7).isActive = true
+        ageGroupPickButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
+        ageGroupPickButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 10.5).isActive = true
+        ageGroupPickButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
-        startPtPickButton.topAnchor.constraint(equalTo: myRankingContainer.bottomAnchor, constant: 7).isActive = true
-        startPtPickButton.leadingAnchor.constraint(equalTo: ageRangePickButton.trailingAnchor, constant: 7).isActive = true
-        startPtPickButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 10.5).isActive = true
-        startPtPickButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        startingPickButton.topAnchor.constraint(equalTo: myRankingContainer.bottomAnchor, constant: 7).isActive = true
+        startingPickButton.leadingAnchor.constraint(equalTo: ageGroupPickButton.trailingAnchor, constant: 7).isActive = true
+        startingPickButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 10.5).isActive = true
+        startingPickButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
-        headerRankLabel.topAnchor.constraint(equalTo: ageRangePickButton.bottomAnchor, constant: 15).isActive = true
-        headerRankLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 40).isActive = true
+        headerRankLabel.topAnchor.constraint(equalTo: ageGroupPickButton.bottomAnchor, constant: 15).isActive = true
+        headerRankLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 50).isActive = true
         
-        headerLifespanLabel.topAnchor.constraint(equalTo: ageRangePickButton.bottomAnchor, constant: 15).isActive = true
+        headerLifespanLabel.topAnchor.constraint(equalTo: ageGroupPickButton.bottomAnchor, constant: 15).isActive = true
         headerLifespanLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
         
         rankingTableView.topAnchor.constraint(equalTo: headerRankLabel.bottomAnchor, constant: 8).isActive = true
@@ -376,12 +493,21 @@ extension RankingViewController {
     
     private func loadRankings() {
         let service = Service(lang: lang)
-        service.getRankings(ageRange: 1, startPoint: 1, popoverAlert: { (message) in
+        service.getRankings(ageRange: selectedAgeGroupKey, startPoint: selectedStartingKey, pageNum: currPageNum, popoverAlert: { (message) in
             self.retryFunction = self.loadRankings
             self.alertError(message)
         }, tokenRefreshCompletion: {
             self.loadRankings()
         }) { (rankingSet) in
+            if self.isScrollToLoading {
+                let newRankings = rankingSet.rankings
+                self.isScrollToLoading = false
+                if newRankings.count > 0 {
+                    self.rankings!.append(contentsOf: newRankings)
+                    self.rankingTableView.reloadData()
+                }
+                return
+            }
             self.rankings = rankingSet.rankings
             self.rankingTableView.reloadData()
         }
@@ -389,22 +515,22 @@ extension RankingViewController {
     
     private func loadMyRanking() {
         let service = Service(lang: lang)
-        service.getARanking(ageRange: 1, popoverAlert: { (message) in
+        service.getARanking(ageRange: selectedAgeGroupKey, popoverAlert: { (message) in
             self.retryFunction = self.loadMyRanking
             self.alertError(message)
         }, tokenRefreshCompletion: {
             self.loadMyRanking()
         }) { (ranking) in
             if ranking.photo_name != nil && ranking.color_code == 0 {
-                let url = "\(URI.host)\(URI.avatar)/\(ranking.avatar_id)/profile/photo/\(ranking.photo_name!)"
-                Alamofire.request(url).responseImage { response in
-                    if let data = response.data {
-                        self.myProfileImgView.image = UIImage(data: data)
-                        UIView.transition(with: self.myProfileImgLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                            self.myProfileImgLabel.textColor = .clear
-                        })
-                    }
-                }
+//                let url = "\(URI.host)\(URI.avatar)/\(ranking.avatar_id)/profile/photo/\(ranking.photo_name!)"
+//                Alamofire.request(url).responseImage { response in
+//                    if let data = response.data {
+//                        self.myProfileImgView.image = UIImage(data: data)
+//                        UIView.transition(with: self.myProfileImgLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
+//                            self.myProfileImgLabel.textColor = .clear
+//                        })
+//                    }
+//                }
             } else {
                 let firstName = ranking.first_name
                 let index = firstName.index(firstName.startIndex, offsetBy: 0)
