@@ -94,6 +94,7 @@ struct LangPack {
     var titleThisMonth: String!
     var titleThisWeek: String!
     var titleVerifCode: String!
+    var titleVerifMail: String!
     var titleWeekdays: [String]!
     var titleYes: String!
     
@@ -105,6 +106,8 @@ struct LangPack {
     var msgAvgScoreUpMonth: ((String) -> String)!
     var msgCameraDisable: String!
     var msgChangePasswordCompl: String!
+    var msgCondScoreNone: String!
+    var msgDateOfBirthNone: String!
     var msgEmptyEmail: String!
     var msgEmptyName: String!
     var msgEmptyPassword: String!
@@ -123,6 +126,7 @@ struct LangPack {
     var msgMismatchConfirmPassword: String!
     var msgNetworkFailure: String!
     var msgShortPassword: String!
+    var msgSignUpYet: String!
     var msgUnauthDuplicatedEmail: String!
     var msgUnauthInvalidEmail: String!
     var msgUnauthInvalidPassword: String!
@@ -380,13 +384,13 @@ struct LangPack {
         self.titleForgotPassword = {
             switch currentLanguageId {
             case LanguageId.eng: return "Forgot password?"
-            case LanguageId.kor: return "패스워드를 잊으셨나요?"
+            case LanguageId.kor: return "비밀번호를 잊으셨나요?"
             default: fatalError()}
         }()
         self.titleForgotPasswordAlert = {
             switch currentLanguageId {
             case LanguageId.eng: return "I forgot my Dymm password"
-            case LanguageId.kor: return "Dymm 패스워드를 분실하였습니다."
+            case LanguageId.kor: return "Dymm 비밀번호를 분실하였습니다."
             default: fatalError()}
         }()
         self.titleGender = {
@@ -490,37 +494,37 @@ struct LangPack {
         self.titlePassword = {
             switch currentLanguageId {
             case LanguageId.eng: return "Password"
-            case LanguageId.kor: return "패스워드"
+            case LanguageId.kor: return "비밀번호"
             default: fatalError()}
         }()
         self.titlePasswordChange = {
             switch currentLanguageId {
             case LanguageId.eng: return "Change Password"
-            case LanguageId.kor: return "패스워드 변경"
+            case LanguageId.kor: return "비밀번호 변경"
             default: fatalError()}
         }()
         self.titlePasswordChangeCompl = {
             switch currentLanguageId {
             case LanguageId.eng: return "Password Change Complete!"
-            case LanguageId.kor: return "패스워드 변경이 완료되었습니다!"
+            case LanguageId.kor: return "비밀번호 변경이 완료되었습니다!"
             default: fatalError()}
         }()
         self.titlePasswordConfirm = {
             switch currentLanguageId {
             case LanguageId.eng: return "Confirm Password"
-            case LanguageId.kor: return "패스워드 확인"
+            case LanguageId.kor: return "비밀번호 확인"
             default: fatalError()}
         }()
         self.titlePasswordNew = {
             switch currentLanguageId {
             case LanguageId.eng: return "New Password"
-            case LanguageId.kor: return "새 패스워드"
+            case LanguageId.kor: return "새 비밀번호"
             default: fatalError()}
         }()
         self.titlePasswordOld = {
             switch currentLanguageId {
             case LanguageId.eng: return "Old Password"
-            case LanguageId.kor: return "이전 패스워드"
+            case LanguageId.kor: return "이전 비밀번호"
             default: fatalError()}
         }()
         self.titlePhoneNum = {
@@ -585,7 +589,7 @@ struct LangPack {
         }()
         self.titleSendAgain = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Send Again"
+            case LanguageId.eng: return "Send it again"
             case LanguageId.kor: return "다시 보내기"
             default: fatalError()}
         }()
@@ -673,6 +677,12 @@ struct LangPack {
             case LanguageId.kor: return "인증 코드"
             default: fatalError()}
         }()
+        self.titleVerifMail = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Verify your email address."
+            case LanguageId.kor: return "이메일 주소를 확인해 주세요."
+            default: fatalError()}
+        }()
         self.titleWeekdays = {
             switch currentLanguageId {
             case LanguageId.eng:
@@ -742,6 +752,18 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Your new password has been successfully changed."
             case LanguageId.kor: return "당신의 새 패스워드가 성공적으로 변경되었습니다."
+            default: fatalError()}
+        }()
+        self.msgCondScoreNone = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "You don't have any \ncondition score log yet."
+            case LanguageId.kor: return "당신의 컨디션 점수가 아직 기록되지 않았습니다."
+            default: fatalError()}
+        }()
+        self.msgDateOfBirthNone = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "You need to fill up your date of birth."
+            case LanguageId.kor: return "당신의 생년월일 이 아직 등록되지 않았습니다."
             default: fatalError()}
         }()
         self.msgEmptyEmail = {
@@ -851,6 +873,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Use 8 characters or more"
             case LanguageId.kor: return "패스워드가 8자리이상 입력되어야 합니다."
+            default: fatalError()}
+        }()
+        self.msgSignUpYet = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "You have not Signed in Dymm."
+            case LanguageId.kor: return "Dymm에 로그인 되지 않았습니다."
             default: fatalError()}
         }()
         self.msgUnauthDuplicatedEmail = {

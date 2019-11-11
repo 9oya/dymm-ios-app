@@ -105,12 +105,13 @@ class CategoryViewController: UIViewController {
     // MARK: - Actions
     
     @objc func alertError(_ message: String) {
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.retryFunction!()
         })
-        alertController.addAction(UIAlertAction(title: lang.titleNo, style: .cancel) { _ in })
-        self.present(alertController, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: lang.titleNo, style: .cancel) { _ in })
+        alert.view.tintColor = .mediumSeaGreen
+        self.present(alert, animated: true, completion: nil)
     }
     
     @objc func alertDatePicker(cond_log_type: Int) {
@@ -135,6 +136,7 @@ class CategoryViewController: UIViewController {
             self.createAConditionLog()
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil))
+        alert.view.tintColor = .mediumSeaGreen
         present(alert, animated: true, completion:{})
     }
     
@@ -161,22 +163,22 @@ class CategoryViewController: UIViewController {
         })
         let height:NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 260)
         alert.view.addConstraint(height)
-        alert.view.tintColor = UIColor.cornflowerBlue
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil )
     }
     
     @objc func alertCompl(_ title: String, _ message: String) {
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.dismiss(animated: true, completion: nil)
         }
         let cancelAction = UIAlertAction(title: lang.titleNo, style: .cancel) { _ in
             _ = self.navigationController?.popViewController(animated: true)
         }
-        alertController.addAction(confirmAction)
-        alertController.addAction(cancelAction)
-        alertController.view.tintColor = UIColor.cornflowerBlue
-        self.present(alertController, animated: true, completion: nil)
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
+        alert.view.tintColor = .mediumSeaGreen
+        self.present(alert, animated: true, completion: nil)
     }
     
     @objc func presentAuthNavigation() {
@@ -634,7 +636,7 @@ extension CategoryViewController {
         }()
         sizePickerContainer = {
             let _view = UIView()
-            _view.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+            _view.backgroundColor = .mediumSeaGreen
             _view.clipsToBounds = true
             _view.layer.cornerRadius = 10
             _view.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]

@@ -18,12 +18,11 @@ class ProfileViewController: UIViewController {
     // UIView
     var blindView: UIView!
     var topBarContainer: UIView!
-    var mailConfContainer: UIView!
+    var verifMailContainer: UIView!
     var infoContainer: UIView!
     var firstNameContainer: UIView!
     var lastNameContainer: UIView!
     var emailContainer: UIView!
-//    var phNumberContainer: UIView!
     var introContainer: UIView!
     var colorContainer: UIView!
     
@@ -50,21 +49,20 @@ class ProfileViewController: UIViewController {
     var colorRightButton: UIButton!
     
     // UILabel
+    var verifMailTitleLabel: UILabel!
+    var verifMailMsgLabel: UILabel!
     var infoImageLabel: UILabel!
-    var mailConfMsgLabel: UILabel!
     var firstNameGuideLabel: UILabel!
     var firstNameLabel: UILabel!
     var lastNameGuideLabel: UILabel!
     var lastNameLabel: UILabel!
     var emailGuideLabel: UILabel!
     var emailLabel: UILabel!
-//    var phNumberGuideLabel: UILabel!
-//    var phNumberLabel: UILabel!
-//    var phNumberPlaceHolderLabel: UILabel!
     var introGuideLabel: UILabel!
     var introLabel: UILabel!
     var introPlaceHolderLabel: UILabel!
     var colorTitleLabel: UILabel!
+    
     
     // Non-view properties
     var lang: LangPack!
@@ -708,8 +706,15 @@ extension ProfileViewController {
         signOutButton.addTarget(self, action: #selector(signOutButtonTapped), for: .touchUpInside)
         closeButton = getCloseButton()
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
-        mailConfAddressButton = getBasicTextButton(.mediumSeaGreen)
-        mailConfAddressButton.addTarget(self, action: #selector(alertMailConfAddressTextField), for: .touchUpInside)
+        mailConfAddressButton = {
+            let _button = UIButton(type: .system)
+            _button.titleLabel?.font = .systemFont(ofSize: 16)
+            _button.setTitleColor(.mediumSeaGreen, for: .normal)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(alertMailConfAddressTextField), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
         sendAgainButton = getBasicTextButton(.mediumSeaGreen)
         sendAgainButton.addTarget(self, action: #selector(sendMailAgainBtnTapped), for: .touchUpInside)
         firstNameContainer = getProfileLabelContainerView()
@@ -718,22 +723,17 @@ extension ProfileViewController {
         lastNameContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertLastNameTextField(_:))))
         emailContainer = getProfileLabelContainerView()
         emailContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertEmailTextField(_:))))
-//        phNumberContainer = getProfileLabelContainerView()
-//        phNumberContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertPhoneNumberTextField(_:))))
         introContainer = getProfileLabelContainerView()
         introContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertIntroTextView(_:))))
         firstNameGuideLabel = getProfileGuideLabel()
         lastNameGuideLabel = getProfileGuideLabel()
         emailGuideLabel = getProfileGuideLabel()
-//        phNumberGuideLabel = getProfileGuideLabel()
         introGuideLabel = getProfileGuideLabel()
         firstNameLabel = getProfileLabel()
         lastNameLabel = getProfileLabel()
         emailLabel = getProfileLabel()
-//        phNumberLabel = getProfileLabel()
-//        phNumberPlaceHolderLabel = getProfilePlaceHolderLabel()
         introPlaceHolderLabel = getProfilePlaceHolderLabel()
-        mailConfContainer = {
+        verifMailContainer = {
             let _view = UIView()
             _view.backgroundColor = .white
             _view.layer.cornerRadius = 10
@@ -742,10 +742,19 @@ extension ProfileViewController {
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
-        mailConfMsgLabel = {
+        verifMailTitleLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 20, weight: .regular)
+            _label.textColor = UIColor.black
+            _label.textAlignment = .center
+            _label.text = lang.titleVerifMail
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        verifMailMsgLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 15, weight: .regular)
-            _label.textColor = .lightSteelBlue
+            _label.textColor = .gray
             _label.textAlignment = .center
             _label.numberOfLines = 2
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -855,7 +864,7 @@ extension ProfileViewController {
         
         // Setup subviews
         view.addSubview(topBarContainer)
-        view.addSubview(mailConfContainer)
+        view.addSubview(verifMailContainer)
         view.addSubview(infoContainer)
         view.addSubview(tagCollection)
         view.addSubview(loadingImageView)
@@ -864,16 +873,16 @@ extension ProfileViewController {
         
         topBarContainer.addSubview(signOutButton)
         
-        mailConfContainer.addSubview(mailConfMsgLabel)
-        mailConfContainer.addSubview(mailConfAddressButton)
-        mailConfContainer.addSubview(sendAgainButton)
+        verifMailContainer.addSubview(verifMailTitleLabel)
+        verifMailContainer.addSubview(verifMailMsgLabel)
+        verifMailContainer.addSubview(mailConfAddressButton)
+        verifMailContainer.addSubview(sendAgainButton)
         
         infoContainer.addSubview(infoImageView)
         infoContainer.addSubview(infoImageLabel)
         infoContainer.addSubview(firstNameContainer)
         infoContainer.addSubview(lastNameContainer)
         infoContainer.addSubview(emailContainer)
-//        infoContainer.addSubview(phNumberContainer)
         infoContainer.addSubview(introContainer)
         
         firstNameContainer.addSubview(firstNameGuideLabel)
@@ -882,9 +891,6 @@ extension ProfileViewController {
         lastNameContainer.addSubview(lastNameLabel)
         emailContainer.addSubview(emailGuideLabel)
         emailContainer.addSubview(emailLabel)
-//        phNumberContainer.addSubview(phNumberGuideLabel)
-//        phNumberContainer.addSubview(phNumberLabel)
-//        phNumberContainer.addSubview(phNumberPlaceHolderLabel)
         introContainer.addSubview(introGuideLabel)
         introContainer.addSubview(introLabel)
         introContainer.addSubview(introPlaceHolderLabel)
@@ -912,20 +918,24 @@ extension ProfileViewController {
         signOutButton.trailingAnchor.constraint(equalTo: topBarContainer.trailingAnchor, constant: -20).isActive = true
         signOutButton.bottomAnchor.constraint(equalTo: topBarContainer.bottomAnchor, constant: 0).isActive = true
         
-        mailConfContainer.topAnchor.constraint(equalTo: topBarContainer.bottomAnchor, constant: 7).isActive = true
-        mailConfContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
-        mailConfContainer.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        mailConfContainer.heightAnchor.constraint(equalToConstant: 220).isActive = true
+        verifMailContainer.topAnchor.constraint(equalTo: topBarContainer.bottomAnchor, constant: 7).isActive = true
+        verifMailContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        verifMailContainer.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        verifMailContainer.heightAnchor.constraint(equalToConstant: 220).isActive = true
         
-        mailConfMsgLabel.leadingAnchor.constraint(equalTo: mailConfContainer.leadingAnchor, constant: 20).isActive = true
-        mailConfMsgLabel.trailingAnchor.constraint(equalTo: mailConfContainer.trailingAnchor, constant: -20).isActive = true
-        mailConfMsgLabel.centerYAnchor.constraint(equalTo: mailConfContainer.centerYAnchor, constant: -40).isActive = true
+        verifMailTitleLabel.topAnchor.constraint(equalTo: verifMailContainer.topAnchor, constant: 20).isActive = true
+        verifMailTitleLabel.leadingAnchor.constraint(equalTo: verifMailContainer.leadingAnchor, constant: 0).isActive = true
+        verifMailTitleLabel.trailingAnchor.constraint(equalTo: verifMailContainer.trailingAnchor, constant: 0).isActive = true
         
-        sendAgainButton.bottomAnchor.constraint(equalTo: mailConfContainer.bottomAnchor, constant: -15).isActive = true
-        sendAgainButton.trailingAnchor.constraint(equalTo: mailConfContainer.trailingAnchor, constant: -15).isActive = true
+        verifMailMsgLabel.topAnchor.constraint(equalTo: verifMailTitleLabel.bottomAnchor, constant: 20).isActive = true
+        verifMailMsgLabel.leadingAnchor.constraint(equalTo: verifMailContainer.leadingAnchor, constant: 0).isActive = true
+        verifMailMsgLabel.trailingAnchor.constraint(equalTo: verifMailContainer.trailingAnchor, constant: 0).isActive = true
+        
+        sendAgainButton.bottomAnchor.constraint(equalTo: verifMailContainer.bottomAnchor, constant: -15).isActive = true
+        sendAgainButton.trailingAnchor.constraint(equalTo: verifMailContainer.trailingAnchor, constant: -15).isActive = true
         
         mailConfAddressButton.bottomAnchor.constraint(equalTo: sendAgainButton.topAnchor, constant: -15).isActive = true
-        mailConfAddressButton.centerXAnchor.constraint(equalTo: mailConfContainer.centerXAnchor, constant: 0).isActive = true
+        mailConfAddressButton.centerXAnchor.constraint(equalTo: verifMailContainer.centerXAnchor, constant: 0).isActive = true
         
         infoContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt)).isActive = true
         infoContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
@@ -1054,7 +1064,7 @@ extension ProfileViewController {
     
     private func setupLangProperties() {
         navigationItem.title = lang.titleProfile
-        mailConfMsgLabel.text = lang.msgMailNotConfirmedYet
+        verifMailMsgLabel.text = lang.msgMailNotConfirmedYet
         firstNameGuideLabel.text = lang.titleFirstNameUpper
         lastNameGuideLabel.text = lang.titleLastNameUpper
         emailGuideLabel.text = lang.titleEmailUpper
@@ -1080,10 +1090,10 @@ extension ProfileViewController {
             self.alertError(message)
         }, emailNotConfirmed: { (email) in
             self.newMailAddress = email
-            UIView.transition(with: self.mailConfContainer, duration: 0.7, options: .transitionCrossDissolve, animations: {
+            UIView.transition(with: self.verifMailContainer, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.infoContainer.isHidden = true
                 self.mailConfAddressButton.setTitle(email, for: .normal)
-                self.mailConfContainer.isHidden = false
+                self.verifMailContainer.isHidden = false
                 self.loadingImageView.isHidden = true
             })
         }, tokenRefreshCompletion: {
@@ -1111,17 +1121,6 @@ extension ProfileViewController {
             self.firstNameLabel.text = firstName
             self.lastNameLabel.text = profile.avatar.last_name
             self.emailLabel.text = profile.avatar.email
-//            if let phoneNumber = profile.avatar.ph_number {
-//                self.phNumberLabel.text = phoneNumber
-//                self.phNumberLabel.isHidden = false
-//                self.phNumberGuideLabel.isHidden = false
-//                self.phNumberPlaceHolderLabel.isHidden = true
-//            } else {
-//                self.phNumberLabel.text = nil
-//                self.phNumberLabel.isHidden = true
-//                self.phNumberGuideLabel.isHidden = true
-//                self.phNumberPlaceHolderLabel.isHidden = false
-//            }
             if let introduction = profile.avatar.introudction {
                 self.introLabel.text = introduction
                 self.introLabel.isHidden = false
@@ -1232,13 +1231,13 @@ extension ProfileViewController {
     }
     
     private func sendMailAgain() {
-        UIView.transition(with: mailConfMsgLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            self.mailConfMsgLabel.text = "u/{02059}"
-            self.mailConfMsgLabel.textColor = UIColor.black
+        UIView.transition(with: verifMailMsgLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.verifMailMsgLabel.text = "u/{02059}"
+            self.verifMailMsgLabel.textColor = UIColor.black
             self.mailConfAddressButton.isHidden = true
             self.sendAgainButton.isHidden = true
         })
-        mailConfMsgLabel.startRotating()
+        verifMailMsgLabel.startRotating()
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -1251,10 +1250,10 @@ extension ProfileViewController {
             self.retryFunction = self.sendMailAgain
             self.alertError(message)
         }) {
-            self.mailConfMsgLabel.stopRotating()
+            self.verifMailMsgLabel.stopRotating()
             UIView.animate(withDuration: 0.5, animations: {
-                self.mailConfMsgLabel.text = self.lang.msgMailSendAgainComplete
-                self.mailConfMsgLabel.textColor = UIColor.mediumSeaGreen
+                self.verifMailMsgLabel.text = self.lang.msgMailSendAgainComplete
+                self.verifMailMsgLabel.textColor = UIColor.mediumSeaGreen
             })
             UIView.transition(with: self.sendAgainButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.mailConfAddressButton.isHidden = false

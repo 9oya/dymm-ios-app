@@ -154,14 +154,19 @@ extension RankingViewController: UITableViewDataSource, UITableViewDelegate {
         }
         cell.rankNumLabel.text = "#\(ranking.rank_num)"
         cell.nameLabel.text = "\(ranking.first_name) \(ranking.last_name)"
-        let year = ranking.full_lifespan / 365
-        let days = ranking.full_lifespan % 365
-        switch self.lang.currentLanguageId {
-        case LanguageId.eng:
-            cell.lifespanLabel.text = "\(year)Y \(days)D"
-        case LanguageId.kor:
-            cell.lifespanLabel.text = "\(year)년 \(days)일"
-        default: fatalError()}
+        
+        if let fullLifespan = ranking.full_lifespan {
+            let year = fullLifespan / 365
+            let days = fullLifespan % 365
+            switch self.lang.currentLanguageId {
+            case LanguageId.eng:
+                cell.lifespanLabel.text = "\(year)Y \(days)D"
+            case LanguageId.kor:
+                cell.lifespanLabel.text = "\(year)년 \(days)일"
+            default: fatalError()}
+        } else {
+            cell.lifespanLabel.text = " "
+        }
         
         if ranking.rank_num <= 100 {
             cell.rankNumLabel.textColor = .dodgerBlue
@@ -540,11 +545,25 @@ extension RankingViewController {
             }
             self.myRankNumLabel.text = "#\(ranking.rank_num)"
             self.myNameLabel.text = "\(ranking.first_name) \(ranking.last_name)"
-            let year = ranking.full_lifespan / 365
-            let days = ranking.full_lifespan % 365
-            self.myLifespanLabel.text = "\(year)Y \(days)D"
             
-            if ranking.rank_num <= 100 {
+            if let fullLifespan = ranking.full_lifespan {
+                let year = fullLifespan / 365
+                let days = fullLifespan % 365
+                switch self.lang.currentLanguageId {
+                case LanguageId.eng:
+                    self.myLifespanLabel.text = "\(year)Y \(days)D"
+                case LanguageId.kor:
+                    self.myLifespanLabel.text = "\(year)년 \(days)일"
+                default: fatalError()}
+            } else {
+                self.myLifespanLabel.text = " "
+            }
+            
+            if ranking.rank_num == 0 {
+                self.myRankNumLabel.textColor = .dimGray
+                self.myNameLabel.textColor = .dimGray
+                self.myLifespanLabel.textColor = .dimGray
+            } else if ranking.rank_num <= 100 {
                 self.myRankNumLabel.textColor = .dodgerBlue
                 self.myNameLabel.textColor = .dodgerBlue
                 self.myLifespanLabel.textColor = .dodgerBlue

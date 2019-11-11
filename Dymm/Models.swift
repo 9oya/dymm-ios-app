@@ -534,7 +534,7 @@ struct CustomModel {
         let date_of_birth: String?
         let photo_name: String?
         let rank_num: Int
-        let full_lifespan: Int
+        let full_lifespan: Int?
         
         enum CodingKeys: String, CodingKey {
             case avatar_id
@@ -558,7 +558,7 @@ struct CustomModel {
             self.date_of_birth = try? valueContainer.decode(String.self, forKey: CodingKeys.date_of_birth)
             self.photo_name = try? valueContainer.decode(String.self, forKey: CodingKeys.photo_name)
             self.rank_num = try valueContainer.decode(Int.self, forKey: CodingKeys.rank_num)
-            self.full_lifespan = try valueContainer.decode(Int.self, forKey: CodingKeys.full_lifespan)
+            self.full_lifespan = try? valueContainer.decode(Int.self, forKey: CodingKeys.full_lifespan)
         }
     }
     

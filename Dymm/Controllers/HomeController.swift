@@ -113,7 +113,7 @@ class HomeViewController: UIViewController {
                 self.ageLabel.text = self.lang.titleAge
                 self.genderLabel.text = self.lang.titleGender
                 
-                self.lifespanMsgLabel.text = "You have not Signed in yet"
+                self.lifespanMsgLabel.text = self.lang.msgSignUpYet
                 self.lifespanLabel.text = ""
                 
                 self.scoreTitleLabel.textColor = getCondScoreColor(0)
@@ -676,9 +676,9 @@ extension HomeViewController {
             self.lifespanMsgLabel.textColor = .webOrange
             switch pattern {
             case UnauthType.scoreNone:
-                self.lifespanMsgLabel.text = "You do not have any \nCondition Score log yet."
+                self.lifespanMsgLabel.text = self.lang.msgCondScoreNone
             case UnauthType.birthNone:
-                self.lifespanMsgLabel.text = "You need to fill \nYour \"Date of birth\" at top right \"Profile\""
+                self.lifespanMsgLabel.text = self.lang.msgDateOfBirthNone
             default: fatalError()}
         }) { (lifeSpan) in
             let year = lifeSpan / 365
