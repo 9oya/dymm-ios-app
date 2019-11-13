@@ -108,6 +108,7 @@ struct LangPack {
     var msgChangePasswordCompl: String!
     var msgCondScoreNone: String!
     var msgDateOfBirthNone: String!
+    var msgDuplicatedEmail: String!
     var msgEmptyEmail: String!
     var msgEmptyName: String!
     var msgEmptyPassword: String!
@@ -764,6 +765,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "You need to fill up your date of birth."
             case LanguageId.kor: return "당신의 생년월일 이 아직 등록되지 않았습니다."
+            default: fatalError()}
+        }()
+        self.msgDuplicatedEmail = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "That email address is already in use. Please try another email."
+            case LanguageId.kor: return "이미 사용중인 이메일 주소 입니다. 다른 이메일을 시도해 보세요."
             default: fatalError()}
         }()
         self.msgEmptyEmail = {

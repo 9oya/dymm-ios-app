@@ -43,7 +43,7 @@ class ProfileViewController: UIViewController {
     // UIButton
     var signOutButton: UIButton!
     var closeButton: UIButton!
-    var mailConfAddressButton: UIButton!
+    var notConfirmedEmailButton: UIButton!
     var sendAgainButton: UIButton!
     var colorLeftButton: UIButton!
     var colorRightButton: UIButton!
@@ -71,7 +71,7 @@ class ProfileViewController: UIViewController {
     var tags: [BaseModel.Tag]?
     var pickedTag: BaseModel.Tag?
     var mailMessage: String?
-    var newMailAddress: String?
+    var notConfirmedEmail: String?
     var avatarInfoTarget: Int?
     var newInfoStr: String?
     var selectedCollectionItem: Int?
@@ -79,6 +79,7 @@ class ProfileViewController: UIViewController {
     var newPassword: String?
     var confPassword: String?
     var isOldPasswordCorrect = true
+    var isNewEmailUnique = true
     var resizedImage: UIImage?
     let colorCodeArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     var selectedColorItem: Int?
@@ -92,13 +93,13 @@ class ProfileViewController: UIViewController {
     // MARK: - Actions
     
     @objc func alertError(_ message: String) {
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
                 self.retryFunction!()
             })
-        alertController.addAction(UIAlertAction(title: lang.titleClose, style: .cancel) { _ in })
-        alertController.view.tintColor = .mediumSeaGreen
-        present(alertController, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: lang.titleClose, style: .cancel) { _ in })
+        alert.view.tintColor = .mediumSeaGreen
+        present(alert, animated: true, completion: nil)
     }
     
     @objc func alertPicker() {
@@ -152,28 +153,8 @@ class ProfileViewController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc func alertMailConfAddressTextField() {
-        let alert = UIAlertController(title: lang.titleEditEmail, message: nil, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
-            if let txtField = alert.textFields?.first, let text = txtField.text {
-                self.newInfoStr = text
-                self.avatarInfoTarget = AvatarInfoTarget.email
-                self.updateAvatarInfo()
-            }
-        }
-        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
-        alert.addTextField { textField in
-            textField.placeholder = self.lang.titleEmail
-            textField.text = self.newMailAddress!
-        }
-        alert.addAction(confirmAction)
-        alert.addAction(cancelAction)
-        alert.view.tintColor = .mediumSeaGreen
-        self.present(alert, animated: true, completion: nil)
-    }
-    
     @objc func sendMailAgainBtnTapped() {
-        sendMailAgain()
+        sendVerifMailAgain()
     }
     
     @objc func alertFirstNameTextField(_ sender: UITapGestureRecognizer? = nil) {
@@ -207,27 +188,29 @@ class ProfileViewController: UIViewController {
     
     @objc func alertLastNameTextField(_ sender: UITapGestureRecognizer? = nil) {
         let alert = UIAlertController(title: lang.titleEditLastName, message: nil, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
-            if let txtField = alert.textFields?.first, let text = txtField.text {
-                self.newInfoStr = text
-                self.avatarInfoTarget = AvatarInfoTarget.lastName
-                self.updateAvatarInfo()
-            }
-        }
-        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
         alert.addTextField { textField in
             textField.autocapitalizationType = UITextAutocapitalizationType.words
             textField.placeholder = self.lang.titleLastName
             textField.text = self.profile!.avatar.last_name
         }
-        alert.addAction(confirmAction)
-        alert.addAction(cancelAction)
+        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
+            if let txtField = alert.textFields?.first, let text = txtField.text {
+                self.newInfoStr = text
+                self.avatarInfoTarget = AvatarInfoTarget.lastName
+                self.updateAvatarInfo()
+            }
+        })
+        alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
         alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
     @objc func alertEmailTextField(_ sender: UITapGestureRecognizer? = nil) {
-        let alert = UIAlertController(title: lang.titleEditEmail, message: nil, preferredStyle: .alert)
+        var title = lang.titleEditEmail
+        if !isNewEmailUnique {
+            title = lang.msgDuplicatedEmail
+        }
+        let alert = UIAlertController(title: title, message: nil, preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let txtField = alert.textFields?.first, let text = txtField.text {
                 self.newInfoStr = text
@@ -235,38 +218,40 @@ class ProfileViewController: UIViewController {
                 self.updateAvatarInfo()
             }
         }
-        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
+        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in
+            UIView.transition(with: self.loadingImageView, duration: 0.7, options: .transitionCrossDissolve, animations: {
+                if self.notConfirmedEmail != nil {
+                    self.verifMailContainer.isHidden = false
+                } else {
+                    self.infoContainer.isHidden = false
+                    self.tagCollection.isHidden = false
+                }
+                self.loadingImageView.isHidden = true
+            })
+        }
         alert.addTextField { textField in
             textField.autocapitalizationType = .none
             textField.keyboardType = .emailAddress
             textField.placeholder = self.lang.titleEmail
-            textField.text = self.profile!.avatar.email
+            if self.notConfirmedEmail != nil {
+                textField.text = self.notConfirmedEmail
+            } else {
+                textField.text = self.profile!.avatar.email
+            }
+            confirmAction.isEnabled = false
+            NotificationCenter.default.addObserver(forName: UITextField.textDidChangeNotification, object: textField, queue: OperationQueue.main) { (notification) in
+                if textField.text!.isValidEmail() {
+                    confirmAction.isEnabled = true
+                } else {
+                    confirmAction.isEnabled = false
+                }
+            }
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
         alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
-    
-//    @objc func alertPhoneNumberTextField(_ sender: UITapGestureRecognizer? = nil) {
-//        let alert = UIAlertController(title: lang.titleEditPhoneNum, message: nil, preferredStyle: .alert)
-//        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
-//            if let txtField = alert.textFields?.first, let text = txtField.text {
-//                self.newInfoStr = text
-//                self.avatarInfoTarget = AvatarInfoTarget.phNumber
-//                self.updateAvatarInfo()
-//            }
-//        }
-//        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
-//        alert.addTextField { textField in
-//            textField.autocapitalizationType = UITextAutocapitalizationType.words
-//            textField.placeholder = self.lang.titlePhoneNum
-//            textField.text = self.profile!.avatar.ph_number ?? nil
-//        }
-//        alert.addAction(confirmAction)
-//        alert.addAction(cancelAction)
-//        self.present(alert, animated: true, completion: nil)
-//    }
     
     @objc func alertIntroTextView(_ sender: UITapGestureRecognizer? = nil) {
         let alert = UIAlertController(title: lang.titleEditIntro, message: nil, preferredStyle: .actionSheet)
@@ -278,28 +263,25 @@ class ProfileViewController: UIViewController {
         }
         controller.view.addSubview(introTextView)
         alert.setValue(controller, forKey: "contentViewController")
-        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
+        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let text = self.introTextView.text {
                 self.newInfoStr = text
                 self.avatarInfoTarget = AvatarInfoTarget.intro
                 self.updateAvatarInfo()
             }
-        }
-        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
-        alert.addAction(confirmAction)
-        alert.addAction(cancelAction)
+        })
+        alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
         alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
     @objc func alertChangePasswordCompl() {
         let alert = UIAlertController(title: lang.titlePasswordChangeCompl, message: "\n" + lang.msgChangePasswordCompl, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
+        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             UserDefaults.standard.setIsSignIn(value: false)
             self.dismiss(animated: true, completion: nil)
             return
-        }
-        alert.addAction(confirmAction)
+        })
         alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
@@ -322,6 +304,11 @@ class ProfileViewController: UIViewController {
             self.confPassword = nil
             self.avatarInfoTarget = nil
             self.isOldPasswordCorrect = true
+            UIView.transition(with: self.tagCollection, duration: 0.7, options: .transitionCrossDissolve, animations: {
+                self.infoContainer.isHidden = false
+                self.tagCollection.isHidden = false
+                self.loadingImageView.isHidden = true
+            })
         }
         alert.addTextField { textField in
             textField.autocapitalizationType = .none
@@ -335,7 +322,11 @@ class ProfileViewController: UIViewController {
                 if self.oldPassword != nil && self.newPassword != nil && self.confPassword != nil {
                     if self.oldPassword!.count >= 8 && self.newPassword!.count >= 8 && self.newPassword == self.confPassword {
                         confirmAction.isEnabled = true
+                    } else {
+                        confirmAction.isEnabled = false
                     }
+                } else {
+                    confirmAction.isEnabled = false
                 }
             }
         }
@@ -351,7 +342,11 @@ class ProfileViewController: UIViewController {
                 if self.oldPassword != nil && self.newPassword != nil && self.confPassword != nil {
                     if self.oldPassword!.count >= 8 && self.newPassword!.count >= 8 && self.newPassword == self.confPassword {
                         confirmAction.isEnabled = true
+                    } else {
+                        confirmAction.isEnabled = false
                     }
+                } else {
+                    confirmAction.isEnabled = false
                 }
             }
         }
@@ -367,7 +362,11 @@ class ProfileViewController: UIViewController {
                 if self.oldPassword != nil && self.newPassword != nil && self.confPassword != nil {
                     if self.oldPassword!.count >= 8 && self.newPassword!.count >= 8 && self.newPassword == self.confPassword {
                         confirmAction.isEnabled = true
+                    } else {
+                        confirmAction.isEnabled = false
                     }
+                } else {
+                    confirmAction.isEnabled = false
                 }
             }
         }
@@ -381,7 +380,6 @@ class ProfileViewController: UIViewController {
         let alert = UIAlertController(title: lang.titleChangeProfileImg, message: nil, preferredStyle: .actionSheet)
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
-        
         alert.addAction(UIAlertAction(title: lang.titleChooseColor, style: .default) { _ in
             self.colorLeftButton.setTitleColor(.mediumSeaGreen, for: .normal)
             UIView.transition(with: self.colorLeftButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
@@ -706,12 +704,12 @@ extension ProfileViewController {
         signOutButton.addTarget(self, action: #selector(signOutButtonTapped), for: .touchUpInside)
         closeButton = getCloseButton()
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
-        mailConfAddressButton = {
+        notConfirmedEmailButton = {
             let _button = UIButton(type: .system)
             _button.titleLabel?.font = .systemFont(ofSize: 16)
             _button.setTitleColor(.mediumSeaGreen, for: .normal)
             _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(alertMailConfAddressTextField), for: .touchUpInside)
+            _button.addTarget(self, action: #selector(alertEmailTextField(_:)), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
@@ -875,7 +873,7 @@ extension ProfileViewController {
         
         verifMailContainer.addSubview(verifMailTitleLabel)
         verifMailContainer.addSubview(verifMailMsgLabel)
-        verifMailContainer.addSubview(mailConfAddressButton)
+        verifMailContainer.addSubview(notConfirmedEmailButton)
         verifMailContainer.addSubview(sendAgainButton)
         
         infoContainer.addSubview(infoImageView)
@@ -934,8 +932,8 @@ extension ProfileViewController {
         sendAgainButton.bottomAnchor.constraint(equalTo: verifMailContainer.bottomAnchor, constant: -15).isActive = true
         sendAgainButton.trailingAnchor.constraint(equalTo: verifMailContainer.trailingAnchor, constant: -15).isActive = true
         
-        mailConfAddressButton.bottomAnchor.constraint(equalTo: sendAgainButton.topAnchor, constant: -15).isActive = true
-        mailConfAddressButton.centerXAnchor.constraint(equalTo: verifMailContainer.centerXAnchor, constant: 0).isActive = true
+        notConfirmedEmailButton.bottomAnchor.constraint(equalTo: sendAgainButton.topAnchor, constant: -15).isActive = true
+        notConfirmedEmailButton.centerXAnchor.constraint(equalTo: verifMailContainer.centerXAnchor, constant: 0).isActive = true
         
         infoContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt)).isActive = true
         infoContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
@@ -988,23 +986,6 @@ extension ProfileViewController {
         emailLabel.topAnchor.constraint(equalTo: emailGuideLabel.bottomAnchor, constant: 2).isActive = true
         emailLabel.leadingAnchor.constraint(equalTo: emailContainer.leadingAnchor, constant: 6).isActive = true
         emailLabel.trailingAnchor.constraint(equalTo: emailContainer.trailingAnchor, constant: 0).isActive = true
-        
-//        phNumberContainer.topAnchor.constraint(equalTo: emailContainer.bottomAnchor, constant: 3).isActive = true
-//        phNumberContainer.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
-//        phNumberContainer.trailingAnchor.constraint(equalTo: infoContainer.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-//        phNumberContainer.heightAnchor.constraint(equalToConstant: 40).isActive = true
-//
-//        phNumberGuideLabel.topAnchor.constraint(equalTo: phNumberContainer.topAnchor, constant: 2).isActive = true
-//        phNumberGuideLabel.leadingAnchor.constraint(equalTo: phNumberContainer.leadingAnchor, constant: 6).isActive = true
-//        phNumberGuideLabel.trailingAnchor.constraint(equalTo: phNumberContainer.trailingAnchor, constant: 0).isActive = true
-//
-//        phNumberLabel.topAnchor.constraint(equalTo: phNumberGuideLabel.bottomAnchor, constant: 2).isActive = true
-//        phNumberLabel.leadingAnchor.constraint(equalTo: phNumberContainer.leadingAnchor, constant: 6).isActive = true
-//        phNumberLabel.trailingAnchor.constraint(equalTo: phNumberContainer.trailingAnchor, constant: 0).isActive = true
-//
-//        phNumberPlaceHolderLabel.leadingAnchor.constraint(equalTo: phNumberContainer.leadingAnchor, constant: 0).isActive = true
-//        phNumberPlaceHolderLabel.trailingAnchor.constraint(equalTo: phNumberContainer.trailingAnchor, constant: 0).isActive = true
-//        phNumberPlaceHolderLabel.centerYAnchor.constraint(equalTo: phNumberContainer.centerYAnchor, constant: 0).isActive = true
         
         introContainer.topAnchor.constraint(equalTo: emailContainer.bottomAnchor, constant: 3).isActive = true
         introContainer.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
@@ -1068,9 +1049,7 @@ extension ProfileViewController {
         firstNameGuideLabel.text = lang.titleFirstNameUpper
         lastNameGuideLabel.text = lang.titleLastNameUpper
         emailGuideLabel.text = lang.titleEmailUpper
-//        phNumberGuideLabel.text = lang.titlePhoneNumUpper
         introGuideLabel.text = lang.titleIntroUpper
-//        phNumberPlaceHolderLabel.text = lang.titlePhoneNum
         introPlaceHolderLabel.text = lang.titleIntro
         signOutButton.setTitle(lang.titleSignOut, for: .normal)
         sendAgainButton.setTitle(lang.titleSendAgain, for: .normal)
@@ -1089,16 +1068,17 @@ extension ProfileViewController {
             self.retryFunction = self.loadProfile
             self.alertError(message)
         }, emailNotConfirmed: { (email) in
-            self.newMailAddress = email
+            self.notConfirmedEmail = email
             UIView.transition(with: self.verifMailContainer, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.infoContainer.isHidden = true
-                self.mailConfAddressButton.setTitle(email, for: .normal)
+                self.notConfirmedEmailButton.setTitle(email, for: .normal)
                 self.verifMailContainer.isHidden = false
                 self.loadingImageView.isHidden = true
             })
         }, tokenRefreshCompletion: {
             self.loadProfile()
         }) { (profile) in
+            self.notConfirmedEmail = nil
             self.profile = profile
             UserDefaults.standard.setCurrentLanguageId(value: profile.language_id)
             UserDefaults.standard.setIsEmailConfirmed(value: profile.avatar.is_confirmed)
@@ -1187,6 +1167,9 @@ extension ProfileViewController {
         UIView.transition(with: loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.infoContainer.isHidden = true
             self.tagCollection.isHidden = true
+            if self.notConfirmedEmail != nil {
+                self.verifMailContainer.isHidden = true
+            }
             self.loadingImageView.isHidden = false
         })
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
@@ -1206,6 +1189,9 @@ extension ProfileViewController {
             if pattern == UnauthType.passwordInvalid {
                 self.isOldPasswordCorrect = false
                 self.alertChangePassword()
+            } else if pattern == UnauthType.mailDuplicated {
+                self.isNewEmailUnique = false
+                self.alertEmailTextField()
             }
         }, popoverAlert: { (message) in
             self.retryFunction = self.updateAvatarInfo
@@ -1230,14 +1216,11 @@ extension ProfileViewController {
         }
     }
     
-    private func sendMailAgain() {
-        UIView.transition(with: verifMailMsgLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            self.verifMailMsgLabel.text = "u/{02059}"
-            self.verifMailMsgLabel.textColor = UIColor.black
-            self.mailConfAddressButton.isHidden = true
-            self.sendAgainButton.isHidden = true
+    private func sendVerifMailAgain() {
+        UIView.transition(with: loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.verifMailContainer.isHidden = true
+            self.loadingImageView.isHidden = false
         })
-        verifMailMsgLabel.startRotating()
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -1247,17 +1230,16 @@ extension ProfileViewController {
         ]
         let service = Service(lang: lang)
         service.sendMailConfLinkAgain(params: params, popoverAlert: { (message) in
-            self.retryFunction = self.sendMailAgain
+            self.retryFunction = self.sendVerifMailAgain
             self.alertError(message)
         }) {
-            self.verifMailMsgLabel.stopRotating()
             UIView.animate(withDuration: 0.5, animations: {
                 self.verifMailMsgLabel.text = self.lang.msgMailSendAgainComplete
                 self.verifMailMsgLabel.textColor = UIColor.mediumSeaGreen
             })
-            UIView.transition(with: self.sendAgainButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.mailConfAddressButton.isHidden = false
-                self.sendAgainButton.isHidden = false
+            UIView.transition(with: self.loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.verifMailContainer.isHidden = false
+                self.loadingImageView.isHidden = true
             })
         }
     }

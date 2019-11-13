@@ -15,13 +15,14 @@ class IAPController: UIViewController {
     
     // UIView
     var blackBoardView: UIView!
+    var topBarView: UIView!
     
     // UIButton
     var purchaseButton: UIButton!
     var restoreButton: UIButton!
     
     // UILabel
-    var logoLabel: UILabel!
+    var eventLabel: UILabel!
     var productDscLabel: UILabel!
     var lblPurchaseDone: UILabel!
     
@@ -156,6 +157,7 @@ extension IAPController {
 //        navigationItem.title = lang.titleNotes
         view.backgroundColor = UIColor.whiteSmoke
         
+        topBarView = getAddtionalTopBarView()
         logoImageView = {
             let _imageView = UIImageView()
             _imageView.image = .itemLogoM
@@ -164,7 +166,7 @@ extension IAPController {
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
-        logoLabel = {
+        eventLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 15, weight: .medium)
             _label.textColor = .mediumSeaGreen
@@ -196,7 +198,7 @@ extension IAPController {
             let _button = UIButton(type: .system)
             _button.setTitleColor(.black, for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 16)
-            _button.setTitle("RESTORE PREMIUM", for: .normal)
+            _button.setTitle("Restore premium", for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(restoreButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -224,27 +226,35 @@ extension IAPController {
         view.addSubview(logoImageView)
         view.addSubview(purchaseButton)
         view.addSubview(productDscLabel)
-        view.addSubview(logoLabel)
-        view.addSubview(restoreButton)
+        view.addSubview(eventLabel)
         view.addSubview(lblPurchaseDone)
         view.addSubview(blackBoardView)
+        view.addSubview(topBarView)
+        
+        topBarView.addSubview(restoreButton)
+        
+        topBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+        topBarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+        topBarView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
+        topBarView.heightAnchor.constraint(equalToConstant: CGFloat(topBarHeightInt)).isActive = true
+        
+        restoreButton.topAnchor.constraint(equalTo: topBarView.topAnchor, constant: 0).isActive = true
+        restoreButton.trailingAnchor.constraint(equalTo: topBarView.trailingAnchor, constant: -20).isActive = true
+        restoreButton.bottomAnchor.constraint(equalTo: topBarView.bottomAnchor, constant: 0).isActive = true
         
         logoImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        logoImageView.bottomAnchor.constraint(equalTo: purchaseButton.topAnchor, constant: -20).isActive = true
+        logoImageView.bottomAnchor.constraint(equalTo: purchaseButton.topAnchor, constant: -40).isActive = true
         
         purchaseButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
         purchaseButton.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: -20).isActive = true
         purchaseButton.widthAnchor.constraint(equalToConstant: 250).isActive = true
         purchaseButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
+        eventLabel.bottomAnchor.constraint(equalTo: purchaseButton.topAnchor, constant: -5).isActive = true
+        eventLabel.trailingAnchor.constraint(equalTo: purchaseButton.trailingAnchor, constant: 0).isActive = true
+        
         productDscLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
         productDscLabel.topAnchor.constraint(equalTo: purchaseButton.bottomAnchor, constant: 10).isActive = true
-        
-        logoLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        logoLabel.topAnchor.constraint(equalTo: productDscLabel.bottomAnchor, constant: 2).isActive = true
-        
-        restoreButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        restoreButton.bottomAnchor.constraint(equalTo: blackBoardView.topAnchor, constant: -7).isActive = true
         
         lblPurchaseDone.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
         lblPurchaseDone.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: 0).isActive = true

@@ -64,15 +64,15 @@ class AuthViewController: UIViewController {
     // MARK: - Actions
     
     @objc func alertError(_ message: String) {
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.retryFunction!()
         }
         let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
-        alertController.addAction(confirmAction)
-        alertController.addAction(cancelAction)
-        alertController.view.tintColor = .mediumSeaGreen
-        present(alertController, animated: true, completion: nil)
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
+        alert.view.tintColor = .mediumSeaGreen
+        present(alert, animated: true, completion: nil)
     }
     
     @objc func alertFindEmail() {
@@ -101,6 +101,7 @@ class AuthViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -141,6 +142,7 @@ class AuthViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -182,6 +184,7 @@ class AuthViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -191,6 +194,7 @@ class AuthViewController: UIViewController {
             return
         }
         alert.addAction(confirmAction)
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
