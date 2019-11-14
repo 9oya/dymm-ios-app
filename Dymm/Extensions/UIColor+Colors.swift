@@ -291,28 +291,20 @@ extension UIColor {
     // Red
     static let hex_fe4c4c = UIColor(hex: "#FE4C4C")
     static let tomato = UIColor(hex: "Tomato")
-    static let coral = UIColor(hex: "Coral")
-    static let indianRed = UIColor(hex: "IndianRed")
-    static let rosyBrown = UIColor(hex: "RosyBrown")
     static let darkOrange = UIColor(hex: "DarkOrange")
     static let webOrange = UIColor(hex: "#FEA32A")
     
     // Yellow
     static let hex_fffede = UIColor(hex: "#FFFEDE")
-    static let gold = UIColor(hex: "#FFD700")
     
     // Blue
     static let dodgerBlue = UIColor(hex: "DodgerBlue")
     static let cornflowerBlue = UIColor(hex: "CornflowerBlue")
-    static let cadetBlue = UIColor(hex: "CadetBlue")
-    static let lightSteelBlue = UIColor(hex: "LightSteelBlue")
     
     // Purple
     static let hex_a45fac = UIColor(hex: "#A45FAC")
     
     // Green
-    static let darkTurquoise = UIColor(hex: "DarkTurquoise")
-    static let yellowGreen = UIColor(hex: "YellowGreen")
     static let mediumSeaGreen = UIColor(hex: "MediumSeaGreen")
     static let hex_72e5Ea = UIColor(hex: "#72E5EA")
     static let hex_41b275 = UIColor(hex: "#41B275")
@@ -321,10 +313,4 @@ extension UIColor {
     static let whiteSmoke = UIColor(hex: "WhiteSmoke")
     static let silver = UIColor(hex: "Silver")
     static let dimGray = UIColor(hex: "DimGray")
-    
-    static let hex_666699 = UIColor(hex: "#666699")
-    static let hex_6699cc = UIColor(hex: "#6699cc")
-    static let hex_99cc99 = UIColor(hex: "#99cc99")
-    static let hex_9999ff = UIColor(hex: "#9999ff")
-    static let hex_cccc66 = UIColor(hex: "#cccc66")
 }

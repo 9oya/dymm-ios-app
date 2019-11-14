@@ -220,20 +220,20 @@ func getCondScoreColor(_ condScore: Float) -> UIColor? {
 
 func getProfileUIColor(key: Int) -> UIColor {
     switch key {
-    case 1: return .coral
-    case 2: return UIColor(hex: "#FFB757")
-    case 3: return .indianRed
-    case 4: return .rosyBrown
-    case 5: return UIColor(hex: "#989CFB")
-    case 6: return UIColor(hex: "#54AEFD")
-    case 7: return .cornflowerBlue
-    case 8: return UIColor(hex: "#666797")
-    case 9: return .darkGray
-    case 10: return UIColor(hex: "#679ACA")
-    case 11: return UIColor(hex: "#B6D878")
-    case 12: return UIColor(hex: "#CCCB6E")
-    case 13: return UIColor(hex: "#9ACB9C")
-    case 14: return UIColor(hex: "#7FD9D9")
-    case 15: return UIColor(hex: "#609EA0")
-    default: return UIColor(hex: "#FF7F50")}
+    case 1: return UIColor(hex: "RosyBrown")
+    case 2: return UIColor(hex: "IndianRed")
+    case 3: return UIColor(hex: "Coral")
+    case 4: return UIColor(hex: "#FFB757")
+    case 5: return UIColor(hex: "#D2D372")
+    case 6: return UIColor(hex: "#6AA8AA")
+    case 7: return UIColor(hex: "#ACD9AB")
+    case 8: return UIColor(hex: "#7FD9D9")
+    case 9: return UIColor(hex: "#5DB5FF")
+    case 10: return UIColor(hex: "LightSkyBlue")
+    case 11: return UIColor(hex: "CornflowerBlue")
+    case 12: return UIColor(hex: "MediumPurple")
+    case 13: return UIColor(hex: "#989CFB")
+    case 14: return UIColor(hex: "Violet")
+    case 15: return UIColor(hex: "HotPink")
+    default: return UIColor(hex: "HotPink")}
 }

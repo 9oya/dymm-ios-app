@@ -1267,8 +1267,7 @@ extension DiaryViewController {
         default:
             return
         }
-//        navigationItem.title = lang.titleDiary
-        view.backgroundColor = UIColor(hex: "WhiteSmoke")
+        view.backgroundColor = .whiteSmoke
         
         // Initialize subveiw properties
         blindView = getAlertBlindView()

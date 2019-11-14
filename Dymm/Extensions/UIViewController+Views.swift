@@ -54,7 +54,7 @@ extension UIViewController {
         let _imageView = UIImageView(image: .itemLoading)
         _imageView.frame = CGRect(x: 0, y: 0, width: 60, height: 60)
         _imageView.contentMode = .scaleAspectFit
-        _imageView.startRotating()
+        _imageView.startRotating(duration: 1)
         if let isHidden = isHidden {
             _imageView.isHidden = isHidden
         }

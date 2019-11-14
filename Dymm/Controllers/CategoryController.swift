@@ -335,12 +335,12 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
                 cell.label.attributedText = attributedString
             } else {
                 cell.label.text = _text
-            }
-            switch tag.id {
-            case TagId.supplements:
-                cell.label.textColor = .mediumSeaGreen
-            default:
-                cell.label.textColor = .black
+                switch tag.id {
+                case TagId.supplements:
+                    cell.label.textColor = .mediumSeaGreen
+                default:
+                    cell.label.textColor = .black
+                }
             }
             cell.imageView.image = UIImage(named: "tag-\(tag.id)")
             return cell
@@ -408,11 +408,17 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
             case LanguageId.kor: txtCnt = tag.kor_name!.count
             case LanguageId.jpn: txtCnt = tag.jpn_name!.count
             default: fatalError()}
-            if txtCnt <= 6 {
-                // Set minimum size
-                return CGSize(width: 60, height: CGFloat(40))
+            var width = 50
+            if txtCnt <= 3 {
+                width = 50
+            } else if txtCnt <= 5 {
+                width = 70
+            } else if txtCnt <= 8 {
+                width = 90
+            } else if txtCnt >= 9 {
+                width = 110
             }
-            return CGSize(width: 100, height: CGFloat(40))
+            return CGSize(width: width, height: 40)
         } else {
             fatalError()
         }
@@ -631,8 +637,23 @@ extension CategoryViewController {
             _textField.placeholder = lang.titleSearch
             _textField.addShadowView()
             _textField.addTarget(self, action: #selector(textFieldDidChanged(_:)), for: .editingChanged)
+            _textField.isHidden = true
             _textField.translatesAutoresizingMaskIntoConstraints = false
             return _textField
+        }()
+        langPickButton = {
+            let _button = UIButton(type: .system)
+            _button.setTitleColor(UIColor.darkGray, for: .normal)
+            _button.setTitle(LangHelper.getLanguageName(lang.currentLanguageId), for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 15)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(langPickBtnTapped), for: .touchUpInside)
+            _button.backgroundColor = UIColor.white
+            _button.layer.cornerRadius = 10.0
+            _button.addShadowView()
+            _button.isHidden = true
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
         }()
         sizePickerContainer = {
             let _view = UIView()
@@ -787,19 +808,6 @@ extension CategoryViewController {
             _button.setTitle(lang.titleEndDate, for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(endDateButtonTapped), for: .touchUpInside)
-            _button.translatesAutoresizingMaskIntoConstraints = false
-            return _button
-        }()
-        langPickButton = {
-            let _button = UIButton(type: .system)
-            _button.setTitleColor(UIColor.darkGray, for: .normal)
-            _button.setTitle(LangHelper.getLanguageName(lang.currentLanguageId), for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 15)
-            _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(langPickBtnTapped), for: .touchUpInside)
-            _button.backgroundColor = UIColor.white
-            _button.layer.cornerRadius = 10.0
-            _button.addShadowView()
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
@@ -1123,6 +1131,8 @@ extension CategoryViewController {
             UIView.transition(with: detailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.detailContainer.isHidden = true
                 self.tagCollection.isHidden = true
+                self.searchTextField.isHidden = true
+                self.langPickButton.isHidden = true
                 self.loadingImageView.isHidden = false
             })
         }

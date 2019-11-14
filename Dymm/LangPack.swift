@@ -38,11 +38,9 @@ struct LangPack {
     var titleEmail: String!
     var titleEmailFound: String!
     var titleEmailNotFound: String!
-    var titleEmailUpper: String!
     var titleEmailValidCode: String!
     var titleEndDate: String!
     var titleFirstName: String!
-    var titleFirstNameUpper: String!
     var titleFold: String!
     var titleFoodLog: String!
     var titleForgotPassword: String!
@@ -52,10 +50,8 @@ struct LangPack {
     var titleIncorrectEmailCode: String!
     var titleIncorrectOldPassword: String!
     var titleIntro: String!
-    var titleIntroUpper: String!
     var titleLastMonth: String!
     var titleLastName: String!
-    var titleLastNameUpper: String!
     var titleLastWeek: String!
     var titleLogGroups: [String]!
     var titleMyAvtCond: String!
@@ -70,10 +66,8 @@ struct LangPack {
     var titlePasswordNew: String!
     var titlePasswordOld: String!
     var titlePhoneNum: String!
-    var titlePhoneNumUpper: String!
     var titlePhotolibrary: String!
     var titleProfile: String!
-    var titleProfileUpper: String!
     var titleRanking: String!
     var titleReLifespanAndAge: String!
     var titleRetry: String!
@@ -121,7 +115,7 @@ struct LangPack {
     var msgLogComplete: String!
     var msgMailEnter: String!
     var msgMailModified: String!
-    var msgMailNotConfirmedYet: String!
+    var msgMailNotConfirmed: String!
     var msgMailSendAgainComplete: String!
     var msgMailSendValidCode: ((String) -> String)!
     var msgMismatchConfirmPassword: String!
@@ -340,12 +334,6 @@ struct LangPack {
             case LanguageId.kor: return "\u{26A0}메일주소를 찾을 수 없습니다."
             default: fatalError()}
         }()
-        self.titleEmailUpper = {
-            switch currentLanguageId {
-            case LanguageId.eng: return "EMAIL ADDRESS"
-            case LanguageId.kor: return "메일주소"
-            default: fatalError()}
-        }()
         self.titleEmailValidCode = {
             switch currentLanguageId {
             case LanguageId.eng: return "A verification code has been sent."
@@ -361,12 +349,6 @@ struct LangPack {
         self.titleFirstName = {
             switch currentLanguageId {
             case LanguageId.eng: return "First Name"
-            case LanguageId.kor: return "이름"
-            default: fatalError()}
-        }()
-        self.titleFirstNameUpper = {
-            switch currentLanguageId {
-            case LanguageId.eng: return "FIRST NAME"
             case LanguageId.kor: return "이름"
             default: fatalError()}
         }()
@@ -424,12 +406,6 @@ struct LangPack {
             case LanguageId.kor: return "소개 글"
             default: fatalError()}
         }()
-        self.titleIntroUpper = {
-            switch currentLanguageId {
-            case LanguageId.eng: return "INTRODUCTION"
-            case LanguageId.kor: return "자기소개"
-            default: fatalError()}
-        }()
         self.titleLastMonth = {
             switch currentLanguageId {
             case LanguageId.eng: return "Last month"
@@ -439,12 +415,6 @@ struct LangPack {
         self.titleLastName = {
             switch currentLanguageId {
             case LanguageId.eng: return "Last Name"
-            case LanguageId.kor: return "성씨"
-            default: fatalError()}
-        }()
-        self.titleLastNameUpper = {
-            switch currentLanguageId {
-            case LanguageId.eng: return "LAST NAME"
             case LanguageId.kor: return "성씨"
             default: fatalError()}
         }()
@@ -534,12 +504,6 @@ struct LangPack {
             case LanguageId.kor: return "전화번호"
             default: fatalError()}
         }()
-        self.titlePhoneNumUpper = {
-            switch currentLanguageId {
-            case LanguageId.eng: return "PHONE NUMBER"
-            case LanguageId.kor: return "전화번호"
-            default: fatalError()}
-        }()
         self.titlePhotolibrary = {
             switch currentLanguageId {
             case LanguageId.eng: return "Photo library"
@@ -552,16 +516,10 @@ struct LangPack {
             case LanguageId.kor: return "프로필"
             default: fatalError()}
         }()
-        self.titleProfileUpper = {
-            switch currentLanguageId {
-            case LanguageId.eng: return "PROFILE"
-            case LanguageId.kor: return "프로필"
-            default: fatalError()}
-        }()
         self.titleRanking = {
             switch currentLanguageId {
             case LanguageId.eng: return "Ranking"
-            case LanguageId.kor: return "랭킹"
+            case LanguageId.kor: return "순위"
             default: fatalError()}
         }()
         self.titleReLifespanAndAge = {
@@ -823,8 +781,8 @@ struct LangPack {
         }()
         self.msgLifeSpan = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your remaining life span \nestimated approx."
-            case LanguageId.kor: return "당신의 남은 수명을 \n예측합니다. 약"
+            case LanguageId.eng: return "I've estimated your remaining lifespan."
+            case LanguageId.kor: return "당신의 남은 수명을 예측하였습니다."
             default: fatalError()}
         }()
         self.msgLogComplete = {
@@ -841,14 +799,14 @@ struct LangPack {
         }()
         self.msgMailModified = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your email address has been modified.\nPlease confirm Your new email."
+            case LanguageId.eng: return "Your email address has been modified.\nPlease verify Your new email."
             case LanguageId.kor: return "메일주소가 변경되었습니다.\n변경된 메일계정을 확인해 주세요."
             default: fatalError()}
         }()
-        self.msgMailNotConfirmedYet = {
+        self.msgMailNotConfirmed = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your email not confirmed yet. \nPleas confirm Your email."
-            case LanguageId.kor: return "계정이 아직 확인되지 않았습니다.\n메일계정을 확인해 주세요."
+            case LanguageId.eng: return "Your email address is not verified yet. \nPleas verify Your email."
+            case LanguageId.kor: return "이메일이 아직 확인되지 않았습니다.\n메일계정을 확인해 주세요."
             default: fatalError()}
         }()
         self.msgMailSendAgainComplete = {

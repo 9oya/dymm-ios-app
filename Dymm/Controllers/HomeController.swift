@@ -104,6 +104,9 @@ class HomeViewController: UIViewController {
             monthPicker.selectRow(0, inComponent: 0, animated: true)
             
             UIView.transition(with: profileButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
+                self.scoreboardView.isHidden = false
+                self.lifespanBoardView.isHidden = false
+                
                 self.scoreEmoImageView.image = getCondScoreImageLarge(0)
                 
                 self.scoreTitleLabel.text = self.lang.getCondScoreName(0)
@@ -392,6 +395,7 @@ extension HomeViewController {
             _view.backgroundColor = .white
             _view.layer.cornerRadius = 10.0
             _view.addShadowView()
+            _view.isHidden = true
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
@@ -400,6 +404,7 @@ extension HomeViewController {
             _view.backgroundColor = .white
             _view.layer.cornerRadius = 10.0
             _view.addShadowView()
+            _view.isHidden = true
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
@@ -446,7 +451,7 @@ extension HomeViewController {
         }()
         ageLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 17, weight: .medium)
+            _label.font = .systemFont(ofSize: 18, weight: .medium)
             _label.textColor = .dimGray
             _label.textAlignment = .right
             _label.numberOfLines = 1
@@ -455,7 +460,7 @@ extension HomeViewController {
         }()
         genderLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 17, weight: .medium)
+            _label.font = .systemFont(ofSize: 18, weight: .medium)
             _label.textColor = .dimGray
             _label.textAlignment = .right
             _label.numberOfLines = 1
@@ -473,7 +478,7 @@ extension HomeViewController {
         }()
         lifespanLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 16, weight: .regular)
+            _label.font = .systemFont(ofSize: 18, weight: .regular)
             _label.textColor = .tomato
             _label.textAlignment = .center
             _label.numberOfLines = 3
@@ -623,7 +628,6 @@ extension HomeViewController {
     
     private func loadScoreboard() {
         let service = Service(lang: lang)
-        
         service.getScoreBoard(yearNumber: "\(selectedYear!)", monthNumber: selectedMonth, popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
@@ -634,11 +638,11 @@ extension HomeViewController {
             self.thisAvgScore = formatter.number(from: scoreBoardSet.avg_score)!.floatValue
             UIView.animate(withDuration: 0.5) {
                 self.scoreEmoImageView.image = getCondScoreImageLarge(self.thisAvgScore)
-                
+
                 self.scoreTitleLabel.text = self.lang.getCondScoreName(self.thisAvgScore)
                 self.scoreNumberLabel.text = String(format: "%.1f", self.thisAvgScore)
                 self.scoreMessageLabel.text = self.lang.titleMyCondScore
-                
+
                 if let genderTag = scoreBoardSet.gender_tag {
                     switch self.lang.currentLanguageId {
                     case LanguageId.eng:
@@ -654,13 +658,45 @@ extension HomeViewController {
                         self.genderLabel.text = "성별"
                     default: fatalError()}
                 }
-                
+
                 self.scoreTitleLabel.textColor = getCondScoreColor(self.thisAvgScore)
                 self.scoreNumberLabel.textColor = getCondScoreColor(self.thisAvgScore)
                 self.scoreMessageLabel.textColor = getCondScoreColor(self.thisAvgScore)
                 self.ageLabel.textColor = getCondScoreColor(self.thisAvgScore)
                 self.genderLabel.textColor = getCondScoreColor(self.thisAvgScore)
+                
+                self.scoreboardView.isHidden = false
             }
+//            self.scoreEmoImageView.image = getCondScoreImageLarge(self.thisAvgScore)
+//
+//            self.scoreTitleLabel.text = self.lang.getCondScoreName(self.thisAvgScore)
+//            self.scoreNumberLabel.text = String(format: "%.1f", self.thisAvgScore)
+//            self.scoreMessageLabel.text = self.lang.titleMyCondScore
+//
+//            if let genderTag = scoreBoardSet.gender_tag {
+//                switch self.lang.currentLanguageId {
+//                case LanguageId.eng:
+//                    self.genderLabel.text = genderTag.eng_name.uppercased()
+//                case LanguageId.kor:
+//                    self.genderLabel.text = genderTag.kor_name
+//                default: fatalError()}
+//            } else {
+//                switch self.lang.currentLanguageId {
+//                case LanguageId.eng:
+//                    self.genderLabel.text = "GENDER"
+//                case LanguageId.kor:
+//                    self.genderLabel.text = "성별"
+//                default: fatalError()}
+//            }
+//
+//            self.scoreTitleLabel.textColor = getCondScoreColor(self.thisAvgScore)
+//            self.scoreNumberLabel.textColor = getCondScoreColor(self.thisAvgScore)
+//            self.scoreMessageLabel.textColor = getCondScoreColor(self.thisAvgScore)
+//            self.ageLabel.textColor = getCondScoreColor(self.thisAvgScore)
+//            self.genderLabel.textColor = getCondScoreColor(self.thisAvgScore)
+//            UIView.transition(with: self.scoreboardView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+//                self.scoreboardView.isHidden = false
+//            })
         }
     }
     
@@ -673,24 +709,30 @@ extension HomeViewController {
         }, tokenRefreshCompletion: {
             self.loadRemainingLifeSpan()
         }, unauthorized: { (pattern) in
-            self.lifespanMsgLabel.textColor = .webOrange
-            switch pattern {
-            case UnauthType.scoreNone:
-                self.lifespanMsgLabel.text = self.lang.msgCondScoreNone
-            case UnauthType.birthNone:
-                self.lifespanMsgLabel.text = self.lang.msgDateOfBirthNone
-            default: fatalError()}
+            UIView.animate(withDuration: 0.5) {
+                self.lifespanMsgLabel.textColor = .webOrange
+                switch pattern {
+                case UnauthType.scoreNone:
+                    self.lifespanMsgLabel.text = self.lang.msgCondScoreNone
+                case UnauthType.birthNone:
+                    self.lifespanMsgLabel.text = self.lang.msgDateOfBirthNone
+                default: fatalError()}
+                self.lifespanBoardView.isHidden = false
+            }
         }) { (lifeSpan) in
             let year = lifeSpan / 365
             let days = lifeSpan % 365
-            switch self.lang.currentLanguageId {
-            case LanguageId.eng:
-                self.lifespanLabel.text = "\(year)Y \(days)D"
-            case LanguageId.kor:
-                self.lifespanLabel.text = "\(year)년 \(days)일"
-            default: fatalError()}
-            self.lifespanMsgLabel.textColor = .mediumSeaGreen
-            self.lifespanMsgLabel.text = self.lang.msgLifeSpan
+            UIView.animate(withDuration: 0.5) {
+                switch self.lang.currentLanguageId {
+                case LanguageId.eng:
+                    self.lifespanLabel.text = "\(year)Y \(days)D"
+                case LanguageId.kor:
+                    self.lifespanLabel.text = "\(year)년 \(days)일"
+                default: fatalError()}
+                self.lifespanMsgLabel.textColor = .mediumSeaGreen
+                self.lifespanMsgLabel.text = self.lang.msgLifeSpan
+                self.lifespanBoardView.isHidden = false
+            }
         }
     }
     

@@ -37,6 +37,7 @@ class RankingViewController: UIViewController {
     var myLifespanLabel: UILabel!
     
     // UIImageView
+    var loadingImageView: UIImageView!
     var myProfileImgView: UIImageView!
     
     // Non-view properties
@@ -168,35 +169,25 @@ extension RankingViewController: UITableViewDataSource, UITableViewDelegate {
             cell.lifespanLabel.text = " "
         }
         
+        var color = UIColor.dimGray
         if ranking.rank_num <= 100 {
-            cell.rankNumLabel.textColor = .dodgerBlue
-            cell.nameLabel.textColor = .dodgerBlue
-            cell.lifespanLabel.textColor = .dodgerBlue
+            color = .dodgerBlue
         } else if ranking.rank_num <= 200 {
-            cell.rankNumLabel.textColor = .mediumSeaGreen
-            cell.nameLabel.textColor = .mediumSeaGreen
-            cell.lifespanLabel.textColor = .mediumSeaGreen
+            color = .mediumSeaGreen
         } else if ranking.rank_num <= 300 {
-           cell.rankNumLabel.textColor = .webOrange
-           cell.nameLabel.textColor = .webOrange
-           cell.lifespanLabel.textColor = .webOrange
+           color = .webOrange
         } else if ranking.rank_num <= 300 {
-            cell.rankNumLabel.textColor = .webOrange
-            cell.nameLabel.textColor = .webOrange
-            cell.lifespanLabel.textColor = .webOrange
+            color = .webOrange
         } else if ranking.rank_num <= 400 {
-           cell.rankNumLabel.textColor = .tomato
-           cell.nameLabel.textColor = .tomato
-           cell.lifespanLabel.textColor = .tomato
+           color = .tomato
         } else if ranking.rank_num <=  500 {
-            cell.rankNumLabel.textColor = .hex_a45fac
-            cell.nameLabel.textColor = .hex_a45fac
-            cell.lifespanLabel.textColor = .hex_a45fac
+            color = .hex_a45fac
         } else {
-            cell.rankNumLabel.textColor = .dimGray
-            cell.nameLabel.textColor = .dimGray
-            cell.lifespanLabel.textColor = .dimGray
+            color = .dimGray
         }
+        cell.rankNumLabel.textColor = color
+        cell.nameLabel.textColor = color
+        cell.lifespanLabel.textColor = color
         return cell
     }
     
@@ -302,7 +293,9 @@ extension RankingViewController {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = .whiteSmoke
+        navigationItem.title = lang.titleRanking.uppercased()
         
+        loadingImageView = getLoadingImageView(isHidden: false)
         homeButton = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemHome.withRenderingMode(.alwaysOriginal), for: .normal)
@@ -316,7 +309,10 @@ extension RankingViewController {
             let _view = UIView()
             _view.backgroundColor = .white
             _view.layer.cornerRadius = 10.0
+            _view.layer.borderWidth = 1.0
+            _view.layer.borderColor = UIColor.white.cgColor
             _view.addShadowView()
+            _view.isHidden = true
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
@@ -444,6 +440,7 @@ extension RankingViewController {
         view.addSubview(headerRankLabel)
         view.addSubview(headerLifespanLabel)
         view.addSubview(rankingTableView)
+        view.addSubview(loadingImageView)
         
         myRankingContainer.addSubview(myProfileImgView)
         myRankingContainer.addSubview(myProfileImgLabel)
@@ -494,9 +491,17 @@ extension RankingViewController {
         rankingTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         rankingTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         rankingTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+        
+        loadingImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        loadingImageView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: 0).isActive = true
     }
     
     private func loadRankings() {
+        if loadingImageView.isHidden {
+            UIView.transition(with: loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.loadingImageView.isHidden = false
+            })
+        }
         let service = Service(lang: lang)
         service.getRankings(ageRange: selectedAgeGroupKey, startPoint: selectedStartingKey, pageNum: currPageNum, popoverAlert: { (message) in
             self.retryFunction = self.loadRankings
@@ -515,6 +520,10 @@ extension RankingViewController {
             }
             self.rankings = rankingSet.rankings
             self.rankingTableView.reloadData()
+            
+            UIView.transition(with: self.loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.loadingImageView.isHidden = true
+            })
         }
     }
     
@@ -558,39 +567,30 @@ extension RankingViewController {
             } else {
                 self.myLifespanLabel.text = " "
             }
-            
+            var myColor = UIColor.dimGray
             if ranking.rank_num == 0 {
-                self.myRankNumLabel.textColor = .dimGray
-                self.myNameLabel.textColor = .dimGray
-                self.myLifespanLabel.textColor = .dimGray
+                myColor = .dimGray
             } else if ranking.rank_num <= 100 {
-                self.myRankNumLabel.textColor = .dodgerBlue
-                self.myNameLabel.textColor = .dodgerBlue
-                self.myLifespanLabel.textColor = .dodgerBlue
+                myColor = .dodgerBlue
             } else if ranking.rank_num <= 200 {
-                self.myRankNumLabel.textColor = .mediumSeaGreen
-                self.myNameLabel.textColor = .mediumSeaGreen
-                self.myLifespanLabel.textColor = .mediumSeaGreen
+                myColor = .mediumSeaGreen
             } else if ranking.rank_num <= 300 {
-               self.myRankNumLabel.textColor = .webOrange
-               self.myNameLabel.textColor = .webOrange
-               self.myLifespanLabel.textColor = .webOrange
+               myColor = .webOrange
             } else if ranking.rank_num <= 300 {
-                self.myRankNumLabel.textColor = .webOrange
-                self.myNameLabel.textColor = .webOrange
-                self.myLifespanLabel.textColor = .webOrange
+                myColor = .webOrange
             } else if ranking.rank_num <= 400 {
-               self.myRankNumLabel.textColor = .tomato
-               self.myNameLabel.textColor = .tomato
-               self.myLifespanLabel.textColor = .tomato
+               myColor = .tomato
             } else if ranking.rank_num <=  500 {
-                self.myRankNumLabel.textColor = .hex_a45fac
-                self.myNameLabel.textColor = .hex_a45fac
-                self.myLifespanLabel.textColor = .hex_a45fac
+                myColor = .hex_a45fac
             } else {
-                self.myRankNumLabel.textColor = .dimGray
-                self.myNameLabel.textColor = .dimGray
-                self.myLifespanLabel.textColor = .dimGray
+                myColor = .dimGray
+            }
+            UIView.animate(withDuration: 0.5) {
+                self.myRankNumLabel.textColor = myColor
+                self.myNameLabel.textColor = myColor
+                self.myLifespanLabel.textColor = myColor
+                self.myRankingContainer.layer.borderColor = myColor.cgColor
+                self.myRankingContainer.isHidden = false
             }
         }
     }
