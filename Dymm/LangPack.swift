@@ -42,9 +42,9 @@ struct LangPack {
     var titleEndDate: String!
     var titleFirstName: String!
     var titleFold: String!
-    var titleFoodLog: String!
     var titleForgotPassword: String!
     var titleForgotPasswordAlert: String!
+    var titleFreeTrial: String!
     var titleGender: String!
     var titleGuest: String!
     var titleIncorrectEmailCode: String!
@@ -54,6 +54,7 @@ struct LangPack {
     var titleLastName: String!
     var titleLastWeek: String!
     var titleLogGroups: [String]!
+    var titleMembership: String!
     var titleMyAvtCond: String!
     var titleMyCondScore: String!
     var titleNo: String!
@@ -358,12 +359,6 @@ struct LangPack {
             case LanguageId.kor: return "접기"
             default: fatalError()}
         }()
-        self.titleFoodLog = {
-            switch currentLanguageId {
-            case LanguageId.eng: return "Log What You Ate"
-            case LanguageId.kor: return "섭취한 것 기록하기"
-            default: fatalError()}
-        }()
         self.titleForgotPassword = {
             switch currentLanguageId {
             case LanguageId.eng: return "Forgot password?"
@@ -374,6 +369,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "I forgot my Dymm password"
             case LanguageId.kor: return "Dymm 비밀번호를 분실하였습니다."
+            default: fatalError()}
+        }()
+        self.titleFreeTrial = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Free Trial"
+            case LanguageId.kor: return "무료 체험"
             default: fatalError()}
         }()
         self.titleGender = {
@@ -431,6 +432,12 @@ struct LangPack {
             case LanguageId.kor:
                 return ["아침", "주간", "저녁", "야간"]
             default: fatalError("")}
+        }()
+        self.titleMembership = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Membership"
+            case LanguageId.kor: return "맴버쉽"
+            default: fatalError()}
         }()
         self.titleMyAvtCond = {
             switch currentLanguageId {

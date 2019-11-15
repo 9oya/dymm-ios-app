@@ -13,8 +13,10 @@ private let stepCellId = "StepCell"
 
 private let stepBarHeightInt = 40
 private let searchBarHeightInt = 40
-private let detailBoxAHeightInt = 350
-private let detailBoxBHeightInt = 333
+//private let detailBoxAHeightInt = 350
+//private let detailBoxBHeightInt = 333
+private let detailBoxAHeightInt = 312
+private let detailBoxBHeightInt = 312
 private let detailBoxCHeightInt = 265
 
 class CategoryViewController: UIViewController {
@@ -35,10 +37,10 @@ class CategoryViewController: UIViewController {
     var langPicker: UIPickerView!
     
     // UIImageViews
-    var fingerImageView: UIImageView!
     var downArrowImageView: UIImageView!
     var photoImageView: UIImageView!
     var loadingImageView: UIImageView!
+    var gradientBackImage: UIImageView!
     
     // UITextField
     var searchTextField: UITextField!
@@ -46,12 +48,13 @@ class CategoryViewController: UIViewController {
     // UILabels
     var titleLabel: UILabel!
     var bookmarksTotalLabel: UILabel!
+    var logSizeLabel: UILabel!
+    var logTimeLabel: UILabel!
     
     // UIButtons
     var homeButton: UIButton!
     var starButton: UIButton!
     var logSizeButton: UIButton!
-    var logTimeButton: UIButton!
     var startDateButton: UIButton!
     var endDateButton: UIButton!
     var langPickButton: UIButton!
@@ -203,17 +206,25 @@ class CategoryViewController: UIViewController {
         }
     }
     
-    @objc func logButtonTapped() {
-        if UserDefaults.standard.isSignIn() {
-            let vc = DiaryViewController()
-            vc.diaryMode = DiaryMode.logger
-            vc.selectedTag = superTag!
-            vc.xVal = selectedXVal!
-            vc.yVal = selectedYVal!
-            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: UIBarButtonItem.Style.plain, target: self, action: nil)
-            self.navigationController?.pushViewController(vc, animated: true)
-        } else {
-            presentAuthNavigation()
+    @objc func logButtonTapped(_ sender: UIButton) {
+        UIButton.animate(withDuration: 0.05, animations: {
+            sender.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+        }) { (_) in
+            UIButton.animate(withDuration: 0.05, animations: {
+                sender.transform = CGAffineTransform.identity
+            }) { (_) in
+                if UserDefaults.standard.isSignIn() {
+                    let vc = DiaryViewController()
+                    vc.diaryMode = DiaryMode.logger
+                    vc.selectedTag = self.superTag!
+                    vc.xVal = self.selectedXVal!
+                    vc.yVal = self.selectedYVal!
+                    self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: UIBarButtonItem.Style.plain, target: self, action: nil)
+                    self.navigationController?.pushViewController(vc, animated: true)
+                } else {
+                    self.presentAuthNavigation()
+                }
+            }
         }
     }
     
@@ -248,8 +259,7 @@ class CategoryViewController: UIViewController {
         if selectedYVal != 0 {
             min = "\(selectedYVal!)min"
         }
-        logTimeButton.setTitle("\(hr) \(min)", for: .normal)
-        print(hr)
+        logTimeLabel.text = "\(hr) \(min)"
     }
     
     @objc func textFieldDidChanged(_ textField: UITextField) {
@@ -461,6 +471,8 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         } else {
             lastContentOffset = scrollView.contentOffset.y
         }
+        
+        
         if (scrollView.frame.size.height + scrollView.contentOffset.y) > (scrollView.contentSize.height - 200) {
             if _subTags.count == minimumCnt {
                 isScrollToLoading = true
@@ -686,6 +698,8 @@ extension CategoryViewController {
             let _datePicker = UIDatePicker()
             _datePicker.datePickerMode = .countDownTimer
             _datePicker.minuteInterval = 5
+            _datePicker.setValue(UIColor.dodgerBlue, forKeyPath: "textColor")
+            _datePicker.setValue(false, forKeyPath: "highlightsToday")
             _datePicker.addTarget(self, action: #selector(timePickerChanged(_:)), for: .valueChanged)
             _datePicker.translatesAutoresizingMaskIntoConstraints = false
             return _datePicker
@@ -700,13 +714,6 @@ extension CategoryViewController {
             _pickerView.transform = CGAffineTransform(rotationAngle: -(.pi / 2))
             _pickerView.translatesAutoresizingMaskIntoConstraints = false
             return _pickerView
-        }()
-        fingerImageView = {
-            let _imageView = UIImageView()
-            _imageView.image = .itemFingerClick
-            _imageView.contentMode = .scaleAspectFit
-            _imageView.translatesAutoresizingMaskIntoConstraints = false
-            return _imageView
         }()
         downArrowImageView = {
             let _imageView = UIImageView()
@@ -767,25 +774,30 @@ extension CategoryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        logSizeButton = {
-            let _button = UIButton(type: .system)
-            _button.setTitleColor(.hex_fe4c4c, for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 35, weight: .bold)
-            _button.frame = CGRect(x: 0, y: 0, width: 59, height: 59)
-            _button.showsTouchWhenHighlighted = true
-            _button.addShadowView()
-            _button.addTarget(self, action: #selector(logButtonTapped), for: .touchUpInside)
-            _button.translatesAutoresizingMaskIntoConstraints = false
-            return _button
+        logSizeLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 30, weight: .regular)
+            _label.textColor = .black
+            _label.textAlignment = .center
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
         }()
-        logTimeButton = {
-            let _button = UIButton(type: .system)
-            _button.setTitleColor(.hex_fe4c4c, for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 25, weight: .bold)
-            _button.frame = CGRect(x: 0, y: 0, width: 59, height: 59)
-            _button.showsTouchWhenHighlighted = true
+        logTimeLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 25, weight: .regular)
+            _label.textColor = .black
+            _label.textAlignment = .center
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        logSizeButton = {
+            let _button = UIButton(type: .custom)
+            _button.setImage(UIImage.itemBtnPlus.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 54, height: 54)
+            _button.showsTouchWhenHighlighted = false
+            _button.adjustsImageWhenHighlighted = false
             _button.addShadowView()
-            _button.addTarget(self, action: #selector(logButtonTapped), for: .touchUpInside)
+            _button.addTarget(self, action: #selector(logButtonTapped(_:)), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
@@ -811,6 +823,14 @@ extension CategoryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
+        gradientBackImage = {
+            let _imageView = UIImageView()
+            _imageView.contentMode = .scaleAspectFill
+            _imageView.clipsToBounds = true
+            _imageView.image = UIImage(named: "item-gradient-back")
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
         
         stepCollection.dataSource = self
         stepCollection.delegate = self
@@ -835,15 +855,16 @@ extension CategoryViewController {
         detailContainer.addSubview(starButton)
         detailContainer.addSubview(bookmarksTotalLabel)
         detailContainer.addSubview(photoImageView)
+        detailContainer.addSubview(logSizeLabel)
         detailContainer.addSubview(logSizeButton)
-        detailContainer.addSubview(logTimeButton)
+        detailContainer.addSubview(logTimeLabel)
         detailContainer.addSubview(startDateButton)
         detailContainer.addSubview(endDateButton)
-        detailContainer.addSubview(fingerImageView)
         detailContainer.addSubview(sizePickerContainer)
         detailContainer.addSubview(downArrowImageView)
         detailContainer.addSubview(timePicker)
         
+        sizePickerContainer.addSubview(gradientBackImage)
         sizePickerContainer.addSubview(sizePicker)
         
         // Setup constraints
@@ -869,24 +890,7 @@ extension CategoryViewController {
         detailContainerHeight.priority = UILayoutPriority(rawValue: 999)
         detailContainerHeight.isActive = true
         
-        photoImageView.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 65).isActive = true
-        photoImageView.centerXAnchor.constraint(equalTo: detailContainer.centerXAnchor, constant: 0).isActive = true
-        
-        startDateButton.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -10).isActive = true
-        startDateButton.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
-        
-        endDateButton.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -10).isActive = true
-        endDateButton.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: view.frame.width / 10).isActive = true
-        
-        timePicker.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: 7).isActive = true
-        timePicker.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: 0).isActive = true
-        timePicker.widthAnchor.constraint(equalToConstant: (view.frame.width / 2)).isActive = true
-        timePicker.heightAnchor.constraint(equalToConstant: 125).isActive = true
-        
-        logTimeButton.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -40).isActive = true
-        logTimeButton.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 18)).isActive = true
-        
-        titleLabel.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 10).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 5).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: 10).isActive = true
         titleLabel.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(27 + 7)).isActive = true
         
@@ -896,10 +900,38 @@ extension CategoryViewController {
         bookmarksTotalLabel.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 1).isActive = true
         bookmarksTotalLabel.trailingAnchor.constraint(equalTo: starButton.leadingAnchor, constant: -2).isActive = true
         
+        photoImageView.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 55).isActive = true
+        photoImageView.centerXAnchor.constraint(equalTo: detailContainer.centerXAnchor, constant: 0).isActive = true
+        
+        logSizeLabel.centerXAnchor.constraint(equalTo: detailContainer.centerXAnchor, constant: 0).isActive = true
+        logSizeLabel.topAnchor.constraint(equalTo: photoImageView.bottomAnchor, constant: 5).isActive = true
+        
+        logTimeLabel.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -36).isActive = true
+        logTimeLabel.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 17)).isActive = true
+        
+        logSizeButton.bottomAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -18).isActive = true
+        logSizeButton.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -15).isActive = true
+        
+        startDateButton.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -15).isActive = true
+        startDateButton.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
+        
+        endDateButton.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -15).isActive = true
+        endDateButton.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: view.frame.width / 10).isActive = true
+        
+        timePicker.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: 7).isActive = true
+        timePicker.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: 0).isActive = true
+        timePicker.widthAnchor.constraint(equalToConstant: (view.frame.width / 2)).isActive = true
+        timePicker.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        
         sizePickerContainer.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: 0).isActive = true
         sizePickerContainer.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: 0).isActive = true
         sizePickerContainer.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: 0).isActive = true
         sizePickerContainer.heightAnchor.constraint(equalToConstant: 58).isActive = true
+        
+        gradientBackImage.topAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: 0).isActive = true
+        gradientBackImage.leadingAnchor.constraint(equalTo: sizePickerContainer.leadingAnchor, constant: 0).isActive = true
+        gradientBackImage.trailingAnchor.constraint(equalTo: sizePickerContainer.trailingAnchor, constant: 0).isActive = true
+        gradientBackImage.bottomAnchor.constraint(equalTo: sizePickerContainer.bottomAnchor, constant: 0).isActive = true
         
         sizePicker.centerXAnchor.constraint(equalTo: sizePickerContainer.centerXAnchor, constant: 0).isActive = true
         sizePicker.centerYAnchor.constraint(equalTo: sizePickerContainer.centerYAnchor, constant: 0).isActive = true
@@ -908,14 +940,6 @@ extension CategoryViewController {
         
         downArrowImageView.centerXAnchor.constraint(equalTo: detailContainer.centerXAnchor, constant: 0).isActive = true
         downArrowImageView.topAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -1).isActive = true
-        
-        logSizeButton.bottomAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -10).isActive = true
-        logSizeButton.trailingAnchor.constraint(equalTo: photoImageView.trailingAnchor, constant: 0).isActive = true
-        
-        fingerImageBottom = fingerImageView.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -75)
-        fingerImageBottom.priority = UILayoutPriority(rawValue: 999)
-        fingerImageBottom.isActive = true
-        fingerImageView.leadingAnchor.constraint(equalTo: logSizeButton.trailingAnchor, constant: 8).isActive = true
         
         tagCollectionTop = tagCollection.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt))
         tagCollectionTop.priority = UILayoutPriority(rawValue: 999)
@@ -936,25 +960,25 @@ extension CategoryViewController {
             switch remainder {
             case 0:
                 // Case select nothing
-                sizePicker.selectRow(1, inComponent: 0, animated: true)
-                logSizeButton.setTitle("¼", for: .normal)
                 // "0 + 1/4"
+                sizePicker.selectRow(1, inComponent: 0, animated: true)
+                logSizeLabel.text = "¼"
                 selectedXVal = 0
                 selectedYVal = 1
                 selectedSizePickerRow = 1
             case 1:
-                logSizeButton.setTitle("¼", for: .normal)
                 // "0 + 1/4"
+                logSizeLabel.text = "¼"
                 selectedXVal = 0
                 selectedYVal = 1
             case 2:
-                logSizeButton.setTitle("½", for: .normal)
                 // "0 + 1/2"
+                logSizeLabel.text = "½"
                 selectedXVal = 0
                 selectedYVal = 2
             case 3:
-                logSizeButton.setTitle("¾", for: .normal)
                 // "0 + 3/4"
+                logSizeLabel.text = "¾"
                 selectedXVal = 0
                 selectedYVal = 3
             default:
@@ -963,23 +987,23 @@ extension CategoryViewController {
         } else {
             switch remainder {
             case 0:
-                logSizeButton.setTitle("\(portion)", for: .normal)
                 // "n + 0"
+                logSizeLabel.text = "\(portion)"
                 selectedXVal = portion
                 selectedYVal = 0
             case 1:
-                logSizeButton.setTitle("\(portion)¼", for: .normal)
                 // "n + 1/4"
+                logSizeLabel.text = "\(portion)¼"
                 selectedXVal = portion
                 selectedYVal = 1
             case 2:
-                logSizeButton.setTitle("\(portion)½", for: .normal)
                 // "n + 1/2"
+                logSizeLabel.text = "\(portion)½"
                 selectedXVal = portion
                 selectedYVal = 2
             case 3:
-                logSizeButton.setTitle("\(portion)¾", for: .normal)
                 // "n + 3/4"
+                logSizeLabel.text = "\(portion)¾"
                 selectedXVal = portion
                 selectedYVal = 3
             default:
@@ -1043,11 +1067,11 @@ extension CategoryViewController {
                 self.detailContainerHeight.constant = CGFloat(detailBoxAHeightInt)
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxAHeightInt + marginInt)
                 
-                self.fingerImageView.isHidden = false
                 self.downArrowImageView.isHidden = false
                 self.logSizeButton.isHidden = false
+                self.logSizeLabel.isHidden = false
                 self.sizePickerContainer.isHidden = false
-                self.logTimeButton.isHidden = true
+                self.logTimeLabel.isHidden = true
                 self.timePicker.isHidden = true
                 self.startDateButton.isHidden = true
                 self.endDateButton.isHidden = true
@@ -1066,7 +1090,7 @@ extension CategoryViewController {
             components.hour = 0
             components.minute = 5
             self.timePicker.setDate(calendar.date(from: components)!, animated: true)
-            logTimeButton.setTitle("5min", for: .normal)
+            logTimeLabel.text = "5min"
             UIView.animate(withDuration: 0.5) {
                 self.detailContainer.isHidden = false
                 self.searchTextField.isHidden = true
@@ -1074,11 +1098,11 @@ extension CategoryViewController {
                 self.detailContainerHeight.constant = CGFloat(detailBoxBHeightInt)
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxBHeightInt + marginInt)
                 
-                self.fingerImageView.isHidden = true
                 self.downArrowImageView.isHidden = true
-                self.logSizeButton.isHidden = true
+                self.logSizeButton.isHidden = false
+                self.logSizeLabel.isHidden = true
                 self.sizePickerContainer.isHidden = true
-                self.logTimeButton.isHidden = false
+                self.logTimeLabel.isHidden = false
                 self.timePicker.isHidden = false
                 self.startDateButton.isHidden = true
                 self.endDateButton.isHidden = true
@@ -1094,11 +1118,11 @@ extension CategoryViewController {
                 self.detailContainerHeight.constant = CGFloat(detailBoxCHeightInt)
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxCHeightInt + marginInt)
                 
-                self.fingerImageView.isHidden = true
                 self.downArrowImageView.isHidden = true
                 self.logSizeButton.isHidden = true
+                self.logSizeLabel.isHidden = true
                 self.sizePickerContainer.isHidden = true
-                self.logTimeButton.isHidden = true
+                self.logTimeLabel.isHidden = true
                 self.timePicker.isHidden = true
                 self.startDateButton.isHidden = false
                 self.endDateButton.isHidden = false
@@ -1134,6 +1158,7 @@ extension CategoryViewController {
                 self.searchTextField.isHidden = true
                 self.langPickButton.isHidden = true
                 self.loadingImageView.isHidden = false
+                self.loadingImageView.startRotating(duration: 1)
             })
         }
         if superTag != nil {

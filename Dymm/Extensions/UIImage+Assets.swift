@@ -104,4 +104,6 @@ extension UIImage {
     
     static let itemBatteryGray = UIImage(named: "item-battery-gray")
     static let itemBatteryGreen = UIImage(named: "item-battery-green")
+    
+    static let itemBtnPlus = UIImage(named: "item-btn-plus")!
 }

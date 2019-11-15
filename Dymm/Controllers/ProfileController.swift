@@ -435,7 +435,7 @@ class ProfileViewController: UIViewController {
     }
     
     @objc func alertTempFreeTriar() {
-        let alert = UIAlertController(title: "Membership", message: "Free trial!", preferredStyle: .alert)
+        let alert = UIAlertController(title: lang.titleMembership, message: "\(lang.titleFreeTrial!)!", preferredStyle: .alert)
         let logoImageView: UIImageView = {
             let imageView = UIImageView()
             imageView.contentMode = .scaleAspectFit
