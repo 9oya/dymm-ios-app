@@ -789,7 +789,7 @@ struct LangPack {
         self.msgLifeSpan = {
             switch currentLanguageId {
             case LanguageId.eng: return "I've estimated your remaining lifespan."
-            case LanguageId.kor: return "당신의 남은 수명을 예측하였습니다."
+            case LanguageId.kor: return "당신의 남은 수명을 예측합니다."
             default: fatalError()}
         }()
         self.msgLogComplete = {

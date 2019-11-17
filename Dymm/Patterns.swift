@@ -13,8 +13,8 @@ private let localHost = "http://127.0.0.1:5000"
 private let productHost = "https://dymm-api-01.appspot.com"
 
 struct URI {
-//    static let host = localHost
-    static let host = productHost
+    static let host = localHost
+//    static let host = productHost
     static let avatar = "/api/avatar"
     static let banner = "/api/banner"
     static let mail = "/api/mail"
@@ -41,7 +41,7 @@ struct UnauthType {
 
 struct TagType {
     static let activity = 7
-    static let condition = 8
+    static let disease = 8
     static let drug = 9
     static let food = 10
     static let character = 11
@@ -183,22 +183,6 @@ func getCondScoreImageLarge(_ condScore: Float) -> UIImage? {
         return .itemScoreGoodL
     } else {
         return .itemScoreExcellentL
-    }
-}
-
-func getAgingHumanImage(_ condScore: Float) -> UIImage? {
-    if condScore < 1 {
-        return .itemAgingGray
-    } else if condScore < 2.5 {
-        return .itemAgingPurple
-    } else if condScore < 4.5 {
-        return .itemAgingTomato
-    } else if condScore < 6.5 {
-        return .itemAgingOrange
-    } else if condScore < 8.5 {
-        return .itemAgingGreen
-    } else {
-        return .itemAgingBlue
     }
 }
 

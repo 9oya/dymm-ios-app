@@ -105,6 +105,11 @@ class CategoryViewController: UIViewController {
         loadCategories()
     }
     
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+//        self.navigationController?.isNavigationBarHidden = true
+//    }
+    
     // MARK: - Actions
     
     @objc func alertError(_ message: String) {
@@ -904,7 +909,7 @@ extension CategoryViewController {
         photoImageView.centerXAnchor.constraint(equalTo: detailContainer.centerXAnchor, constant: 0).isActive = true
         
         logSizeLabel.centerXAnchor.constraint(equalTo: detailContainer.centerXAnchor, constant: 0).isActive = true
-        logSizeLabel.topAnchor.constraint(equalTo: photoImageView.bottomAnchor, constant: 5).isActive = true
+        logSizeLabel.bottomAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -4).isActive = true
         
         logTimeLabel.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -36).isActive = true
         logTimeLabel.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 17)).isActive = true
@@ -1012,6 +1017,58 @@ extension CategoryViewController {
         }
     }
     
+    private func setDetailPhotoImage(tag: BaseModel.Tag) {
+        if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-\(tag.division2!)-\(tag.division3!)-\(tag.division4!)-\(tag.division5!)") {
+            self.photoImageView.image = image
+        } else {
+            if tag.division2 == 0 {
+                self.photoImageView.image = UIImage(named: "photo-\(tag.class1!)-0-0-0-0-0")
+            } else if tag.division3 == 0 {
+                if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-\(tag.division2!)-0-0-0") {
+                    self.photoImageView.image = image
+                } else {
+                    if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-0-0-0-0") {
+                        self.photoImageView.image = image
+                    } else {
+                        self.photoImageView.image = UIImage(named: "photo-\(tag.class1!)-0-0-0-0-0")
+                    }
+                }
+            } else if tag.division4 == 0 {
+                if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-\(tag.division2!)-\(tag.division3!)-0-0") {
+                    self.photoImageView.image = image
+                } else {
+                    if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-\(tag.division2!)-0-0-0") {
+                        self.photoImageView.image = image
+                    } else {
+                        if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-0-0-0-0") {
+                            self.photoImageView.image = image
+                        } else {
+                            self.photoImageView.image = UIImage(named: "photo-\(tag.class1!)-0-0-0-0-0")
+                        }
+                    }
+                }
+            } else if tag.division5 == 0 {
+                if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-\(tag.division2!)-\(tag.division3!)-\(tag.division4!)-0") {
+                    self.photoImageView.image = image
+                } else {
+                    if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-\(tag.division2!)-\(tag.division3!)-0-0") {
+                        self.photoImageView.image = image
+                    } else {
+                        if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-\(tag.division2!)-0-0-0") {
+                            self.photoImageView.image = image
+                        } else {
+                            if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-0-0-0-0") {
+                                self.photoImageView.image = image
+                            } else {
+                                self.photoImageView.image = UIImage(named: "photo-\(tag.class1!)-0-0-0-0-0")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     private func afterFetchCategoriesTransition(_ _superTag: BaseModel.Tag, _ _subTags: [BaseModel.Tag]) {
         self.superTag = _superTag
         if isScrollToLoading {
@@ -1075,10 +1132,8 @@ extension CategoryViewController {
                 self.timePicker.isHidden = true
                 self.startDateButton.isHidden = true
                 self.endDateButton.isHidden = true
-                if _superTag.tag_type == TagType.food {
-                    self.photoImageView.image = UIImage(named: "photo-meat")
-                } else {
-                    self.photoImageView.image = UIImage(named: "photo-pills")
+                if _superTag.class1 != nil {
+                    self.setDetailPhotoImage(tag: _superTag)
                 }
             }
         } else if _superTag.tag_type == TagType.activity {
@@ -1107,9 +1162,11 @@ extension CategoryViewController {
                 self.startDateButton.isHidden = true
                 self.endDateButton.isHidden = true
                 
-                self.photoImageView.image = UIImage(named: "photo-walking")
+                if _superTag.class1 != nil {
+                    self.setDetailPhotoImage(tag: _superTag)
+                }
             }
-        } else if _superTag.tag_type == TagType.condition {
+        } else if _superTag.tag_type == TagType.disease {
             // Execute condition tag_type exclusive
             UIView.animate(withDuration: 0.5) {
                 self.detailContainer.isHidden = false
@@ -1127,7 +1184,9 @@ extension CategoryViewController {
                 self.startDateButton.isHidden = false
                 self.endDateButton.isHidden = false
                 
-                self.photoImageView.image = UIImage(named: "photo-condition")
+                if _superTag.class1 != nil {
+                    self.setDetailPhotoImage(tag: _superTag)
+                }
             }
         }
         

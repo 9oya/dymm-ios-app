@@ -37,13 +37,13 @@ extension UIImage {
     }
     
     // Items
-    static let itemRectangleLine = UIImage(named: "item-Rectangle-line")!
     static let itemArrowCircle = UIImage(named: "item-arrow-circle")!
     static let itemArrowDown = UIImage(named: "item-arrow-down")!
     static let itemArrowLeft = UIImage(named: "item-arrow-left")!
     static let itemArrowMaximize = UIImage(named: "item-arrow-maximize")!
     static let itemArrowMinimize = UIImage(named: "item-arrow-minimize")!
     static let itemArrowRight = UIImage(named: "item-arrow-right")!
+    static let itemBtnPlus = UIImage(named: "item-btn-plus")!
     static let itemCheckThin = UIImage(named: "item-check-thin")!
     static let itemCheck = UIImage(named: "item-check")!
     static let itemCircleAlmostEmpty = UIImage(named: "item-circle-almost-empty")!
@@ -57,6 +57,7 @@ extension UIImage {
     static let itemDivBig = UIImage(named: "item-div-big")!
     static let itemDivSmall = UIImage(named: "item-div-small")!
     static let itemFingerClick = UIImage(named: "item-finger-click")!
+    static let itemGradientBack = UIImage(named: "item-gradient-back")!
     static let itemGtMoon = UIImage(named: "item-gt-moon")!
     static let itemGtSun = UIImage(named: "item-gt-sun")!
     static let itemGtSunrise = UIImage(named: "item-gt-sunrise")!
@@ -70,13 +71,20 @@ extension UIImage {
     static let itemNoteYellow = UIImage(named: "item-note-yellow")!
     static let itemNotes = UIImage(named: "item-notes")!
     static let itemProfileDef = UIImage(named: "item-profile-def")!
+    static let itemReload = UIImage(named: "item-reload")!
     static let itemRemove = UIImage(named: "item-remove")!
     static let itemScoreAvg = UIImage(named: "item-score-avg")!
+    static let itemScoreAwfulL = UIImage(named: "item-score-awful-l")!
     static let itemScoreAwful = UIImage(named: "item-score-awful")!
+    static let itemScoreBadL = UIImage(named: "item-score-bad-l")!
     static let itemScoreBad = UIImage(named: "item-score-bad")!
+    static let itemScoreExcellentL = UIImage(named: "item-score-excellent-l")!
     static let itemScoreExcellent = UIImage(named: "item-score-excellent")!
+    static let itemScoreGoodL = UIImage(named: "item-score-good-l")!
     static let itemScoreGood = UIImage(named: "item-score-good")!
+    static let itemScoreNoneL = UIImage(named: "item-score-none-l")!
     static let itemScoreNone = UIImage(named: "item-score-none")!
+    static let itemScoreSosoL = UIImage(named: "item-score-soso-l")!
     static let itemScoreSoso = UIImage(named: "item-score-soso")!
     static let itemStarEmpty = UIImage(named: "item-star-empty")!
     static let itemStarFilled = UIImage(named: "item-star-filled")!
@@ -84,26 +92,4 @@ extension UIImage {
     static let itemTrendUpGray = UIImage(named: "item-trend-up-gray")!
     static let itemTrendUp = UIImage(named: "item-trend-up")!
     static let itemTriangleDown = UIImage(named: "item-triangle-down")!
-    
-    static let itemScoreAwfulL = UIImage(named: "item-score-awful-l")!
-    static let itemScoreBadL = UIImage(named: "item-score-bad-l")!
-    static let itemScoreExcellentL = UIImage(named: "item-score-excellent-l")!
-    static let itemScoreGoodL = UIImage(named: "item-score-good-l")!
-    static let itemScoreNoneL = UIImage(named: "item-score-none-l")!
-    static let itemScoreSosoL = UIImage(named: "item-score-soso-l")!
-    
-    static let itemAgingGray = UIImage(named: "item-aging-gray")!
-    static let itemAgingPurple = UIImage(named: "item-aging-purple")!
-    static let itemAgingTomato = UIImage(named: "item-aging-tomato")!
-    static let itemAgingOrange = UIImage(named: "item-aging-orange")!
-    static let itemAgingGreen = UIImage(named: "item-aging-green")!
-    static let itemAgingBlue = UIImage(named: "item-aging-blue")!
-    
-    static let itemAiGray = UIImage(named: "item-ai-gray")!
-    static let itemAiGreen = UIImage(named: "item-ai-green")!
-    
-    static let itemBatteryGray = UIImage(named: "item-battery-gray")
-    static let itemBatteryGreen = UIImage(named: "item-battery-green")
-    
-    static let itemBtnPlus = UIImage(named: "item-btn-plus")!
 }

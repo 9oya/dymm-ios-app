@@ -1445,7 +1445,7 @@ extension DiaryViewController {
         }()
         condRefreshButton = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage(named: "item-refresh")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.itemReload.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(condRefreshButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false

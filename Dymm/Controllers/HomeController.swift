@@ -67,6 +67,7 @@ class HomeViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         UIView.transition(with: tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.monthPicker.reloadAllComponents()

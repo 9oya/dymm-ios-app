@@ -311,7 +311,13 @@ struct BaseModel {
         let eng_name: String
         let kor_name: String?
         let jpn_name: String?
-        let bookmark_id: Int?
+        let bookmark_id: Int?  // Determining whether it has been bookmarked.
+        let class1: Int?
+        let division1: Int?
+        let division2: Int?
+        let division3: Int?
+        let division4: Int?
+        let division5: Int?
         
         enum CodingKeys: String, CodingKey {
             case id
@@ -321,6 +327,12 @@ struct BaseModel {
             case kor_name
             case jpn_name
             case bookmark_id
+            case class1
+            case division1
+            case division2
+            case division3
+            case division4
+            case division5
         }
         
         init(from decoder: Decoder) throws {
@@ -332,6 +344,12 @@ struct BaseModel {
             self.kor_name = try? valueContainer.decode(String.self, forKey: CodingKeys.kor_name)
             self.jpn_name = try? valueContainer.decode(String.self, forKey: CodingKeys.jpn_name)
             self.bookmark_id = try? valueContainer.decode(Int.self, forKey: CodingKeys.bookmark_id)
+            self.class1 = try? valueContainer.decode(Int.self, forKey: CodingKeys.class1)
+            self.division1 = try? valueContainer.decode(Int.self, forKey: CodingKeys.division1)
+            self.division2 = try? valueContainer.decode(Int.self, forKey: CodingKeys.division2)
+            self.division3 = try? valueContainer.decode(Int.self, forKey: CodingKeys.division3)
+            self.division4 = try? valueContainer.decode(Int.self, forKey: CodingKeys.division4)
+            self.division5 = try? valueContainer.decode(Int.self, forKey: CodingKeys.division5)
         }
     }
     
