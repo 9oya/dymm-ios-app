@@ -828,7 +828,7 @@ struct LangPack {
         self.msgMailNotConfirmed = {
             switch currentLanguageId {
             case LanguageId.eng: return "Your email address is not verified yet. \nPleas verify Your email."
-            case LanguageId.kor: return "이메일이 아직 확인되지 않았습니다.\n메일계정을 확인해 주세요."
+            case LanguageId.kor: return "메일주소가 아직 검증되지 않았습니다.\n메일을 확인해 주세요."
             default: fatalError()}
         }()
         self.msgMailSendAgainComplete = {

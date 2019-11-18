@@ -71,6 +71,7 @@ class ProfileViewController: UIViewController {
     var mailMessage: String?
     var notConfirmedEmail: String?
     var avatarInfoTarget: Int?
+    var oldInfoStr: String?
     var newInfoStr: String?
     var selectedCollectionItem: Int?
     var oldPassword: String?
@@ -101,7 +102,7 @@ class ProfileViewController: UIViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    @objc func alertPicker() {
+    @objc func alertProfileTagPicker() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
         alert.view.addSubview(profileTagPicker)
         profileTagPicker.topAnchor.constraint(equalTo: alert.view.topAnchor, constant: 0).isActive = true
@@ -128,6 +129,8 @@ class ProfileViewController: UIViewController {
         datePicker.datePickerMode = .date
         datePicker.frame = CGRect(x: 0, y: 15, width: 270, height: 200)
         if let dateOfBirth = self.profile!.avatar.date_of_birth {
+            let oldDate = dateFormatter.date(from: dateOfBirth)!
+            self.oldInfoStr = dateFormatter.string(from: oldDate)
             datePicker.setDate(dateFormatter.date(from: dateOfBirth)!, animated: true)
         }
         let alert = UIAlertController(title: "\n\n\n\n\n\n\n\n", message: nil, preferredStyle: UIAlertController.Style.alert)
@@ -169,7 +172,8 @@ class ProfileViewController: UIViewController {
         alert.addTextField { textField in
             textField.autocapitalizationType = UITextAutocapitalizationType.words
             textField.placeholder = self.lang.titleFirstName
-            textField.text = self.profile!.avatar.first_name
+            self.oldInfoStr = self.profile!.avatar.first_name
+            textField.text = self.oldInfoStr
             textField.keyboardAppearance = .default
             textField.keyboardType = .default
             textField.returnKeyType = .done
@@ -202,7 +206,8 @@ class ProfileViewController: UIViewController {
         alert.addTextField { textField in
             textField.autocapitalizationType = UITextAutocapitalizationType.words
             textField.placeholder = self.lang.titleLastName
-            textField.text = self.profile!.avatar.last_name
+            self.oldInfoStr = self.profile!.avatar.last_name
+            textField.text = self.oldInfoStr
             textField.keyboardAppearance = .default
             textField.keyboardType = .default
             textField.returnKeyType = .done
@@ -252,9 +257,11 @@ class ProfileViewController: UIViewController {
             textField.keyboardType = .emailAddress
             textField.placeholder = self.lang.titleEmail
             if self.notConfirmedEmail != nil {
-                textField.text = self.notConfirmedEmail
+                self.oldInfoStr = self.notConfirmedEmail
+                textField.text = self.oldInfoStr
             } else {
-                textField.text = self.profile!.avatar.email
+                self.oldInfoStr = self.profile!.avatar.email
+                textField.text = self.oldInfoStr
             }
             confirmAction.isEnabled = false
             NotificationCenter.default.addObserver(forName: UITextField.textDidChangeNotification, object: textField, queue: OperationQueue.main) { (notification) in
@@ -277,6 +284,7 @@ class ProfileViewController: UIViewController {
         let controller = UIViewController()
         introTextView.frame = controller.view.frame
         if let originTxt = introLabel.text {
+            self.oldInfoStr = originTxt
             introTextView.text = originTxt
         }
         controller.view.addSubview(introTextView)
@@ -405,9 +413,7 @@ class ProfileViewController: UIViewController {
             })
             UIView.transition(with: self.blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.blindView.isHidden = false
-            }) { (_) in
-                print("")
-            }
+            })
             return
         })
         alert.addAction(UIAlertAction(title: lang.titleCamera, style: .default) { _ in
@@ -459,6 +465,7 @@ class ProfileViewController: UIViewController {
             colorLeftButtonTapped()
             return
         }
+        self.oldInfoStr = "\(self.profile!.avatar.color_code)"
         self.newInfoStr = "\(colorCodeArr[selectedColorItem!])"
         self.avatarInfoTarget = AvatarInfoTarget.color_code
         self.updateAvatarInfo()
@@ -521,9 +528,11 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
                 cell.label.textColor = .mediumSeaGreen
             case TagId.dateOfBirth:
                 if let dateOfBirth = profile?.avatar.date_of_birth {
+                    cell.label.font = .systemFont(ofSize: 14, weight: .regular)
                     cell.label.text = dateOfBirth
                     cell.label.textColor = .black
                 } else {
+                    cell.label.font = .systemFont(ofSize: 14, weight: .regular)
                     cell.label.text = profileTag.eng_name
                     cell.label.textColor = .lightGray
                 }
@@ -539,6 +548,7 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
                     cell.label.textColor = .lightGray
                     return cell
                 }
+                cell.label.font = .systemFont(ofSize: 14, weight: .regular)
                 cell.label.textColor = .black
             }
             return cell
@@ -1167,19 +1177,22 @@ extension ProfileViewController {
             }
             self.profileTagPicker.reloadAllComponents()
             self.profileTagPicker.selectRow(profileTagSet.select_idx, inComponent: 0, animated: true)
-            self.alertPicker()
+            self.alertProfileTagPicker()
         }
     }
     
     private func updateProfileTag() {
+        let myProfileTag = profile!.profile_tags[selectedCollectionItem!]
+        if myProfileTag.tag_id == pickedTag!.id {
+            return
+        }
         self.view.showSpinner()
         UIView.transition(with: tagCollection, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.infoContainer.isHidden = true
             self.tagCollection.isHidden = true
         })
-        let profileTagId = profile!.profile_tags[selectedCollectionItem!].id
         let service = Service(lang: lang)
-        service.putProfileTag(profile_tag_id: profileTagId, tag_id: pickedTag!.id, popoverAlert: { (message) in
+        service.putProfileTag(profile_tag_id: myProfileTag.id, tag_id: pickedTag!.id, popoverAlert: { (message) in
             self.retryFunction = self.updateProfileTag
             self.alertError(message)
         }, tokenRefreshCompletion: {
@@ -1195,6 +1208,15 @@ extension ProfileViewController {
     }
     
     private func updateAvatarInfo() {
+        if oldInfoStr == newInfoStr {
+            self.oldInfoStr = nil
+            self.newInfoStr = nil
+            if self.avatarInfoTarget == AvatarInfoTarget.color_code {
+                self.colorLeftButtonTapped()
+            }
+            self.avatarInfoTarget = nil
+            return
+        }
         self.view.showSpinner()
         UIView.transition(with: tagCollection, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.infoContainer.isHidden = true

@@ -13,8 +13,8 @@ private let localHost = "http://127.0.0.1:5000"
 private let productHost = "https://dymm-api-01.appspot.com"
 
 struct URI {
-    static let host = localHost
-//    static let host = productHost
+//    static let host = localHost
+    static let host = productHost
     static let avatar = "/api/avatar"
     static let banner = "/api/banner"
     static let mail = "/api/mail"
