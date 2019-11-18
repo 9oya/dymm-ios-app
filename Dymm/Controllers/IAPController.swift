@@ -27,7 +27,6 @@ class IAPController: UIViewController {
     var lblPurchaseDone: UILabel!
     
     // UIImageView
-    var loadingImageView: UIImageView!
     var logoImageView: UIImageView!
     
     // UIActivityIndicatorView

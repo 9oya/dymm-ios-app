@@ -19,9 +19,6 @@ class AuthViewController: UIViewController {
     var formContainerView: UIView!
     var formGrayLineView: UIView!
     
-    // UIImageView
-    var loadingImageView: UIImageView!
-    
     // UITextField
     var firstNameTextField: SkyFloatingLabelTextField!
     var lastNameTextField: SkyFloatingLabelTextField!
@@ -64,6 +61,7 @@ class AuthViewController: UIViewController {
     // MARK: - Actions
     
     @objc func alertError(_ message: String) {
+        view.hideSpinner()
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.retryFunction!()
@@ -113,6 +111,7 @@ class AuthViewController: UIViewController {
         let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -189,6 +188,7 @@ class AuthViewController: UIViewController {
     }
     
     @objc func alertChangePasswordCompl() {
+        self.view.hideSpinner()
         let alert = UIAlertController(title: lang.titlePasswordChangeCompl, message: "\n" + lang.msgChangePasswordCompl, preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
             return
@@ -363,7 +363,6 @@ extension AuthViewController {
         view.backgroundColor = UIColor.whiteSmoke
         
         // Initialize subveiw properties
-        loadingImageView = getLoadingImageView(isHidden: true)
         topBarView = getAddtionalTopBarView()
         forgotButton = getBasicTextButton()
         forgotButton.setTitle(lang.titleForgotPassword, for: .normal)
@@ -493,7 +492,6 @@ extension AuthViewController {
         confirmPassTextField.delegate = self
         
         // Setup subviews
-        view.addSubview(loadingImageView)
         view.addSubview(formContainerView)
         view.addSubview(topBarView)
         
@@ -511,9 +509,6 @@ extension AuthViewController {
         formContainerView.addSubview(formGrayLineView)
         
         // Setup constraints
-        loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
-        loadingImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0).isActive = true
-        
         topBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         topBarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         topBarView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
@@ -601,15 +596,17 @@ extension AuthViewController {
         default:
             fatalError()
         }
-        UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            if self.loadingImageView.isHidden {
-                self.formContainerView.isHidden = true
-                self.loadingImageView.isHidden = false
-            } else {
+        if self.formContainerView.isHidden {
+            self.view.hideSpinner()
+            UIView.transition(with: formContainerView, duration: 0.6, options: .transitionCrossDissolve, animations: {
                 self.formContainerView.isHidden = false
-                self.loadingImageView.isHidden = true
-            }
-        })
+            })
+        } else {
+            self.view.showSpinner()
+            UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.formContainerView.isHidden = true
+            })
+        }
     }
     
     private func accountSignIn() {
@@ -641,9 +638,9 @@ extension AuthViewController {
         if avatar_id > 0 {
             params["id"] = avatar_id
         }
+        self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
-            self.loadingImageView.isHidden = false
         })
         let service = Service(lang: lang)
         service.authOldAvatar(params: params, unauthorized: { pattern in
@@ -703,9 +700,9 @@ extension AuthViewController {
             "password": password,
             "language_id": getDeviceLanguage()
         ]
+        self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
-            self.loadingImageView.isHidden = false
         })
         let service = Service(lang: lang)
         service.createNewAvatar(params: params, unauthorized: { pattern in
@@ -744,9 +741,9 @@ extension AuthViewController {
     }
     
     private func sendVerificationCodeToMail() {
+        self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
-            self.loadingImageView.isHidden = false
         })
         let params: Parameters = [
             "email": emailToFind!
@@ -761,16 +758,16 @@ extension AuthViewController {
             self.isCodeCorrect = true
             UIView.transition(with: self.formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.formContainerView.isHidden = false
-                self.loadingImageView.isHidden = true
+                self.view.hideSpinner()
             })
             self.alertVerificationCode()
         }
     }
     
     private func verifyEmailCode() {
+        self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
-            self.loadingImageView.isHidden = false
         })
         let params: Parameters = [
             "email": emailToFind!,
@@ -787,23 +784,19 @@ extension AuthViewController {
             self.isCodeCorrect = true
             UIView.transition(with: self.formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.formContainerView.isHidden = false
-                self.loadingImageView.isHidden = true
+                self.view.hideSpinner()
             })
             self.alertChangePassword()
         }
     }
     
     private func changePassword() {
+        self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
-            self.loadingImageView.isHidden = false
         })
-        guard let avatarId = UserDefaults.standard.getAvatarId() else {
-            UserDefaults.standard.setIsSignIn(value: false)
-            fatalError()
-        }
         let params: Parameters = [
-            "avatar_id": avatarId,
+            "email": emailToFind!,
             "target": TagId.password,
             "new_info": confPassword!
         ]
@@ -818,7 +811,7 @@ extension AuthViewController {
         }) { (newInfoTxt) in
             UIView.transition(with: self.formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.formContainerView.isHidden = false
-                self.loadingImageView.isHidden = true
+                self.view.hideSpinner()
             })
             self.alertChangePasswordCompl()
         }

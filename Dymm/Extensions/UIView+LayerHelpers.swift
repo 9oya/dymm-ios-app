@@ -66,4 +66,27 @@ extension UIView {
             self.layer.removeAnimation(forKey: kAnimationKey)
         }
     }
+    
+    func showSpinner() {
+        let spinner: UIActivityIndicatorView = {
+            let indicator = UIActivityIndicatorView()
+            indicator.style = .whiteLarge
+            indicator.color = UIColor(hex: "#ABDE65")
+            indicator.layer.cornerRadius = 10.0
+            indicator.startAnimating()
+            indicator.tag = 475647
+            indicator.translatesAutoresizingMaskIntoConstraints = false
+            return indicator
+        }()
+        addSubview(spinner)
+        spinner.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+        spinner.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+    }
+    
+    func hideSpinner() {
+        if let spinner = viewWithTag(475647){
+            spinner.removeFromSuperview()
+        }
+        self.isUserInteractionEnabled = true
+    }
 }

@@ -39,7 +39,6 @@ class CategoryViewController: UIViewController {
     // UIImageViews
     var downArrowImageView: UIImageView!
     var photoImageView: UIImageView!
-    var loadingImageView: UIImageView!
     var gradientBackImage: UIImageView!
     
     // UITextField
@@ -105,14 +104,10 @@ class CategoryViewController: UIViewController {
         loadCategories()
     }
     
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        self.navigationController?.isNavigationBarHidden = true
-//    }
-    
     // MARK: - Actions
     
     @objc func alertError(_ message: String) {
+        view.hideSpinner()
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.retryFunction!()
@@ -345,8 +340,9 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
             case LanguageId.kor: _text = tag.kor_name!
             default: fatalError()}
             if typedKeyword != nil {
+                cell.label.textColor = .black
                 let attributedString: NSMutableAttributedString = NSMutableAttributedString(string: _text)
-                attributedString.setColorForText(textForAttribute: typedKeyword!, withColor: UIColor.orange)
+                attributedString.setColorForText(textForAttribute: typedKeyword!, withColor: .orange)
                 cell.label.attributedText = attributedString
             } else {
                 cell.label.text = _text
@@ -733,7 +729,6 @@ extension CategoryViewController {
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
-        loadingImageView = getLoadingImageView(isHidden: false)
         titleLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 20, weight: .regular)
@@ -854,7 +849,6 @@ extension CategoryViewController {
         view.addSubview(langPickButton)
         view.addSubview(detailContainer)
         view.addSubview(tagCollection)
-        view.addSubview(loadingImageView)
         
         detailContainer.addSubview(titleLabel)
         detailContainer.addSubview(starButton)
@@ -952,9 +946,6 @@ extension CategoryViewController {
         tagCollection.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         tagCollection.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         tagCollection.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
-        
-        loadingImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        loadingImageView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: 0).isActive = true
     }
     
     private func didSelectSizePickerRow(row: Int) {
@@ -1200,7 +1191,8 @@ extension CategoryViewController {
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt)
             }
             self.tagCollection.isHidden = false
-            self.loadingImageView.isHidden = true
+            self.view.hideSpinner()
+            
         }, completion: { (_) in
             if self.subTags.count > 0 {
                 let indexPath = IndexPath(row: 0, section: 0)
@@ -1211,13 +1203,12 @@ extension CategoryViewController {
     
     private func loadCategories() {
         if !isScrollToLoading {
+            self.view.showSpinner()
             UIView.transition(with: detailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.detailContainer.isHidden = true
                 self.tagCollection.isHidden = true
                 self.searchTextField.isHidden = true
                 self.langPickButton.isHidden = true
-                self.loadingImageView.isHidden = false
-                self.loadingImageView.startRotating(duration: 1)
             })
         }
         if superTag != nil {

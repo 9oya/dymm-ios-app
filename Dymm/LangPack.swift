@@ -11,6 +11,7 @@ import Foundation
 struct LangPack {
     var currentLanguageId: Int!
     
+    var titleAccountInvalid: String!
     var titleAge: String!
     var titleAgeGroup: String!
     var titleAll: String!
@@ -93,6 +94,7 @@ struct LangPack {
     var titleWeekdays: [String]!
     var titleYes: String!
     
+    var msgAccountInvalid: String!
     var msgAvgScoreDownMonth: ((String) -> String)!
     var msgAvgScoreDownWeek: String!
     var msgAvgScoreEqualWeek: String!
@@ -163,6 +165,13 @@ struct LangPack {
         
         // MARK: Titles
         
+        self.titleAccountInvalid = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "\u{26A0}Unauthorized account"
+            case LanguageId.kor: return "\u{26A0}권한이 없는 계정"
+            case LanguageId.jpn: return ""
+            default: fatalError()}
+        }()
         self.titleAge = {
             switch currentLanguageId {
             case LanguageId.eng: return "AGE"
@@ -666,6 +675,12 @@ struct LangPack {
         
         // MARK: Messages
         
+        self.msgAccountInvalid = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Try sign-in again. If you get the same error contact Dymm customer service."
+            case LanguageId.kor: return "다시 로그인을 시도해 보세요. 만일 같은 오류가 발생한다면 딤 고객센터에 문의해 주세요."
+            default: fatalError()}
+        }()
         self.msgAvgScoreDownWeek = {
             switch currentLanguageId {
             case LanguageId.eng: return "Your score has gone down this week."

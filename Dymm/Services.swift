@@ -116,7 +116,7 @@ struct Service {
     
     // MARK: - GET services
     
-    func getAvatar(popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ data: CustomModel.Auth) -> Void) {
+    func getAvatar(unauthorized: @escaping (_ pattern: Int) -> Void, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ data: CustomModel.Auth) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -146,6 +146,11 @@ struct Service {
                     completion(data)
                 case 400:
                     self.badRequest(responseData)
+                case 401:
+                    guard let decodedData = try? self.decoder.decode(Unauthorized.self, from: responseData) else {
+                        fatalError()
+                    }
+                    unauthorized(decodedData.pattern)
                 case 403:
                     _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
                         tokenRefreshCompletion()
@@ -433,7 +438,7 @@ struct Service {
         }
     }
     
-    func getScoreBoard(yearNumber: String, monthNumber: Int?, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.ScoreBoardSet) -> Void) {
+    func getScoreBoard(yearNumber: String, monthNumber: Int?, unauthorized: @escaping (_ pattern: Int) -> Void, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.ScoreBoardSet) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -468,6 +473,11 @@ struct Service {
                     completion(scoreBoardSet)
                 case 400:
                     self.badRequest(responseData)
+                case 401:
+                    guard let decodedData = try? self.decoder.decode(Unauthorized.self, from: responseData) else {
+                        fatalError()
+                    }
+                    unauthorized(decodedData.pattern)
                 case 403:
                     _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
                         tokenRefreshCompletion()

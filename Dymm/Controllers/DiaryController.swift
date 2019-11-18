@@ -47,9 +47,6 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var groupTypePickerView: UIPickerView!
     var condScorePickerView: UIPickerView!
     
-    // UIImageView
-    var loadingImageView: UIImageView!
-    
     // UILabel
     var pickerDateLabel: UILabel!
     var condTitleLabel: UILabel!
@@ -136,6 +133,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     // MARK: - Actions
     
     @objc func alertError(_ message: String) {
+        view.hideSpinner()
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
         alert.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
@@ -406,9 +404,9 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     @objc func pickerCheckButtonTapped() {
+        self.view.showSpinner()
         UIView.transition(with: pickerContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.pickerContainerView.isHidden = true
-            self.loadingImageView.isHidden = false
         })
         createGroupOfALog()
     }
@@ -1271,7 +1269,6 @@ extension DiaryViewController {
         
         // Initialize subveiw properties
         blindView = getAlertBlindView()
-        loadingImageView = getLoadingImageView(isHidden: true)
         pickerGrayLineView = getGrayLineView()
         pickerContainerView = {
             let _view = UIView()
@@ -1487,7 +1484,6 @@ extension DiaryViewController {
         view.addSubview(calendarView)
         view.addSubview(condButton)
         view.addSubview(toggleButton)
-        view.addSubview(loadingImageView)
         view.addSubview(blindView)
         view.addSubview(condLeftButton)
         view.addGestureRecognizer(scopeGesture)
@@ -1511,9 +1507,6 @@ extension DiaryViewController {
         condContainerView.addSubview(condRefreshButton)
         
         // Setup constraints
-        loadingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
-        loadingImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0).isActive = true
-        
         blindView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         blindView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
         blindView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
@@ -1771,9 +1764,9 @@ extension DiaryViewController {
         }, tokenRefreshCompletion: {
             self.createGroupOfALog()
         }) {
-            UIView.transition(with: self.loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            UIView.transition(with: self.pickerContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.pickerContainerView.isHidden = true
-                self.loadingImageView.isHidden = true
+                self.view.hideSpinner()
             }, completion: { (_) in
                 switch self.lang.currentLanguageId {
                 case LanguageId.eng: self.alertCompl(self.selectedTag!.eng_name, self.lang.msgLogComplete)

@@ -37,7 +37,6 @@ class RankingViewController: UIViewController {
     var myLifespanLabel: UILabel!
     
     // UIImageView
-    var loadingImageView: UIImageView!
     var myProfileImgView: UIImageView!
     
     // Non-view properties
@@ -66,6 +65,7 @@ class RankingViewController: UIViewController {
     // MARK: - Actions
     
     @objc func alertError(_ message: String) {
+        view.hideSpinner()
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.retryFunction!()
@@ -295,7 +295,6 @@ extension RankingViewController {
         view.backgroundColor = .whiteSmoke
         navigationItem.title = lang.titleRanking.uppercased()
         
-        loadingImageView = getLoadingImageView(isHidden: false)
         homeButton = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemHome.withRenderingMode(.alwaysOriginal), for: .normal)
@@ -440,7 +439,6 @@ extension RankingViewController {
         view.addSubview(headerRankLabel)
         view.addSubview(headerLifespanLabel)
         view.addSubview(rankingTableView)
-        view.addSubview(loadingImageView)
         
         myRankingContainer.addSubview(myProfileImgView)
         myRankingContainer.addSubview(myProfileImgLabel)
@@ -491,17 +489,10 @@ extension RankingViewController {
         rankingTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         rankingTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         rankingTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
-        
-        loadingImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        loadingImageView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: 0).isActive = true
     }
     
     private func loadRankings() {
-        if loadingImageView.isHidden {
-            UIView.transition(with: loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.loadingImageView.isHidden = false
-            })
-        }
+        view.showSpinner()
         let service = Service(lang: lang)
         service.getRankings(ageRange: selectedAgeGroupKey, startPoint: selectedStartingKey, pageNum: currPageNum, popoverAlert: { (message) in
             self.retryFunction = self.loadRankings
@@ -520,10 +511,7 @@ extension RankingViewController {
             }
             self.rankings = rankingSet.rankings
             self.rankingTableView.reloadData()
-            
-            UIView.transition(with: self.loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.loadingImageView.isHidden = true
-            })
+            self.view.hideSpinner()
         }
     }
     
@@ -536,15 +524,15 @@ extension RankingViewController {
             self.loadMyRanking()
         }) { (ranking) in
             if ranking.photo_name != nil && ranking.color_code == 0 {
-//                let url = "\(URI.host)\(URI.avatar)/\(ranking.avatar_id)/profile/photo/\(ranking.photo_name!)"
-//                Alamofire.request(url).responseImage { response in
-//                    if let data = response.data {
-//                        self.myProfileImgView.image = UIImage(data: data)
-//                        UIView.transition(with: self.myProfileImgLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
-//                            self.myProfileImgLabel.textColor = .clear
-//                        })
-//                    }
-//                }
+                let url = "\(URI.host)\(URI.avatar)/\(ranking.avatar_id)/profile/photo/\(ranking.photo_name!)"
+                Alamofire.request(url).responseImage { response in
+                    if let data = response.data {
+                        self.myProfileImgView.image = UIImage(data: data)
+                        UIView.transition(with: self.myProfileImgLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                            self.myProfileImgLabel.textColor = .clear
+                        })
+                    }
+                }
             } else {
                 let firstName = ranking.first_name
                 let index = firstName.index(firstName.startIndex, offsetBy: 0)

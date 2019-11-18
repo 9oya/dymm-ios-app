@@ -35,7 +35,6 @@ class ProfileViewController: UIViewController {
     
     // UIImageView
     var infoImageView: UIImageView!
-    var loadingImageView: UIImageView!
     
     // UITextView
     var introTextView: UITextView!
@@ -62,7 +61,6 @@ class ProfileViewController: UIViewController {
     var introLabel: UILabel!
     var introPlaceHolderLabel: UILabel!
     var colorTitleLabel: UILabel!
-    
     
     // Non-view properties
     var lang: LangPack!
@@ -93,6 +91,7 @@ class ProfileViewController: UIViewController {
     // MARK: - Actions
     
     @objc func alertError(_ message: String) {
+        view.hideSpinner()
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
                 self.retryFunction!()
@@ -238,14 +237,14 @@ class ProfileViewController: UIViewController {
             }
         }
         let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in
-            UIView.transition(with: self.loadingImageView, duration: 0.7, options: .transitionCrossDissolve, animations: {
+            UIView.transition(with: self.tagCollection, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 if self.notConfirmedEmail != nil {
                     self.verifMailContainer.isHidden = false
                 } else {
                     self.infoContainer.isHidden = false
                     self.tagCollection.isHidden = false
                 }
-                self.loadingImageView.isHidden = true
+                self.view.hideSpinner()
             })
         }
         alert.addTextField { textField in
@@ -326,7 +325,7 @@ class ProfileViewController: UIViewController {
             UIView.transition(with: self.tagCollection, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.infoContainer.isHidden = false
                 self.tagCollection.isHidden = false
-                self.loadingImageView.isHidden = true
+                self.view.hideSpinner()
             })
         }
         alert.addTextField { textField in
@@ -739,6 +738,7 @@ extension ProfileViewController {
         // Initialize super view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = UIColor.whiteSmoke
+        view.showSpinner()
         
         // Initialize subveiw properties
         blindView = getAlertBlindView()
@@ -856,7 +856,6 @@ extension ProfileViewController {
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
-        loadingImageView = getLoadingImageView(isHidden: false)
         infoImageLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 35, weight: .medium)
@@ -908,7 +907,6 @@ extension ProfileViewController {
         view.addSubview(verifMailContainer)
         view.addSubview(infoContainer)
         view.addSubview(tagCollection)
-        view.addSubview(loadingImageView)
         view.addSubview(blindView)
         view.addSubview(colorLeftButton)
         
@@ -1052,9 +1050,6 @@ extension ProfileViewController {
         tagCollection.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         tagCollection.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
         
-        loadingImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        loadingImageView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: 0).isActive = true
-        
         blindView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         blindView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
         blindView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
@@ -1099,13 +1094,6 @@ extension ProfileViewController {
     }
     
     private func loadProfile() {
-        if loadingImageView.isHidden {
-            UIView.transition(with: loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.infoContainer.isHidden = true
-                self.tagCollection.isHidden = true
-                self.loadingImageView.isHidden = false
-            })
-        }
         let service = Service(lang: lang)
         service.getProfile(popoverAlert: { (message) in
             self.retryFunction = self.loadProfile
@@ -1116,7 +1104,7 @@ extension ProfileViewController {
                 self.infoContainer.isHidden = true
                 self.notConfirmedEmailButton.setTitle(email, for: .normal)
                 self.verifMailContainer.isHidden = false
-                self.loadingImageView.isHidden = true
+                self.view.hideSpinner()
             })
         }, tokenRefreshCompletion: {
             self.loadProfile()
@@ -1128,7 +1116,6 @@ extension ProfileViewController {
             UserDefaults.standard.setIsSignIn(value: true)
             let firstName = profile.avatar.first_name
             if profile.avatar.photo_name != nil && profile.avatar.color_code == 0 {
-                print(profile.avatar.photo_name!)
                 let url = "\(URI.host)\(URI.avatar)/\(profile.avatar.id)/profile/photo/\(profile.avatar.photo_name!)"
                 Alamofire.request(url).responseImage { response in
                     if let data = response.data {
@@ -1139,6 +1126,7 @@ extension ProfileViewController {
                 let index = firstName.index(firstName.startIndex, offsetBy: 0)
                 self.infoImageLabel.text = String(firstName[index])
                 self.infoImageLabel.textColor = .white
+                self.infoImageView.image = nil
                 self.infoImageView.backgroundColor = getProfileUIColor(key: profile.avatar.color_code)
             }
             self.firstNameLabel.text = firstName
@@ -1155,11 +1143,11 @@ extension ProfileViewController {
                 self.introGuideLabel.isHidden = true
                 self.introPlaceHolderLabel.isHidden = false
             }
+            self.view.hideSpinner()
             self.tagCollection.reloadData()
             UIView.transition(with: self.tagCollection, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.infoContainer.isHidden = false
                 self.tagCollection.isHidden = false
-                self.loadingImageView.isHidden = true
             })
         }
     }
@@ -1184,10 +1172,10 @@ extension ProfileViewController {
     }
     
     private func updateProfileTag() {
-        UIView.transition(with: loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+        self.view.showSpinner()
+        UIView.transition(with: tagCollection, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.infoContainer.isHidden = true
             self.tagCollection.isHidden = true
-            self.loadingImageView.isHidden = false
         })
         let profileTagId = profile!.profile_tags[selectedCollectionItem!].id
         let service = Service(lang: lang)
@@ -1207,13 +1195,13 @@ extension ProfileViewController {
     }
     
     private func updateAvatarInfo() {
-        UIView.transition(with: loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+        self.view.showSpinner()
+        UIView.transition(with: tagCollection, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.infoContainer.isHidden = true
             self.tagCollection.isHidden = true
             if self.notConfirmedEmail != nil {
                 self.verifMailContainer.isHidden = true
             }
-            self.loadingImageView.isHidden = false
         })
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
             UserDefaults.standard.setIsSignIn(value: false)
@@ -1260,9 +1248,9 @@ extension ProfileViewController {
     }
     
     private func sendVerifMailAgain() {
-        UIView.transition(with: loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+        self.view.showSpinner()
+        UIView.transition(with: verifMailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.verifMailContainer.isHidden = true
-            self.loadingImageView.isHidden = false
         })
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
             UserDefaults.standard.setIsSignIn(value: false)
@@ -1280,21 +1268,19 @@ extension ProfileViewController {
                 self.verifMailMsgLabel.text = self.lang.msgMailSendAgainComplete
                 self.verifMailMsgLabel.textColor = UIColor.mediumSeaGreen
             })
-            UIView.transition(with: self.loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            UIView.transition(with: self.verifMailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.verifMailContainer.isHidden = false
-                self.loadingImageView.isHidden = true
+                self.view.hideSpinner()
             })
         }
     }
     
     private func uploadProfilePhoto() {
-        if loadingImageView.isHidden {
-            UIView.transition(with: loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.infoContainer.isHidden = true
-                self.tagCollection.isHidden = true
-                self.loadingImageView.isHidden = false
-            })
-        }
+        self.view.showSpinner()
+        UIView.transition(with: tagCollection, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.infoContainer.isHidden = true
+            self.tagCollection.isHidden = true
+        })
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -1305,10 +1291,11 @@ extension ProfileViewController {
             self.alertError(message)
         }) {
             self.infoImageView.image = self.resizedImage!
-            UIView.transition(with: self.loadingImageView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            UIView.transition(with: self.tagCollection, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.infoContainer.isHidden = false
                 self.tagCollection.isHidden = false
-                self.loadingImageView.isHidden = true
+                self.infoImageLabel.text = ""
+                self.view.hideSpinner()
             })
         }
     }

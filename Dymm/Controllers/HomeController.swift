@@ -40,7 +40,6 @@ class HomeViewController: UIViewController {
     // UIImageView
     var titleImageView: UIImageView!
     var profileImageView: UIImageView!
-    var loadingImageView: UIImageView!
     var scoreEmoImageView: UIImageView!
     
     // UIButton
@@ -92,52 +91,14 @@ class HomeViewController: UIViewController {
             loadAvatar()
             loadRemainingLifeSpan()
         } else {
-            monthArr = {
-                var month = currentMonth
-                var months = [Int]()
-                while month! > 0 {
-                    months.append(month!)
-                    month! -= 1
-                }
-                return months
-            }()
-            yearPicker.selectRow(0, inComponent: 0, animated: true)
-            monthPicker.selectRow(0, inComponent: 0, animated: true)
-            
-            UIView.transition(with: profileButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
-                self.scoreboardView.isHidden = false
-                self.lifespanBoardView.isHidden = false
-                
-                self.scoreEmoImageView.image = getCondScoreImageLarge(0)
-                
-                self.scoreTitleLabel.text = self.lang.getCondScoreName(0)
-                self.scoreNumberLabel.text = String(format: "%.1f", 0.0)
-                self.scoreMessageLabel.text = self.lang.titleMyCondScore
-                
-                self.ageLabel.text = self.lang.titleAge
-                self.genderLabel.text = self.lang.titleGender
-                
-                self.lifespanMsgLabel.text = self.lang.msgSignUpYet
-                self.lifespanLabel.text = ""
-                
-                self.scoreTitleLabel.textColor = getCondScoreColor(0)
-                self.scoreNumberLabel.textColor = getCondScoreColor(0)
-                self.scoreMessageLabel.textColor = getCondScoreColor(0)
-                self.ageLabel.textColor = getCondScoreColor(0)
-                self.genderLabel.textColor = getCondScoreColor(0)
-                self.lifespanMsgLabel.textColor = .webOrange
-                
-                self.profileButton.setTitleColor(UIColor.clear, for: .normal)
-                self.profileButton.backgroundColor = UIColor.clear
-                self.profileButton.setBackgroundImage(.itemProfileDef, for: .normal)
-            })
-            navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: profileButton)]
+            showGuestScene()
         }
     }
     
     // MARK: - Actions
     
     @objc func alertError(_ message: String) {
+        view.hideSpinner()
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.retryFunction!()
@@ -145,6 +106,17 @@ class HomeViewController: UIViewController {
         let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
+        alertController.view.tintColor = .mediumSeaGreen
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    @objc func alertUnauthError(_ message: String) {
+        let alertController = UIAlertController(title: lang.titleAccountInvalid, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: lang.titleDone, style: .cancel) { _ in
+            UserDefaults.standard.setIsSignIn(value: false)
+            UserDefaults.standard.setAvatarId(value: 0)
+            self.showGuestScene()
+        })
         alertController.view.tintColor = .mediumSeaGreen
         present(alertController, animated: true, completion: nil)
     }
@@ -382,7 +354,7 @@ extension HomeViewController {
     private func setupLayout() {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
-        view.backgroundColor = UIColor.whiteSmoke
+        view.backgroundColor = .whiteSmoke
         
         let date = Date()
         let calendar = Calendar.current
@@ -497,7 +469,7 @@ extension HomeViewController {
             _imageView.layer.cornerRadius = 31 / 2
             _imageView.contentMode = .scaleAspectFill
             _imageView.clipsToBounds = true
-            _imageView.image = UIImage.itemProfileDef
+            _imageView.image = .itemProfileDef
             _imageView.isUserInteractionEnabled = true
             _imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileButtonTapped)))
             _imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -513,7 +485,6 @@ extension HomeViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        loadingImageView = getLoadingImageView(isHidden: false)
         yearArr = {
             var year = currentYear
             selectedYear = year
@@ -550,7 +521,6 @@ extension HomeViewController {
         view.addSubview(scoreboardView)
         view.addSubview(lifespanBoardView)
         view.addSubview(tagCollectionView)
-        view.addSubview(loadingImageView)
         
         scoreboardView.addSubview(scoreTitleLabel)
         scoreboardView.addSubview(scoreEmoImageView)
@@ -613,9 +583,6 @@ extension HomeViewController {
         tagCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
         tagCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
         tagCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
-        
-        loadingImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        loadingImageView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: 0).isActive = true
     }
     
     private func retryFunctionSet() {
@@ -627,9 +594,54 @@ extension HomeViewController {
         loadCategories()
     }
     
+    private func showGuestScene() {
+        monthArr = {
+            var month = currentMonth
+            var months = [Int]()
+            while month! > 0 {
+                months.append(month!)
+                month! -= 1
+            }
+            return months
+        }()
+        yearPicker.selectRow(0, inComponent: 0, animated: true)
+        monthPicker.selectRow(0, inComponent: 0, animated: true)
+        
+        UIView.transition(with: profileButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
+            self.scoreboardView.isHidden = false
+            self.lifespanBoardView.isHidden = false
+            
+            self.scoreEmoImageView.image = getCondScoreImageLarge(0)
+            
+            self.scoreTitleLabel.text = self.lang.getCondScoreName(0)
+            self.scoreNumberLabel.text = String(format: "%.1f", 0.0)
+            self.scoreMessageLabel.text = self.lang.titleMyCondScore
+            
+            self.ageLabel.text = self.lang.titleAge
+            self.genderLabel.text = self.lang.titleGender
+            
+            self.lifespanMsgLabel.text = self.lang.msgSignUpYet
+            self.lifespanLabel.text = ""
+            
+            self.scoreTitleLabel.textColor = getCondScoreColor(0)
+            self.scoreNumberLabel.textColor = getCondScoreColor(0)
+            self.scoreMessageLabel.textColor = getCondScoreColor(0)
+            self.ageLabel.textColor = getCondScoreColor(0)
+            self.genderLabel.textColor = getCondScoreColor(0)
+            self.lifespanMsgLabel.textColor = .webOrange
+            
+            self.profileButton.setTitleColor(UIColor.clear, for: .normal)
+            self.profileButton.backgroundColor = UIColor.clear
+            self.profileButton.setBackgroundImage(.itemProfileDef, for: .normal)
+        })
+        navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: profileButton)]
+    }
+    
     private func loadScoreboard() {
         let service = Service(lang: lang)
-        service.getScoreBoard(yearNumber: "\(selectedYear!)", monthNumber: selectedMonth, popoverAlert: { (message) in
+        service.getScoreBoard(yearNumber: "\(selectedYear!)", monthNumber: selectedMonth, unauthorized: { (errorCode) in
+            self.alertUnauthError(self.lang.msgAccountInvalid)
+        }, popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }, tokenRefreshCompletion: {
@@ -639,11 +651,9 @@ extension HomeViewController {
             self.thisAvgScore = formatter.number(from: scoreBoardSet.avg_score)!.floatValue
             UIView.animate(withDuration: 0.5) {
                 self.scoreEmoImageView.image = getCondScoreImageLarge(self.thisAvgScore)
-
                 self.scoreTitleLabel.text = self.lang.getCondScoreName(self.thisAvgScore)
                 self.scoreNumberLabel.text = String(format: "%.1f", self.thisAvgScore)
                 self.scoreMessageLabel.text = self.lang.titleMyCondScore
-
                 if let genderTag = scoreBoardSet.gender_tag {
                     switch self.lang.currentLanguageId {
                     case LanguageId.eng:
@@ -659,51 +669,18 @@ extension HomeViewController {
                         self.genderLabel.text = "성별"
                     default: fatalError()}
                 }
-
                 self.scoreTitleLabel.textColor = getCondScoreColor(self.thisAvgScore)
                 self.scoreNumberLabel.textColor = getCondScoreColor(self.thisAvgScore)
                 self.scoreMessageLabel.textColor = getCondScoreColor(self.thisAvgScore)
                 self.ageLabel.textColor = getCondScoreColor(self.thisAvgScore)
                 self.genderLabel.textColor = getCondScoreColor(self.thisAvgScore)
-                
                 self.scoreboardView.isHidden = false
             }
-//            self.scoreEmoImageView.image = getCondScoreImageLarge(self.thisAvgScore)
-//
-//            self.scoreTitleLabel.text = self.lang.getCondScoreName(self.thisAvgScore)
-//            self.scoreNumberLabel.text = String(format: "%.1f", self.thisAvgScore)
-//            self.scoreMessageLabel.text = self.lang.titleMyCondScore
-//
-//            if let genderTag = scoreBoardSet.gender_tag {
-//                switch self.lang.currentLanguageId {
-//                case LanguageId.eng:
-//                    self.genderLabel.text = genderTag.eng_name.uppercased()
-//                case LanguageId.kor:
-//                    self.genderLabel.text = genderTag.kor_name
-//                default: fatalError()}
-//            } else {
-//                switch self.lang.currentLanguageId {
-//                case LanguageId.eng:
-//                    self.genderLabel.text = "GENDER"
-//                case LanguageId.kor:
-//                    self.genderLabel.text = "성별"
-//                default: fatalError()}
-//            }
-//
-//            self.scoreTitleLabel.textColor = getCondScoreColor(self.thisAvgScore)
-//            self.scoreNumberLabel.textColor = getCondScoreColor(self.thisAvgScore)
-//            self.scoreMessageLabel.textColor = getCondScoreColor(self.thisAvgScore)
-//            self.ageLabel.textColor = getCondScoreColor(self.thisAvgScore)
-//            self.genderLabel.textColor = getCondScoreColor(self.thisAvgScore)
-//            UIView.transition(with: self.scoreboardView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-//                self.scoreboardView.isHidden = false
-//            })
         }
     }
     
     private func loadRemainingLifeSpan() {
         let service = Service(lang: lang)
-        
         service.getRemainingLifeSpan(popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
@@ -713,6 +690,8 @@ extension HomeViewController {
             UIView.animate(withDuration: 0.5) {
                 self.lifespanMsgLabel.textColor = .webOrange
                 switch pattern {
+                case UnauthType.userInvalid:
+                    self.alertUnauthError(self.lang.msgAccountInvalid)
                 case UnauthType.scoreNone:
                     self.lifespanMsgLabel.text = self.lang.msgCondScoreNone
                 case UnauthType.birthNone:
@@ -738,6 +717,7 @@ extension HomeViewController {
     }
     
     private func loadCategories() {
+        view.showSpinner()
         let service = Service(lang: lang)
         service.getTagSetList(tagId: TagId.home, sortType: SortType.priority, popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
@@ -746,14 +726,16 @@ extension HomeViewController {
             self.tags = tagSet.sub_tags
             UIView.transition(with: self.tagCollectionView, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.tagCollectionView.reloadData()
-                self.loadingImageView.isHidden = true
+                self.view.hideSpinner()
             })
         }
     }
     
     private func loadAvatar() {
         let service = Service(lang: lang)
-        service.getAvatar(popoverAlert: { (message) in
+        service.getAvatar(unauthorized: { (errorCode) in
+            self.alertUnauthError(self.lang.msgAccountInvalid)
+        }, popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }, tokenRefreshCompletion: {
