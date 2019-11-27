@@ -429,6 +429,7 @@ class ProfileViewController: UIViewController {
             self.present(imagePickerController, animated: true, completion: nil)
         })
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
+        alert.view.tintColor = .mediumSeaGreen
         self.present(alert, animated: true, completion: nil)
     }
     

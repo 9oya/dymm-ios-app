@@ -13,8 +13,6 @@ private let stepCellId = "StepCell"
 
 private let stepBarHeightInt = 40
 private let searchBarHeightInt = 40
-//private let detailBoxAHeightInt = 350
-//private let detailBoxBHeightInt = 333
 private let detailBoxAHeightInt = 312
 private let detailBoxBHeightInt = 312
 private let detailBoxCHeightInt = 265
@@ -1215,7 +1213,7 @@ extension CategoryViewController {
             superTagId = superTag!.id
         }
         let service = Service(lang: lang)
-        service.getTagSetList(tagId: superTagId!, sortType: SortType.priority, pageNum: currPageNum, popoverAlert: { (message) in
+        service.getTagSetList(tagId: superTagId!, sortType: SortType.priority, pageNum: currPageNum, langId: lang.currentLanguageId,popoverAlert: { (message) in
             self.retryFunction = self.loadCategories
             self.alertError(message)
         }) { (tagSet) in
@@ -1324,6 +1322,14 @@ extension CategoryViewController {
         }) { (profileTagSet) in
             self.langTags = profileTagSet.sub_tags
             self.langPicker.reloadAllComponents()
+            
+            switch self.lang.currentLanguageId {
+            case LanguageId.eng:
+                self.langPicker.selectRow(0, inComponent: 0, animated: true)
+            case LanguageId.kor:
+                self.langPicker.selectRow(1, inComponent: 0, animated: true)
+            default: fatalError()}
+            
             self.alertLangPicker()
         }
     }

@@ -589,8 +589,9 @@ extension HomeViewController {
         if UserDefaults.standard.isSignIn() {
             loadAvatar()
             loadRemainingLifeSpan()
+            loadScoreboard()
         }
-        loadScoreboard()
+//        loadScoreboard()
         loadCategories()
     }
     
