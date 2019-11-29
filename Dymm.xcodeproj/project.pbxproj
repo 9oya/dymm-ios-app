@@ -14,7 +14,6 @@
 		6A6AFEC023055BC200435954 /* CondCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A6AFEBF23055BC200435954 /* CondCollectionCell.swift */; };
 		6A8D896322F8874000A7F333 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D896222F8874000A7F333 /* AppDelegate.swift */; };
 		6A8D896522F8874000A7F333 /* HomeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D896422F8874000A7F333 /* HomeController.swift */; };
-		6A8D896A22F8874100A7F333 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A8D896922F8874100A7F333 /* Assets.xcassets */; };
 		6A8D896D22F8874100A7F333 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6A8D896B22F8874100A7F333 /* LaunchScreen.storyboard */; };
 		6A8D897822F8888B00A7F333 /* CategoryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D897722F8888B00A7F333 /* CategoryController.swift */; };
 		6A8D897A22F888A400A7F333 /* ProfileController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D897922F888A400A7F333 /* ProfileController.swift */; };
@@ -58,7 +57,6 @@
 		6A8D895F22F8874000A7F333 /* Dymm.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dymm.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A8D896222F8874000A7F333 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6A8D896422F8874000A7F333 /* HomeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeController.swift; sourceTree = "<group>"; };
-		6A8D896922F8874100A7F333 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6A8D896C22F8874100A7F333 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6A8D896E22F8874100A7F333 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6A8D897722F8888B00A7F333 /* CategoryController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryController.swift; sourceTree = "<group>"; };
@@ -142,7 +140,6 @@
 				6A8D89A722F88A3B00A7F333 /* Helpers+Patterns.swift */,
 				F59C14E0235BF992004A3B41 /* Utilities.swift */,
 				6A8D896222F8874000A7F333 /* AppDelegate.swift */,
-				6A8D896922F8874100A7F333 /* Assets.xcassets */,
 				6A8D896B22F8874100A7F333 /* LaunchScreen.storyboard */,
 				6A8D896E22F8874100A7F333 /* Info.plist */,
 			);
@@ -268,7 +265,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				6A8D896D22F8874100A7F333 /* LaunchScreen.storyboard in Resources */,
-				6A8D896A22F8874100A7F333 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
