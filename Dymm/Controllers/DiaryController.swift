@@ -88,6 +88,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var selectedLogGroup: BaseModel.LogGroup?
     var selectedTag: BaseModel.Tag?
     var groupOfLogSet: CustomModel.GroupOfLogSet?
+    var tempStoredLogs = [BaseModel.TagLog]()
     let condScores: [Int] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     
     // Non-view properties
@@ -536,6 +537,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             } else {
                 // Case no logGroups are found in the section
                 groupOfLogSet = nil
+                tempStoredLogs.removeAll()
                 groupType = LogGroupType.morning
                 pickerContainerTransition(pickerCollectionHeightInt)
             }
@@ -797,6 +799,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     // Display next groupType of logGroup and set parameters.
                     groupType = lastLogGroup.group_type + 1
                     groupOfLogSet = nil
+                    tempStoredLogs.removeAll()
                     selectedLogGroupId = nil
                     afterLoadGroupOfLogs(pickerCollectionHeightInt)
                 } else {
@@ -975,6 +978,8 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             }
             if ((groupOfLogSet!.food_logs?.count) != nil && ((groupOfLogSet!.food_logs?.count)!) > 0) {
                 let foodLog = groupOfLogSet!.food_logs!.popLast()
+                tempStoredLogs.append(foodLog!)
+                
                 cell.bulletView.backgroundColor = UIColor.tomato
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.nameLabel.text = foodLog!.eng_name
@@ -996,6 +1001,8 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 }
             } else if ((groupOfLogSet!.act_logs?.count) != nil && ((groupOfLogSet!.act_logs?.count)!) > 0) {
                 let actLog = groupOfLogSet!.act_logs!.popLast()
+                tempStoredLogs.append(actLog!)
+                
                 cell.bulletView.backgroundColor = .cornflowerBlue
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.nameLabel.text = actLog!.eng_name
@@ -1013,6 +1020,8 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 cell.quantityLabel.text = "\(hr)\(min)"
             } else if ((groupOfLogSet!.drug_logs?.count) != nil && ((groupOfLogSet!.drug_logs?.count)!) > 0) {
                 let drugLog = groupOfLogSet!.drug_logs!.popLast()
+                tempStoredLogs.append(drugLog!)
+                
                 cell.bulletView.backgroundColor = .hex_72e5Ea
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.nameLabel.text = drugLog!.eng_name
@@ -1103,9 +1112,8 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        // Prevent the display of non-existent dateLabels.
-        switch collectionView {
-        case condCollectionView:
+        if collectionView == condCollectionView {
+            // Prevent the display of non-existent dateLabels.
             guard let cell = cell as? CondCollectionCell,
                 let avtCond = avtCondList?[indexPath.item] else {
                 return
@@ -1129,20 +1137,60 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             } else {
                 cell.endDateLabel.isHidden = true
             }
-        case pickerCollectionView:
+        } else if collectionView == pickerCollectionView {
+            // The cells has not store data itself.
+            // So when they vanished from the screen, they lost view layout infos.
+            // That means they need to resetting view layouts, when they reappear from vanishing.
             guard let cell = cell as? LogCollectionCell else {
                 return
             }
-            // TODO: Fix bug
-            if ((groupOfLogSet!.food_logs?.count) != nil && ((groupOfLogSet!.food_logs?.count)!) > 0) {
-                cell.bulletView.backgroundColor = UIColor.tomato
-            } else if ((groupOfLogSet!.act_logs?.count) != nil && ((groupOfLogSet!.act_logs?.count)!) > 0) {
+            let tagLog = tempStoredLogs[indexPath.item]
+            switch lang.currentLanguageId {
+            case LanguageId.eng: cell.nameLabel.text = tagLog.eng_name
+            case LanguageId.kor: cell.nameLabel.text = tagLog.kor_name
+            default: fatalError() }
+            if tagLog.tag_type == TagType.food {
+                cell.bulletView.backgroundColor = .tomato
+                var x_val = ""
+                if tagLog.x_val! > 0 {
+                    x_val = "\(tagLog.x_val!)"
+                }
+                if tagLog.y_val == 0 {
+                    cell.quantityLabel.text = "\(x_val)"
+                } else if tagLog.y_val == 1 {
+                    cell.quantityLabel.text = "\(x_val)¼"
+                } else if tagLog.y_val == 2 {
+                    cell.quantityLabel.text = "\(x_val)½"
+                } else if tagLog.y_val == 3 {
+                    cell.quantityLabel.text = "\(x_val)¾"
+                }
+            } else if tagLog.tag_type == TagType.activity {
                 cell.bulletView.backgroundColor = .cornflowerBlue
-            } else if ((groupOfLogSet!.drug_logs?.count) != nil && ((groupOfLogSet!.drug_logs?.count)!) > 0) {
+                var hr = ""
+                var min = ""
+                if tagLog.x_val! > 0 {
+                    hr = "\(tagLog.x_val!)hr"
+                }
+                if tagLog.y_val != 0 {
+                    min = " \(tagLog.y_val!)min"
+                }
+                cell.quantityLabel.text = "\(hr)\(min)"
+            } else if tagLog.tag_type == TagType.drug {
                 cell.bulletView.backgroundColor = .hex_72e5Ea
+                var x_val = ""
+                if tagLog.x_val! > 0 {
+                    x_val = "\(tagLog.x_val!)"
+                }
+                if tagLog.y_val == 0 {
+                    cell.quantityLabel.text = "\(x_val)"
+                } else if tagLog.y_val == 1 {
+                    cell.quantityLabel.text = "\(x_val)¼"
+                } else if tagLog.y_val == 2 {
+                    cell.quantityLabel.text = "\(x_val)½"
+                } else if tagLog.y_val == 3 {
+                    cell.quantityLabel.text = "\(x_val)¾"
+                }
             }
-        default:
-            fatalError()
         }
     }
     
@@ -1225,6 +1273,7 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
                     // Case found some groupOfLogs in the logGroup.
                     selectedLogGroupId = logGroup.id
                     selectedLogGroup = logGroup
+                    tempStoredLogs.removeAll()
                     loadGroupOfLogs { (groupOfLogSet) in
                         let collectionViewHeight = logCollectionCellHeightInt * self.getGroupOfLogsTotalCnt(groupOfLogSet)
                         self.afterLoadGroupOfLogs(collectionViewHeight)
@@ -1232,6 +1281,7 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
                 } else {
                     // Case no groupOfLogs are found in the logGroup.
                     groupOfLogSet = nil
+                    tempStoredLogs.removeAll()
                     selectedLogGroupId = nil
                     selectedLogGroup = nil
                     pickerContainerTransition(pickerCollectionHeightInt)
@@ -1239,6 +1289,7 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
             } else {
                 // Case no logGroups are found in the section.
                 groupOfLogSet = nil
+                tempStoredLogs.removeAll()
                 selectedLogGroupId = nil
                 selectedLogGroup = nil
                 pickerContainerTransition(pickerCollectionHeightInt)

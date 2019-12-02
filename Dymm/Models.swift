@@ -357,6 +357,7 @@ struct BaseModel {
         let id: Int
         let group_id: Int
         let tag_id: Int
+        let tag_type: Int
         let x_val: Int?
         let y_val: Int?
         let eng_name: String
@@ -367,6 +368,7 @@ struct BaseModel {
             case id
             case group_id
             case tag_id
+            case tag_type
             case x_val
             case y_val
             case eng_name
@@ -379,6 +381,7 @@ struct BaseModel {
             self.id = try valueContainer.decode(Int.self, forKey: CodingKeys.id)
             self.group_id = try valueContainer.decode(Int.self, forKey: CodingKeys.group_id)
             self.tag_id = try valueContainer.decode(Int.self, forKey: CodingKeys.tag_id)
+            self.tag_type = try valueContainer.decode(Int.self, forKey: CodingKeys.tag_type)
             self.x_val = try? valueContainer.decode(Int.self, forKey: CodingKeys.x_val)
             self.y_val = try? valueContainer.decode(Int.self, forKey: CodingKeys.y_val)
             self.eng_name = try valueContainer.decode(String.self, forKey: CodingKeys.eng_name)
