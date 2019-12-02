@@ -40,6 +40,10 @@ extension LogTableCell {
             _label.font = .systemFont(ofSize: 14)
             _label.textAlignment = .left
             _label.addShadowView()
+            _label.numberOfLines = 2
+            _label.adjustsFontSizeToFitWidth = true
+            _label.minimumScaleFactor = 0.5
+            _label.allowsDefaultTighteningForTruncation = true
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -57,6 +61,7 @@ extension LogTableCell {
         addSubview(nameLabel)
         addSubview(quantityLabel)
         
+        
         bulletView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
         bulletView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15).isActive = true
         bulletView.widthAnchor.constraint(equalToConstant: 7).isActive = true
@@ -64,6 +69,8 @@ extension LogTableCell {
         
         nameLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
         nameLabel.leadingAnchor.constraint(equalTo: bulletView.trailingAnchor, constant: 15).isActive = true
+        nameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20).isActive = true
+//        nameLabel.trailingAnchor.constraint(equalTo: quantityLabel.leadingAnchor, constant: 0).isActive = true
         
         quantityLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0).isActive = true
         quantityLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15).isActive = true

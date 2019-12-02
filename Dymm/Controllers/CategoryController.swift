@@ -137,7 +137,11 @@ class CategoryViewController: UIViewController {
             self.createAConditionLog()
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil))
-        alert.view.tintColor = .mediumSeaGreen
+        if cond_log_type == CondLogType.startDate {
+            alert.view.tintColor = .mediumSeaGreen
+        } else {
+            alert.view.tintColor = .hex_fe4c4c
+        }
         present(alert, animated: true, completion:{})
     }
     
@@ -346,7 +350,7 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
                 cell.label.text = _text
                 switch tag.id {
                 case TagId.supplements:
-                    cell.label.textColor = .mediumSeaGreen
+                    cell.label.textColor = .webOrange
                 default:
                     cell.label.textColor = .black
                 }

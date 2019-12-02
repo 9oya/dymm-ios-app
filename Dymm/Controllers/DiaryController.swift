@@ -1104,7 +1104,8 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         // Prevent the display of non-existent dateLabels.
-        if collectionView == condCollectionView {
+        switch collectionView {
+        case condCollectionView:
             guard let cell = cell as? CondCollectionCell,
                 let avtCond = avtCondList?[indexPath.item] else {
                 return
@@ -1128,6 +1129,20 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             } else {
                 cell.endDateLabel.isHidden = true
             }
+        case pickerCollectionView:
+            guard let cell = cell as? LogCollectionCell else {
+                return
+            }
+            // TODO: Fix bug
+            if ((groupOfLogSet!.food_logs?.count) != nil && ((groupOfLogSet!.food_logs?.count)!) > 0) {
+                cell.bulletView.backgroundColor = UIColor.tomato
+            } else if ((groupOfLogSet!.act_logs?.count) != nil && ((groupOfLogSet!.act_logs?.count)!) > 0) {
+                cell.bulletView.backgroundColor = .cornflowerBlue
+            } else if ((groupOfLogSet!.drug_logs?.count) != nil && ((groupOfLogSet!.drug_logs?.count)!) > 0) {
+                cell.bulletView.backgroundColor = .hex_72e5Ea
+            }
+        default:
+            fatalError()
         }
     }
     
@@ -1141,7 +1156,8 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
         let screenWidth = UIScreen.main.bounds.width
         switch collectionView {
         case pickerCollectionView:
-            return CGSize(width: screenWidth - (screenWidth / 5), height: CGFloat(30))
+//            return CGSize(width: screenWidth - (screenWidth / 5), height: CGFloat(30))
+            return CGSize(width: screenWidth - (screenWidth / 7), height: CGFloat(30))
         case condCollectionView:
             return CGSize(width: screenWidth - (screenWidth / 7), height: CGFloat(45))
         default:
@@ -1329,7 +1345,7 @@ extension DiaryViewController {
         }()
         pickerCollectionView = {
             let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
-            _collectionView.backgroundColor = UIColor.clear
+            _collectionView.backgroundColor = .clear
             _collectionView.register(LogCollectionCell.self, forCellWithReuseIdentifier: logCollectionCellId)
             _collectionView.translatesAutoresizingMaskIntoConstraints = false
             return _collectionView
@@ -1610,10 +1626,14 @@ extension DiaryViewController {
     }
     
     private func pickerContainerTransition(_ collectionViewHeightVal: Int) {
+        var dynamicHeightVal = CGFloat(collectionViewHeightVal)
+        if CGFloat(collectionViewHeightVal + 220) > (UIScreen.main.bounds.height * 0.84) {
+            dynamicHeightVal = UIScreen.main.bounds.height * 0.5
+        }
         pickerCollectionView.reloadData()
         UIView.animate(withDuration: 0.5) {
-            self.pickerCollectionHeight.constant = CGFloat(collectionViewHeightVal)
-            self.pickerContainerHeight.constant = CGFloat(collectionViewHeightVal + 220)
+            self.pickerCollectionHeight.constant = dynamicHeightVal
+            self.pickerContainerHeight.constant = dynamicHeightVal + 220
             self.view.layoutIfNeeded()
         }
     }
