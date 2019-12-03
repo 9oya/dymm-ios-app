@@ -92,4 +92,6 @@ extension UIImage {
     static let itemTrendUpGray = UIImage(named: "item-trend-up-gray")!
     static let itemTrendUp = UIImage(named: "item-trend-up")!
     static let itemTriangleDown = UIImage(named: "item-triangle-down")!
+    
+    static let itemOpinion = UIImage(named: "item-opinion")!
 }

@@ -911,6 +911,36 @@ struct Service {
         }
     }
     
+    func sendUserOpinionMail(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping () -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            print("Load UserDefaults.standard.getAccessToken() failed")
+            return
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)",
+        ]
+        Alamofire.request("\(URI.host)\(URI.mail)/opinion", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    completion()
+                case 400:
+                    self.badRequest(responseData)
+                case 401:
+                    UserDefaults.standard.setIsSignIn(value: false)
+                    fatalError()
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "sendMailConfLinkAgain()")
+                    return
+                }
+        }
+    }
+    
     func searchTags(tagId: Int, keyWord: String, page: Int, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
         let params: Parameters = [
             "key_word": keyWord

@@ -55,6 +55,7 @@ class CategoryViewController: UIViewController {
     var startDateButton: UIButton!
     var endDateButton: UIButton!
     var langPickButton: UIButton!
+    var sendOpinionBtn: UIButton!
     
     // NSLayoutConstraints
     var tagCollectionTop: NSLayoutConstraint!
@@ -95,6 +96,7 @@ class CategoryViewController: UIViewController {
     var isScrollToLoading: Bool = false
     var currPageNum: Int = 1
     var minimumCnt: Int = 40
+    var opinion: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -180,6 +182,43 @@ class CategoryViewController: UIViewController {
         let cancelAction = UIAlertAction(title: lang.titleNo, style: .cancel) { _ in
             _ = self.navigationController?.popViewController(animated: true)
         }
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
+        alert.view.tintColor = .mediumSeaGreen
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func alertOpinionTextView(_ sender: UITapGestureRecognizer? = nil) {
+        var message = ""
+        switch lang.currentLanguageId {
+        case LanguageId.eng: message = superTag!.eng_name
+        case LanguageId.kor: message = superTag!.kor_name!
+        default: fatalError() }
+        let alert = UIAlertController(title: lang.titleOpinion, message: message, preferredStyle: .alert)
+        let noteTextView: UITextView = {
+            let _textView = UITextView()
+            _textView.backgroundColor = .white
+            _textView.font = .systemFont(ofSize: 15, weight: .light)
+            _textView.translatesAutoresizingMaskIntoConstraints = false
+            return _textView
+        }()
+        noteTextView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        let controller = UIViewController()
+        noteTextView.frame = controller.view.frame
+        controller.view.addSubview(noteTextView)
+        alert.setValue(controller, forKey: "contentViewController")
+        let confirmAction = UIAlertAction(title: lang.titleSubmit, style: .default) { _ in
+            if let text = noteTextView.text {
+                self.opinion = text
+                if self.opinion == "" {
+                    return
+                } else if self.opinion!.count < 5 {
+                    return
+                }
+                self.submitOpinion()
+            }
+        }
+        let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
         alert.view.tintColor = .mediumSeaGreen
@@ -767,6 +806,15 @@ extension CategoryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
+        sendOpinionBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemOpinion.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 35, height: 32)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action:#selector(alertOpinionTextView(_:)), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
         starButton = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
@@ -846,6 +894,7 @@ extension CategoryViewController {
         
         // Setup subviews
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: sendOpinionBtn)
         view.addSubview(stepCollection)
         view.addSubview(searchTextField)
         view.addSubview(langPickButton)
@@ -1335,6 +1384,25 @@ extension CategoryViewController {
             default: fatalError()}
             
             self.alertLangPicker()
+        }
+    }
+    
+    private func submitOpinion() {
+        guard let avatarId = UserDefaults.standard.getAvatarId() else {
+            UserDefaults.standard.setIsSignIn(value: false)
+            fatalError()
+        }
+        let params: Parameters = [
+            "avatar_id": avatarId,
+            "tag_id": superTag!.id,
+            "opinion": opinion!
+        ]
+        let service = Service(lang: lang)
+        service.sendUserOpinionMail(params: params, popoverAlert: { (message) in
+            self.retryFunction = self.submitOpinion
+            self.alertError(message)
+        }) {
+            self.alertCompl("Complete!", "Thank you for your precious opinion.")
         }
     }
 }

@@ -591,7 +591,6 @@ extension HomeViewController {
             loadRemainingLifeSpan()
             loadScoreboard()
         }
-//        loadScoreboard()
         loadCategories()
     }
     

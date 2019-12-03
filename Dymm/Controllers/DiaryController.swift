@@ -443,7 +443,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     @objc func condRefreshButtonTapped() {
-        loadAvatarCondList()
+        loadAvatarDiseasHistory()
     }
     
     @objc func homeButtonTapped() {
@@ -461,7 +461,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     @objc func condButtonTapped() {
-        loadAvatarCondList()
+        loadAvatarDiseasHistory()
     }
     
     @objc func removeAvatarCondBtnTapped() {
@@ -1781,22 +1781,27 @@ extension DiaryViewController {
         }
     }
     
-    private func loadAvatarCondList() {
+    private func loadAvatarDiseasHistory() {
         let service = Service(lang: lang)
         service.getAvatarCondList(popoverAlert: { (message) in
-            self.retryFunction = self.loadAvatarCondList
+            self.retryFunction = self.loadAvatarDiseasHistory
             self.pickerContainerView.isHidden = true
             self.alertError(message)
         }, tokenRefreshCompletion: {
-            self.loadAvatarCondList()
+            self.loadAvatarDiseasHistory()
         }) { (avtCondList) in
             self.avtCondList = avtCondList
             self.condCollectionView.reloadData()
             self.condLeftButton.setTitleColor(.mediumSeaGreen, for: .normal)
+            
+            var collectionViewHeight = CGFloat(45 * self.avtCondList!.count)
+            if CGFloat(collectionViewHeight + 105) > (UIScreen.main.bounds.height * 0.84) {
+                collectionViewHeight = UIScreen.main.bounds.height * 0.5
+            }
             UIView.transition(with: self.condLeftButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.condLeftButton.isHidden = false
-                self.condCollectionHeight.constant = CGFloat(45 * self.avtCondList!.count)
-                self.condContainerHeight.constant = CGFloat(45 * self.avtCondList!.count + 105)
+                self.condCollectionHeight.constant = collectionViewHeight
+                self.condContainerHeight.constant = collectionViewHeight + 105
             })
             UIView.transition(with: self.blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.pickerContainerView.isHidden = true
@@ -1905,7 +1910,7 @@ extension DiaryViewController {
         }, tokenRefreshCompletion: {
             self.updateAvatarCondRemove()
         }) {
-            self.loadAvatarCondList()
+            self.loadAvatarDiseasHistory()
         }
     }
     

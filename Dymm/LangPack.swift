@@ -61,6 +61,7 @@ struct LangPack {
     var titleNo: String!
     var titleNote: String!
     var titleNotes: String!
+    var titleOpinion: String!
     var titlePassword: String!
     var titlePasswordChange: String!
     var titlePasswordChangeCompl: String!
@@ -476,6 +477,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Notes"
             case LanguageId.kor: return "메모"
+            default: fatalError()}
+        }()
+        self.titleOpinion = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Send us your opinion."
+            case LanguageId.kor: return "당신의 의견을 보내주세요."
             default: fatalError()}
         }()
         self.titlePassword = {
