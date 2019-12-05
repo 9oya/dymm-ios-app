@@ -40,6 +40,7 @@
 		F56B8036235B132800D3300D /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F56B8035235B132800D3300D /* StoreKit.framework */; };
 		F59C14DD235BC418004A3B41 /* IAPController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59C14DC235BC418004A3B41 /* IAPController.swift */; };
 		F59C14E1235BF993004A3B41 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59C14E0235BF992004A3B41 /* Utilities.swift */; };
+		F5A194912390BBD20020C082 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5A194902390BBD20020C082 /* Assets.xcassets */; };
 		F5D6A653236AC19C00E9CDE9 /* RankingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D6A652236AC19C00E9CDE9 /* RankingController.swift */; };
 		F5D6A655236AC27600E9CDE9 /* RankingTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D6A654236AC27600E9CDE9 /* RankingTableCell.swift */; };
 		F5FC19CB233C4D2600116F71 /* ColorCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FC19CA233C4D2600116F71 /* ColorCollectionCell.swift */; };
@@ -83,6 +84,7 @@
 		F56B8035235B132800D3300D /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		F59C14DC235BC418004A3B41 /* IAPController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPController.swift; sourceTree = "<group>"; };
 		F59C14E0235BF992004A3B41 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		F5A194902390BBD20020C082 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F5D6A652236AC19C00E9CDE9 /* RankingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingController.swift; sourceTree = "<group>"; };
 		F5D6A654236AC27600E9CDE9 /* RankingTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingTableCell.swift; sourceTree = "<group>"; };
 		F5FC19CA233C4D2600116F71 /* ColorCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCollectionCell.swift; sourceTree = "<group>"; };
@@ -140,6 +142,7 @@
 				6A8D89A722F88A3B00A7F333 /* Helpers+Patterns.swift */,
 				F59C14E0235BF992004A3B41 /* Utilities.swift */,
 				6A8D896222F8874000A7F333 /* AppDelegate.swift */,
+				F5A194902390BBD20020C082 /* Assets.xcassets */,
 				6A8D896B22F8874100A7F333 /* LaunchScreen.storyboard */,
 				6A8D896E22F8874100A7F333 /* Info.plist */,
 			);
@@ -164,16 +167,16 @@
 		6A8D897522F8886100A7F333 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
-				6A8D898122F8892400A7F333 /* LogTableCell.swift */,
-				F5344084231E5F2A00FAC84B /* NoteTableCell.swift */,
-				6A4B8EE122FB2290009810A5 /* BannerCollectionCell.swift */,
-				6A6AFEBF23055BC200435954 /* CondCollectionCell.swift */,
-				F5FC19CA233C4D2600116F71 /* ColorCollectionCell.swift */,
-				6A8D897F22F8891E00A7F333 /* LogGroupTableCell.swift */,
-				6A8D898322F8892D00A7F333 /* LogCollectionCell.swift */,
-				6A665F4523005C960065DC79 /* StepCollectionCell.swift */,
 				6A8D897D22F8890900A7F333 /* TagCollectionCell.swift */,
+				6A665F4523005C960065DC79 /* StepCollectionCell.swift */,
+				6A8D897F22F8891E00A7F333 /* LogGroupTableCell.swift */,
+				6A8D898122F8892400A7F333 /* LogTableCell.swift */,
+				6A8D898322F8892D00A7F333 /* LogCollectionCell.swift */,
+				6A6AFEBF23055BC200435954 /* CondCollectionCell.swift */,
+				F5344084231E5F2A00FAC84B /* NoteTableCell.swift */,
 				F5D6A654236AC27600E9CDE9 /* RankingTableCell.swift */,
+				F5FC19CA233C4D2600116F71 /* ColorCollectionCell.swift */,
+				6A4B8EE122FB2290009810A5 /* BannerCollectionCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -264,6 +267,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5A194912390BBD20020C082 /* Assets.xcassets in Resources */,
 				6A8D896D22F8874100A7F333 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

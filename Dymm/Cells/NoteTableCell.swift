@@ -24,7 +24,7 @@ class NoteTableCell: UITableViewCell {
 
 extension NoteTableCell {
     private func setupLayout() {
-        backgroundColor = .hex_fffede
+        backgroundColor = .yellow_FFFEDE
         selectionStyle = .none
         
         titleLabel = {

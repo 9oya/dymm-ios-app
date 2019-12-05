@@ -933,7 +933,10 @@ struct Service {
                     self.badRequest(responseData)
                 case 401:
                     UserDefaults.standard.setIsSignIn(value: false)
-                    fatalError()
+                    return
+                case 403:
+                    UserDefaults.standard.setIsSignIn(value: false)
+                    return
                 default:
                     self.unexpectedResponse(statusCode, responseData, "sendMailConfLinkAgain()")
                     return

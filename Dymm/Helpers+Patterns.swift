@@ -13,8 +13,8 @@ private let localHost = "http://127.0.0.1:5000"
 private let productHost = "https://dymm-api-01.appspot.com"
 
 struct URI {
-//    static let host = localHost
-    static let host = productHost
+    static let host = localHost
+//    static let host = productHost
     static let avatar = "/api/avatar"
     static let banner = "/api/banner"
     static let mail = "/api/mail"
@@ -190,13 +190,13 @@ func getCondScoreColor(_ condScore: Float) -> UIColor? {
     if condScore < 1 {
         return .dimGray
     } else if condScore < 2.5 {
-        return .hex_a45fac
+        return .purple_A45FAC
     } else if condScore < 4.5 {
         return .tomato
     } else if condScore < 6.5 {
         return UIColor(hex: "#FEA32A")
     } else if condScore < 8.5 {
-        return .hex_41b275
+        return .green_41B275
     } else {
         return .dodgerBlue
     }

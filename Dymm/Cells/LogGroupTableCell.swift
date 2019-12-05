@@ -73,7 +73,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
         }
         if ((groupOfLogSetForPop!.food_logs?.count) != nil && ((groupOfLogSetForPop!.food_logs?.count)!) > 0) {
             let foodLog = groupOfLogSetForPop!.food_logs!.popLast()
-            cell.bulletView.backgroundColor = UIColor.tomato
+            cell.bulletView.backgroundColor = .red_FF4779
             switch lang.currentLanguageId {
             case LanguageId.eng: cell.nameLabel.text = foodLog!.eng_name
             case LanguageId.kor: cell.nameLabel.text = foodLog!.kor_name
@@ -95,7 +95,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
             logsArray.append(foodLog!)
         } else if ((groupOfLogSetForPop!.act_logs?.count) != nil && ((groupOfLogSetForPop!.act_logs?.count)!) > 0) {
             let actLog = groupOfLogSetForPop!.act_logs!.popLast()
-            cell.bulletView.backgroundColor = UIColor.cornflowerBlue
+            cell.bulletView.backgroundColor = .cornflowerBlue
             switch lang.currentLanguageId {
             case LanguageId.eng: cell.nameLabel.text = actLog!.eng_name
             case LanguageId.kor: cell.nameLabel.text = actLog!.kor_name
@@ -113,7 +113,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
             logsArray.append(actLog!)
         } else if ((groupOfLogSetForPop!.drug_logs?.count) != nil && ((groupOfLogSetForPop!.drug_logs?.count)!) > 0) {
             let drugLog = groupOfLogSetForPop!.drug_logs!.popLast()
-            cell.bulletView.backgroundColor = UIColor.hex_72e5Ea
+            cell.bulletView.backgroundColor = .green_72E5EA
             switch lang.currentLanguageId {
             case LanguageId.eng: cell.nameLabel.text = drugLog!.eng_name
             case LanguageId.kor: cell.nameLabel.text = drugLog!.kor_name
@@ -205,7 +205,6 @@ extension LogGroupTableCell {
         groupTypeImageView = {
             let _imageView = UIImageView()
             _imageView.contentMode = .scaleAspectFit
-            _imageView.addShadowView()
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
@@ -250,13 +249,12 @@ extension LogGroupTableCell {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 15)
             _label.textAlignment = .left
-            _label.addShadowView()
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
         foodLogBulletView = {
             let _view = UIView(frame: CGRect(x: 0, y: 0, width: 7, height: 7))
-            _view.backgroundColor = UIColor.tomato
+            _view.backgroundColor = .red_FF4779
             _view.layer.cornerRadius = 3.5
             _view.isHidden = true
             _view.addShadowView()
@@ -265,7 +263,7 @@ extension LogGroupTableCell {
         }()
         actLogBulletView = {
             let _view = UIView(frame: CGRect(x: 0, y: 0, width: 7, height: 7))
-            _view.backgroundColor = UIColor.cornflowerBlue
+            _view.backgroundColor = .cornflowerBlue
             _view.layer.cornerRadius = 3.5
             _view.isHidden = true
             _view.addShadowView()
@@ -274,7 +272,7 @@ extension LogGroupTableCell {
         }()
         drugLogBulletView = {
             let _view = UIView(frame: CGRect(x: 0, y: 0, width: 7, height: 7))
-            _view.backgroundColor = UIColor.hex_72e5Ea
+            _view.backgroundColor = .green_72E5EA
             _view.layer.cornerRadius = 3.5
             _view.isHidden = true
             _view.addShadowView()
@@ -284,7 +282,7 @@ extension LogGroupTableCell {
         groupOfLogsTableView = {
             let _tableView = UITableView(frame: CGRect.zero, style: .plain)
             _tableView.register(LogTableCell.self, forCellReuseIdentifier: logTableCellId)
-            _tableView.backgroundColor = UIColor.clear
+            _tableView.backgroundColor = .clear
             _tableView.separatorStyle = .singleLine
             _tableView.isScrollEnabled = false
             _tableView.isHidden = true

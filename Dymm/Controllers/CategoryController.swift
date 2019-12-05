@@ -142,7 +142,7 @@ class CategoryViewController: UIViewController {
         if cond_log_type == CondLogType.startDate {
             alert.view.tintColor = .mediumSeaGreen
         } else {
-            alert.view.tintColor = .hex_fe4c4c
+            alert.view.tintColor = .red_FE4C4C
         }
         present(alert, animated: true, completion:{})
     }
@@ -188,6 +188,16 @@ class CategoryViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
+    @objc func alertSimpleCompl(_ title: String, _ message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in
+            return
+        }
+        alert.addAction(confirmAction)
+        alert.view.tintColor = .mediumSeaGreen
+        self.present(alert, animated: true, completion: nil)
+    }
+    
     @objc func alertOpinionTextView(_ sender: UITapGestureRecognizer? = nil) {
         var message = ""
         switch lang.currentLanguageId {
@@ -195,33 +205,31 @@ class CategoryViewController: UIViewController {
         case LanguageId.kor: message = superTag!.kor_name!
         default: fatalError() }
         let alert = UIAlertController(title: lang.titleOpinion, message: message, preferredStyle: .alert)
-        let noteTextView: UITextView = {
+        let textView: UITextView = {
             let _textView = UITextView()
-            _textView.backgroundColor = .white
+            _textView.backgroundColor = UIColor(hex: "#00E9CC")
             _textView.font = .systemFont(ofSize: 15, weight: .light)
             _textView.translatesAutoresizingMaskIntoConstraints = false
             return _textView
         }()
-        noteTextView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        textView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         let controller = UIViewController()
-        noteTextView.frame = controller.view.frame
-        controller.view.addSubview(noteTextView)
+        textView.frame = controller.view.frame
+        controller.view.addSubview(textView)
         alert.setValue(controller, forKey: "contentViewController")
         let confirmAction = UIAlertAction(title: lang.titleSubmit, style: .default) { _ in
-            if let text = noteTextView.text {
+            if let text = textView.text {
                 self.opinion = text
-                if self.opinion == "" {
-                    return
-                } else if self.opinion!.count < 5 {
+                if self.opinion == "" || self.opinion!.count < 8 {
                     return
                 }
                 self.submitOpinion()
             }
         }
         let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
-        alert.addAction(confirmAction)
         alert.addAction(cancelAction)
-        alert.view.tintColor = .mediumSeaGreen
+        alert.addAction(confirmAction)
+        alert.view.tintColor = UIColor(hex: "#B847FF")
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -1388,6 +1396,7 @@ extension CategoryViewController {
     }
     
     private func submitOpinion() {
+        view.showSpinner()
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -1402,7 +1411,8 @@ extension CategoryViewController {
             self.retryFunction = self.submitOpinion
             self.alertError(message)
         }) {
-            self.alertCompl("Complete!", "Thank you for your precious opinion.")
+            self.view.hideSpinner()
+            self.alertSimpleCompl("Complete!", "Thank you for your precious opinion.")
         }
     }
 }

@@ -193,7 +193,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         let alert = UIAlertController(title: lang.titleNote, message: message, preferredStyle: .alert)
         let noteTextView: UITextView = {
             let _textView = UITextView()
-            _textView.backgroundColor = .hex_fffede
+            _textView.backgroundColor = .yellow_FFFEDE
             _textView.font = .systemFont(ofSize: 16, weight: .light)
             _textView.translatesAutoresizingMaskIntoConstraints = false
             return _textView
@@ -423,7 +423,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         } else {
             isCondEditBtnTapped = true
             condRightButton.setTitle(lang.titleDone, for: .normal)
-            condRightButton.setTitleColor(UIColor.tomato, for: .normal)
+            condRightButton.setTitleColor(.red_FF4779, for: .normal)
             UIView.animate(withDuration: 0.5) {
                 self.condCollectionView.reloadData()
             }
@@ -1022,7 +1022,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 let drugLog = groupOfLogSet!.drug_logs!.popLast()
                 tempStoredLogs.append(drugLog!)
                 
-                cell.bulletView.backgroundColor = .hex_72e5Ea
+                cell.bulletView.backgroundColor = .green_72E5EA
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.nameLabel.text = drugLog!.eng_name
                 case LanguageId.kor: cell.nameLabel.text = drugLog!.kor_name
@@ -1176,7 +1176,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 }
                 cell.quantityLabel.text = "\(hr)\(min)"
             } else if tagLog.tag_type == TagType.drug {
-                cell.bulletView.backgroundColor = .hex_72e5Ea
+                cell.bulletView.backgroundColor = .green_72E5EA
                 var x_val = ""
                 if tagLog.x_val! > 0 {
                     x_val = "\(tagLog.x_val!)"
@@ -1360,8 +1360,8 @@ extension DiaryViewController {
             _calendar.appearance.titleDefaultColor = .mediumSeaGreen
             _calendar.appearance.titlePlaceholderColor = .lightGray
             _calendar.appearance.eventDefaultColor = .tomato
-            _calendar.appearance.eventSelectionColor = .hex_fe4c4c
-            _calendar.appearance.selectionColor = .hex_fe4c4c
+            _calendar.appearance.eventSelectionColor = .red_FE4C4C
+            _calendar.appearance.selectionColor = .red_FE4C4C
             _calendar.appearance.headerDateFormat = lang.calendarHeaderDateFormat
             _calendar.appearance.caseOptions = FSCalendarCaseOptions.weekdayUsesUpperCase
             _calendar.scope = .week

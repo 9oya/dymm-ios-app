@@ -68,7 +68,7 @@ class NoteController: UIViewController {
         let alert = UIAlertController(title: lang.titleNote, message: message, preferredStyle: .alert)
         let noteTextView: UITextView = {
             let _textView = UITextView()
-            _textView.backgroundColor = .hex_fffede
+            _textView.backgroundColor = .yellow_FFFEDE
             _textView.font = .systemFont(ofSize: 16, weight: .light)
             _textView.translatesAutoresizingMaskIntoConstraints = false
             return _textView
@@ -208,7 +208,7 @@ extension NoteController {
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         noteTableView = {
             let _tableView = UITableView(frame: CGRect.zero, style: .plain)
-            _tableView.backgroundColor = .hex_fffede
+            _tableView.backgroundColor = .yellow_FFFEDE
             _tableView.separatorStyle = .singleLine
             _tableView.register(NoteTableCell.self, forCellReuseIdentifier: noteTableCellId)
             _tableView.translatesAutoresizingMaskIntoConstraints = false

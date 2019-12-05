@@ -291,6 +291,9 @@ class ProfileViewController: UIViewController {
         alert.setValue(controller, forKey: "contentViewController")
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let text = self.introTextView.text {
+                if text == "" || text == " " || text == self.oldInfoStr {
+                    return
+                }
                 self.newInfoStr = text
                 self.avatarInfoTarget = AvatarInfoTarget.intro
                 self.updateAvatarInfo()
@@ -1159,6 +1162,7 @@ extension ProfileViewController {
             UIView.transition(with: self.tagCollection, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.infoContainer.isHidden = false
                 self.tagCollection.isHidden = false
+                self.view.hideSpinner()
             })
         }
     }

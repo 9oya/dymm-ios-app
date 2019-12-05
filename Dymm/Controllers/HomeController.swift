@@ -194,11 +194,11 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             if let image = UIImage(named: "tag-\(tag.id)") {
                 cell.imageView.image = image.withRenderingMode(.alwaysOriginal)
             }
-//            cell.imageView.image = UIImage(named: "tag-\(tag.id)")!.withRenderingMode(.alwaysOriginal)
-            
             switch tag.id {
             case TagId.diary:
-                cell.label.textColor = .tomato
+                cell.label.textColor = .red_E96464
+            case TagId.ranking:
+                cell.label.textColor = .red_E96464
             default:
                 cell.label.textColor = .mediumSeaGreen
             }
@@ -452,7 +452,7 @@ extension HomeViewController {
         lifespanLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 18, weight: .regular)
-            _label.textColor = .tomato
+            _label.textColor = .red_E96464
             _label.textAlignment = .center
             _label.numberOfLines = 3
             _label.translatesAutoresizingMaskIntoConstraints = false

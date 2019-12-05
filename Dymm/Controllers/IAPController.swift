@@ -177,7 +177,7 @@ extension IAPController {
         purchaseButton = {
             let _button = UIButton(type: .system)
             _button.setTitleColor(.white, for: .normal)
-            _button.backgroundColor = .hex_fe4c4c
+            _button.backgroundColor = .red_FE4C4C
             _button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
             _button.layer.cornerRadius = 10.0
             _button.showsTouchWhenHighlighted = true

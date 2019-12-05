@@ -181,7 +181,7 @@ extension RankingViewController: UITableViewDataSource, UITableViewDelegate {
         } else if ranking.rank_num <= 400 {
            color = .tomato
         } else if ranking.rank_num <=  500 {
-            color = .hex_a45fac
+            color = .purple_A45FAC
         } else {
             color = .dimGray
         }
@@ -569,7 +569,7 @@ extension RankingViewController {
             } else if ranking.rank_num <= 400 {
                myColor = .tomato
             } else if ranking.rank_num <=  500 {
-                myColor = .hex_a45fac
+                myColor = .purple_A45FAC
             } else {
                 myColor = .dimGray
             }
