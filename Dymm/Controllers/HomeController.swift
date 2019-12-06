@@ -38,9 +38,10 @@ class HomeViewController: UIViewController {
     var lifespanLabel: UILabel!
     
     // UIImageView
-    var titleImageView: UIImageView!
-    var profileImageView: UIImageView!
-    var scoreEmoImageView: UIImageView!
+    var titleImgView: UIImageView!
+    var profileImgView: UIImageView!
+    var scoreEmoImgView: UIImageView!
+    var cubeImgView: UIImageView!
     
     // UIButton
     var profileButton: UIButton!
@@ -93,6 +94,8 @@ class HomeViewController: UIViewController {
         } else {
             showGuestScene()
         }
+        
+        cubeImgView.startRotating(duration: 5.5)
     }
     
     // MARK: - Actions
@@ -391,7 +394,7 @@ extension HomeViewController {
             _pickerView.translatesAutoresizingMaskIntoConstraints = false
             return _pickerView
         }()
-        scoreEmoImageView = {
+        scoreEmoImgView = {
             let _imageView = UIImageView()
             _imageView.contentMode = .scaleAspectFit
             _imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -458,13 +461,20 @@ extension HomeViewController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-        titleImageView = {
+        cubeImgView = {
+            let _imageView = UIImageView()
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.image = .item3dCube
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        titleImgView = {
             let _imageView = UIImageView(image: .itemLogoS)
             _imageView.frame = CGRect(x: 0, y: 0, width: 26, height: 26)
             _imageView.contentMode = .scaleAspectFit
             return _imageView
         }()
-        profileImageView = {
+        profileImgView = {
             let _imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 31, height: 31))
             _imageView.layer.cornerRadius = 31 / 2
             _imageView.contentMode = .scaleAspectFill
@@ -506,10 +516,10 @@ extension HomeViewController {
             return months
         }()
         
-        navigationItem.titleView = titleImageView
-        profileImageView.widthAnchor.constraint(equalToConstant: 31).isActive = true
-        profileImageView.heightAnchor.constraint(equalToConstant: 31).isActive = true
-        navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: profileImageView)]
+        navigationItem.titleView = titleImgView
+        profileImgView.widthAnchor.constraint(equalToConstant: 31).isActive = true
+        profileImgView.heightAnchor.constraint(equalToConstant: 31).isActive = true
+        navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: profileImgView)]
         tagCollectionView.dataSource = self
         tagCollectionView.delegate = self
         yearPicker.dataSource = self
@@ -523,7 +533,7 @@ extension HomeViewController {
         view.addSubview(tagCollectionView)
         
         scoreboardView.addSubview(scoreTitleLabel)
-        scoreboardView.addSubview(scoreEmoImageView)
+        scoreboardView.addSubview(scoreEmoImgView)
         scoreboardView.addSubview(scoreNumberLabel)
         scoreboardView.addSubview(scoreMessageLabel)
         scoreboardView.addSubview(yearPicker)
@@ -533,6 +543,7 @@ extension HomeViewController {
         
         lifespanBoardView.addSubview(lifespanMsgLabel)
         lifespanBoardView.addSubview(lifespanLabel)
+        lifespanBoardView.addSubview(cubeImgView)
         
         // Setup constraints
         scoreboardView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 7).isActive = true
@@ -553,11 +564,11 @@ extension HomeViewController {
         scoreTitleLabel.centerXAnchor.constraint(equalTo: scoreboardView.centerXAnchor, constant: 0).isActive = true
         scoreTitleLabel.centerYAnchor.constraint(equalTo: scoreboardView.centerYAnchor, constant: -(view.frame.height / 7)).isActive = true
         
-        scoreEmoImageView.centerXAnchor.constraint(equalTo: scoreboardView.centerXAnchor, constant: 0).isActive = true
-        scoreEmoImageView.centerYAnchor.constraint(equalTo: scoreboardView.centerYAnchor, constant: -(view.frame.height / 44)).isActive = true
+        scoreEmoImgView.centerXAnchor.constraint(equalTo: scoreboardView.centerXAnchor, constant: 0).isActive = true
+        scoreEmoImgView.centerYAnchor.constraint(equalTo: scoreboardView.centerYAnchor, constant: -(view.frame.height / 44)).isActive = true
         
         scoreNumberLabel.centerXAnchor.constraint(equalTo: scoreboardView.centerXAnchor, constant: 0).isActive = true
-        scoreNumberLabel.topAnchor.constraint(equalTo: scoreEmoImageView.bottomAnchor, constant: 7).isActive = true
+        scoreNumberLabel.topAnchor.constraint(equalTo: scoreEmoImgView.bottomAnchor, constant: 7).isActive = true
         
         scoreMessageLabel.centerXAnchor.constraint(equalTo: scoreboardView.centerXAnchor, constant: 0).isActive = true
         scoreMessageLabel.bottomAnchor.constraint(equalTo: scoreboardView.bottomAnchor, constant: -(view.frame.height / 33)).isActive = true
@@ -576,8 +587,11 @@ extension HomeViewController {
         lifespanMsgLabel.centerYAnchor.constraint(equalTo: lifespanBoardView.centerYAnchor, constant: -10).isActive = true
         lifespanMsgLabel.centerXAnchor.constraint(equalTo: lifespanBoardView.centerXAnchor, constant: 0).isActive = true
         
-        lifespanLabel.topAnchor.constraint(equalTo: lifespanMsgLabel.bottomAnchor, constant: 2).isActive = true
+        lifespanLabel.bottomAnchor.constraint(equalTo: lifespanBoardView.bottomAnchor, constant: -((view.frame.height / 8) / 10)).isActive = true
         lifespanLabel.centerXAnchor.constraint(equalTo: lifespanBoardView.centerXAnchor, constant: 0).isActive = true
+        
+        cubeImgView.centerYAnchor.constraint(equalTo: lifespanLabel.centerYAnchor, constant: 0).isActive = true
+        cubeImgView.leadingAnchor.constraint(equalTo: lifespanLabel.trailingAnchor, constant: 20).isActive = true
         
         tagCollectionView.topAnchor.constraint(equalTo: lifespanBoardView.bottomAnchor, constant: 7).isActive = true
         tagCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
@@ -611,7 +625,7 @@ extension HomeViewController {
             self.scoreboardView.isHidden = false
             self.lifespanBoardView.isHidden = false
             
-            self.scoreEmoImageView.image = getCondScoreImageLarge(0)
+            self.scoreEmoImgView.image = getCondScoreImageLarge(0)
             
             self.scoreTitleLabel.text = self.lang.getCondScoreName(0)
             self.scoreNumberLabel.text = String(format: "%.1f", 0.0)
@@ -650,7 +664,7 @@ extension HomeViewController {
             let formatter = NumberFormatter()
             self.thisAvgScore = formatter.number(from: scoreBoardSet.avg_score)!.floatValue
             UIView.animate(withDuration: 0.5) {
-                self.scoreEmoImageView.image = getCondScoreImageLarge(self.thisAvgScore)
+                self.scoreEmoImgView.image = getCondScoreImageLarge(self.thisAvgScore)
                 self.scoreTitleLabel.text = self.lang.getCondScoreName(self.thisAvgScore)
                 self.scoreNumberLabel.text = String(format: "%.1f", self.thisAvgScore)
                 self.scoreMessageLabel.text = self.lang.titleMyCondScore
@@ -774,8 +788,8 @@ extension HomeViewController {
                     let url = "\(URI.host)\(URI.avatar)/\(auth.avatar.id)/profile/photo/\(auth.avatar.photo_name!)"
                     Alamofire.request(url).responseImage { response in
                         if let data = response.data {
-                            self.profileImageView.image = UIImage(data: data)
-                            self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: self.profileImageView)]
+                            self.profileImgView.image = UIImage(data: data)
+                            self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: self.profileImgView)]
                         }
                     }
                 } else {

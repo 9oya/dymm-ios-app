@@ -94,4 +94,5 @@ extension UIImage {
     static let itemTriangleDown = UIImage(named: "item-triangle-down")!
     
     static let itemOpinion = UIImage(named: "item-opinion")!
+    static let item3dCube = UIImage(named: "item-3d-cube")!
 }
