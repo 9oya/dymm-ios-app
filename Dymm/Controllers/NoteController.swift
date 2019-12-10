@@ -46,7 +46,7 @@ class NoteController: UIViewController {
             self.retryFunction!()
         })
         alert.addAction(UIAlertAction(title: lang.titleNo, style: .cancel) { _ in })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -68,7 +68,7 @@ class NoteController: UIViewController {
         let alert = UIAlertController(title: lang.titleNote, message: message, preferredStyle: .alert)
         let noteTextView: UITextView = {
             let _textView = UITextView()
-            _textView.backgroundColor = .yellow_FFFEDE
+            _textView.backgroundColor = .green_00E9CC
             _textView.font = .systemFont(ofSize: 16, weight: .light)
             _textView.translatesAutoresizingMaskIntoConstraints = false
             return _textView
@@ -100,7 +100,7 @@ class NoteController: UIViewController {
             }
         })
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
 }
@@ -208,7 +208,7 @@ extension NoteController {
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         noteTableView = {
             let _tableView = UITableView(frame: CGRect.zero, style: .plain)
-            _tableView.backgroundColor = .yellow_FFFEDE
+            _tableView.backgroundColor = .green_00E9CC
             _tableView.separatorStyle = .singleLine
             _tableView.register(NoteTableCell.self, forCellReuseIdentifier: noteTableCellId)
             _tableView.translatesAutoresizingMaskIntoConstraints = false

@@ -98,7 +98,7 @@ class ProfileViewController: UIViewController {
                 self.retryFunction!()
             })
         alert.addAction(UIAlertAction(title: lang.titleClose, style: .cancel) { _ in })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         present(alert, animated: true, completion: nil)
     }
     
@@ -106,14 +106,14 @@ class ProfileViewController: UIViewController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
         alert.view.addSubview(profileTagPicker)
         profileTagPicker.topAnchor.constraint(equalTo: alert.view.topAnchor, constant: 0).isActive = true
-        alert.addAction(UIAlertAction(title: lang.titleClose, style: .default) { _ in })
+        alert.addAction(UIAlertAction(title: lang.titleClose, style: .cancel) { _ in })
         profileTagPicker.widthAnchor.constraint(equalTo: alert.view.widthAnchor, constant: 0).isActive = true
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             self.updateProfileTag()
         })
         let height:NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 260)
         alert.view.addConstraint(height)
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil )
     }
     
@@ -135,13 +135,13 @@ class ProfileViewController: UIViewController {
         }
         let alert = UIAlertController(title: "\n\n\n\n\n\n\n\n", message: nil, preferredStyle: UIAlertController.Style.alert)
         alert.view.addSubview(datePicker)
-        alert.addAction(UIAlertAction(title: lang.titleDone, style: UIAlertAction.Style.default, handler: { _ in
+        alert.addAction(UIAlertAction(title: lang.titleDone, style: .default, handler: { _ in
             self.newInfoStr = dateFormatter.string(from: datePicker.date)
             self.avatarInfoTarget = TagId.dateOfBirth
             self.updateAvatarInfo()
         }))
-        alert.addAction(UIAlertAction(title: lang.titleCancel, style: UIAlertAction.Style.cancel, handler: nil))
-        alert.view.tintColor = .mediumSeaGreen
+        alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel, handler: nil))
+        alert.view.tintColor = .purple_B847FF
         present(alert, animated: true, completion:{})
     }
     
@@ -190,7 +190,7 @@ class ProfileViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         present(alert, animated: true, completion: nil)
     }
     
@@ -224,7 +224,7 @@ class ProfileViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -274,7 +274,7 @@ class ProfileViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -300,7 +300,7 @@ class ProfileViewController: UIViewController {
             }
         })
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -311,7 +311,7 @@ class ProfileViewController: UIViewController {
             self.dismiss(animated: true, completion: nil)
             return
         })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -401,7 +401,7 @@ class ProfileViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -432,14 +432,14 @@ class ProfileViewController: UIViewController {
             self.present(imagePickerController, animated: true, completion: nil)
         })
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
     @objc func alertCameraError() {
         let alert = UIAlertController(title: lang.titleSorry, message: lang.msgCameraDisable, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .cancel) { _ in })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         present(alert, animated: true, completion: nil)
     }
     
@@ -460,7 +460,7 @@ class ProfileViewController: UIViewController {
         let height = NSLayoutConstraint(item: alert.view!, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 220)
         alert.view.addConstraint(height)
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .cancel) { _ in })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         present(alert, animated: true, completion: nil)
     }
     
@@ -880,7 +880,7 @@ extension ProfileViewController {
         }()
         introTextView = {
             let _textView = UITextView()
-            _textView.backgroundColor = UIColor.white.withAlphaComponent(0.7)
+            _textView.backgroundColor = .green_00E9CC
             _textView.font = .systemFont(ofSize: 16, weight: .regular)
             _textView.translatesAutoresizingMaskIntoConstraints = false
             return _textView

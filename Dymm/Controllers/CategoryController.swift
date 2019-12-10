@@ -113,7 +113,7 @@ class CategoryViewController: UIViewController {
             self.retryFunction!()
         })
         alert.addAction(UIAlertAction(title: lang.titleNo, style: .cancel) { _ in })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -140,7 +140,7 @@ class CategoryViewController: UIViewController {
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil))
         if cond_log_type == CondLogType.startDate {
-            alert.view.tintColor = .mediumSeaGreen
+            alert.view.tintColor = .limeGreen
         } else {
             alert.view.tintColor = .red_FE4C4C
         }
@@ -151,7 +151,7 @@ class CategoryViewController: UIViewController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
         alert.view.addSubview(langPicker)
         langPicker.topAnchor.constraint(equalTo: alert.view.topAnchor, constant: 0).isActive = true
-        alert.addAction(UIAlertAction(title: lang.titleClose, style: .default) { _ in })
+        alert.addAction(UIAlertAction(title: lang.titleClose, style: .cancel) { _ in })
         langPicker.widthAnchor.constraint(equalTo: alert.view.widthAnchor, constant: 0).isActive = true
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let langId = self.selectedLangTag?.id {
@@ -170,7 +170,7 @@ class CategoryViewController: UIViewController {
         })
         let height:NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 260)
         alert.view.addConstraint(height)
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil )
     }
     
@@ -184,7 +184,7 @@ class CategoryViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -194,7 +194,7 @@ class CategoryViewController: UIViewController {
             return
         }
         alert.addAction(confirmAction)
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -204,10 +204,10 @@ class CategoryViewController: UIViewController {
         case LanguageId.eng: message = superTag!.eng_name
         case LanguageId.kor: message = superTag!.kor_name!
         default: fatalError() }
-        let alert = UIAlertController(title: lang.titleOpinion, message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: lang.titleFeedback, message: message, preferredStyle: .alert)
         let textView: UITextView = {
             let _textView = UITextView()
-            _textView.backgroundColor = UIColor(hex: "#00E9CC")
+            _textView.backgroundColor = .green_00E9CC
             _textView.font = .systemFont(ofSize: 15, weight: .light)
             _textView.translatesAutoresizingMaskIntoConstraints = false
             return _textView
@@ -223,13 +223,13 @@ class CategoryViewController: UIViewController {
                 if self.opinion == "" || self.opinion!.count < 8 {
                     return
                 }
-                self.submitOpinion()
+                self.submitFeedback()
             }
         }
         let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
         alert.addAction(cancelAction)
         alert.addAction(confirmAction)
-        alert.view.tintColor = UIColor(hex: "#B847FF")
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -1395,7 +1395,7 @@ extension CategoryViewController {
         }
     }
     
-    private func submitOpinion() {
+    private func submitFeedback() {
         view.showSpinner()
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
             UserDefaults.standard.setIsSignIn(value: false)
@@ -1408,11 +1408,11 @@ extension CategoryViewController {
         ]
         let service = Service(lang: lang)
         service.sendUserOpinionMail(params: params, popoverAlert: { (message) in
-            self.retryFunction = self.submitOpinion
+            self.retryFunction = self.submitFeedback
             self.alertError(message)
         }) {
             self.view.hideSpinner()
-            self.alertSimpleCompl("Complete!", "Thank you for your precious opinion.")
+            self.alertSimpleCompl(self.lang.titleComplete, self.lang.msgOpinionCompl)
         }
     }
 }

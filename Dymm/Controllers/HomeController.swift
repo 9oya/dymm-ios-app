@@ -64,6 +64,7 @@ class HomeViewController: UIViewController {
         super.viewDidLoad()
         setupLayout()
         loadCategories()
+        NotificationCenter.default.addObserver(self, selector: #selector(appMovedToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -87,18 +88,22 @@ class HomeViewController: UIViewController {
             }()
             yearPicker.selectRow(0, inComponent: 0, animated: true)
             monthPicker.selectRow(0, inComponent: 0, animated: true)
-            
             loadScoreboard()
             loadAvatar()
             loadRemainingLifeSpan()
+            cubeImgView.isHidden = false
         } else {
             showGuestScene()
+            cubeImgView.isHidden = true
         }
-        
-        cubeImgView.startRotating(duration: 5.5)
+        cubeImgView.startRotating(duration: 5)
     }
     
     // MARK: - Actions
+    
+    @objc func appMovedToForeground() {
+        cubeImgView.startRotating(duration: 5)
+    }
     
     @objc func alertError(_ message: String) {
         view.hideSpinner()
@@ -109,7 +114,7 @@ class HomeViewController: UIViewController {
         let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
-        alertController.view.tintColor = .mediumSeaGreen
+        alertController.view.tintColor = .purple_B847FF
         present(alertController, animated: true, completion: nil)
     }
     
@@ -120,7 +125,7 @@ class HomeViewController: UIViewController {
             UserDefaults.standard.setAvatarId(value: 0)
             self.showGuestScene()
         })
-        alertController.view.tintColor = .mediumSeaGreen
+        alertController.view.tintColor = .purple_B847FF
         present(alertController, animated: true, completion: nil)
     }
     
@@ -199,9 +204,9 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             }
             switch tag.id {
             case TagId.diary:
-                cell.label.textColor = .red_E96464
+                cell.label.textColor = .mediumSeaGreen
             case TagId.ranking:
-                cell.label.textColor = .red_E96464
+                cell.label.textColor = .mediumSeaGreen
             default:
                 cell.label.textColor = .mediumSeaGreen
             }
@@ -284,7 +289,6 @@ extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: 90, height: 30))
-//        label.textColor = getCondScoreColor(thisAvgScore)
         label.textColor = .mediumSeaGreen
         label.font = .systemFont(ofSize: 20, weight: .regular)
         label.textAlignment = .center
@@ -411,7 +415,7 @@ extension HomeViewController {
         scoreNumberLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 40, weight: .medium)
-            _label.textColor = .dimGray
+            _label.textColor = .mediumSeaGreen
             _label.textAlignment = .center
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
@@ -419,7 +423,7 @@ extension HomeViewController {
         scoreMessageLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 20, weight: .medium)
-            _label.textColor = .dimGray
+            _label.textColor = .mediumSeaGreen
             _label.textAlignment = .center
             _label.numberOfLines = 2
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -428,7 +432,7 @@ extension HomeViewController {
         ageLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 18, weight: .medium)
-            _label.textColor = .dimGray
+            _label.textColor = .mediumSeaGreen
             _label.textAlignment = .right
             _label.numberOfLines = 1
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -437,7 +441,7 @@ extension HomeViewController {
         genderLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 18, weight: .medium)
-            _label.textColor = .dimGray
+            _label.textColor = .mediumSeaGreen
             _label.textAlignment = .right
             _label.numberOfLines = 1
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -455,7 +459,7 @@ extension HomeViewController {
         lifespanLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 18, weight: .regular)
-            _label.textColor = .red_E96464
+            _label.textColor = .mediumSeaGreen
             _label.textAlignment = .center
             _label.numberOfLines = 3
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -465,6 +469,7 @@ extension HomeViewController {
             let _imageView = UIImageView()
             _imageView.contentMode = .scaleAspectFit
             _imageView.image = .item3dCube
+            _imageView.isHidden = true
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
@@ -489,7 +494,7 @@ extension HomeViewController {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemProfileDef.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 31, height: 31)
-            _button.layer.cornerRadius = _button.frame.width/2
+            _button.layer.cornerRadius = _button.frame.width / 2
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(profileButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -637,15 +642,15 @@ extension HomeViewController {
             self.lifespanMsgLabel.text = self.lang.msgSignUpYet
             self.lifespanLabel.text = ""
             
-            self.scoreTitleLabel.textColor = getCondScoreColor(0)
-            self.scoreNumberLabel.textColor = getCondScoreColor(0)
-            self.scoreMessageLabel.textColor = getCondScoreColor(0)
-            self.ageLabel.textColor = getCondScoreColor(0)
-            self.genderLabel.textColor = getCondScoreColor(0)
-            self.lifespanMsgLabel.textColor = .webOrange
+//            self.scoreTitleLabel.textColor = getCondScoreColor(0)
+//            self.scoreNumberLabel.textColor = getCondScoreColor(0)
+//            self.scoreMessageLabel.textColor = getCondScoreColor(0)
+//            self.ageLabel.textColor = getCondScoreColor(0)
+//            self.genderLabel.textColor = getCondScoreColor(0)
+//            self.lifespanMsgLabel.textColor = .webOrange
             
-            self.profileButton.setTitleColor(UIColor.clear, for: .normal)
-            self.profileButton.backgroundColor = UIColor.clear
+            self.profileButton.setTitleColor(.clear, for: .normal)
+            self.profileButton.backgroundColor = .clear
             self.profileButton.setBackgroundImage(.itemProfileDef, for: .normal)
         })
         navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: profileButton)]
@@ -683,11 +688,16 @@ extension HomeViewController {
                         self.genderLabel.text = "성별"
                     default: fatalError()}
                 }
-                self.scoreTitleLabel.textColor = getCondScoreColor(self.thisAvgScore)
-                self.scoreNumberLabel.textColor = getCondScoreColor(self.thisAvgScore)
-                self.scoreMessageLabel.textColor = getCondScoreColor(self.thisAvgScore)
-                self.ageLabel.textColor = getCondScoreColor(self.thisAvgScore)
-                self.genderLabel.textColor = getCondScoreColor(self.thisAvgScore)
+                self.scoreTitleLabel.textColor = .mediumSeaGreen
+                self.scoreNumberLabel.textColor = .mediumSeaGreen
+                self.scoreMessageLabel.textColor = .mediumSeaGreen
+                self.ageLabel.textColor = .mediumSeaGreen
+                self.genderLabel.textColor = .mediumSeaGreen
+//                self.scoreTitleLabel.textColor = getCondScoreColor(self.thisAvgScore)
+//                self.scoreNumberLabel.textColor = getCondScoreColor(self.thisAvgScore)
+//                self.scoreMessageLabel.textColor = getCondScoreColor(self.thisAvgScore)
+//                self.ageLabel.textColor = getCondScoreColor(self.thisAvgScore)
+//                self.genderLabel.textColor = getCondScoreColor(self.thisAvgScore)
                 self.scoreboardView.isHidden = false
             }
         }

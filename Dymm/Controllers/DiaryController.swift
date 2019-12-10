@@ -58,9 +58,9 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var homeButton: UIButton!
     var notesButton: UIButton!
     var avgScoreButton: UIButton!
-    var condButton: UIButton!
-    var condLeftButton: UIButton!
-    var condRightButton: UIButton!
+    var diseaseHistoryBtn: UIButton!
+    var diseaseLeftBtn: UIButton!
+    var diseaseRightBtn: UIButton!
     var condRefreshButton: UIButton!
     
     // NSLayoutConstraint
@@ -144,7 +144,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             }
             self.retryFunction!()
         })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -156,7 +156,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         alert.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
             self.dismiss(animated: true, completion: nil)
         })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -175,7 +175,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             self.updateLogGroupCondScore()
         })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil )
     }
     
@@ -193,7 +193,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         let alert = UIAlertController(title: lang.titleNote, message: message, preferredStyle: .alert)
         let noteTextView: UITextView = {
             let _textView = UITextView()
-            _textView.backgroundColor = .yellow_FFFEDE
+            _textView.backgroundColor = .green_00E9CC
             _textView.font = .systemFont(ofSize: 16, weight: .light)
             _textView.translatesAutoresizingMaskIntoConstraints = false
             return _textView
@@ -221,7 +221,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             }
         })
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -358,7 +358,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         let height = NSLayoutConstraint(item: alert.view!, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: CGFloat(heightInt))
         alert.view.addConstraint(height)
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -415,15 +415,15 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     @objc func condRightButtonTapped() {
         if isCondEditBtnTapped {
             isCondEditBtnTapped = false
-            condRightButton.setTitle(lang.titleEdit, for: .normal)
-            condRightButton.setTitleColor(.mediumSeaGreen, for: .normal)
+            diseaseRightBtn.setTitle(lang.titleEdit, for: .normal)
+            diseaseRightBtn.setTitleColor(.purple_B847FF, for: .normal)
             UIView.animate(withDuration: 0.5) {
                 self.condCollectionView.reloadData()
             }
         } else {
             isCondEditBtnTapped = true
-            condRightButton.setTitle(lang.titleDone, for: .normal)
-            condRightButton.setTitleColor(.red_FF4779, for: .normal)
+            diseaseRightBtn.setTitle(lang.titleDone, for: .normal)
+            diseaseRightBtn.setTitleColor(.red_FF4779, for: .normal)
             UIView.animate(withDuration: 0.5) {
                 self.condCollectionView.reloadData()
             }
@@ -433,12 +433,12 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     @objc func condLeftButtonTapped() {
         UIView.transition(with: self.blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.blindView.isHidden = true
-            self.condLeftButton.setTitleColor(UIColor.clear, for: .normal)
+            self.diseaseLeftBtn.setTitleColor(UIColor.clear, for: .normal)
         }, completion: { (_) in
-            self.condLeftButton.isHidden = true
+            self.diseaseLeftBtn.isHidden = true
             self.isCondEditBtnTapped = false
-            self.condRightButton.setTitle(self.lang.titleEdit, for: .normal)
-            self.condRightButton.setTitleColor(.mediumSeaGreen, for: .normal)
+            self.diseaseRightBtn.setTitle(self.lang.titleEdit, for: .normal)
+            self.diseaseRightBtn.setTitleColor(.purple_B847FF, for: .normal)
         })
     }
     
@@ -460,7 +460,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         present(nc, animated: true, completion: nil)
     }
     
-    @objc func condButtonTapped() {
+    @objc func diseaseHistoryBtnTapped() {
         loadAvatarDiseasHistory()
     }
     
@@ -1359,9 +1359,9 @@ extension DiaryViewController {
             _calendar.appearance.weekdayTextColor = .black
             _calendar.appearance.titleDefaultColor = .mediumSeaGreen
             _calendar.appearance.titlePlaceholderColor = .lightGray
-            _calendar.appearance.eventDefaultColor = .tomato
-            _calendar.appearance.eventSelectionColor = .red_FE4C4C
-            _calendar.appearance.selectionColor = .red_FE4C4C
+            _calendar.appearance.eventDefaultColor = .red_FF4779
+            _calendar.appearance.eventSelectionColor = .red_FF4779
+            _calendar.appearance.selectionColor = .red_FF4779
             _calendar.appearance.headerDateFormat = lang.calendarHeaderDateFormat
             _calendar.appearance.caseOptions = FSCalendarCaseOptions.weekdayUsesUpperCase
             _calendar.scope = .week
@@ -1476,20 +1476,20 @@ extension DiaryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        condButton = {
+        diseaseHistoryBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemHeartbeat.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 27, height: 25)
             _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action:#selector(condButtonTapped), for: .touchUpInside)
+            _button.addTarget(self, action:#selector(diseaseHistoryBtnTapped), for: .touchUpInside)
             _button.isHidden = true
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        condLeftButton = {
+        diseaseLeftBtn = {
             let _button = UIButton(type: .system)
             _button.setTitle(lang.titleClose, for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+            _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .bold)
             _button.setTitleColor(UIColor.clear, for: .normal)
             _button.showsTouchWhenHighlighted = false
             _button.isHidden = true
@@ -1497,11 +1497,11 @@ extension DiaryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        condRightButton = {
+        diseaseRightBtn = {
             let _button = UIButton(type: .system)
             _button.setTitle(lang.titleEdit, for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            _button.setTitleColor(.mediumSeaGreen, for: .normal)
+            _button.setTitleColor(.purple_B847FF, for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(condRightButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -1526,7 +1526,7 @@ extension DiaryViewController {
             navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
             navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: notesButton), UIBarButtonItem(customView: avgScoreButton)]
             calendarView.appearance.titleDefaultColor = UIColor.black
-            condButton.isHidden = false
+            diseaseHistoryBtn.isHidden = false
         }
         
         calendarView.dataSource = self
@@ -1549,10 +1549,10 @@ extension DiaryViewController {
         // Setup subviews
         view.addSubview(logGroupTableView)
         view.addSubview(calendarView)
-        view.addSubview(condButton)
+        view.addSubview(diseaseHistoryBtn)
         view.addSubview(toggleButton)
         view.addSubview(blindView)
-        view.addSubview(condLeftButton)
+        view.addSubview(diseaseLeftBtn)
         view.addGestureRecognizer(scopeGesture)
         
         // TODO
@@ -1570,7 +1570,7 @@ extension DiaryViewController {
         
         condContainerView.addSubview(condTitleLabel)
         condContainerView.addSubview(condCollectionView)
-        condContainerView.addSubview(condRightButton)
+        condContainerView.addSubview(diseaseRightBtn)
         condContainerView.addSubview(condRefreshButton)
         
         // Setup constraints
@@ -1635,15 +1635,15 @@ extension DiaryViewController {
         pickerCheckButton.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
         pickerCheckButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        condLeftButton.leadingAnchor.constraint(equalTo: condContainerView.leadingAnchor, constant: 0).isActive = true
-        condLeftButton.bottomAnchor.constraint(equalTo: condContainerView.bottomAnchor, constant: -5).isActive = true
-        condLeftButton.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
-        condLeftButton.heightAnchor.constraint(equalToConstant: 45).isActive = true
+        diseaseLeftBtn.leadingAnchor.constraint(equalTo: condContainerView.leadingAnchor, constant: 0).isActive = true
+        diseaseLeftBtn.bottomAnchor.constraint(equalTo: condContainerView.bottomAnchor, constant: -5).isActive = true
+        diseaseLeftBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
+        diseaseLeftBtn.heightAnchor.constraint(equalToConstant: 45).isActive = true
         
-        condRightButton.trailingAnchor.constraint(equalTo: condContainerView.trailingAnchor, constant: 0).isActive = true
-        condRightButton.bottomAnchor.constraint(equalTo: condContainerView.bottomAnchor, constant: -5).isActive = true
-        condRightButton.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
-        condRightButton.heightAnchor.constraint(equalToConstant: 45).isActive = true
+        diseaseRightBtn.trailingAnchor.constraint(equalTo: condContainerView.trailingAnchor, constant: 0).isActive = true
+        diseaseRightBtn.bottomAnchor.constraint(equalTo: condContainerView.bottomAnchor, constant: -5).isActive = true
+        diseaseRightBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
+        diseaseRightBtn.heightAnchor.constraint(equalToConstant: 45).isActive = true
         
         condRefreshButton.topAnchor.constraint(equalTo: condContainerView.topAnchor, constant: 0).isActive = true
         condRefreshButton.trailingAnchor.constraint(equalTo: condContainerView.trailingAnchor, constant: 0).isActive = true
@@ -1655,8 +1655,8 @@ extension DiaryViewController {
         calendarViewHeight.priority = UILayoutPriority(rawValue: 999)
         calendarViewHeight.isActive = true
         
-        condButton.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
-        condButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+        diseaseHistoryBtn.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
+        diseaseHistoryBtn.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         
         toggleButton.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
         toggleButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
@@ -1792,14 +1792,14 @@ extension DiaryViewController {
         }) { (avtCondList) in
             self.avtCondList = avtCondList
             self.condCollectionView.reloadData()
-            self.condLeftButton.setTitleColor(.mediumSeaGreen, for: .normal)
+            self.diseaseLeftBtn.setTitleColor(.purple_B847FF, for: .normal)
             
             var collectionViewHeight = CGFloat(45 * self.avtCondList!.count)
             if CGFloat(collectionViewHeight + 105) > (UIScreen.main.bounds.height * 0.84) {
                 collectionViewHeight = UIScreen.main.bounds.height * 0.5
             }
-            UIView.transition(with: self.condLeftButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
-                self.condLeftButton.isHidden = false
+            UIView.transition(with: self.diseaseLeftBtn, duration: 0.7, options: .transitionCrossDissolve, animations: {
+                self.diseaseLeftBtn.isHidden = false
                 self.condCollectionHeight.constant = collectionViewHeight
                 self.condContainerHeight.constant = collectionViewHeight + 105
             })

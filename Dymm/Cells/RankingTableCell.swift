@@ -12,11 +12,20 @@ let rankingTableCellId = "RankingTableCell"
 
 class RankingTableCell: UITableViewCell {
     var containerView: UIView!
+    var yearsBar: UIView!
+    var daysBarBg: UIView!
+    var daysBar: UIView!
+    
     var profileImgView: UIImageView!
+    
     var profileImgLabel: UILabel!
     var rankNumLabel: UILabel!
     var nameLabel: UILabel!
-    var lifespanLabel: UILabel!
+    var yearsLabel: UILabel!
+    var daysLabel: UILabel!
+    
+    var yearsBarWidth: NSLayoutConstraint!
+    var daysBarWidth: NSLayoutConstraint!
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -62,7 +71,7 @@ extension RankingTableCell {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 14, weight: .regular)
             _label.textAlignment = .left
-            _label.textColor = .dimGray
+            _label.textColor = .mediumSeaGreen
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -70,17 +79,44 @@ extension RankingTableCell {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 14, weight: .regular)
             _label.textAlignment = .left
-            _label.textColor = .dimGray
+            _label.textColor = .mediumSeaGreen
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-        lifespanLabel = {
+        yearsLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 14, weight: .regular)
             _label.textAlignment = .right
-            _label.textColor = .dimGray
+            _label.textColor = .mediumSeaGreen
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
+        }()
+        daysLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 9, weight: .regular)
+            _label.textAlignment = .right
+            _label.textColor = .mediumSeaGreen
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        yearsBar = {
+            let _view = UIView()
+            _view.backgroundColor = .mediumSeaGreen
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        daysBarBg = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor(hex: "#CBF5E8")
+//            _view.backgroundColor = UIColor.green_00E9CC.withAlphaComponent(0.37)
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        daysBar = {
+            let _view = UIView()
+            _view.backgroundColor = .mediumSeaGreen
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
         }()
         
         // Setup subviews
@@ -89,7 +125,11 @@ extension RankingTableCell {
         containerView.addSubview(profileImgView)
         containerView.addSubview(profileImgLabel)
         containerView.addSubview(nameLabel)
-        containerView.addSubview(lifespanLabel)
+        containerView.addSubview(yearsBar)
+        containerView.addSubview(daysBar)
+        containerView.addSubview(daysBarBg)
+        containerView.addSubview(yearsLabel)
+        containerView.addSubview(daysLabel)
         
         // Setup constraints
         containerView.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
@@ -110,7 +150,29 @@ extension RankingTableCell {
         nameLabel.topAnchor.constraint(equalTo: rankNumLabel.bottomAnchor, constant: 2).isActive = true
         nameLabel.leadingAnchor.constraint(equalTo: profileImgView.trailingAnchor, constant: 10).isActive = true
         
-        lifespanLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: 0).isActive = true
-        lifespanLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -10).isActive = true
+        yearsBar.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 10).isActive = true
+        yearsBar.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -10).isActive = true
+        yearsBar.heightAnchor.constraint(equalToConstant: 11).isActive = true
+        yearsBarWidth = yearsBar.widthAnchor.constraint(equalToConstant: 1)
+        yearsBarWidth.priority = UILayoutPriority(rawValue: 999)
+        yearsBarWidth.isActive = true
+        
+        daysBarBg.topAnchor.constraint(equalTo: yearsBar.bottomAnchor, constant: 1).isActive = true
+        daysBarBg.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -10).isActive = true
+        daysBarBg.heightAnchor.constraint(equalToConstant: 7).isActive = true
+        daysBarBg.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        
+        daysBar.topAnchor.constraint(equalTo: yearsBar.bottomAnchor, constant: 1).isActive = true
+        daysBar.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -10).isActive = true
+        daysBar.heightAnchor.constraint(equalToConstant: 7).isActive = true
+        daysBarWidth = daysBar.widthAnchor.constraint(equalToConstant: 1)
+        daysBarWidth.priority = UILayoutPriority(rawValue: 999)
+        daysBarWidth.isActive = true
+        
+        yearsLabel.topAnchor.constraint(equalTo: daysBar.bottomAnchor, constant: 1).isActive = true
+        yearsLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -10).isActive = true
+        
+        daysLabel.topAnchor.constraint(equalTo: yearsLabel.bottomAnchor, constant: 0).isActive = true
+        daysLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -10).isActive = true
     }
 }

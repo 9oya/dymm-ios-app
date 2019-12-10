@@ -15,6 +15,10 @@ class RankingViewController: UIViewController {
     
     // UIView
     var myRankingContainer: UIView!
+    var myYearsBarBg: UIView!
+    var myYearsBar: UIView!
+    var myDaysBarBg: UIView!
+    var myDaysBar: UIView!
     
     // UITableView
     var rankingTableView: UITableView!
@@ -30,14 +34,19 @@ class RankingViewController: UIViewController {
     
     // UILabel
     var headerRankLabel: UILabel!
-    var headerLifespanLabel: UILabel!
+    var headerHPLabel: UILabel!
     var myProfileImgLabel: UILabel!
     var myRankNumLabel: UILabel!
     var myNameLabel: UILabel!
-    var myLifespanLabel: UILabel!
+    var myYearsLabel: UILabel!
+    var myDaysLabel: UILabel!
     
     // UIImageView
     var myProfileImgView: UIImageView!
+    
+    // Constraint
+    var myYearsBarWidth: NSLayoutConstraint!
+    var myDaysBarWidth: NSLayoutConstraint!
     
     // Non-view properties
     var lang: LangPack!
@@ -71,11 +80,11 @@ class RankingViewController: UIViewController {
             self.retryFunction!()
         })
         alert.addAction(UIAlertAction(title: lang.titleNo, style: .cancel) { _ in })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
     }
     
-    @objc func alertStartingPicker() {
+    @objc func alertStartingPointPicker() {
         let alert = UIAlertController(title: lang.titleStartingPoint, message: "\n\n\n\n\n\n\n\n\n\n", preferredStyle: .alert)
         alert.isModalInPopover = true
         startingPickerView.selectRow(selectedStartingKey - 1, inComponent: 0, animated: false)
@@ -86,7 +95,7 @@ class RankingViewController: UIViewController {
             self.startingPickButton.setTitle(LangHelper.getStartingPickName(key: self.selectedStartingKey), for: .normal)
             self.loadRankings()
         })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil )
     }
     
@@ -107,7 +116,7 @@ class RankingViewController: UIViewController {
             self.loadMyRanking()
             self.loadRankings()
         })
-        alert.view.tintColor = .mediumSeaGreen
+        alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil )
     }
     
@@ -161,33 +170,40 @@ extension RankingViewController: UITableViewDataSource, UITableViewDelegate {
             let days = fullLifespan % 365
             switch self.lang.currentLanguageId {
             case LanguageId.eng:
-                cell.lifespanLabel.text = "\(year)Y \(days)D"
+                cell.yearsLabel.text = "\(year)Y"
+                cell.daysLabel.text = "\(days)D"
             case LanguageId.kor:
-                cell.lifespanLabel.text = "\(year)년 \(days)일"
+                cell.yearsLabel.text = "\(year)년"
+                cell.daysLabel.text = "\(days)일"
             default: fatalError()}
+            cell.yearsBarWidth.constant = CGFloat(year)
+            cell.daysBarWidth.constant = CGFloat((days * 50) / 365)
         } else {
-            cell.lifespanLabel.text = " "
+            cell.yearsLabel.text = " "
+            cell.daysLabel.text = " "
         }
         
-        var color = UIColor.dimGray
-        if ranking.rank_num <= 100 {
-            color = .dodgerBlue
-        } else if ranking.rank_num <= 200 {
-            color = .mediumSeaGreen
-        } else if ranking.rank_num <= 300 {
-           color = .webOrange
-        } else if ranking.rank_num <= 300 {
-            color = .webOrange
-        } else if ranking.rank_num <= 400 {
-           color = .tomato
-        } else if ranking.rank_num <=  500 {
-            color = .purple_A45FAC
-        } else {
-            color = .dimGray
-        }
-        cell.rankNumLabel.textColor = color
-        cell.nameLabel.textColor = color
-        cell.lifespanLabel.textColor = color
+        
+        
+//        var color = UIColor.dimGray
+//        if ranking.rank_num <= 100 {
+//            color = .dodgerBlue
+//        } else if ranking.rank_num <= 200 {
+//            color = .mediumSeaGreen
+//        } else if ranking.rank_num <= 300 {
+//           color = .webOrange
+//        } else if ranking.rank_num <= 300 {
+//            color = .webOrange
+//        } else if ranking.rank_num <= 400 {
+//           color = .tomato
+//        } else if ranking.rank_num <=  500 {
+//            color = .purple_A45FAC
+//        } else {
+//            color = .dimGray
+//        }
+//        cell.rankNumLabel.textColor = color
+//        cell.nameLabel.textColor = color
+//        cell.yearsLabel.textColor = color
         return cell
     }
     
@@ -308,8 +324,6 @@ extension RankingViewController {
             let _view = UIView()
             _view.backgroundColor = .white
             _view.layer.cornerRadius = 10.0
-            _view.layer.borderWidth = 1.0
-            _view.layer.borderColor = UIColor.white.cgColor
             _view.addShadowView()
             _view.isHidden = true
             _view.translatesAutoresizingMaskIntoConstraints = false
@@ -319,16 +333,16 @@ extension RankingViewController {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 14, weight: .regular)
             _label.textAlignment = .left
-            _label.textColor = .lightGray
+            _label.textColor = .mediumSeaGreen
             _label.text = "#\(lang.titleRanking!)"
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-        headerLifespanLabel = {
+        headerHPLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 14, weight: .regular)
             _label.textAlignment = .right
-            _label.textColor = .lightGray
+            _label.textColor = .mediumSeaGreen
             _label.text = lang.titleReLifespanAndAge
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
@@ -343,7 +357,7 @@ extension RankingViewController {
         }()
         ageGroupPickButton = {
             let _button = UIButton(type: .system)
-            _button.setTitleColor(.black, for: .normal)
+            _button.setTitleColor(.mediumSeaGreen, for: .normal)
             switch self.lang.currentLanguageId {
             case LanguageId.eng:
                 _button.setTitle(LangHelper.getAgeGroupEngPickName(key: self.selectedAgeGroupKey), for: .normal)
@@ -361,11 +375,11 @@ extension RankingViewController {
         }()
         startingPickButton = {
             let _button = UIButton(type: .system)
-            _button.setTitleColor(.black, for: .normal)
+            _button.setTitleColor(.mediumSeaGreen, for: .normal)
             _button.setTitle(LangHelper.getStartingPickName(key: selectedStartingKey), for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 15)
             _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(alertStartingPicker), for: .touchUpInside)
+            _button.addTarget(self, action: #selector(alertStartingPointPicker), for: .touchUpInside)
             _button.backgroundColor = .white
             _button.layer.cornerRadius = 10.0
             _button.addShadowView()
@@ -405,9 +419,17 @@ extension RankingViewController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-        myLifespanLabel = {
+        myYearsLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 14, weight: .regular)
+            _label.textAlignment = .right
+            _label.textColor = .dimGray
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        myDaysLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 9, weight: .regular)
             _label.textAlignment = .right
             _label.textColor = .dimGray
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -423,6 +445,32 @@ extension RankingViewController {
             _pickerView.translatesAutoresizingMaskIntoConstraints = false
             return _pickerView
         }()
+        myYearsBarBg = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor(hex: "#CBF5E8")
+//            _view.backgroundColor = UIColor.green_00E9CC.withAlphaComponent(0.37)
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        myYearsBar = {
+            let _view = UIView()
+            _view.backgroundColor = .mediumSeaGreen
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        myDaysBarBg = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor(hex: "#CBF5E8")
+//            _view.backgroundColor = UIColor.green_00E9CC.withAlphaComponent(0.37)
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
+        myDaysBar = {
+            let _view = UIView()
+            _view.backgroundColor = .mediumSeaGreen
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
         rankingTableView.dataSource = self
@@ -437,14 +485,19 @@ extension RankingViewController {
         view.addSubview(ageGroupPickButton)
         view.addSubview(startingPickButton)
         view.addSubview(headerRankLabel)
-        view.addSubview(headerLifespanLabel)
+        view.addSubview(headerHPLabel)
         view.addSubview(rankingTableView)
         
         myRankingContainer.addSubview(myProfileImgView)
         myRankingContainer.addSubview(myProfileImgLabel)
         myRankingContainer.addSubview(myRankNumLabel)
         myRankingContainer.addSubview(myNameLabel)
-        myRankingContainer.addSubview(myLifespanLabel)
+        myRankingContainer.addSubview(myYearsLabel)
+        myRankingContainer.addSubview(myDaysLabel)
+        myRankingContainer.addSubview(myYearsBarBg)
+        myRankingContainer.addSubview(myYearsBar)
+        myRankingContainer.addSubview(myDaysBarBg)
+        myRankingContainer.addSubview(myDaysBar)
         
         // Setup constraints
         myRankingContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 7).isActive = true
@@ -466,8 +519,35 @@ extension RankingViewController {
         myNameLabel.topAnchor.constraint(equalTo: myRankNumLabel.bottomAnchor, constant: 2).isActive = true
         myNameLabel.leadingAnchor.constraint(equalTo: myProfileImgView.trailingAnchor, constant: 10).isActive = true
         
-        myLifespanLabel.centerYAnchor.constraint(equalTo: myRankingContainer.centerYAnchor, constant: 0).isActive = true
-        myLifespanLabel.trailingAnchor.constraint(equalTo: myRankingContainer.trailingAnchor, constant: -10).isActive = true
+        myYearsBarBg.topAnchor.constraint(equalTo: myRankingContainer.topAnchor, constant: 10).isActive = true
+        myYearsBarBg.trailingAnchor.constraint(equalTo: myRankingContainer.trailingAnchor, constant: -10).isActive = true
+        myYearsBarBg.heightAnchor.constraint(equalToConstant: 11).isActive = true
+        myYearsBarBg.widthAnchor.constraint(equalToConstant: 200).isActive = true
+        
+        myYearsBar.topAnchor.constraint(equalTo: myRankingContainer.topAnchor, constant: 10).isActive = true
+        myYearsBar.trailingAnchor.constraint(equalTo: myRankingContainer.trailingAnchor, constant: -10).isActive = true
+        myYearsBar.heightAnchor.constraint(equalToConstant: 11).isActive = true
+        myYearsBarWidth = myYearsBar.widthAnchor.constraint(equalToConstant: 1)
+        myYearsBarWidth.priority = UILayoutPriority(rawValue: 999)
+        myYearsBarWidth.isActive = true
+        
+        myDaysBarBg.topAnchor.constraint(equalTo: myYearsBar.bottomAnchor, constant: 1).isActive = true
+        myDaysBarBg.trailingAnchor.constraint(equalTo: myRankingContainer.trailingAnchor, constant: -10).isActive = true
+        myDaysBarBg.heightAnchor.constraint(equalToConstant: 7).isActive = true
+        myDaysBarBg.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        
+        myDaysBar.topAnchor.constraint(equalTo: myYearsBar.bottomAnchor, constant: 1).isActive = true
+        myDaysBar.trailingAnchor.constraint(equalTo: myRankingContainer.trailingAnchor, constant: -10).isActive = true
+        myDaysBar.heightAnchor.constraint(equalToConstant: 7).isActive = true
+        myDaysBarWidth = myDaysBar.widthAnchor.constraint(equalToConstant: 1)
+        myDaysBarWidth.priority = UILayoutPriority(rawValue: 999)
+        myDaysBarWidth.isActive = true
+        
+        myYearsLabel.topAnchor.constraint(equalTo: myDaysBar.bottomAnchor, constant: 1).isActive = true
+        myYearsLabel.trailingAnchor.constraint(equalTo: myRankingContainer.trailingAnchor, constant: -10).isActive = true
+        
+        myDaysLabel.topAnchor.constraint(equalTo: myYearsLabel.bottomAnchor, constant: 0).isActive = true
+        myDaysLabel.trailingAnchor.constraint(equalTo: myRankingContainer.trailingAnchor, constant: -10).isActive = true
         
         ageGroupPickButton.topAnchor.constraint(equalTo: myRankingContainer.bottomAnchor, constant: 7).isActive = true
         ageGroupPickButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
@@ -482,8 +562,8 @@ extension RankingViewController {
         headerRankLabel.topAnchor.constraint(equalTo: ageGroupPickButton.bottomAnchor, constant: 15).isActive = true
         headerRankLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 50).isActive = true
         
-        headerLifespanLabel.topAnchor.constraint(equalTo: ageGroupPickButton.bottomAnchor, constant: 15).isActive = true
-        headerLifespanLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
+        headerHPLabel.topAnchor.constraint(equalTo: ageGroupPickButton.bottomAnchor, constant: 15).isActive = true
+        headerHPLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -25).isActive = true
         
         rankingTableView.topAnchor.constraint(equalTo: headerRankLabel.bottomAnchor, constant: 8).isActive = true
         rankingTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
@@ -548,36 +628,31 @@ extension RankingViewController {
                 let days = fullLifespan % 365
                 switch self.lang.currentLanguageId {
                 case LanguageId.eng:
-                    self.myLifespanLabel.text = "\(year)Y \(days)D"
+                    self.myYearsLabel.text = "\(year)Y"
+                    self.myDaysLabel.text = "\(days)D"
                 case LanguageId.kor:
-                    self.myLifespanLabel.text = "\(year)년 \(days)일"
+                    self.myYearsLabel.text = "\(year)년"
+                    self.myDaysLabel.text = "\(days)일"
                 default: fatalError()}
+                self.myYearsBarWidth.constant = CGFloat(year)
+                self.myDaysBarWidth.constant = CGFloat((days * 50) / 365)
             } else {
-                self.myLifespanLabel.text = " "
+                self.myYearsLabel.text = " "
+                self.myDaysLabel.text = " "
             }
             var myColor = UIColor.dimGray
-            if ranking.rank_num == 0 {
-                myColor = .dimGray
-            } else if ranking.rank_num <= 100 {
-                myColor = .dodgerBlue
-            } else if ranking.rank_num <= 200 {
+            if ranking.rank_num > 0 {
                 myColor = .mediumSeaGreen
-            } else if ranking.rank_num <= 300 {
-               myColor = .webOrange
-            } else if ranking.rank_num <= 300 {
-                myColor = .webOrange
-            } else if ranking.rank_num <= 400 {
-               myColor = .tomato
-            } else if ranking.rank_num <=  500 {
-                myColor = .purple_A45FAC
-            } else {
-                myColor = .dimGray
             }
             UIView.animate(withDuration: 0.5) {
                 self.myRankNumLabel.textColor = myColor
                 self.myNameLabel.textColor = myColor
-                self.myLifespanLabel.textColor = myColor
-                self.myRankingContainer.layer.borderColor = myColor.cgColor
+                self.myYearsLabel.textColor = myColor
+                self.myDaysLabel.textColor = myColor
+                self.myYearsBarBg.backgroundColor = myColor.withAlphaComponent(0.37)
+                self.myDaysBarBg.backgroundColor = myColor.withAlphaComponent(0.37)
+                self.myYearsBar.backgroundColor = myColor.withAlphaComponent(0.8)
+                self.myDaysBar.backgroundColor = myColor.withAlphaComponent(0.8)
                 self.myRankingContainer.isHidden = false
             }
         }

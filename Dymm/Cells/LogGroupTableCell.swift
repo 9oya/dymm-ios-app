@@ -212,7 +212,6 @@ extension LogGroupTableCell {
             let _imageView = UIImageView()
             _imageView.frame = CGRect(x: 0, y: 0, width: 21, height: 21)
             _imageView.contentMode = .scaleAspectFit
-            _imageView.addShadowView()
             _imageView.isHidden = true
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
@@ -222,7 +221,6 @@ extension LogGroupTableCell {
             _imageView.contentMode = .scaleAspectFit
             _imageView.image = .itemNoteYellow
             _imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
-            _imageView.addShadowView()
             _imageView.isHidden = true
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView

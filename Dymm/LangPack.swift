@@ -23,6 +23,7 @@ struct LangPack {
     var titleChooseColor: String!
     var titleChangeProfileImg: String!
     var titleClose: String!
+    var titleComplete: String!
     var titleCondScore: String!
     var titleCondScores: [String]!
     var titleContinue: String!
@@ -61,7 +62,7 @@ struct LangPack {
     var titleNo: String!
     var titleNote: String!
     var titleNotes: String!
-    var titleOpinion: String!
+    var titleFeedback: String!
     var titlePassword: String!
     var titlePasswordChange: String!
     var titlePasswordChangeCompl: String!
@@ -124,6 +125,7 @@ struct LangPack {
     var msgMailSendValidCode: ((String) -> String)!
     var msgMismatchConfirmPassword: String!
     var msgNetworkFailure: String!
+    var msgOpinionCompl: String!
     var msgShortPassword: String!
     var msgSignUpYet: String!
     var msgUnauthDuplicatedEmail: String!
@@ -249,6 +251,12 @@ struct LangPack {
             case LanguageId.kor: return "닫기"
             default: fatalError()}
         }()
+        self.titleComplete = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Complete!"
+            case LanguageId.kor: return "전송완료!"
+            default: fatalError()}
+        }()
         self.titleCondScore = {
             switch currentLanguageId {
             case LanguageId.eng: return "Condition score"
@@ -336,7 +344,7 @@ struct LangPack {
         self.titleEmailFound = {
             switch currentLanguageId {
             case LanguageId.eng: return "We found a matching account."
-            case LanguageId.kor: return "일치하는 계정을 찾았습니다."
+            case LanguageId.kor: return "일치하는 계정을 찾았어요."
             default: fatalError()}
         }()
         self.titleEmailNotFound = {
@@ -348,7 +356,7 @@ struct LangPack {
         self.titleEmailValidCode = {
             switch currentLanguageId {
             case LanguageId.eng: return "A verification code has been sent."
-            case LanguageId.kor: return "인증 코드를 발송하였습니다."
+            case LanguageId.kor: return "인증 코드를 발송했습니다."
             default: fatalError()}
         }()
         self.titleEndDate = {
@@ -378,7 +386,7 @@ struct LangPack {
         self.titleForgotPasswordAlert = {
             switch currentLanguageId {
             case LanguageId.eng: return "I forgot my Dymm password"
-            case LanguageId.kor: return "Dymm 비밀번호를 분실하였습니다."
+            case LanguageId.kor: return "Dymm 비밀번호를 분실했어요."
             default: fatalError()}
         }()
         self.titleFreeTrial = {
@@ -479,10 +487,10 @@ struct LangPack {
             case LanguageId.kor: return "메모"
             default: fatalError()}
         }()
-        self.titleOpinion = {
+        self.titleFeedback = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Send us your opinion."
-            case LanguageId.kor: return "당신의 의견을 보내주세요."
+            case LanguageId.eng: return "Send your feedback to Dymm."
+            case LanguageId.kor: return "딤에게 피드백을 보내주세요."
             default: fatalError()}
         }()
         self.titlePassword = {
@@ -547,8 +555,8 @@ struct LangPack {
         }()
         self.titleReLifespanAndAge = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Remaining lifespan + Age"
-            case LanguageId.kor: return "남은 수명 + 나이"
+            case LanguageId.eng: return "Health Points"
+            case LanguageId.kor: return "생명력"
             default: fatalError()}
         }()
         self.titleRetry = {
@@ -863,6 +871,12 @@ struct LangPack {
             case LanguageId.kor: return "서버와의 통신이 원활하지 않습니다.\n\n다시 시도하시겠습니다?"
             default: fatalError()}
         }()
+        self.msgOpinionCompl = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Thank you for your precious opinion."
+            case LanguageId.kor: return "소중한 의견 감사드립니다."
+            default: fatalError()}
+        }()
         self.msgShortPassword = {
             switch currentLanguageId {
             case LanguageId.eng: return "Use 8 characters or more"
@@ -872,7 +886,7 @@ struct LangPack {
         self.msgSignUpYet = {
             switch currentLanguageId {
             case LanguageId.eng: return "You have not Signed in Dymm."
-            case LanguageId.kor: return "Dymm에 로그인 되지 않았습니다."
+            case LanguageId.kor: return "Dymm에 로그인 되지 않았어요."
             default: fatalError()}
         }()
         self.msgUnauthDuplicatedEmail = {
