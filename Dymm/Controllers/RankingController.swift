@@ -90,7 +90,7 @@ class RankingViewController: UIViewController {
         startingPickerView.selectRow(selectedStartingKey - 1, inComponent: 0, animated: false)
         alert.view.addSubview(startingPickerView)
         startingPickerView.widthAnchor.constraint(equalTo: alert.view.widthAnchor, constant: 0).isActive = true
-        alert.addAction(UIAlertAction(title: lang.titleClose, style: .cancel) { _ in })
+        alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             self.startingPickButton.setTitle(LangHelper.getStartingPickName(key: self.selectedStartingKey), for: .normal)
             self.loadRankings()
@@ -105,7 +105,7 @@ class RankingViewController: UIViewController {
         ageGroupPickerView.selectRow(selectedAgeGroupKey - 1, inComponent: 0, animated: false)
         alert.view.addSubview(ageGroupPickerView)
         ageGroupPickerView.widthAnchor.constraint(equalTo: alert.view.widthAnchor, constant: 0).isActive = true
-        alert.addAction(UIAlertAction(title: lang.titleClose, style: .cancel) { _ in })
+        alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             switch self.lang.currentLanguageId {
             case LanguageId.eng:

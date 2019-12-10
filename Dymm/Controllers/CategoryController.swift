@@ -136,7 +136,7 @@ class CategoryViewController: UIViewController {
             UIView.transition(with: self.detailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.detailContainer.isHidden = true
             })
-            self.createAConditionLog()
+            self.createAMoodScoreLog()
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil))
         if cond_log_type == CondLogType.startDate {
@@ -1300,7 +1300,7 @@ extension CategoryViewController {
         }
     }
     
-    private func createAConditionLog() {
+    private func createAMoodScoreLog() {
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -1314,11 +1314,11 @@ extension CategoryViewController {
         ]
         let service = Service(lang: lang)
         service.postAvatarCond(params: params, popoverAlert: { (message) in
-            self.retryFunction = self.createAConditionLog
+            self.retryFunction = self.createAMoodScoreLog
             self.detailContainer.isHidden = true
             self.alertError(message)
         }, tokenRefreshCompletion: {
-            self.createAConditionLog()
+            self.createAMoodScoreLog()
         }) {
             UIView.transition(with: self.detailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.detailContainer.isHidden = false

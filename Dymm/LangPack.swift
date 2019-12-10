@@ -15,8 +15,8 @@ struct LangPack {
     var titleAge: String!
     var titleAgeGroup: String!
     var titleAll: String!
-    var titleAvgScoreWeek: String!
-    var titleAvgScoreMonth: String!
+    var titleAvgMoodScoreWeek: String!
+    var titleAvgMoodScoreMonth: String!
     var titleBackHome: String!
     var titleCamera: String!
     var titleCancel: String!
@@ -24,7 +24,7 @@ struct LangPack {
     var titleChangeProfileImg: String!
     var titleClose: String!
     var titleComplete: String!
-    var titleCondScore: String!
+    var titleMoodScore: String!
     var titleCondScores: [String]!
     var titleContinue: String!
     var titleCreateNew: String!
@@ -203,16 +203,16 @@ struct LangPack {
 //            case LanguageId.jpn: return ""
 //            default: fatalError()}
 //        }
-        self.titleAvgScoreMonth = {
+        self.titleAvgMoodScoreMonth = {
             switch currentLanguageId {
-            case LanguageId.eng: return "My Monthly Condition Score"
-            case LanguageId.kor: return "나의 월간 컨디션 점수"
+            case LanguageId.eng: return "My Monthly Mood Score"
+            case LanguageId.kor: return "나의 월간 기분점수"
             default: fatalError()}
         }()
-        self.titleAvgScoreWeek = {
+        self.titleAvgMoodScoreWeek = {
             switch currentLanguageId {
-            case LanguageId.eng: return "My Weekly Condition Score"
-            case LanguageId.kor: return "나의 주간 컨디션 점수"
+            case LanguageId.eng: return "My Weekly Mood Score"
+            case LanguageId.kor: return "나의 주간 기분점수"
             default: fatalError()}
         }()
         self.titleBackHome = {
@@ -257,10 +257,10 @@ struct LangPack {
             case LanguageId.kor: return "전송완료!"
             default: fatalError()}
         }()
-        self.titleCondScore = {
+        self.titleMoodScore = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Condition score"
-            case LanguageId.kor: return "컨디션 점수"
+            case LanguageId.eng: return "Mood score"
+            case LanguageId.kor: return "기분점수"
             default: fatalError()}
         }()
         self.titleCondScores = {
@@ -465,8 +465,8 @@ struct LangPack {
         }()
         self.titleMyCondScore = {
             switch currentLanguageId {
-            case LanguageId.eng: return "MY CONDITION SCORE"
-            case LanguageId.kor: return "나의 컨디션 점수"
+            case LanguageId.eng: return "MY MOOD SCORE"
+            case LanguageId.kor: return "나의 평균 기분점수"
             default: fatalError()}
         }()
         self.titleNo = {
@@ -752,8 +752,8 @@ struct LangPack {
         }()
         self.msgCondScoreNone = {
             switch currentLanguageId {
-            case LanguageId.eng: return "You don't have any \ncondition score log yet."
-            case LanguageId.kor: return "당신의 컨디션 점수가 아직 기록되지 않았습니다."
+            case LanguageId.eng: return "You don't have any \nmood score log."
+            case LanguageId.kor: return "당신의 기분점수가 하나도 기록되지 않았어요."
             default: fatalError()}
         }()
         self.msgDateOfBirthNone = {
@@ -818,8 +818,8 @@ struct LangPack {
         }()
         self.msgLifeSpan = {
             switch currentLanguageId {
-            case LanguageId.eng: return "I've estimated your remaining lifespan."
-            case LanguageId.kor: return "나는 당신의 남은 수명을 예측했어요."
+            case LanguageId.eng: return "I've estimated your remaining lifespan :)"
+            case LanguageId.kor: return "당신의 남은 수명을 예측했어요 :)"
             default: fatalError()}
         }()
         self.msgLogComplete = {

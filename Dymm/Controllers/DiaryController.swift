@@ -161,7 +161,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     @objc func alertCondScorePicker() {
-        let alert = UIAlertController(title: lang.titleCondScore, message: "\n\n\n\n\n\n\n\n\n\n", preferredStyle: .alert)
+        let alert = UIAlertController(title: lang.titleMoodScore, message: "\n\n\n\n\n\n\n\n\n\n", preferredStyle: .alert)
         alert.isModalInPopover = true
         if let condScore = selectedLogGroup?.cond_score {
             condScorePickerView.selectRow(10 - condScore, inComponent: 0, animated: false)
@@ -279,9 +279,9 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             imageView.image = UIImage.itemTrendUp.withRenderingMode(.alwaysOriginal)
             changedScorelabel.text = String(format: "+%.1f", (thisAvgScore! - lastAvgScore!))
         }
-        var title = lang.titleAvgScoreWeek
+        var title = lang.titleAvgMoodScoreWeek
         if calendarView.scope == .month {
-            title = lang.titleAvgScoreMonth
+            title = lang.titleAvgMoodScoreMonth
         }
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let thisAvgScorelabel: UILabel = {
