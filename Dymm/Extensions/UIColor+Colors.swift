@@ -295,6 +295,7 @@ extension UIColor {
     static let webOrange = UIColor(hex: "#FEA32A")
     static let red_FF4779 = UIColor(hex: "#FF4779")
     static let red_E96464 = UIColor(hex: "#E96464")
+    static let orange_FFBF67 = UIColor(hex: "#FFBF67")
     
     // Yellow
     static let yellow_FFFEDE = UIColor(hex: "#FFFEDE")

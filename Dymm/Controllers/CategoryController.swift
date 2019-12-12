@@ -37,7 +37,6 @@ class CategoryViewController: UIViewController {
     // UIImageViews
     var downArrowImageView: UIImageView!
     var photoImageView: UIImageView!
-    var gradientBackImage: UIImageView!
     
     // UITextField
     var searchTextField: UITextField!
@@ -131,18 +130,18 @@ class CategoryViewController: UIViewController {
         }
         let alert = UIAlertController(title: title, message: nil, preferredStyle: UIAlertController.Style.alert)
         alert.view.addSubview(datePicker)
-        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: { _ in
+        alert.addAction(UIAlertAction(title: lang.titleDone, style: UIAlertAction.Style.default, handler: { _ in
             self.selectedDate = self.dateFormatter.string(from: datePicker.date)
             UIView.transition(with: self.detailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.detailContainer.isHidden = true
             })
             self.createAMoodScoreLog()
         }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: lang.titleCancel, style: UIAlertAction.Style.cancel, handler: nil))
         if cond_log_type == CondLogType.startDate {
-            alert.view.tintColor = .limeGreen
+            alert.view.tintColor = .purple_B847FF
         } else {
-            alert.view.tintColor = .red_FE4C4C
+            alert.view.tintColor = UIColor(hex: "#FE4CF0")
         }
         present(alert, animated: true, completion:{})
     }
@@ -719,7 +718,7 @@ extension CategoryViewController {
         }()
         sizePickerContainer = {
             let _view = UIView()
-            _view.backgroundColor = .mediumSeaGreen
+            _view.backgroundColor = .whiteSmoke
             _view.clipsToBounds = true
             _view.layer.cornerRadius = 10
             _view.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
@@ -863,8 +862,9 @@ extension CategoryViewController {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemArrowCircle.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 16, height: 17)
-            _button.setTitleColor(UIColor.dimGray, for: .normal)
+            _button.setTitleColor(.dimGray, for: .normal)
             _button.setTitle(lang.titleStartDate, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 16, weight: .regular)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(startDateButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -873,21 +873,14 @@ extension CategoryViewController {
         endDateButton = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemCheckThin.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.frame = CGRect(x: 0, y: 0, width: 16, height: 17)
-            _button.setTitleColor(UIColor.dimGray, for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 16, height: 16)
+            _button.setTitleColor(.dimGray, for: .normal)
             _button.setTitle(lang.titleEndDate, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(endDateButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
-        }()
-        gradientBackImage = {
-            let _imageView = UIImageView()
-            _imageView.contentMode = .scaleAspectFill
-            _imageView.clipsToBounds = true
-            _imageView.image = UIImage(named: "item-gradient-back")
-            _imageView.translatesAutoresizingMaskIntoConstraints = false
-            return _imageView
         }()
         
         stepCollection.dataSource = self
@@ -922,7 +915,6 @@ extension CategoryViewController {
         detailContainer.addSubview(downArrowImageView)
         detailContainer.addSubview(timePicker)
         
-        sizePickerContainer.addSubview(gradientBackImage)
         sizePickerContainer.addSubview(sizePicker)
         
         // Setup constraints
@@ -985,11 +977,6 @@ extension CategoryViewController {
         sizePickerContainer.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: 0).isActive = true
         sizePickerContainer.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: 0).isActive = true
         sizePickerContainer.heightAnchor.constraint(equalToConstant: 58).isActive = true
-        
-        gradientBackImage.topAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: 0).isActive = true
-        gradientBackImage.leadingAnchor.constraint(equalTo: sizePickerContainer.leadingAnchor, constant: 0).isActive = true
-        gradientBackImage.trailingAnchor.constraint(equalTo: sizePickerContainer.trailingAnchor, constant: 0).isActive = true
-        gradientBackImage.bottomAnchor.constraint(equalTo: sizePickerContainer.bottomAnchor, constant: 0).isActive = true
         
         sizePicker.centerXAnchor.constraint(equalTo: sizePickerContainer.centerXAnchor, constant: 0).isActive = true
         sizePicker.centerYAnchor.constraint(equalTo: sizePickerContainer.centerYAnchor, constant: 0).isActive = true
@@ -1184,6 +1171,12 @@ extension CategoryViewController {
                 self.endDateButton.isHidden = true
                 if _superTag.class1 != nil {
                     self.setDetailPhotoImage(tag: _superTag)
+                }
+                
+                if _superTag.tag_type == TagType.food {
+                    self.sizePickerContainer.backgroundColor = .orange_FFBF67
+                } else if _superTag.tag_type == TagType.drug {
+                    self.sizePickerContainer.backgroundColor = .dodgerBlue
                 }
             }
         } else if _superTag.tag_type == TagType.activity {

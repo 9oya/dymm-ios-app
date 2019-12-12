@@ -528,15 +528,15 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
                 case LanguageId.kor: cell.label.text = profileTag.kor_name
                 case LanguageId.jpn: cell.label.text = profileTag.jpn_name
                 default: cell.label.text = profileTag.eng_name}
-                cell.label.font = .systemFont(ofSize: 14, weight: .medium)
-                cell.label.textColor = .mediumSeaGreen
+//                cell.label.font = .systemFont(ofSize: 14, weight: .medium)
+//                cell.label.textColor = .mediumSeaGreen
             case TagId.dateOfBirth:
                 if let dateOfBirth = profile?.avatar.date_of_birth {
-                    cell.label.font = .systemFont(ofSize: 14, weight: .regular)
+//                    cell.label.font = .systemFont(ofSize: 14, weight: .regular)
                     cell.label.text = dateOfBirth
                     cell.label.textColor = .black
                 } else {
-                    cell.label.font = .systemFont(ofSize: 14, weight: .regular)
+//                    cell.label.font = .systemFont(ofSize: 14, weight: .regular)
                     cell.label.text = profileTag.eng_name
                     cell.label.textColor = .lightGray
                 }
