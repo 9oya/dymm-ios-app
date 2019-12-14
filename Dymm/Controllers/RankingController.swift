@@ -161,6 +161,7 @@ extension RankingViewController: UITableViewDataSource, UITableViewDelegate {
             cell.profileImgLabel.text = String(firstName[index])
             cell.profileImgLabel.textColor = .white
             cell.profileImgView.backgroundColor = getProfileUIColor(key: ranking.color_code)
+            cell.profileImgView.image = nil
         }
         cell.rankNumLabel.text = "#\(ranking.rank_num)"
         cell.nameLabel.text = "\(ranking.first_name) \(ranking.last_name)"
@@ -182,28 +183,6 @@ extension RankingViewController: UITableViewDataSource, UITableViewDelegate {
             cell.yearsLabel.text = " "
             cell.daysLabel.text = " "
         }
-        
-        
-        
-//        var color = UIColor.dimGray
-//        if ranking.rank_num <= 100 {
-//            color = .dodgerBlue
-//        } else if ranking.rank_num <= 200 {
-//            color = .mediumSeaGreen
-//        } else if ranking.rank_num <= 300 {
-//           color = .webOrange
-//        } else if ranking.rank_num <= 300 {
-//            color = .webOrange
-//        } else if ranking.rank_num <= 400 {
-//           color = .tomato
-//        } else if ranking.rank_num <=  500 {
-//            color = .purple_A45FAC
-//        } else {
-//            color = .dimGray
-//        }
-//        cell.rankNumLabel.textColor = color
-//        cell.nameLabel.textColor = color
-//        cell.yearsLabel.textColor = color
         return cell
     }
     
@@ -333,7 +312,7 @@ extension RankingViewController {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 14, weight: .regular)
             _label.textAlignment = .left
-            _label.textColor = .mediumSeaGreen
+            _label.textColor = .green_3ED6A7
             _label.text = "#\(lang.titleRanking!)"
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
@@ -342,7 +321,7 @@ extension RankingViewController {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 14, weight: .regular)
             _label.textAlignment = .right
-            _label.textColor = .mediumSeaGreen
+            _label.textColor = .green_3ED6A7
             _label.text = lang.titleReLifespanAndAge
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
@@ -357,7 +336,7 @@ extension RankingViewController {
         }()
         ageGroupPickButton = {
             let _button = UIButton(type: .system)
-            _button.setTitleColor(.mediumSeaGreen, for: .normal)
+            _button.setTitleColor(.green_3ED6A7, for: .normal)
             switch self.lang.currentLanguageId {
             case LanguageId.eng:
                 _button.setTitle(LangHelper.getAgeGroupEngPickName(key: self.selectedAgeGroupKey), for: .normal)
@@ -375,7 +354,7 @@ extension RankingViewController {
         }()
         startingPickButton = {
             let _button = UIButton(type: .system)
-            _button.setTitleColor(.mediumSeaGreen, for: .normal)
+            _button.setTitleColor(.green_3ED6A7, for: .normal)
             _button.setTitle(LangHelper.getStartingPickName(key: selectedStartingKey), for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 15)
             _button.showsTouchWhenHighlighted = true
@@ -454,7 +433,7 @@ extension RankingViewController {
         }()
         myYearsBar = {
             let _view = UIView()
-            _view.backgroundColor = .mediumSeaGreen
+            _view.backgroundColor = .green_3ED6A7
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
@@ -467,7 +446,7 @@ extension RankingViewController {
         }()
         myDaysBar = {
             let _view = UIView()
-            _view.backgroundColor = .mediumSeaGreen
+            _view.backgroundColor = .green_3ED6A7
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
@@ -642,7 +621,7 @@ extension RankingViewController {
             }
             var myColor = UIColor.dimGray
             if ranking.rank_num > 0 {
-                myColor = .mediumSeaGreen
+                myColor = .green_3ED6A7
             }
             UIView.animate(withDuration: 0.5) {
                 self.myRankNumLabel.textColor = myColor

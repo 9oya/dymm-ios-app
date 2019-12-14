@@ -204,11 +204,11 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             }
             switch tag.id {
             case TagId.diary:
-                cell.label.textColor = .mediumSeaGreen
+                cell.label.textColor = .green_3ED6A7
             case TagId.ranking:
-                cell.label.textColor = .mediumSeaGreen
+                cell.label.textColor = .green_3ED6A7
             default:
-                cell.label.textColor = .mediumSeaGreen
+                cell.label.textColor = .green_3ED6A7
             }
         }
         return cell
@@ -289,7 +289,7 @@ extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: 90, height: 30))
-        label.textColor = .mediumSeaGreen
+        label.textColor = .green_3ED6A7
         label.font = .systemFont(ofSize: 20, weight: .regular)
         label.textAlignment = .center
         switch pickerView {
@@ -415,7 +415,7 @@ extension HomeViewController {
         scoreNumberLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 40, weight: .medium)
-            _label.textColor = .mediumSeaGreen
+            _label.textColor = .green_3ED6A7
             _label.textAlignment = .center
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
@@ -423,7 +423,7 @@ extension HomeViewController {
         scoreMessageLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 20, weight: .medium)
-            _label.textColor = .mediumSeaGreen
+            _label.textColor = .green_3ED6A7
             _label.textAlignment = .center
             _label.numberOfLines = 2
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -432,7 +432,7 @@ extension HomeViewController {
         ageLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 18, weight: .medium)
-            _label.textColor = .mediumSeaGreen
+            _label.textColor = .green_3ED6A7
             _label.textAlignment = .right
             _label.numberOfLines = 1
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -441,7 +441,7 @@ extension HomeViewController {
         genderLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 18, weight: .medium)
-            _label.textColor = .mediumSeaGreen
+            _label.textColor = .green_3ED6A7
             _label.textAlignment = .right
             _label.numberOfLines = 1
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -450,7 +450,7 @@ extension HomeViewController {
         lifespanMsgLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 16, weight: .regular)
-            _label.textColor = .mediumSeaGreen
+            _label.textColor = .green_3ED6A7
             _label.textAlignment = .center
             _label.numberOfLines = 3
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -459,7 +459,7 @@ extension HomeViewController {
         lifespanLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 18, weight: .regular)
-            _label.textColor = .mediumSeaGreen
+            _label.textColor = .green_3ED6A7
             _label.textAlignment = .center
             _label.numberOfLines = 3
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -642,13 +642,6 @@ extension HomeViewController {
             self.lifespanMsgLabel.text = self.lang.msgSignUpYet
             self.lifespanLabel.text = ""
             
-//            self.scoreTitleLabel.textColor = getCondScoreColor(0)
-//            self.scoreNumberLabel.textColor = getCondScoreColor(0)
-//            self.scoreMessageLabel.textColor = getCondScoreColor(0)
-//            self.ageLabel.textColor = getCondScoreColor(0)
-//            self.genderLabel.textColor = getCondScoreColor(0)
-//            self.lifespanMsgLabel.textColor = .webOrange
-            
             self.profileButton.setTitleColor(.clear, for: .normal)
             self.profileButton.backgroundColor = .clear
             self.profileButton.setBackgroundImage(.itemProfileDef, for: .normal)
@@ -688,16 +681,11 @@ extension HomeViewController {
                         self.genderLabel.text = "성별"
                     default: fatalError()}
                 }
-                self.scoreTitleLabel.textColor = .mediumSeaGreen
-                self.scoreNumberLabel.textColor = .mediumSeaGreen
-                self.scoreMessageLabel.textColor = .mediumSeaGreen
-                self.ageLabel.textColor = .mediumSeaGreen
-                self.genderLabel.textColor = .mediumSeaGreen
-//                self.scoreTitleLabel.textColor = getCondScoreColor(self.thisAvgScore)
-//                self.scoreNumberLabel.textColor = getCondScoreColor(self.thisAvgScore)
-//                self.scoreMessageLabel.textColor = getCondScoreColor(self.thisAvgScore)
-//                self.ageLabel.textColor = getCondScoreColor(self.thisAvgScore)
-//                self.genderLabel.textColor = getCondScoreColor(self.thisAvgScore)
+                self.scoreTitleLabel.textColor = .green_3ED6A7
+                self.scoreNumberLabel.textColor = .green_3ED6A7
+                self.scoreMessageLabel.textColor = .green_3ED6A7
+                self.ageLabel.textColor = .green_3ED6A7
+                self.genderLabel.textColor = .green_3ED6A7
                 self.scoreboardView.isHidden = false
             }
         }
@@ -712,7 +700,6 @@ extension HomeViewController {
             self.loadRemainingLifeSpan()
         }, unauthorized: { (pattern) in
             UIView.animate(withDuration: 0.5) {
-                self.lifespanMsgLabel.textColor = .webOrange
                 switch pattern {
                 case UnauthType.userInvalid:
                     self.alertUnauthError(self.lang.msgAccountInvalid)
@@ -722,6 +709,7 @@ extension HomeViewController {
                     self.lifespanMsgLabel.text = self.lang.msgDateOfBirthNone
                 default: fatalError()}
                 self.lifespanBoardView.isHidden = false
+                self.cubeImgView.isHidden = true
             }
         }) { (lifeSpan) in
             let year = lifeSpan / 365
@@ -733,7 +721,7 @@ extension HomeViewController {
                 case LanguageId.kor:
                     self.lifespanLabel.text = "\(year)년 \(days)일"
                 default: fatalError()}
-                self.lifespanMsgLabel.textColor = .mediumSeaGreen
+                self.lifespanMsgLabel.textColor = .green_3ED6A7
                 self.lifespanMsgLabel.text = self.lang.msgLifeSpan
                 self.lifespanBoardView.isHidden = false
             }

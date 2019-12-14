@@ -198,6 +198,10 @@ class CategoryViewController: UIViewController {
     }
     
     @objc func alertOpinionTextView(_ sender: UITapGestureRecognizer? = nil) {
+        if !UserDefaults.standard.isSignIn() {
+            presentAuthNavigation()
+            return
+        }
         var message = ""
         switch lang.currentLanguageId {
         case LanguageId.eng: message = superTag!.eng_name

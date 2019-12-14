@@ -410,7 +410,7 @@ class ProfileViewController: UIViewController {
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
         alert.addAction(UIAlertAction(title: lang.titleChooseColor, style: .default) { _ in
-            self.colorLeftButton.setTitleColor(.mediumSeaGreen, for: .normal)
+            self.colorLeftButton.setTitleColor(.green_3ED6A7, for: .normal)
             UIView.transition(with: self.colorLeftButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.colorLeftButton.isHidden = false
             })
@@ -760,13 +760,13 @@ extension ProfileViewController {
         notConfirmedEmailButton = {
             let _button = UIButton(type: .system)
             _button.titleLabel?.font = .systemFont(ofSize: 16)
-            _button.setTitleColor(.mediumSeaGreen, for: .normal)
+            _button.setTitleColor(.green_3ED6A7, for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(alertEmailTextField(_:)), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        sendAgainButton = getBasicTextButton(.mediumSeaGreen)
+        sendAgainButton = getBasicTextButton(.green_3ED6A7)
         sendAgainButton.addTarget(self, action: #selector(sendMailAgainBtnTapped), for: .touchUpInside)
         firstNameContainer = getProfileLabelContainerView()
         firstNameContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertFirstNameTextField(_:))))
@@ -905,7 +905,7 @@ extension ProfileViewController {
             let _button = UIButton(type: .system)
             _button.setTitle(lang.titleDone, for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            _button.setTitleColor(.mediumSeaGreen, for: .normal)
+            _button.setTitleColor(.green_3ED6A7, for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(colorRightButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -1289,7 +1289,7 @@ extension ProfileViewController {
         }) {
             UIView.animate(withDuration: 0.5, animations: {
                 self.verifMailMsgLabel.text = self.lang.msgMailSendAgainComplete
-                self.verifMailMsgLabel.textColor = UIColor.mediumSeaGreen
+                self.verifMailMsgLabel.textColor = UIColor.green_3ED6A7
             })
             UIView.transition(with: self.verifMailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.verifMailContainer.isHidden = false

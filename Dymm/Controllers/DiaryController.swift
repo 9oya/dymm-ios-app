@@ -670,7 +670,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             if indexPath.row == 0 {
                 // Case 'Create new group' cell
                 cell.nameLabel.text = lang.titleCreateNewGroup
-                cell.nameLabel.textColor = .mediumSeaGreen
+                cell.nameLabel.textColor = .green_3ED6A7
                 cell.groupTypeImageView.image = nil
                 cell.foodLogBulletView.isHidden = true
                 cell.actLogBulletView.isHidden = true
@@ -681,7 +681,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row - 1].logGroup
                 cell.nameLabel.text = lang.getLogGroupTypeName(logGroup.group_type)
                 cell.groupTypeImageView.image = nil
-                cell.nameLabel.textColor = .mediumSeaGreen
+                cell.nameLabel.textColor = .green_3ED6A7
                 return cell
             }
         default:
@@ -1357,7 +1357,7 @@ extension DiaryViewController {
             let _calendar = FSCalendar()
             _calendar.appearance.headerTitleColor = .black
             _calendar.appearance.weekdayTextColor = .black
-            _calendar.appearance.titleDefaultColor = .mediumSeaGreen
+            _calendar.appearance.titleDefaultColor = .green_3ED6A7
             _calendar.appearance.titlePlaceholderColor = .lightGray
             _calendar.appearance.eventDefaultColor = .red_FF4779
             _calendar.appearance.eventSelectionColor = .red_FF4779

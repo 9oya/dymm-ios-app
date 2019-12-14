@@ -71,7 +71,7 @@ extension RankingTableCell {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 14, weight: .regular)
             _label.textAlignment = .left
-            _label.textColor = .mediumSeaGreen
+            _label.textColor = .green_3ED6A7
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -79,7 +79,7 @@ extension RankingTableCell {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 14, weight: .regular)
             _label.textAlignment = .left
-            _label.textColor = .mediumSeaGreen
+            _label.textColor = .green_3ED6A7
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -87,7 +87,7 @@ extension RankingTableCell {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 14, weight: .regular)
             _label.textAlignment = .right
-            _label.textColor = .mediumSeaGreen
+            _label.textColor = .green_3ED6A7
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -95,26 +95,25 @@ extension RankingTableCell {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 9, weight: .regular)
             _label.textAlignment = .right
-            _label.textColor = .mediumSeaGreen
+            _label.textColor = .green_3ED6A7
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
         yearsBar = {
             let _view = UIView()
-            _view.backgroundColor = .mediumSeaGreen
+            _view.backgroundColor = .green_3ED6A7
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
         daysBarBg = {
             let _view = UIView()
             _view.backgroundColor = UIColor(hex: "#CBF5E8")
-//            _view.backgroundColor = UIColor.green_00E9CC.withAlphaComponent(0.37)
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
         daysBar = {
             let _view = UIView()
-            _view.backgroundColor = .mediumSeaGreen
+            _view.backgroundColor = .green_3ED6A7
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
@@ -126,8 +125,8 @@ extension RankingTableCell {
         containerView.addSubview(profileImgLabel)
         containerView.addSubview(nameLabel)
         containerView.addSubview(yearsBar)
-        containerView.addSubview(daysBar)
         containerView.addSubview(daysBarBg)
+        containerView.addSubview(daysBar)
         containerView.addSubview(yearsLabel)
         containerView.addSubview(daysLabel)
         

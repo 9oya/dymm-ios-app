@@ -168,7 +168,7 @@ extension IAPController {
         eventLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 15, weight: .medium)
-            _label.textColor = .mediumSeaGreen
+            _label.textColor = .green_3ED6A7
             _label.textAlignment = .center
             _label.text = "+1 Month Free Trial"
             _label.translatesAutoresizingMaskIntoConstraints = false

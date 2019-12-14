@@ -71,7 +71,7 @@ extension UIView {
         let spinner: UIActivityIndicatorView = {
             let indicator = UIActivityIndicatorView()
             indicator.style = .whiteLarge
-            indicator.color = .mediumSeaGreen
+            indicator.color = .green_3ED6A7
             indicator.layer.cornerRadius = 10.0
             indicator.startAnimating()
             indicator.tag = 475647
