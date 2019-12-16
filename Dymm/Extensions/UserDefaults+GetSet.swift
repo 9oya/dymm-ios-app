@@ -13,6 +13,8 @@ extension UserDefaults {
     enum UserDefaultsKeys: String {
         case isSignIn
         case isEmailConfirmed
+        case isFreeTrial
+        case isPurchased
         case accessToken
         case refreshToken
         case avatarId
@@ -29,6 +31,16 @@ extension UserDefaults {
     
     func setIsEmailConfirmed(value: Bool) {
         set(value, forKey: UserDefaultsKeys.isEmailConfirmed.rawValue)
+        synchronize()
+    }
+    
+    func setIsFreeTrial(value: Bool) {
+        set(value, forKey: UserDefaultsKeys.isFreeTrial.rawValue)
+        synchronize()
+    }
+    
+    func setIsPurchased(value: Bool) {
+        set(value, forKey: UserDefaultsKeys.isPurchased.rawValue)
         synchronize()
     }
     
@@ -60,6 +72,14 @@ extension UserDefaults {
     
     func isEmailConfirmed() -> Bool {
         return bool(forKey: UserDefaultsKeys.isEmailConfirmed.rawValue)
+    }
+    
+    func isFreeTrial() -> Bool {
+        return bool(forKey: UserDefaultsKeys.isFreeTrial.rawValue)
+    }
+    
+    func isPurchased() -> Bool {
+        return bool(forKey: UserDefaultsKeys.isPurchased.rawValue)
     }
     
     func getAccessToken() -> String? {

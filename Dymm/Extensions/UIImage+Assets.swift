@@ -96,4 +96,5 @@ extension UIImage {
     
     static let itemOpinion = UIImage(named: "item-opinion")!
     static let item3dCube = UIImage(named: "item-3d-cube")!
+    static let itemLogoMPurple = UIImage(named: "item-logo-m-purple")!
 }

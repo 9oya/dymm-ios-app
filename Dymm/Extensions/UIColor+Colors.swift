@@ -307,6 +307,7 @@ extension UIColor {
     // Purple
     static let purple_A45FAC = UIColor(hex: "#A45FAC")
     static let purple_B847FF = UIColor(hex: "#B847FF")
+    static let purple_921BEA = UIColor(hex: "#921BEA")
     
     // Green
     static let limeGreen = UIColor(hex: "LimeGreen")

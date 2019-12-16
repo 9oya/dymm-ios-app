@@ -1004,45 +1004,57 @@ struct Service {
     }
 
     func postProfilePhoto(avatarId: Int, image: Data, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping () -> Void) {
-//        guard let accessToken = UserDefaults.standard.getAccessToken() else {
-//            print("Load UserDefaults.standard.getAccessToken() failed")
-//            return
-//        }
-//        let headers: HTTPHeaders = [
-//            "Authorization": "Bearer \(accessToken)",
-//        ]
         let url = "\(URI.host)\(URI.avatar)/\(avatarId)/profile-img"
-//        Alamofire.upload(image, to: url, method: .post, headers: headers)
-//            .validate(contentType: ["application/json"])
-//            .responseData { response in
-//                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
-//                    popoverAlert(self.lang.msgNetworkFailure)
-//                    return
-//                }
-//                switch statusCode {
-//                case 200:
-//                    completion()
-//                case 400:
-//                    self.badRequest(responseData)
-//                default:
-//                    self.unexpectedResponse(statusCode, responseData, "findEmailAddress()")
-//                    return
-//                }
-//        }
-        
         Alamofire.upload(multipartFormData: { (form) in
             form.append(image, withName: "file", fileName: "file.jpg", mimeType: "image/jpg")
         }, to: url, encodingCompletion: { result in
             switch result {
             case .success(let upload, _, _):
                 upload.responseString { response in
-//                    print(response.value)
                     completion()
                 }
             case .failure(let encodingError):
                 print(encodingError)
             }
         })
+    }
+    
+    func verifyReceipt(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ isReceiptVerif: Bool) -> Void) {
+        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+            print("Load UserDefaults.standard.getAccessToken() failed")
+            return
+        }
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(accessToken)",
+        ]
+        Alamofire.request("\(URI.host)\(URI.avatar)/receipt", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<Bool>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    guard let isReceiptVerif = decodedData.data else {
+                        fatalError()
+                    }
+                    completion(isReceiptVerif)
+                case 400:
+                    self.badRequest(responseData)
+                case 403:
+                    _ = self.forbiddenRequest(responseData, popoverAlert) { (message, pattern) in
+                        tokenRefreshCompletion()
+                    }
+                    return
+                default:
+                    self.unexpectedResponse(statusCode, responseData, "verifyReceipt()")
+                    return
+                }
+        }
     }
     
     // MARK: - PUT services

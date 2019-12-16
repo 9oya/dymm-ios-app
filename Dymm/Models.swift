@@ -94,6 +94,8 @@ struct BaseModel {
         let introudction: String?
         let date_of_birth: String?
         let photo_name: String?
+        let free_exp_date: String
+        let is_free_trial: Bool
         let access_token: String?
         let refresh_token: String?
         
@@ -108,6 +110,8 @@ struct BaseModel {
             case color_code
             case introudction
             case date_of_birth
+            case free_exp_date
+            case is_free_trial
             case photo_name
             case access_token
             case refresh_token
@@ -125,6 +129,8 @@ struct BaseModel {
             self.color_code = try valueContainer.decode(Int.self, forKey: CodingKeys.color_code)
             self.introudction = try? valueContainer.decode(String.self, forKey: CodingKeys.introudction)
             self.date_of_birth = try? valueContainer.decode(String.self, forKey: CodingKeys.date_of_birth)
+            self.free_exp_date = try valueContainer.decode(String.self, forKey: CodingKeys.free_exp_date)
+            self.is_free_trial = try valueContainer.decode(Bool.self, forKey: CodingKeys.is_free_trial)
             self.photo_name = try? valueContainer.decode(String.self, forKey: CodingKeys.photo_name)
             self.access_token = try? valueContainer.decode(String.self, forKey: CodingKeys.access_token)
             self.refresh_token = try? valueContainer.decode(String.self, forKey: CodingKeys.refresh_token)

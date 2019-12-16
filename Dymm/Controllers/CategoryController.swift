@@ -242,6 +242,11 @@ class CategoryViewController: UIViewController {
         present(nc, animated: true, completion: nil)
     }
     
+    @objc func presentIAPController() {
+            let vc = IAPController()
+            self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
     @objc func homeButtonTapped() {
         dismiss(animated: true, completion: nil)
     }
@@ -266,13 +271,17 @@ class CategoryViewController: UIViewController {
                 sender.transform = CGAffineTransform.identity
             }) { (_) in
                 if UserDefaults.standard.isSignIn() {
-                    let vc = DiaryViewController()
-                    vc.diaryMode = DiaryMode.logger
-                    vc.selectedTag = self.superTag!
-                    vc.xVal = self.selectedXVal!
-                    vc.yVal = self.selectedYVal!
-                    self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: UIBarButtonItem.Style.plain, target: self, action: nil)
-                    self.navigationController?.pushViewController(vc, animated: true)
+                    if UserDefaults.standard.isFreeTrial() || UserDefaults.standard.isPurchased() {
+                        let vc = DiaryViewController()
+                        vc.diaryMode = DiaryMode.logger
+                        vc.selectedTag = self.superTag!
+                        vc.xVal = self.selectedXVal!
+                        vc.yVal = self.selectedYVal!
+                        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: UIBarButtonItem.Style.plain, target: self, action: nil)
+                        self.navigationController?.pushViewController(vc, animated: true)
+                    } else {
+                        self.presentIAPController()
+                    }
                 } else {
                     self.presentAuthNavigation()
                 }

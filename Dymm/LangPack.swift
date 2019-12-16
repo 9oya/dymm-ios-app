@@ -74,6 +74,7 @@ struct LangPack {
     var titleProfile: String!
     var titleRanking: String!
     var titleReLifespanAndAge: String!
+    var titleRestoreProduct: String!
     var titleRetry: String!
     var titleSearch: String!
     var titleSend: String!
@@ -114,6 +115,7 @@ struct LangPack {
     var msgFloatingInvalidEmail: String!
     var msgFloatingInvalidPassword: String!
     var msgFloatingMismatchConfirmPassword: String!
+    var msgFreeTrialExpired: String!
     var msgInactiveFood: String!
     var msgInvalidEmail: String!
     var msgLifeSpan: String!
@@ -126,6 +128,10 @@ struct LangPack {
     var msgMismatchConfirmPassword: String!
     var msgNetworkFailure: String!
     var msgOpinionCompl: String!
+    var msgPriceDesc: String!
+    var msgProductDesc1: String!
+    var msgProductDesc2: String!
+    var msgProductPurchased: String!
     var msgShortPassword: String!
     var msgSignUpYet: String!
     var msgUnauthDuplicatedEmail: String!
@@ -386,12 +392,12 @@ struct LangPack {
         self.titleForgotPasswordAlert = {
             switch currentLanguageId {
             case LanguageId.eng: return "I forgot my Dymm password"
-            case LanguageId.kor: return "Dymm 비밀번호를 분실했어요."
+            case LanguageId.kor: return "딤 비밀번호를 분실했어요."
             default: fatalError()}
         }()
         self.titleFreeTrial = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Free Trial"
+            case LanguageId.eng: return "Free trial"
             case LanguageId.kor: return "무료 체험"
             default: fatalError()}
         }()
@@ -454,7 +460,7 @@ struct LangPack {
         self.titleMembership = {
             switch currentLanguageId {
             case LanguageId.eng: return "Membership"
-            case LanguageId.kor: return "맴버쉽"
+            case LanguageId.kor: return "멤버쉽"
             default: fatalError()}
         }()
         self.titleMyAvtCond = {
@@ -557,6 +563,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Health Points"
             case LanguageId.kor: return "생명력"
+            default: fatalError()}
+        }()
+        self.titleRestoreProduct = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Restore membership"
+            case LanguageId.kor: return "멤버쉽 복원하기"
             default: fatalError()}
         }()
         self.titleRetry = {
@@ -804,6 +816,12 @@ struct LangPack {
             case LanguageId.kor: return "패스워드 확인 불일치"
             default: fatalError()}
         }()
+        self.msgFreeTrialExpired = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Your free trial has expired. Please register your membership."
+            case LanguageId.kor: return "무료 체험이 만료되었습니다. 멤버쉽을 등록해 주세요."
+            default: fatalError()}
+        }()
         self.msgInvalidEmail = {
             switch currentLanguageId {
             case LanguageId.eng: return "Invalid mail address"
@@ -877,6 +895,52 @@ struct LangPack {
             case LanguageId.kor: return "소중한 의견 감사드립니다."
             default: fatalError()}
         }()
+        self.msgPriceDesc = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "+1 Month Free Trial"
+            case LanguageId.kor: return "+1 달 무료 체험"
+            default: fatalError()}
+        }()
+        self.msgProductDesc1 = {
+            switch currentLanguageId {
+            case LanguageId.eng: return """
+                Your membership starts as soon as you set up payment and subscribe with iTunes. Your monthly charge will occur on the last day of the current billing period.
+                We’ll renew your membership for you (unless auto-renew is turned off 24 hours before the end of your billing cycle). Once you’re a member, you can manage your subscription or turn off auto-renewal under Account Settings.
+            """
+            case LanguageId.kor: return """
+                결제를 설정하고 iTunes로 구독하는 즉시 멤버십을 이용할 수 있습니다. 월별 요금은 현재 결제 주기의 마지막 날에 청구됩니다.
+                결제 주기가 끝나기 24시간 전에 자동 갱신을 사용 중지하지 않는 한 멤버십이 자동으로 갱신됩니다. 회원은 계정 설정에서 구독을 관리하거나 자동 갱신을 사용 중지할 수 있습니다.
+            """
+            default: fatalError()}
+        }()
+        self.msgProductDesc2 = {
+            switch currentLanguageId {
+            case LanguageId.eng: return """
+                * After 7 days of free trial, service usage will be limited.
+                * You can still browse your diary.
+                
+                * Get your membership and enjoy all the features.
+                We will reward you with the best service.
+                
+                Thank you.
+            """
+            case LanguageId.kor: return """
+                * 무료체험기간 7일이 종료 후 서비스이용이 제한됩니다.
+                * 일기장은 여전히 이용가능합니다.
+                
+                * 멤버쉽을 등록하고 모든 서비스를 자유롭게 사용하세요.
+                최고의 서비스로 보답하겠습니다.
+
+                감사합니다.
+            """
+            default: fatalError()}
+        }()
+        self.msgProductPurchased = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "You are now a premium member!"
+            case LanguageId.kor: return "프리미엄 멤버가 되었습니다!"
+            default: fatalError()}
+        }()
         self.msgShortPassword = {
             switch currentLanguageId {
             case LanguageId.eng: return "Use 8 characters or more"
@@ -886,7 +950,7 @@ struct LangPack {
         self.msgSignUpYet = {
             switch currentLanguageId {
             case LanguageId.eng: return "You have not Signed in Dymm."
-            case LanguageId.kor: return "Dymm에 로그인 되지 않았어요."
+            case LanguageId.kor: return "딤에 로그인 되지 않았어요."
             default: fatalError()}
         }()
         self.msgUnauthDuplicatedEmail = {

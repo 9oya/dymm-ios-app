@@ -48,6 +48,7 @@ class ProfileViewController: UIViewController {
     var colorRightButton: UIButton!
     
     // UILabel
+    var memberStatusLabel: UILabel!
     var verifMailTitleLabel: UILabel!
     var verifMailMsgLabel: UILabel!
     var infoImageLabel: UILabel!
@@ -82,11 +83,22 @@ class ProfileViewController: UIViewController {
     var resizedImage: UIImage?
     let colorCodeArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     var selectedColorItem: Int?
+    var receiptString: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
         loadProfile()
+        
+        if let appStoreReceiptURL = Bundle.main.appStoreReceiptURL,
+            FileManager.default.fileExists(atPath: appStoreReceiptURL.path) {
+            do {
+                let receiptData = try Data(contentsOf: appStoreReceiptURL, options: .alwaysMapped)
+                receiptString = receiptData.base64EncodedString(options: [])
+                verifyReceipt()
+            }
+            catch { print("Couldn't read receipt data with error: " + error.localizedDescription) }
+        }
     }
     
     // MARK: - Actions
@@ -484,9 +496,8 @@ class ProfileViewController: UIViewController {
         })
     }
     
-    @objc func presentSubscriptionController() {
+    @objc func presentIAPController() {
         let vc = IAPController()
-//        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: UIBarButtonItem.Style.plain, target: self, action: nil)
         self.navigationController?.pushViewController(vc, animated: true)
     }
 }
@@ -528,6 +539,7 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
                 case LanguageId.kor: cell.label.text = profileTag.kor_name
                 case LanguageId.jpn: cell.label.text = profileTag.jpn_name
                 default: cell.label.text = profileTag.eng_name}
+                cell.label.textColor = .black
             case TagId.dateOfBirth:
                 if let dateOfBirth = profile?.avatar.date_of_birth {
                     cell.label.text = dateOfBirth
@@ -580,9 +592,8 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
                 alertChangePassword()
                 return
             case TagId.subscription:
-                // TODO: Membership subscription
-                // presentSubscriptionController()
-                alertTempFreeTriar()
+                presentIAPController()
+//                alertTempFreeTriar()
                 return
             default:
                 loadProfileTagsOnPicker()
@@ -793,10 +804,19 @@ extension ProfileViewController {
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
+        memberStatusLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 12, weight: .regular)
+            _label.textColor = .black
+            _label.textAlignment = .left
+            _label.text = lang.titleVerifMail
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
         verifMailTitleLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 20, weight: .regular)
-            _label.textColor = UIColor.black
+            _label.textColor = .black
             _label.textAlignment = .center
             _label.text = lang.titleVerifMail
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -927,6 +947,7 @@ extension ProfileViewController {
         verifMailContainer.addSubview(notConfirmedEmailButton)
         verifMailContainer.addSubview(sendAgainButton)
         
+        infoContainer.addSubview(memberStatusLabel)
         infoContainer.addSubview(infoImageView)
         infoContainer.addSubview(infoImageLabel)
         infoContainer.addSubview(firstNameContainer)
@@ -990,6 +1011,9 @@ extension ProfileViewController {
         infoContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         infoContainer.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         infoContainer.heightAnchor.constraint(equalToConstant: 240).isActive = true
+        
+        memberStatusLabel.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 7).isActive = true
+        memberStatusLabel.topAnchor.constraint(equalTo: infoContainer.topAnchor, constant: 2).isActive = true
 
         infoImageView.topAnchor.constraint(equalTo: infoContainer.topAnchor, constant: 20).isActive = true
         infoImageView.leadingAnchor.constraint(equalTo: infoContainer.leadingAnchor, constant: 20).isActive = true
@@ -1160,6 +1184,24 @@ extension ProfileViewController {
                 self.tagCollection.isHidden = false
                 self.view.hideSpinner()
             })
+            
+            if profile.avatar.is_free_trial {
+                UserDefaults.standard.setIsFreeTrial(value: true)
+                let expDateArr = profile.avatar.free_exp_date.split(separator: "-")
+                let monthNum = Int(expDateArr[1])
+                var month = LangHelper.getEngNameOfMM(monthNumber: monthNum!)
+                switch self.lang.currentLanguageId {
+                case LanguageId.kor:
+                    month = LangHelper.getKorNameOfMonth(monthNumber: monthNum!, engMMM: nil)
+                default:
+                    month = LangHelper.getEngNameOfMM(monthNumber: monthNum!)
+                }
+                self.memberStatusLabel.text = self.lang.titleFreeTrial + " ~\(expDateArr[2])/\(month)"
+            } else {
+                UserDefaults.standard.setIsFreeTrial(value: false)
+                self.memberStatusLabel.text = self.lang.msgFreeTrialExpired
+            }
+            
         }
     }
     
@@ -1320,6 +1362,31 @@ extension ProfileViewController {
                 self.infoImageLabel.text = ""
                 self.view.hideSpinner()
             })
+        }
+    }
+    
+    private func verifyReceipt() {
+        let params: Parameters = [
+            "receipt_data": receiptString!
+        ]
+        let service = Service(lang: lang)
+        service.verifyReceipt(params: params, popoverAlert: { (message) in
+            self.retryFunction = self.verifyReceipt
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.verifyReceipt()
+        }) { (isReceiptVerified) in
+            if isReceiptVerified {
+                UIView.animate(withDuration: 0.5) {
+                    self.memberStatusLabel.text = "Premium Member"
+                }
+                UserDefaults.standard.setIsPurchased(value: true)
+            } else {
+                UIView.animate(withDuration: 0.5) {
+                    self.memberStatusLabel.text = self.lang.msgFreeTrialExpired
+                }
+                UserDefaults.standard.setIsPurchased(value: false)
+            }
         }
     }
 }

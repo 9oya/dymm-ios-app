@@ -11,9 +11,9 @@ import UIKit
 class Utilities: NSObject {
 
     func showAlertContrller(title:String, message: String) -> UIAlertController {
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let alertAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-        alertController.addAction(alertAction)
-        return alertController
+        alert.addAction(alertAction)
+        return alert
     }
 }

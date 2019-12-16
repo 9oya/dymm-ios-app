@@ -8,4 +8,5 @@ target 'Dymm' do
   pod 'AlamofireImage', '~> 3.5'
   pod 'FSCalendar', '~> 2.8'
   pod 'SkyFloatingLabelTextField', '~> 3.7'
+  pod 'OpenSSL-Universal'
 end

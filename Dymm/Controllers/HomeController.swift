@@ -782,7 +782,6 @@ extension HomeViewController {
             UserDefaults.standard.setCurrentLanguageId(value: auth.language_id)
             UIView.animate(withDuration: 0.5, animations: {
                 if auth.avatar.photo_name != nil && auth.avatar.color_code == 0 {
-                    print(auth.avatar.photo_name!)
                     let url = "\(URI.host)\(URI.avatar)/\(auth.avatar.id)/profile/photo/\(auth.avatar.photo_name!)"
                     Alamofire.request(url).responseImage { response in
                         if let data = response.data {
