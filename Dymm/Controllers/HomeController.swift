@@ -59,6 +59,7 @@ class HomeViewController: UIViewController {
     var currentYear: Int!
     var currentMonth: Int!
     var thisAvgScore: Float = 0.0
+    var receiptString: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -91,9 +92,12 @@ class HomeViewController: UIViewController {
             loadScoreboard()
             loadAvatar()
             loadRemainingLifeSpan()
+            loadReceipt()
             cubeImgView.isHidden = false
         } else {
             showGuestScene()
+            UserDefaults.standard.setIsFreeTrial(value: false)
+            UserDefaults.standard.setIsPurchased(value: false)
             cubeImgView.isHidden = true
         }
         cubeImgView.startRotating(duration: 5)
@@ -362,7 +366,6 @@ extension HomeViewController {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = .whiteSmoke
-        
         let date = Date()
         let calendar = Calendar.current
         currentYear = calendar.component(.year, from: date)
@@ -674,12 +677,7 @@ extension HomeViewController {
                         self.genderLabel.text = genderTag.kor_name
                     default: fatalError()}
                 } else {
-                    switch self.lang.currentLanguageId {
-                    case LanguageId.eng:
-                        self.genderLabel.text = "GENDER"
-                    case LanguageId.kor:
-                        self.genderLabel.text = "성별"
-                    default: fatalError()}
+                    self.genderLabel.text = self.lang.titleGender
                 }
                 self.scoreTitleLabel.textColor = .green_3ED6A7
                 self.scoreNumberLabel.textColor = .green_3ED6A7
@@ -753,7 +751,6 @@ extension HomeViewController {
         }, tokenRefreshCompletion: {
             self.loadAvatar()
         }) { (auth) in
-            
             if let dateOfBirth = auth.avatar.date_of_birth {
                 let dateFormatter : DateFormatter = {
                     let formatter = DateFormatter()
@@ -763,19 +760,9 @@ extension HomeViewController {
                 }()
                 let birthday = dateFormatter.date(from: dateOfBirth)
                 let timeInterval = birthday?.timeIntervalSinceNow
-                switch self.lang.currentLanguageId {
-                case LanguageId.eng:
-                    self.ageLabel.text = "AGE \(abs(Int(timeInterval! / 31556926.0)))"
-                case LanguageId.kor:
-                    self.ageLabel.text = "나이 \(abs(Int(timeInterval! / 31556926.0)))"
-                default: fatalError()}
+                self.ageLabel.text = self.lang.titleAge + " \(abs(Int(timeInterval! / 31556926.0)))"
             } else {
-                switch self.lang.currentLanguageId {
-                case LanguageId.eng:
-                    self.ageLabel.text = "AGE"
-                case LanguageId.kor:
-                    self.ageLabel.text = "나이"
-                default: fatalError()}
+                self.ageLabel.text = self.lang.titleAge
             }
             
             self.avatar = auth.avatar
@@ -801,6 +788,43 @@ extension HomeViewController {
                     self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: self.profileButton)]
                 }
             })
+            
+            if auth.avatar.is_free_trial {
+                UserDefaults.standard.setIsFreeTrial(value: true)
+            } else {
+                UserDefaults.standard.setIsFreeTrial(value: false)
+            }
+        }
+    }
+    
+    private func loadReceipt() {
+        if let appStoreReceiptURL = Bundle.main.appStoreReceiptURL,
+            FileManager.default.fileExists(atPath: appStoreReceiptURL.path) {
+            do {
+                let receiptData = try Data(contentsOf: appStoreReceiptURL, options: .alwaysMapped)
+                receiptString = receiptData.base64EncodedString(options: [])
+                verifyReceipt()
+            }
+            catch { print("Couldn't read receipt data with error: " + error.localizedDescription) }
+        }
+    }
+    
+    private func verifyReceipt() {
+        let params: Parameters = [
+            "receipt_data": receiptString!
+        ]
+        let service = Service(lang: lang)
+        service.verifyReceipt(params: params, popoverAlert: { (message) in
+            self.retryFunction = self.verifyReceipt
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.verifyReceipt()
+        }) { (isReceiptVerified) in
+            if isReceiptVerified {
+                UserDefaults.standard.setIsPurchased(value: true)
+            } else {
+                UserDefaults.standard.setIsPurchased(value: false)
+            }
         }
     }
 }

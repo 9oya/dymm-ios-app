@@ -291,7 +291,11 @@ class CategoryViewController: UIViewController {
     
     @objc func startDateButtonTapped() {
         if UserDefaults.standard.isSignIn() {
-            alertDatePicker(cond_log_type: CondLogType.startDate)
+            if UserDefaults.standard.isFreeTrial() || UserDefaults.standard.isPurchased() {
+                alertDatePicker(cond_log_type: CondLogType.startDate)
+            } else {
+                self.presentIAPController()
+            }
         } else {
             presentAuthNavigation()
         }
@@ -299,7 +303,11 @@ class CategoryViewController: UIViewController {
     
     @objc func endDateButtonTapped() {
         if UserDefaults.standard.isSignIn() {
-            alertDatePicker(cond_log_type: CondLogType.endDate)
+            if UserDefaults.standard.isFreeTrial() || UserDefaults.standard.isPurchased() {
+                alertDatePicker(cond_log_type: CondLogType.endDate)
+            } else {
+                self.presentIAPController()
+            }
         } else {
             presentAuthNavigation()
         }

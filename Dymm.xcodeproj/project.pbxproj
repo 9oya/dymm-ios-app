@@ -336,8 +336,8 @@
 				6A8D897722F8888B00A7F333 /* CategoryController.swift */,
 				6A8D897B22F888B200A7F333 /* DiaryController.swift */,
 				F5344082231E5D9A00FAC84B /* NoteController.swift */,
-				F59C14DC235BC418004A3B41 /* IAPController.swift */,
 				F5D6A652236AC19C00E9CDE9 /* RankingController.swift */,
+				F59C14DC235BC418004A3B41 /* IAPController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";

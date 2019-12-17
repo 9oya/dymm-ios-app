@@ -18,7 +18,6 @@ extension UserDefaults {
         case accessToken
         case refreshToken
         case avatarId
-        
         case currentLanguageId
     }
     

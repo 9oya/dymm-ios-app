@@ -291,7 +291,7 @@ class ProfileViewController: UIViewController {
     }
     
     @objc func alertIntroTextView(_ sender: UITapGestureRecognizer? = nil) {
-        let alert = UIAlertController(title: lang.titleEditIntro, message: nil, preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: lang.titleEditIntro, message: nil, preferredStyle: .alert)
         introTextView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         let controller = UIViewController()
         introTextView.frame = controller.view.frame

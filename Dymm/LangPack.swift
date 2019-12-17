@@ -71,9 +71,14 @@ struct LangPack {
     var titlePasswordOld: String!
     var titlePhoneNum: String!
     var titlePhotolibrary: String!
+    var titlePurchaseCompl: String!
+    var titlePurchaseFail: String!
+    var titlePurchaseDisable: String!
+    var titlePremiumMember: String!
     var titleProfile: String!
     var titleRanking: String!
     var titleReLifespanAndAge: String!
+    var titleRestoreCompl: String!
     var titleRestoreProduct: String!
     var titleRetry: String!
     var titleSearch: String!
@@ -128,10 +133,15 @@ struct LangPack {
     var msgMismatchConfirmPassword: String!
     var msgNetworkFailure: String!
     var msgOpinionCompl: String!
+    var msgPremiumRestored: String!
     var msgPriceDesc: String!
     var msgProductDesc1: String!
-    var msgProductDesc2: String!
+    var msgProductDesc2_1: String!
+    var msgProductDesc2_2: String!
     var msgProductPurchased: String!
+    var msgPurchaseCompl: String!
+    var msgPurchaseDisable: String!
+    var msgRestoreCompl: String!
     var msgShortPassword: String!
     var msgSignUpYet: String!
     var msgUnauthDuplicatedEmail: String!
@@ -242,13 +252,13 @@ struct LangPack {
         self.titleChooseColor = {
             switch currentLanguageId {
             case LanguageId.eng: return "Choose color"
-            case LanguageId.kor: return "컬러 선택"
+            case LanguageId.kor: return "색상 선택"
             default: fatalError()}
         }()
         self.titleChangeProfileImg = {
             switch currentLanguageId {
             case LanguageId.eng: return "Change profile image"
-            case LanguageId.kor: return "프로파일 이미지를 변경합니다"
+            case LanguageId.kor: return "프로필 이미지를 변경합니다"
             default: fatalError()}
         }()
         self.titleClose = {
@@ -547,6 +557,30 @@ struct LangPack {
             case LanguageId.kor: return "사진 앨범"
             default: fatalError()}
         }()
+        self.titlePurchaseCompl = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Purchase complete"
+            case LanguageId.kor: return "구매 완료"
+            default: fatalError()}
+        }()
+        self.titlePurchaseFail = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Purchase failure!"
+            case LanguageId.kor: return "구매 실패!"
+            default: fatalError()}
+        }()
+        self.titlePurchaseDisable = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Oops!"
+            case LanguageId.kor: return "Oops!"
+            default: fatalError()}
+        }()
+        self.titlePremiumMember = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Dymm Premium Membership"
+            case LanguageId.kor: return "딤 프리미엄 멤버쉽"
+            default: fatalError()}
+        }()
         self.titleProfile = {
             switch currentLanguageId {
             case LanguageId.eng: return "Profile"
@@ -563,6 +597,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Health Points"
             case LanguageId.kor: return "생명력"
+            default: fatalError()}
+        }()
+        self.titleRestoreCompl = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Restore Complete"
+            case LanguageId.kor: return "복원 완료"
             default: fatalError()}
         }()
         self.titleRestoreProduct = {
@@ -895,6 +935,12 @@ struct LangPack {
             case LanguageId.kor: return "소중한 의견 감사드립니다."
             default: fatalError()}
         }()
+        self.msgPremiumRestored = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Premium Membership Restored."
+            case LanguageId.kor: return "프리미엄 맴버쉽이 복원되었습니다."
+            default: fatalError()}
+        }()
         self.msgPriceDesc = {
             switch currentLanguageId {
             case LanguageId.eng: return "+1 Month Free Trial"
@@ -913,25 +959,39 @@ struct LangPack {
             """
             default: fatalError()}
         }()
-        self.msgProductDesc2 = {
+        self.msgProductDesc2_1 = {
             switch currentLanguageId {
             case LanguageId.eng: return """
                 * After 7 days of free trial, service usage will be limited.
                 * You can still browse your diary.
                 
-                * Get your membership and enjoy all the features.
-                We will reward you with the best service.
+                * Get your membership and enjoy all the features. We will reward you with the best service.
                 
-                Thank you.
+                Dymm ©
             """
             case LanguageId.kor: return """
                 * 무료체험기간 7일이 종료 후 서비스이용이 제한됩니다.
                 * 일기장은 여전히 이용가능합니다.
                 
-                * 멤버쉽을 등록하고 모든 서비스를 자유롭게 사용하세요.
-                최고의 서비스로 보답하겠습니다.
+                * 멤버쉽을 등록하고 모든 서비스를 자유롭게 이용하세요. 최고의 서비스로 보답하겠습니다.
 
-                감사합니다.
+                딤 ©
+            """
+            default: fatalError()}
+        }()
+        self.msgProductDesc2_2 = {
+            switch currentLanguageId {
+            case LanguageId.eng: return """
+                * You are currently subscribed to a premium membership.
+                * All the features and services of Dymm are available.
+                
+                Dymm ©
+            """
+            case LanguageId.kor: return """
+                * 현재 프리미엄 멤버쉽에 가입되어 있습니다.
+                * 딤의 모든 기능과 서비스 이용이 가능합니다.
+
+                딤 ©
             """
             default: fatalError()}
         }()
@@ -939,6 +999,24 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "You are now a premium member!"
             case LanguageId.kor: return "프리미엄 멤버가 되었습니다!"
+            default: fatalError()}
+        }()
+        self.msgPurchaseCompl = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "You've successfully purchased!"
+            case LanguageId.kor: return "성공적으로 구매하셨습니다!"
+            default: fatalError()}
+        }()
+        self.msgPurchaseDisable = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Purchases aren't available on your device!"
+            case LanguageId.kor: return "해당 기기에서 구매를 사용을 할 수 없습니다!"
+            default: fatalError()}
+        }()
+        self.msgRestoreCompl = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "You've successfully restored your purchase!"
+            case LanguageId.kor: return "구매를 성공적으로 복원했습니다!"
             default: fatalError()}
         }()
         self.msgShortPassword = {

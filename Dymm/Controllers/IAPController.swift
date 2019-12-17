@@ -26,21 +26,17 @@ class IAPController: UIViewController {
     var productPriceDscLabel: UILabel!
     var productDsc1Label: UILabel!
     var productDsc2Label: UILabel!
-    var lblPurchaseDone: UILabel!
+    var purchaseComplLabel: UILabel!
     
     // UIImageView
     var logoImageView: UIImageView!
     
-    // UIActivityIndicatorView
-    var activityIndicator: UIActivityIndicatorView!
-    
+    // Non-view properties
     var PRODUCT_ID = "dymm_premium_plan1"
     var SHARED_SECRET = "6be41dc52be84d78ba58cf74d3b13af0"
-    
     var productID = ""
     var productsRequest = SKProductsRequest()
     var iapProducts = [SKProduct]()
-    
     var lang: LangPack!
     var retryFunction: (() -> Void)?
     
@@ -48,21 +44,31 @@ class IAPController: UIViewController {
         super.viewDidLoad()
         setupLayout()
         if UserDefaults.standard.isPurchased() {
-            lblPurchaseDone.isHidden = false
-            lblPurchaseDone.text = "Dymm Premium Membership"
-            self.purchaseButton.isHidden = true
-            self.restoreButton.isHidden = true
-            self.eventLabel.isHidden = true
-            self.fetchAvailableProducts()
-        }
-        else{
+            purchaseComplLabel.isHidden = false
+            UIView.animate(withDuration: 0.5) {
+                self.productPriceDscLabel.textColor = .gray
+                self.productDsc1Label.textColor = .gray
+            }
+            purchaseButton.isHidden = true
+            restoreButton.isHidden = true
+            eventLabel.isHidden = true
+            fetchAvailableProducts()
+        } else{
             /* Product is not purchased */
-            lblPurchaseDone.isHidden = true
+            purchaseComplLabel.isHidden = true
             self.fetchAvailableProducts()
         }
     }
     
     // MARK - Actions
+    
+    @objc func alertCompl(_ title: String, _ message: String?) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in }
+        alert.addAction(confirmAction)
+        alert.view.tintColor = .purple_B847FF
+        self.present(alert, animated: true, completion: nil)
+    }
     
     @objc func purchaseButtonTapped() {
         purchaseProduct(product: iapProducts[0])
@@ -79,35 +85,43 @@ extension IAPController: SKProductsRequestDelegate, SKPaymentTransactionObserver
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
         view.hideSpinner()
         UserDefaults.standard.setIsPurchased(value: true)
-        lblPurchaseDone.text = "Pro Version Restored."
-        lblPurchaseDone.isHidden = false
+        purchaseComplLabel.text = lang.msgPremiumRestored
+        productDsc2Label.text = self.lang.msgProductDesc2_2
+        purchaseComplLabel.isHidden = false
+        eventLabel.isHidden = true
         purchaseButton.isHidden = true
         restoreButton.isHidden = true
-        self.present(Utilities().showAlertContrller(title: "Restore Success", message: "You've successfully restored your purchase!"), animated: true, completion: nil)
+        alertCompl(lang.titleRestoreCompl, lang.msgRestoreCompl)
     }
     
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
         if response.products.count > 0 {
             iapProducts = response.products
             let purchasingProduct = response.products[0] as SKProduct
-            
             // Get its price from iTunes Connect
             let numberFormatter = NumberFormatter()
             numberFormatter.formatterBehavior = .behavior10_4
             numberFormatter.numberStyle = .currency
             numberFormatter.locale = purchasingProduct.priceLocale
             let price = numberFormatter.string(from: purchasingProduct.price)
-            
             if UserDefaults.standard.isPurchased() {
                 DispatchQueue.main.async {
+                    self.purchaseComplLabel.text = self.lang.titlePremiumMember
                     self.productPriceDscLabel.text = "\(price!) / \(purchasingProduct.localizedDescription)"
+                    self.productDsc1Label.text = self.lang.msgProductDesc1
+                    self.productDsc2Label.text = self.lang.msgProductDesc2_2
+                    self.descScrollView.backgroundColor = .white
                     self.view.hideSpinner()
                 }
             } else {
                 // Show description
                 DispatchQueue.main.async {
+                    self.eventLabel.text = self.lang.msgPriceDesc
                     self.purchaseButton.setTitle(purchasingProduct.localizedTitle.uppercased(), for: .normal)
                     self.productPriceDscLabel.text = "\(price!) / \(purchasingProduct.localizedDescription)"
+                    self.productDsc1Label.text = self.lang.msgProductDesc1
+                    self.productDsc2Label.text = self.lang.msgProductDesc2_1
+                    self.descScrollView.backgroundColor = .white
                     self.view.hideSpinner()
                 }
             }
@@ -120,28 +134,25 @@ extension IAPController: SKProductsRequestDelegate, SKPaymentTransactionObserver
                 switch trans.transactionState {
                 case .purchased:
                     view.hideSpinner()
-                    
                     if let paymentTransaction = transaction as? SKPaymentTransaction {
                         SKPaymentQueue.default().finishTransaction(paymentTransaction)
                     }
-                    
                     if productID == PRODUCT_ID {
                         UserDefaults.standard.setIsPurchased(value: true)
-                        lblPurchaseDone.text = lang.msgProductPurchased
-                        lblPurchaseDone.isHidden = false
+                        purchaseComplLabel.text = lang.msgProductPurchased
+                        purchaseComplLabel.isHidden = false
                         purchaseButton.isHidden = true
                         restoreButton.isHidden = true
-                        self.present(Utilities().showAlertContrller(title: "Purchase Success", message: "You've successfully purchased"), animated: true, completion: nil)
+                        alertCompl(lang.titlePurchaseCompl, lang.msgPurchaseCompl)
                     }
                 case .failed:
                     view.hideSpinner()
                     if trans.error != nil {
-                        self.present(Utilities().showAlertContrller(title: "Purchase failed!", message: trans.error!.localizedDescription), animated: true, completion: nil)
+                        alertCompl(lang.titlePurchaseFail, trans.error!.localizedDescription)
                         print(trans.error!)
                     }
                     SKPaymentQueue.default().finishTransaction(transaction as! SKPaymentTransaction)
                 case .restored:
-                    print("restored")
                     SKPaymentQueue.default().finishTransaction(transaction as! SKPaymentTransaction)
                 default: break
                 }
@@ -156,7 +167,7 @@ extension IAPController {
     private func setupLayout() {
         // Initialize super view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
-        view.backgroundColor = UIColor.whiteSmoke
+        view.backgroundColor = .green_00E9CC
         
         topBarView = getAddtionalTopBarView()
         logoImageView = {
@@ -172,7 +183,6 @@ extension IAPController {
             _label.font = .systemFont(ofSize: 15, weight: .medium)
             _label.textColor = .purple_921BEA
             _label.textAlignment = .center
-            _label.text = lang.msgPriceDesc
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -191,34 +201,32 @@ extension IAPController {
         productPriceDscLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 15, weight: .regular)
-            _label.textColor = .black
+            _label.textColor = .purple_921BEA
             _label.textAlignment = .center
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
         descScrollView = {
             let _scrollView = UIScrollView()
-            _scrollView.backgroundColor = .white
+            _scrollView.backgroundColor = .clear
             _scrollView.translatesAutoresizingMaskIntoConstraints = false
             return _scrollView
         }()
         productDsc1Label = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 12, weight: .regular)
-            _label.textColor = .darkGray
+            _label.textColor = .gray
             _label.textAlignment = .center
             _label.numberOfLines = 10
-            _label.text = lang.msgProductDesc1
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
         productDsc2Label = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 12, weight: .regular)
-            _label.textColor = .purple_921BEA
+            _label.textColor = .purple_7671FF
             _label.textAlignment = .center
             _label.numberOfLines = 10
-            _label.text = lang.msgProductDesc2
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -232,24 +240,19 @@ extension IAPController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        lblPurchaseDone = {
+        purchaseComplLabel = {
             let _label = UILabel()
+            _label.font = .systemFont(ofSize: 18, weight: .bold)
+            _label.textColor = .purple_921BEA
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
-        }()
-        activityIndicator = {
-            let _indicator = UIActivityIndicatorView()
-            _indicator.center = view.center
-            _indicator.style = .gray
-            _indicator.hidesWhenStopped = true
-            return _indicator
         }()
         
         view.addSubview(logoImageView)
         view.addSubview(purchaseButton)
         view.addSubview(productPriceDscLabel)
         view.addSubview(eventLabel)
-        view.addSubview(lblPurchaseDone)
+        view.addSubview(purchaseComplLabel)
         view.addSubview(topBarView)
         view.addSubview(descScrollView)
         
@@ -298,34 +301,31 @@ extension IAPController {
         productDsc2Label.trailingAnchor.constraint(equalTo: descScrollView.trailingAnchor, constant: -10).isActive = true
         productDsc2Label.bottomAnchor.constraint(equalTo: descScrollView.bottomAnchor, constant: -10).isActive = true
         
-        lblPurchaseDone.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        lblPurchaseDone.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: 0).isActive = true
+        purchaseComplLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        purchaseComplLabel.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: -30).isActive = true
         
         view.showSpinner()
     }
     
-    func purchaseProduct(product: SKProduct) {
+    private func purchaseProduct(product: SKProduct) {
         if SKPaymentQueue.canMakePayments() {
             view.showSpinner()
             let payment = SKPayment(product: product)
             SKPaymentQueue.default().add(self)
             SKPaymentQueue.default().add(payment)
-            print("Product to Purchase: \(product.productIdentifier)")
             productID = product.productIdentifier
         } else {
             // IAP Purchases disabled on the Device
-            self.present(Utilities().showAlertContrller(title: "Oops!", message: "Purchases are disabled in your device!"), animated: true, completion: nil)
+            alertCompl(lang.titlePurchaseDisable, lang.msgPurchaseDisable)
         }
     }
     
-    func fetchAvailableProducts() {
+    private func fetchAvailableProducts() {
         let productIdentifiers = NSSet(objects:
             PRODUCT_ID
         )
-        
         guard let identifier = productIdentifiers as? Set<String> else { return }
         productsRequest.cancel()
-        
         productsRequest = SKProductsRequest(productIdentifiers: identifier)
         productsRequest.delegate = self
         productsRequest.start()
