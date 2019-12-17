@@ -75,6 +75,7 @@ struct LangPack {
     var titlePurchaseFail: String!
     var titlePurchaseDisable: String!
     var titlePremiumMember: String!
+    var titlePremiumMemberShip: String!
     var titleProfile: String!
     var titleRanking: String!
     var titleReLifespanAndAge: String!
@@ -577,6 +578,12 @@ struct LangPack {
         }()
         self.titlePremiumMember = {
             switch currentLanguageId {
+            case LanguageId.eng: return "Premium Member"
+            case LanguageId.kor: return "프리미엄 멤버"
+            default: fatalError()}
+        }()
+        self.titlePremiumMemberShip = {
+            switch currentLanguageId {
             case LanguageId.eng: return "Dymm Premium Membership"
             case LanguageId.kor: return "딤 프리미엄 멤버쉽"
             default: fatalError()}
@@ -804,14 +811,14 @@ struct LangPack {
         }()
         self.msgCondScoreNone = {
             switch currentLanguageId {
-            case LanguageId.eng: return "You don't have any \nmood score log."
-            case LanguageId.kor: return "당신의 기분점수가 하나도 기록되지 않았어요."
+            case LanguageId.eng: return "I can't find your mood score log."
+            case LanguageId.kor: return "현재 당신의 기분점수 로그를 찾을 수 없어요."
             default: fatalError()}
         }()
         self.msgDateOfBirthNone = {
             switch currentLanguageId {
-            case LanguageId.eng: return "You need to fill up your date of birth."
-            case LanguageId.kor: return "당신의 생년월일 이 아직 등록되지 않았습니다."
+            case LanguageId.eng: return "Please select your date of birth on the Profile tab."
+            case LanguageId.kor: return "프로필 탭에서 당신의 생년월일을 선택해주세요."
             default: fatalError()}
         }()
         self.msgDuplicatedEmail = {
@@ -858,8 +865,8 @@ struct LangPack {
         }()
         self.msgFreeTrialExpired = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your free trial has expired. Please register your membership."
-            case LanguageId.kor: return "무료 체험이 만료되었습니다. 멤버쉽을 등록해 주세요."
+            case LanguageId.eng: return "Your free trial has expired. Please renew your membership."
+            case LanguageId.kor: return "무료 체험이 만료되었습니다. 멤버쉽을 갱신해 주세요."
             default: fatalError()}
         }()
         self.msgInvalidEmail = {
@@ -876,7 +883,7 @@ struct LangPack {
         }()
         self.msgLifeSpan = {
             switch currentLanguageId {
-            case LanguageId.eng: return "I've estimated your remaining lifespan :)"
+            case LanguageId.eng: return "I predicted your remaining lifespan :)"
             case LanguageId.kor: return "당신의 남은 수명을 예측했어요 :)"
             default: fatalError()}
         }()
@@ -894,20 +901,20 @@ struct LangPack {
         }()
         self.msgMailModified = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your email address has been modified.\nPlease verify Your new email."
-            case LanguageId.kor: return "메일주소가 변경되었습니다.\n변경된 메일계정을 확인해 주세요."
+            case LanguageId.eng: return "Your email address has changed.\nPlease verify your new email."
+            case LanguageId.kor: return "메일주소가 변경되었습니다.\n새 메일을 확인해 주세요."
             default: fatalError()}
         }()
         self.msgMailNotConfirmed = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your email address is not verified yet. \nPleas verify Your email."
-            case LanguageId.kor: return "메일주소가 아직 검증되지 않았습니다.\n메일을 확인해 주세요."
+            case LanguageId.eng: return "Your email address is not verified. \nPleas verify your email."
+            case LanguageId.kor: return "메일주소가 검증되지 않았습니다.\n메일을 확인해 주세요."
             default: fatalError()}
         }()
         self.msgMailSendAgainComplete = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Account email has been resent.\nPleas confirm Your email."
-            case LanguageId.kor: return "계정 확인 메일이 다시 보내졌습니다.\n메일계정을 확인해 주세요."
+            case LanguageId.eng: return "Your account verification email has been resent.\nPleas verify your new email."
+            case LanguageId.kor: return "계정 확인 메일이 다시 보내졌습니다.\n새 메일을 확인해 주세요."
             default: fatalError()}
         }()
         func _msgMailSendValidCode(_ email: String) -> String {
@@ -965,7 +972,7 @@ struct LangPack {
                 * After 7 days of free trial, service usage will be limited.
                 * You can still browse your diary.
                 
-                * Get your membership and enjoy all the features. We will reward you with the best service.
+                * Get your membership and enjoy all the features. We will always try to reward you with the best service.
                 
                 Dymm ©
             """
@@ -973,7 +980,7 @@ struct LangPack {
                 * 무료체험기간 7일이 종료 후 서비스이용이 제한됩니다.
                 * 일기장은 여전히 이용가능합니다.
                 
-                * 멤버쉽을 등록하고 모든 서비스를 자유롭게 이용하세요. 최고의 서비스로 보답하겠습니다.
+                * 멤버쉽을 등록하고 모든 서비스를 자유롭게 이용하세요. 최고의 서비스로 보답하도록 항상 노력하겠습니다.
 
                 딤 ©
             """
@@ -1027,8 +1034,8 @@ struct LangPack {
         }()
         self.msgSignUpYet = {
             switch currentLanguageId {
-            case LanguageId.eng: return "You have not Signed in Dymm."
-            case LanguageId.kor: return "딤에 로그인 되지 않았어요."
+            case LanguageId.eng: return "I can't find an account logged in."
+            case LanguageId.kor: return "로그인된 계정을 찾지 못했어요."
             default: fatalError()}
         }()
         self.msgUnauthDuplicatedEmail = {

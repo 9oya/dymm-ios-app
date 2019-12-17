@@ -106,7 +106,7 @@ extension IAPController: SKProductsRequestDelegate, SKPaymentTransactionObserver
             let price = numberFormatter.string(from: purchasingProduct.price)
             if UserDefaults.standard.isPurchased() {
                 DispatchQueue.main.async {
-                    self.purchaseComplLabel.text = self.lang.titlePremiumMember
+                    self.purchaseComplLabel.text = self.lang.titlePremiumMemberShip
                     self.productPriceDscLabel.text = "\(price!) / \(purchasingProduct.localizedDescription)"
                     self.productDsc1Label.text = self.lang.msgProductDesc1
                     self.productDsc2Label.text = self.lang.msgProductDesc2_2

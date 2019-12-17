@@ -19,7 +19,7 @@ class HomeViewController: UIViewController {
     
     // UIView
     var scoreboardView: UIView!
-    var lifespanBoardView: UIView!
+    var aiBoardView: UIView!
     
     // UICollectionView
     var tagCollectionView: UICollectionView!
@@ -34,7 +34,7 @@ class HomeViewController: UIViewController {
     var scoreMessageLabel: UILabel!
     var ageLabel: UILabel!
     var genderLabel: UILabel!
-    var lifespanMsgLabel: UILabel!
+    var aiMsgLabel: UILabel!
     var lifespanLabel: UILabel!
     
     // UIImageView
@@ -382,7 +382,7 @@ extension HomeViewController {
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
-        lifespanBoardView = {
+        aiBoardView = {
             let _view = UIView()
             _view.backgroundColor = .white
             _view.layer.cornerRadius = 10.0
@@ -450,7 +450,7 @@ extension HomeViewController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-        lifespanMsgLabel = {
+        aiMsgLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 16, weight: .regular)
             _label.textColor = .green_3ED6A7
@@ -537,7 +537,7 @@ extension HomeViewController {
         
         // Setup subviews
         view.addSubview(scoreboardView)
-        view.addSubview(lifespanBoardView)
+        view.addSubview(aiBoardView)
         view.addSubview(tagCollectionView)
         
         scoreboardView.addSubview(scoreTitleLabel)
@@ -549,9 +549,9 @@ extension HomeViewController {
         scoreboardView.addSubview(ageLabel)
         scoreboardView.addSubview(genderLabel)
         
-        lifespanBoardView.addSubview(lifespanMsgLabel)
-        lifespanBoardView.addSubview(lifespanLabel)
-        lifespanBoardView.addSubview(cubeImgView)
+        aiBoardView.addSubview(aiMsgLabel)
+        aiBoardView.addSubview(lifespanLabel)
+        aiBoardView.addSubview(cubeImgView)
         
         // Setup constraints
         scoreboardView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 7).isActive = true
@@ -587,21 +587,23 @@ extension HomeViewController {
         genderLabel.topAnchor.constraint(equalTo: ageLabel.bottomAnchor, constant: 1).isActive = true
         genderLabel.trailingAnchor.constraint(equalTo: scoreboardView.trailingAnchor, constant: -10).isActive = true
         
-        lifespanBoardView.topAnchor.constraint(equalTo: scoreboardView.bottomAnchor, constant: 7).isActive = true
-        lifespanBoardView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
-        lifespanBoardView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
-        lifespanBoardView.heightAnchor.constraint(equalToConstant: view.frame.height / 8.2).isActive = true
+        aiBoardView.topAnchor.constraint(equalTo: scoreboardView.bottomAnchor, constant: 7).isActive = true
+        aiBoardView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
+        aiBoardView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
+        aiBoardView.heightAnchor.constraint(equalToConstant: view.frame.height / 8.2).isActive = true
         
-        lifespanMsgLabel.centerYAnchor.constraint(equalTo: lifespanBoardView.centerYAnchor, constant: -10).isActive = true
-        lifespanMsgLabel.centerXAnchor.constraint(equalTo: lifespanBoardView.centerXAnchor, constant: 0).isActive = true
+        aiMsgLabel.centerYAnchor.constraint(equalTo: aiBoardView.centerYAnchor, constant: -10).isActive = true
+        aiMsgLabel.centerXAnchor.constraint(equalTo: aiBoardView.centerXAnchor, constant: 0).isActive = true
+        aiMsgLabel.leadingAnchor.constraint(equalTo: aiBoardView.leadingAnchor, constant: 3).isActive = true
+        aiMsgLabel.trailingAnchor.constraint(equalTo: aiBoardView.trailingAnchor, constant: -3).isActive = true
         
-        lifespanLabel.bottomAnchor.constraint(equalTo: lifespanBoardView.bottomAnchor, constant: -((view.frame.height / 8) / 10)).isActive = true
-        lifespanLabel.centerXAnchor.constraint(equalTo: lifespanBoardView.centerXAnchor, constant: 0).isActive = true
+        lifespanLabel.bottomAnchor.constraint(equalTo: aiBoardView.bottomAnchor, constant: -((view.frame.height / 8) / 10)).isActive = true
+        lifespanLabel.centerXAnchor.constraint(equalTo: aiBoardView.centerXAnchor, constant: 0).isActive = true
         
         cubeImgView.centerYAnchor.constraint(equalTo: lifespanLabel.centerYAnchor, constant: 0).isActive = true
         cubeImgView.leadingAnchor.constraint(equalTo: lifespanLabel.trailingAnchor, constant: 20).isActive = true
         
-        tagCollectionView.topAnchor.constraint(equalTo: lifespanBoardView.bottomAnchor, constant: 7).isActive = true
+        tagCollectionView.topAnchor.constraint(equalTo: aiBoardView.bottomAnchor, constant: 7).isActive = true
         tagCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
         tagCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
         tagCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
@@ -631,7 +633,7 @@ extension HomeViewController {
         
         UIView.transition(with: profileButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
             self.scoreboardView.isHidden = false
-            self.lifespanBoardView.isHidden = false
+            self.aiBoardView.isHidden = false
             
             self.scoreEmoImgView.image = getCondScoreImageLarge(0)
             
@@ -642,7 +644,7 @@ extension HomeViewController {
             self.ageLabel.text = self.lang.titleAge
             self.genderLabel.text = self.lang.titleGender
             
-            self.lifespanMsgLabel.text = self.lang.msgSignUpYet
+            self.aiMsgLabel.text = self.lang.msgSignUpYet
             self.lifespanLabel.text = ""
             
             self.profileButton.setTitleColor(.clear, for: .normal)
@@ -702,12 +704,13 @@ extension HomeViewController {
                 case UnauthType.userInvalid:
                     self.alertUnauthError(self.lang.msgAccountInvalid)
                 case UnauthType.scoreNone:
-                    self.lifespanMsgLabel.text = self.lang.msgCondScoreNone
+                    self.aiMsgLabel.text = self.lang.msgCondScoreNone
                 case UnauthType.birthNone:
-                    self.lifespanMsgLabel.text = self.lang.msgDateOfBirthNone
+                    self.aiMsgLabel.text = self.lang.msgDateOfBirthNone
                 default: fatalError()}
-                self.lifespanBoardView.isHidden = false
+                self.aiBoardView.isHidden = false
                 self.cubeImgView.isHidden = true
+                self.lifespanLabel.isHidden = true
             }
         }) { (lifeSpan) in
             let year = lifeSpan / 365
@@ -719,9 +722,9 @@ extension HomeViewController {
                 case LanguageId.kor:
                     self.lifespanLabel.text = "\(year)년 \(days)일"
                 default: fatalError()}
-                self.lifespanMsgLabel.textColor = .green_3ED6A7
-                self.lifespanMsgLabel.text = self.lang.msgLifeSpan
-                self.lifespanBoardView.isHidden = false
+                self.aiMsgLabel.textColor = .green_3ED6A7
+                self.aiMsgLabel.text = self.lang.msgLifeSpan
+                self.aiBoardView.isHidden = false
             }
         }
     }

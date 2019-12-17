@@ -88,17 +88,11 @@ class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         loadProfile()
-        
-        if let appStoreReceiptURL = Bundle.main.appStoreReceiptURL,
-            FileManager.default.fileExists(atPath: appStoreReceiptURL.path) {
-            do {
-                let receiptData = try Data(contentsOf: appStoreReceiptURL, options: .alwaysMapped)
-                receiptString = receiptData.base64EncodedString(options: [])
-                verifyReceipt()
-            }
-            catch { print("Couldn't read receipt data with error: " + error.localizedDescription) }
-        }
     }
     
     // MARK: - Actions
@@ -809,7 +803,6 @@ extension ProfileViewController {
             _label.font = .systemFont(ofSize: 12, weight: .regular)
             _label.textColor = .black
             _label.textAlignment = .left
-            _label.text = lang.titleVerifMail
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -1184,24 +1177,7 @@ extension ProfileViewController {
                 self.tagCollection.isHidden = false
                 self.view.hideSpinner()
             })
-            
-            if profile.avatar.is_free_trial {
-                UserDefaults.standard.setIsFreeTrial(value: true)
-                let expDateArr = profile.avatar.free_exp_date.split(separator: "-")
-                let monthNum = Int(expDateArr[1])
-                var month = LangHelper.getEngNameOfMM(monthNumber: monthNum!)
-                switch self.lang.currentLanguageId {
-                case LanguageId.kor:
-                    month = LangHelper.getKorNameOfMonth(monthNumber: monthNum!, engMMM: nil)
-                default:
-                    month = LangHelper.getEngNameOfMM(monthNumber: monthNum!)
-                }
-                self.memberStatusLabel.text = self.lang.titleFreeTrial + " ~\(expDateArr[2])/\(month)"
-            } else {
-                UserDefaults.standard.setIsFreeTrial(value: false)
-                self.memberStatusLabel.text = self.lang.msgFreeTrialExpired
-            }
-            
+            self.loadReceipt()
         }
     }
     
@@ -1365,6 +1341,44 @@ extension ProfileViewController {
         }
     }
     
+    private func loadReceipt() {
+        if let appStoreReceiptURL = Bundle.main.appStoreReceiptURL,
+            FileManager.default.fileExists(atPath: appStoreReceiptURL.path) {
+            do {
+                let receiptData = try Data(contentsOf: appStoreReceiptURL, options: .alwaysMapped)
+                receiptString = receiptData.base64EncodedString(options: [])
+                verifyReceipt()
+            }
+            catch { print("Couldn't read receipt data with error: " + error.localizedDescription) }
+        } else {
+            setNoReceiptMemeberStat()
+        }
+    }
+    
+    private func setNoReceiptMemeberStat() {
+        var memberStatusTxt = ""
+        if self.profile!.avatar.is_free_trial {
+            UserDefaults.standard.setIsFreeTrial(value: true)
+            let expDateArr = self.profile!.avatar.free_exp_date.split(separator: "-")
+            let monthNum = Int(expDateArr[1])
+            var month = LangHelper.getEngNameOfMM(monthNumber: monthNum!)
+            switch self.lang.currentLanguageId {
+            case LanguageId.kor:
+                month = LangHelper.getKorNameOfMonth(monthNumber: monthNum!, engMMM: nil)
+            default:
+                month = LangHelper.getEngNameOfMM(monthNumber: monthNum!)
+            }
+            memberStatusTxt = self.lang.titleFreeTrial + " ~\(expDateArr[2])/\(month)"
+        } else {
+            UserDefaults.standard.setIsFreeTrial(value: false)
+            memberStatusTxt = self.lang.msgFreeTrialExpired
+        }
+        UserDefaults.standard.setIsPurchased(value: false)
+        UIView.transition(with: self.memberStatusLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.memberStatusLabel.text = memberStatusTxt
+        })
+    }
+    
     private func verifyReceipt() {
         let params: Parameters = [
             "receipt_data": receiptString!
@@ -1377,15 +1391,12 @@ extension ProfileViewController {
             self.verifyReceipt()
         }) { (isReceiptVerified) in
             if isReceiptVerified {
-                UIView.animate(withDuration: 0.5) {
-                    self.memberStatusLabel.text = "Premium Member"
-                }
+                UIView.transition(with: self.memberStatusLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                    self.memberStatusLabel.text = self.lang.titlePremiumMember
+                })
                 UserDefaults.standard.setIsPurchased(value: true)
             } else {
-                UIView.animate(withDuration: 0.5) {
-                    self.memberStatusLabel.text = self.lang.msgFreeTrialExpired
-                }
-                UserDefaults.standard.setIsPurchased(value: false)
+                self.setNoReceiptMemeberStat()
             }
         }
     }
