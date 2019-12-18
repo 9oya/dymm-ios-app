@@ -412,7 +412,7 @@ class ProfileViewController: UIViewController {
     }
     
     @objc func alertChangeProfileImage(_ sender: UITapGestureRecognizer? = nil) {
-        let alert = UIAlertController(title: lang.titleChangeProfileImg, message: nil, preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: lang.titleChangeProfileImg, message: nil, preferredStyle: .alert)
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
         alert.addAction(UIAlertAction(title: lang.titleChooseColor, style: .default) { _ in
