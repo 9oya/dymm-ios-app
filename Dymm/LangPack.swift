@@ -71,6 +71,7 @@ struct LangPack {
     var titlePasswordOld: String!
     var titlePhoneNum: String!
     var titlePhotolibrary: String!
+    var titlePrivaryPolocy: String!
     var titlePurchaseCompl: String!
     var titlePurchaseFail: String!
     var titlePurchaseDisable: String!
@@ -95,6 +96,7 @@ struct LangPack {
     var titleStay: String!
     var titleSubmit: String!
     var titleSubscribe: String!
+    var titleTerms: String!
     var titleToday: String!
     var titleThisMonth: String!
     var titleThisWeek: String!
@@ -558,6 +560,12 @@ struct LangPack {
             case LanguageId.kor: return "사진 앨범"
             default: fatalError()}
         }()
+        self.titlePrivaryPolocy = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Privacy Policy"
+            case LanguageId.kor: return "개인정보처리방침"
+            default: fatalError()}
+        }()
         self.titlePurchaseCompl = {
             switch currentLanguageId {
             case LanguageId.eng: return "Purchase complete"
@@ -614,7 +622,7 @@ struct LangPack {
         }()
         self.titleRestoreProduct = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Restore membership"
+            case LanguageId.eng: return "Restore Membership"
             case LanguageId.kor: return "멤버쉽 복원하기"
             default: fatalError()}
         }()
@@ -700,6 +708,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Subscribe"
             case LanguageId.kor: return "구독하기"
+            default: fatalError()}
+        }()
+        self.titleTerms = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Terms and Conditions"
+            case LanguageId.kor: return "서비스이용약관"
             default: fatalError()}
         }()
         self.titleToday = {
@@ -1092,7 +1106,7 @@ struct LangHelper {
         switch alpha2 {
         case "en": return LanguageId.eng
         case "kr": return LanguageId.kor
-        case "jp": return LanguageId.jpn
+//        TODO: case "jp": return LanguageId.jpn
         default: return LanguageId.eng
         }
     }

@@ -18,8 +18,10 @@ class IAPController: UIViewController {
     var descScrollView: UIScrollView!
     
     // UIButton
-    var purchaseButton: UIButton!
-    var restoreButton: UIButton!
+    var purchaseBtn: UIButton!
+    var restoreBtn: UIButton!
+    var privacyPolicyLink: UIButton!
+    var termsLink: UIButton!
     
     // UILabel
     var eventLabel: UILabel!
@@ -49,14 +51,14 @@ class IAPController: UIViewController {
                 self.productPriceDscLabel.textColor = .gray
                 self.productDsc1Label.textColor = .gray
             }
-            purchaseButton.isHidden = true
-            restoreButton.isHidden = true
+            purchaseBtn.isHidden = true
+            restoreBtn.isHidden = true
             eventLabel.isHidden = true
             fetchAvailableProducts()
         } else{
             /* Product is not purchased */
             purchaseComplLabel.isHidden = true
-            self.fetchAvailableProducts()
+            fetchAvailableProducts()
         }
     }
     
@@ -79,6 +81,28 @@ class IAPController: UIViewController {
         SKPaymentQueue.default().add(self)
         SKPaymentQueue.default().restoreCompletedTransactions()
     }
+    
+    @objc func privacyPolicyTapped() {
+        var url = "https://www.dymm.io/privacy/en"
+        switch lang.currentLanguageId {
+        case LanguageId.eng: url = "https://www.dymm.io/privacy/en"
+        case LanguageId.kor: url = "https://www.dymm.io/privacy/ko"
+        default: fatalError() }
+        if let url = URL(string: url) {
+            UIApplication.shared.open(url)
+        }
+    }
+    
+    @objc func termsTapped() {
+        var url = "https://www.dymm.io/terms/en"
+        switch lang.currentLanguageId {
+        case LanguageId.eng: url = "https://www.dymm.io/terms/en"
+        case LanguageId.kor: url = "https://www.dymm.io/terms/ko"
+        default: fatalError() }
+        if let url = URL(string: url) {
+            UIApplication.shared.open(url)
+        }
+    }
 }
 
 extension IAPController: SKProductsRequestDelegate, SKPaymentTransactionObserver {
@@ -89,8 +113,8 @@ extension IAPController: SKProductsRequestDelegate, SKPaymentTransactionObserver
         productDsc2Label.text = self.lang.msgProductDesc2_2
         purchaseComplLabel.isHidden = false
         eventLabel.isHidden = true
-        purchaseButton.isHidden = true
-        restoreButton.isHidden = true
+        purchaseBtn.isHidden = true
+        restoreBtn.isHidden = true
         alertCompl(lang.titleRestoreCompl, lang.msgRestoreCompl)
     }
     
@@ -109,6 +133,8 @@ extension IAPController: SKProductsRequestDelegate, SKPaymentTransactionObserver
                     self.purchaseComplLabel.text = self.lang.titlePremiumMemberShip
                     self.productPriceDscLabel.text = "\(price!) / \(purchasingProduct.localizedDescription)"
                     self.productDsc1Label.text = self.lang.msgProductDesc1
+                    self.privacyPolicyLink.setTitle(self.lang.titlePrivaryPolocy, for: .normal)
+                    self.termsLink.setTitle(self.lang.titleTerms, for: .normal)
                     self.productDsc2Label.text = self.lang.msgProductDesc2_2
                     self.descScrollView.backgroundColor = .white
                     self.view.hideSpinner()
@@ -117,9 +143,11 @@ extension IAPController: SKProductsRequestDelegate, SKPaymentTransactionObserver
                 // Show description
                 DispatchQueue.main.async {
                     self.eventLabel.text = self.lang.msgPriceDesc
-                    self.purchaseButton.setTitle(purchasingProduct.localizedTitle.uppercased(), for: .normal)
+                    self.purchaseBtn.setTitle(purchasingProduct.localizedTitle.uppercased(), for: .normal)
                     self.productPriceDscLabel.text = "\(price!) / \(purchasingProduct.localizedDescription)"
                     self.productDsc1Label.text = self.lang.msgProductDesc1
+                    self.privacyPolicyLink.setTitle(self.lang.titlePrivaryPolocy, for: .normal)
+                    self.termsLink.setTitle(self.lang.titleTerms, for: .normal)
                     self.productDsc2Label.text = self.lang.msgProductDesc2_1
                     self.descScrollView.backgroundColor = .white
                     self.view.hideSpinner()
@@ -141,8 +169,8 @@ extension IAPController: SKProductsRequestDelegate, SKPaymentTransactionObserver
                         UserDefaults.standard.setIsPurchased(value: true)
                         purchaseComplLabel.text = lang.msgProductPurchased
                         purchaseComplLabel.isHidden = false
-                        purchaseButton.isHidden = true
-                        restoreButton.isHidden = true
+                        purchaseBtn.isHidden = true
+                        restoreBtn.isHidden = true
                         alertCompl(lang.titlePurchaseCompl, lang.msgPurchaseCompl)
                     }
                 case .failed:
@@ -186,9 +214,9 @@ extension IAPController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-        purchaseButton = {
+        purchaseBtn = {
             let _button = UIButton(type: .system)
-            _button.setTitleColor(.white, for: .normal)
+            _button.setTitleColor(.green_00E9CC, for: .normal)
             _button.backgroundColor = .purple_921BEA
             _button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
             _button.layer.cornerRadius = 10.0
@@ -230,7 +258,7 @@ extension IAPController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-        restoreButton = {
+        restoreBtn = {
             let _button = UIButton(type: .system)
             _button.setTitleColor(.black, for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 16)
@@ -247,42 +275,63 @@ extension IAPController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
+        privacyPolicyLink = {
+            let _button = UIButton(type: .system)
+            _button.setTitleColor(.dodgerBlue, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 12)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(privacyPolicyTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        termsLink = {
+            let _button = UIButton(type: .system)
+            _button.setTitleColor(.dodgerBlue, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 12)
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(termsTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        
         
         view.addSubview(logoImageView)
-        view.addSubview(purchaseButton)
+        view.addSubview(purchaseBtn)
         view.addSubview(productPriceDscLabel)
         view.addSubview(eventLabel)
         view.addSubview(purchaseComplLabel)
         view.addSubview(topBarView)
         view.addSubview(descScrollView)
         
-        topBarView.addSubview(restoreButton)
+        topBarView.addSubview(restoreBtn)
         
         descScrollView.addSubview(productDsc1Label)
         descScrollView.addSubview(productDsc2Label)
+        descScrollView.addSubview(privacyPolicyLink)
+        descScrollView.addSubview(termsLink)
         
         topBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         topBarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         topBarView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
         topBarView.heightAnchor.constraint(equalToConstant: CGFloat(topBarHeightInt)).isActive = true
         
-        restoreButton.topAnchor.constraint(equalTo: topBarView.topAnchor, constant: 0).isActive = true
-        restoreButton.trailingAnchor.constraint(equalTo: topBarView.trailingAnchor, constant: -20).isActive = true
-        restoreButton.bottomAnchor.constraint(equalTo: topBarView.bottomAnchor, constant: 0).isActive = true
+        restoreBtn.topAnchor.constraint(equalTo: topBarView.topAnchor, constant: 0).isActive = true
+        restoreBtn.trailingAnchor.constraint(equalTo: topBarView.trailingAnchor, constant: -20).isActive = true
+        restoreBtn.bottomAnchor.constraint(equalTo: topBarView.bottomAnchor, constant: 0).isActive = true
         
         logoImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        logoImageView.bottomAnchor.constraint(equalTo: purchaseButton.topAnchor, constant: -40).isActive = true
+        logoImageView.bottomAnchor.constraint(equalTo: purchaseBtn.topAnchor, constant: -40).isActive = true
         
-        purchaseButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        purchaseButton.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: -20).isActive = true
-        purchaseButton.widthAnchor.constraint(equalToConstant: 250).isActive = true
-        purchaseButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        purchaseBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        purchaseBtn.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: -20).isActive = true
+        purchaseBtn.widthAnchor.constraint(equalToConstant: 250).isActive = true
+        purchaseBtn.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        eventLabel.bottomAnchor.constraint(equalTo: purchaseButton.topAnchor, constant: -5).isActive = true
-        eventLabel.trailingAnchor.constraint(equalTo: purchaseButton.trailingAnchor, constant: 0).isActive = true
+        eventLabel.bottomAnchor.constraint(equalTo: purchaseBtn.topAnchor, constant: -5).isActive = true
+        eventLabel.trailingAnchor.constraint(equalTo: purchaseBtn.trailingAnchor, constant: 0).isActive = true
         
         productPriceDscLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        productPriceDscLabel.topAnchor.constraint(equalTo: purchaseButton.bottomAnchor, constant: 10).isActive = true
+        productPriceDscLabel.topAnchor.constraint(equalTo: purchaseBtn.bottomAnchor, constant: 10).isActive = true
         
         descScrollView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
         descScrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
@@ -295,7 +344,14 @@ extension IAPController {
         productDsc1Label.leadingAnchor.constraint(equalTo: descScrollView.leadingAnchor, constant: 7).isActive = true
         productDsc1Label.trailingAnchor.constraint(equalTo: descScrollView.trailingAnchor, constant: -7).isActive = true
         
-        productDsc2Label.topAnchor.constraint(equalTo: productDsc1Label.bottomAnchor, constant: 25).isActive = true
+        privacyPolicyLink.topAnchor.constraint(equalTo: productDsc1Label.bottomAnchor, constant: 1).isActive = true
+//        privacyPolicyLink.centerXAnchor.constraint(equalTo: descScrollView.centerXAnchor, constant: 0).isActive = true
+        privacyPolicyLink.trailingAnchor.constraint(equalTo: termsLink.leadingAnchor, constant: -7).isActive = true
+        
+        termsLink.topAnchor.constraint(equalTo: productDsc1Label.bottomAnchor, constant: 1).isActive = true
+        termsLink.trailingAnchor.constraint(equalTo: descScrollView.trailingAnchor, constant: -25).isActive = true
+        
+        productDsc2Label.topAnchor.constraint(equalTo: privacyPolicyLink.bottomAnchor, constant: 25).isActive = true
         productDsc2Label.centerXAnchor.constraint(equalTo: descScrollView.centerXAnchor, constant: 0).isActive = true
         productDsc2Label.leadingAnchor.constraint(equalTo: descScrollView.leadingAnchor, constant: 10).isActive = true
         productDsc2Label.trailingAnchor.constraint(equalTo: descScrollView.trailingAnchor, constant: -10).isActive = true
