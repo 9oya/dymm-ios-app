@@ -416,7 +416,7 @@ class ProfileViewController: UIViewController {
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
         alert.addAction(UIAlertAction(title: lang.titleChooseColor, style: .default) { _ in
-            self.colorLeftButton.setTitleColor(.green_3ED6A7, for: .normal)
+            self.colorLeftButton.setTitleColor(.purple_B847FF, for: .normal)
             UIView.transition(with: self.colorLeftButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.colorLeftButton.isHidden = false
             })
@@ -484,7 +484,7 @@ class ProfileViewController: UIViewController {
     @objc func colorLeftButtonTapped() {
         UIView.transition(with: self.blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.blindView.isHidden = true
-            self.colorLeftButton.setTitleColor(UIColor.clear, for: .normal)
+            self.colorLeftButton.setTitleColor(.clear, for: .normal)
         }, completion: { (_) in
             self.colorLeftButton.isHidden = true
         })
@@ -897,7 +897,7 @@ extension ProfileViewController {
         introLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 15, weight: .regular)
-            _label.textColor = UIColor.black
+            _label.textColor = .black
             _label.textAlignment = .left
             _label.numberOfLines = 4
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -906,8 +906,8 @@ extension ProfileViewController {
         colorLeftButton = {
             let _button = UIButton(type: .system)
             _button.setTitle(lang.titleClose, for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            _button.setTitleColor(UIColor.clear, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .bold)
+            _button.setTitleColor(.clear, for: .normal)
             _button.showsTouchWhenHighlighted = false
             _button.isHidden = true
             _button.addTarget(self, action:#selector(colorLeftButtonTapped), for: .touchUpInside)
@@ -918,7 +918,7 @@ extension ProfileViewController {
             let _button = UIButton(type: .system)
             _button.setTitle(lang.titleDone, for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            _button.setTitleColor(.green_3ED6A7, for: .normal)
+            _button.setTitleColor(.purple_B847FF, for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(colorRightButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -1086,13 +1086,13 @@ extension ProfileViewController {
         colorContainer.trailingAnchor.constraint(equalTo: blindView.trailingAnchor, constant: -7).isActive = true
         colorContainer.centerXAnchor.constraint(equalTo: blindView.centerXAnchor, constant: 0).isActive = true
         colorContainer.centerYAnchor.constraint(equalTo: blindView.centerYAnchor, constant: 0).isActive = true
-        colorContainer.heightAnchor.constraint(equalToConstant: (60 * 3) + 100).isActive = true
+        colorContainer.heightAnchor.constraint(equalToConstant: (view.frame.height * 0.27) + 100).isActive = true
         
         colorCollection.topAnchor.constraint(equalTo: colorContainer.topAnchor, constant: 40).isActive = true
         colorCollection.centerXAnchor.constraint(equalTo: colorContainer.centerXAnchor, constant: 0).isActive = true
         colorCollection.leadingAnchor.constraint(equalTo: colorContainer.leadingAnchor, constant: 15).isActive = true
         colorCollection.trailingAnchor.constraint(equalTo: colorContainer.trailingAnchor, constant: -15).isActive = true
-        colorCollection.heightAnchor.constraint(equalToConstant: 60 * 3).isActive = true
+        colorCollection.heightAnchor.constraint(equalToConstant: view.frame.height * 0.27).isActive = true
         
         colorTitleLabel.topAnchor.constraint(equalTo: colorContainer.topAnchor, constant: 10).isActive = true
         colorTitleLabel.centerXAnchor.constraint(equalTo: colorContainer.centerXAnchor, constant: 0).isActive = true

@@ -554,14 +554,14 @@ struct Service {
         }
     }
     
-    func getTagSetList(tagId: Int, sortType: String, pageNum: Int? = nil, langId: Int? = nil, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
+    func getTagSetList(tagId: Int, sortType: String, pageNum: Int? = nil, perPage: Int? = nil, langId: Int? = nil, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
         var url = "\(URI.host)\(URI.tag)/\(tagId)/set/\(sortType)"
         if let _pageNum = pageNum {
             if UserDefaults.standard.getAvatarId() != nil && UserDefaults.standard.getAvatarId() != 0 {
                 let avatarId = UserDefaults.standard.getAvatarId()
-                url += "/avt/\(avatarId!)/page/\(_pageNum)/lang/\(langId!)"
+                url += "/avt/\(avatarId!)/page/\(_pageNum)/\(perPage!)/lang/\(langId!)"
             } else {
-                url += "/page/\(_pageNum)/lang/\(langId!)"
+                url += "/page/\(_pageNum)/\(perPage!)/lang/\(langId!)"
             }
         }
         Alamofire.request(url)
@@ -944,11 +944,11 @@ struct Service {
         }
     }
     
-    func searchTags(tagId: Int, keyWord: String, page: Int, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
+    func searchTags(tagId: Int, keyWord: String, page: Int, perPage: Int, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
         let params: Parameters = [
             "key_word": keyWord
         ]
-        let url = "\(URI.host)\(URI.tag)/\(tagId)/search/page/\(page)"
+        let url = "\(URI.host)\(URI.tag)/\(tagId)/search/page/\(page)/\(perPage)"
         Alamofire.request(url, method: .post, parameters: params, encoding: JSONEncoding.default)
             .validate(contentType: ["application/json"])
             .responseData { response in

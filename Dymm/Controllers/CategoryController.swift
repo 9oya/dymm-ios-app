@@ -16,6 +16,7 @@ private let searchBarHeightInt = 40
 private let detailBoxAHeightInt = 312
 private let detailBoxBHeightInt = 312
 private let detailBoxCHeightInt = 265
+//private var minimumCntInt = 40
 
 class CategoryViewController: UIViewController {
     
@@ -94,11 +95,19 @@ class CategoryViewController: UIViewController {
     var lastContentOffset: CGFloat = 0.0
     var isScrollToLoading: Bool = false
     var currPageNum: Int = 1
+    var minimumCntInt = 40
     var minimumCnt: Int = 40
     var opinion: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if view.frame.height >= 1024 {
+            minimumCnt = 50
+            minimumCntInt = 50
+        }
+        print(view.frame.height)
+        
         setupLayout()
         loadCategories()
     }
@@ -333,7 +342,7 @@ class CategoryViewController: UIViewController {
     
     @objc func textFieldDidChanged(_ textField: UITextField) {
         currPageNum = 1
-        minimumCnt = 40
+        minimumCnt = minimumCntInt
         lastContentOffset = 0.0
         isScrollToLoading = false
         let _text = textField.text!
@@ -446,7 +455,7 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         searchTextField.text = nil
         typedKeyword = nil
         currPageNum = 1
-        minimumCnt = 40
+        minimumCnt = minimumCntInt
         lastContentOffset = 0.0
         isScrollToLoading = false
         if collectionView == tagCollection {
@@ -547,7 +556,7 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
             if _subTags.count == minimumCnt {
                 isScrollToLoading = true
                 currPageNum += 1
-                minimumCnt += 40
+                minimumCnt += minimumCntInt
                 if typedKeyword != nil {
                     searchTagsByKeyword()
                 } else {
@@ -1288,7 +1297,7 @@ extension CategoryViewController {
             superTagId = superTag!.id
         }
         let service = Service(lang: lang)
-        service.getTagSetList(tagId: superTagId!, sortType: SortType.priority, pageNum: currPageNum, langId: lang.currentLanguageId,popoverAlert: { (message) in
+        service.getTagSetList(tagId: superTagId!, sortType: SortType.priority, pageNum: currPageNum, perPage: minimumCntInt, langId: lang.currentLanguageId,popoverAlert: { (message) in
             self.retryFunction = self.loadCategories
             self.alertError(message)
         }) { (tagSet) in
@@ -1306,7 +1315,7 @@ extension CategoryViewController {
     
     private func searchTagsByKeyword() {
         let service = Service(lang: lang)
-        service.searchTags(tagId: superTag!.id, keyWord: typedKeyword!, page: currPageNum, popoverAlert: { (message) in
+        service.searchTags(tagId: superTag!.id, keyWord: typedKeyword!, page: currPageNum, perPage: minimumCntInt, popoverAlert: { (message) in
             self.retryFunction = self.searchTagsByKeyword
             self.alertError(message)
         }) { (tagSet) in
