@@ -103,10 +103,10 @@ class CategoryViewController: UIViewController {
         super.viewDidLoad()
         
         if view.frame.height >= 1024 {
+            // Minimum height of iPad: 1024
             minimumCnt = 50
             minimumCntInt = 50
         }
-        print(view.frame.height)
         
         setupLayout()
         loadCategories()
@@ -148,9 +148,9 @@ class CategoryViewController: UIViewController {
         }))
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: UIAlertAction.Style.cancel, handler: nil))
         if cond_log_type == CondLogType.startDate {
-            alert.view.tintColor = .purple_B847FF
+            alert.view.tintColor = UIColor(hex: "#00A792")
         } else {
-            alert.view.tintColor = UIColor(hex: "#FE4CF0")
+            alert.view.tintColor = .red_FF4779
         }
         present(alert, animated: true, completion:{})
     }

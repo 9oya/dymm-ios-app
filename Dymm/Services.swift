@@ -555,7 +555,8 @@ struct Service {
     }
     
     func getTagSetList(tagId: Int, sortType: String, pageNum: Int? = nil, perPage: Int? = nil, langId: Int? = nil, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
-        var url = "\(URI.host)\(URI.tag)/\(tagId)/set/\(sortType)"
+        // TODO: Remove "/new"
+        var url = "\(URI.host)\(URI.tag)/new/\(tagId)/set/\(sortType)"
         if let _pageNum = pageNum {
             if UserDefaults.standard.getAvatarId() != nil && UserDefaults.standard.getAvatarId() != 0 {
                 let avatarId = UserDefaults.standard.getAvatarId()
@@ -590,14 +591,16 @@ struct Service {
     }
     
     func getProfileTagSets(tagId: Int, isSelected: Bool, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ profileTagSet: CustomModel.ProfileTagSet) -> Void) {
-        guard let accessToken = UserDefaults.standard.getAccessToken() else {
-            UserDefaults.standard.setIsSignIn(value: false)
-            fatalError()
-        }
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(accessToken)"
-        ]
-        Alamofire.request("\(URI.host)\(URI.tag)/\(tagId)/set/match/\(isSelected)", method: .get, headers: headers)
+//        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+//            UserDefaults.standard.setIsSignIn(value: false)
+//            fatalError()
+//        }
+//        let headers: HTTPHeaders = [
+//            "Authorization": "Bearer \(accessToken)"
+//        ]
+//        Alamofire.request("\(URI.host)\(URI.tag)/\(tagId)/set/match/\(isSelected)", method: .get, headers: headers)
+        // TODO: Remove "/new
+        Alamofire.request("\(URI.host)\(URI.tag)/new/\(tagId)/set/match/\(isSelected)", method: .get)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -948,7 +951,8 @@ struct Service {
         let params: Parameters = [
             "key_word": keyWord
         ]
-        let url = "\(URI.host)\(URI.tag)/\(tagId)/search/page/\(page)/\(perPage)"
+        // TODO: Remove "/new"
+        let url = "\(URI.host)\(URI.tag)/new/\(tagId)/search/page/\(page)/\(perPage)"
         Alamofire.request(url, method: .post, parameters: params, encoding: JSONEncoding.default)
             .validate(contentType: ["application/json"])
             .responseData { response in
