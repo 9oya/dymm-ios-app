@@ -387,6 +387,9 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         selectedOnceCellIdxPath = nil
         selectedTableSection = nil
         selectedTableRow = nil
+        
+        isPullToRefresh = true
+        
         refreshControler.endRefreshing()
     }
     
@@ -934,12 +937,12 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if diaryMode == DiaryMode.editor {
-            isPullToRefresh = true
-            loadLogGroups()
-        }
-    }
+//    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+//        if diaryMode == DiaryMode.editor || isPullToRefresh {
+//
+//            loadLogGroups()
+//        }
+//    }
 }
 
 extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -1557,7 +1560,7 @@ extension DiaryViewController {
         view.addGestureRecognizer(scopeGesture)
         
         // TODO
-        logGroupTable.addSubview(refreshControler)
+//        logGroupTable.addSubview(refreshControler)
         
         blindView.addSubview(pickerContainerView)
         blindView.addSubview(diseaseContainer)

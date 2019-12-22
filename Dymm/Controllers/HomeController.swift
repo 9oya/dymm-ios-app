@@ -722,6 +722,7 @@ extension HomeViewController {
                 case LanguageId.kor:
                     self.lifespanLabel.text = "\(year)년 \(days)일"
                 default: fatalError()}
+                self.lifespanLabel.isHidden = false
                 self.aiMsgLabel.textColor = .green_3ED6A7
                 self.aiMsgLabel.text = self.lang.msgLifeSpan
                 self.aiBoardView.isHidden = false

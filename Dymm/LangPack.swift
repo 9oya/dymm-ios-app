@@ -921,13 +921,13 @@ struct LangPack {
         }()
         self.msgMailNotConfirmed = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your email address is not verified. \nPleas verify your email."
+            case LanguageId.eng: return "Your email address is not verified. \nPlease verify your email."
             case LanguageId.kor: return "메일주소가 검증되지 않았습니다.\n메일을 확인해 주세요."
             default: fatalError()}
         }()
         self.msgMailSendAgainComplete = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your account verification email has been resent.\nPleas verify your new email."
+            case LanguageId.eng: return "Your account verification email has been resent.\nPlease verify your new email."
             case LanguageId.kor: return "계정 확인 메일이 다시 보내졌습니다.\n새 메일을 확인해 주세요."
             default: fatalError()}
         }()
