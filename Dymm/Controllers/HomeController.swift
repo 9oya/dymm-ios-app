@@ -93,7 +93,6 @@ class HomeViewController: UIViewController {
             loadAvatar()
             loadRemainingLifeSpan()
             loadReceipt()
-            cubeImgView.isHidden = false
         } else {
             showGuestScene()
             UserDefaults.standard.setIsFreeTrial(value: false)
@@ -726,6 +725,7 @@ extension HomeViewController {
                 self.aiMsgLabel.textColor = .green_3ED6A7
                 self.aiMsgLabel.text = self.lang.msgLifeSpan
                 self.aiBoardView.isHidden = false
+                self.cubeImgView.isHidden = false
             }
         }
     }
