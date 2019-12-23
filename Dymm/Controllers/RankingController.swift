@@ -146,6 +146,7 @@ extension RankingViewController: UITableViewDataSource, UITableViewDelegate {
         }
         let ranking = rankings![indexPath.row]
         if ranking.photo_name != nil && ranking.color_code == 0 {
+            cell.profileImgView.backgroundColor = .clear
             cell.profileImgView.image = nil
             cell.profileImgLabel.textColor = .clear
             let url = "\(URI.host)\(URI.avatar)/\(ranking.avatar_id)/profile/photo/\(ranking.photo_name!)"
@@ -183,52 +184,6 @@ extension RankingViewController: UITableViewDataSource, UITableViewDelegate {
         }
         return cell
     }
-    
-//    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-//        // The cells has not store data itself.
-//        // So when they vanished from the screen, they lost view layout infos.
-//        // That means they need to resetting view layouts, when they reappear from vanishing.
-//        guard let cell = cell as? RankingTableCell else {
-//            return
-//        }
-//        let ranking = rankings![indexPath.row]
-//        if ranking.photo_name != nil && ranking.color_code == 0 {
-//            cell.profileImgView.image = nil
-//            cell.profileImgLabel.textColor = .clear
-//            let url = "\(URI.host)\(URI.avatar)/\(ranking.avatar_id)/profile/photo/\(ranking.photo_name!)"
-//            Alamofire.request(url).responseImage { response in
-//                if let data = response.data {
-//                    cell.profileImgView.image = UIImage(data: data)
-//                }
-//            }
-//        } else {
-//            let firstName = ranking.first_name
-//            let index = firstName.index(firstName.startIndex, offsetBy: 0)
-//            cell.profileImgLabel.text = String(firstName[index])
-//            cell.profileImgLabel.textColor = .white
-//            cell.profileImgView.backgroundColor = getProfileUIColor(key: ranking.color_code)
-//            cell.profileImgView.image = nil
-//        }
-//        cell.rankNumLabel.text = "#\(ranking.rank_num)"
-//        cell.nameLabel.text = "\(ranking.first_name) \(ranking.last_name)"
-//        if let fullLifespan = ranking.full_lifespan {
-//            let year = fullLifespan / 365
-//            let days = fullLifespan % 365
-//            switch self.lang.currentLanguageId {
-//            case LanguageId.eng:
-//                cell.yearsLabel.text = "\(year)Y"
-//                cell.daysLabel.text = "\(days)D"
-//            case LanguageId.kor:
-//                cell.yearsLabel.text = "\(year)년"
-//                cell.daysLabel.text = "\(days)일"
-//            default: fatalError()}
-//            cell.yearsBarWidth.constant = CGFloat(year)
-//            cell.daysBarWidth.constant = CGFloat((days * 50) / 365)
-//        } else {
-//            cell.yearsLabel.text = " "
-//            cell.daysLabel.text = " "
-//        }
-//    }
     
     // MARK: - UITableViewDelegate
     

@@ -116,6 +116,7 @@ struct LangPack {
     var msgChangePasswordCompl: String!
     var msgCondScoreNone: String!
     var msgDateOfBirthNone: String!
+    var msgDiarySelect: String!
     var msgDuplicatedEmail: String!
     var msgEmptyEmail: String!
     var msgEmptyName: String!
@@ -833,6 +834,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Please select your date of birth on the Profile tab."
             case LanguageId.kor: return "프로필 탭에서 당신의 생년월일을 선택해주세요."
+            default: fatalError()}
+        }()
+        self.msgDiarySelect = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Select a calendar date or a below group."
+            case LanguageId.kor: return "달력에 일자또는 아래 그룹중에 선택해 주세요."
             default: fatalError()}
         }()
         self.msgDuplicatedEmail = {

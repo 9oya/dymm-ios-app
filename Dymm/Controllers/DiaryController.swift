@@ -119,6 +119,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var isPullToRefresh: Bool = false
     var isLogGroupTableEdited: Bool = false
     var isCondEditBtnTapped: Bool = false
+    var isFirstAppear: Bool = true
     var superTag: BaseModel.Tag?
     
     override func viewDidLoad() {
@@ -501,49 +502,10 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             calendar.setCurrentPage(date, animated: true)
         }
         
-        switch diaryMode {
-        case DiaryMode.editor:
+        if diaryMode == DiaryMode.logger {
+            popoverLogger(date)
+        } else {
             return
-        case DiaryMode.logger:
-            let selectedDateArr = dateFormatter.string(from: date).components(separatedBy: "-")
-            yearNumber = Int(selectedDateArr[0])
-            monthNumber = Int(selectedDateArr[1])
-            dayNumber = Int(selectedDateArr[2])
-            weekOfYear = Calendar.current.component(.weekOfYear, from: date)
-            dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: date)!
-            selectedDate = dateFormatter.string(from: date)
-            // logGrouDictArr: [groupType:LogGroup]
-            if let logGroupDictArr = logGroupDictTwoDimArr[dayOfYear!] {
-                // Case found some logGroups in section.
-                // Display last log group.
-                let sortedGroupTypes = logGroupDictArr.keys.sorted(by: >)
-                var sortedLogGourpArr = [BaseModel.LogGroup]()
-                sortedGroupTypes.forEach { (key) in
-                    sortedLogGourpArr.append(logGroupDictArr[key]!)
-                }
-                let logGroup = sortedLogGourpArr.first!
-                selectedLogGroupId = logGroup.id
-                selectedLogGroup = logGroup
-                groupType = logGroup.group_type
-                loadGroupOfLogs { (groupOfLogSet) in
-                    let collectionViewHeight = logCollectionCellHeightInt * self.getGroupOfLogsTotalCnt(groupOfLogSet)
-                    self.afterLoadGroupOfLogs(collectionViewHeight)
-                }
-            } else {
-                // Case no logGroups are found in the section
-                groupOfLogSet = nil
-                tempStoredLogs.removeAll()
-                groupType = LogGroupType.morning
-                pickerContainerTransition(pickerCollectionHeightInt)
-            }
-            groupTypePicker.selectRow(LogGroupType.nighttime - groupType!, inComponent: 0, animated: true)
-            UIView.transition(with: self.pickerContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.pickerDateLabel.text = "\(self.monthNumber!)월 \(self.dayNumber!)일"
-                self.blindView.isHidden = false
-                self.pickerContainerView.isHidden = false
-            })
-        default:
-            fatalError()
         }
     }
     
@@ -1323,15 +1285,16 @@ extension DiaryViewController {
     private func setupLayout() {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
-        switch lang.currentLanguageId {
-        case LanguageId.eng:
-            navigationItem.title = superTag?.eng_name
-        case LanguageId.kor:
-            navigationItem.title = superTag?.kor_name
-        case LanguageId.jpn:
-            navigationItem.title = superTag?.jpn_name
-        default:
-            return
+        
+        if diaryMode == DiaryMode.editor {
+            switch lang.currentLanguageId {
+            case LanguageId.eng: navigationItem.title = superTag?.eng_name
+            case LanguageId.kor: navigationItem.title = superTag?.kor_name
+            case LanguageId.jpn: navigationItem.title = superTag?.jpn_name
+            default: return }
+        } else {
+            navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15, weight: .regular)]
+            navigationItem.title = lang.msgDiarySelect
         }
         view.backgroundColor = .whiteSmoke
         
@@ -1767,7 +1730,54 @@ extension DiaryViewController {
                     self.editedCellIdxPath = nil
                 })
             }
+            
+            if self.isFirstAppear {
+                self.isFirstAppear = false
+                if self.diaryMode == DiaryMode.logger {
+                    self.popoverLogger(self.calendarView.today!)
+                }
+            }
         }
+    }
+    
+    private func popoverLogger(_ date: Date) {
+        let selectedDateArr = self.dateFormatter.string(from: date).components(separatedBy: "-")
+        self.yearNumber = Int(selectedDateArr[0])
+        self.monthNumber = Int(selectedDateArr[1])
+        self.dayNumber = Int(selectedDateArr[2])
+        self.weekOfYear = Calendar.current.component(.weekOfYear, from: date)
+        self.dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: date)!
+        self.selectedDate = self.dateFormatter.string(from: date)
+        // logGrouDictArr: [groupType:LogGroup]
+        if let logGroupDictArr = self.logGroupDictTwoDimArr[self.dayOfYear!] {
+            // Case found some logGroups in section.
+            // Display last log group.
+            let sortedGroupTypes = logGroupDictArr.keys.sorted(by: >)
+            var sortedLogGourpArr = [BaseModel.LogGroup]()
+            sortedGroupTypes.forEach { (key) in
+                sortedLogGourpArr.append(logGroupDictArr[key]!)
+            }
+            let logGroup = sortedLogGourpArr.first!
+            self.selectedLogGroupId = logGroup.id
+            self.selectedLogGroup = logGroup
+            self.groupType = logGroup.group_type
+            self.loadGroupOfLogs { (groupOfLogSet) in
+                let collectionViewHeight = logCollectionCellHeightInt * self.getGroupOfLogsTotalCnt(groupOfLogSet)
+                self.afterLoadGroupOfLogs(collectionViewHeight)
+            }
+        } else {
+            // Case no logGroups are found in the section
+            self.groupOfLogSet = nil
+            self.tempStoredLogs.removeAll()
+            self.groupType = LogGroupType.morning
+            self.pickerContainerTransition(pickerCollectionHeightInt)
+        }
+        self.groupTypePicker.selectRow(LogGroupType.nighttime - self.groupType!, inComponent: 0, animated: true)
+        UIView.transition(with: self.pickerContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.pickerDateLabel.text = "\(self.monthNumber!)월 \(self.dayNumber!)일"
+            self.blindView.isHidden = false
+            self.pickerContainerView.isHidden = false
+        })
     }
     
     private func loadGroupOfLogs(_ completion: @escaping (CustomModel.GroupOfLogSet) -> Void) {
