@@ -50,17 +50,6 @@ extension UIViewController {
         _label.translatesAutoresizingMaskIntoConstraints = false
         return _label
     }
-    func getLoadingImageView(isHidden: Bool? = nil) -> UIImageView {
-        let _imageView = UIImageView(image: .itemLoading)
-        _imageView.frame = CGRect(x: 0, y: 0, width: 60, height: 60)
-        _imageView.contentMode = .scaleAspectFit
-        _imageView.startRotating(duration: 1)
-        if let isHidden = isHidden {
-            _imageView.isHidden = isHidden
-        }
-        _imageView.translatesAutoresizingMaskIntoConstraints = false
-        return _imageView
-    }
     func getScrollView(isHidden: Bool? = nil) -> UIScrollView {
         let _scrollView = UIScrollView(frame: CGRect.zero)
         _scrollView.showsHorizontalScrollIndicator = false

@@ -50,6 +50,8 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     // UILabel
     var pickerDateLabel: UILabel!
     var diseaseTitleLabel: UILabel!
+    var guideLabel: UILabel!
+    var pullToRefreshLabel: UILabel!
     
     // UIButton
     var toggleBtn: UIButton!
@@ -62,6 +64,13 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var diseaseLeftBtn: UIButton!
     var diseaseRightBtn: UIButton!
     var diseaseRefreshBtn: UIButton!
+    var foodBtn: UIButton!
+    var pillBtn: UIButton!
+    var activityBtn: UIButton!
+    var diseaseBtn: UIButton!
+    
+    // UIImageView
+    var guideIllustImgView: UIImageView!
     
     // NSLayoutConstraint
     var calendarViewHeight: NSLayoutConstraint!
@@ -468,6 +477,14 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         let vc = CategoryViewController()
         vc.topLeftButtonType = ButtonType.close
         vc.superTagId = sender.tag
+        let nc = UINavigationController(rootViewController: vc)
+        present(nc, animated: true, completion: nil)
+    }
+    
+    @objc func presentFoodCategory() {
+        let vc = CategoryViewController()
+        vc.topLeftButtonType = ButtonType.close
+        vc.superTagId = TagId.food
         let nc = UINavigationController(rootViewController: vc)
         present(nc, animated: true, completion: nil)
     }
@@ -1367,7 +1384,7 @@ extension DiaryViewController {
         }()
         diseaseCollection = {
             let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
-            _collectionView.backgroundColor = UIColor.clear
+            _collectionView.backgroundColor = .clear
             _collectionView.register(CondCollectionCell.self, forCellWithReuseIdentifier: condCollectionCellId)
             _collectionView.dragInteractionEnabled = true
             _collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -1386,7 +1403,7 @@ extension DiaryViewController {
         pickerDateLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 18, weight: .regular)
-            _label.textColor = UIColor.black
+            _label.textColor = .black
             _label.textAlignment = .center
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
@@ -1394,7 +1411,7 @@ extension DiaryViewController {
         diseaseTitleLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 18, weight: .regular)
-            _label.textColor = UIColor.black
+            _label.textColor = .black
             _label.textAlignment = .left
             _label.text = lang.titleMyAvtCond
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -1485,6 +1502,95 @@ extension DiaryViewController {
             _refresh.addTarget(self, action: #selector(refreshLogGroupTableView(sender:)), for: UIControl.Event.valueChanged)
             return _refresh
         }()
+        pullToRefreshLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 16, weight: .bold)
+            _label.textColor = .purple_948BFF
+            _label.textAlignment = .center
+            _label.text = lang.titlePullToRefresh
+            _label.numberOfLines = 2
+            _label.isHidden = true
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        guideLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 18, weight: .bold)
+            _label.textColor = .green_3ED6A7
+            _label.textAlignment = .center
+            _label.text = lang.msgGuideDiary
+            _label.isHidden = true
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        foodBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage(named: "tag-5")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setTitle("FOODS", for: .normal)
+            _button.tintColor = .green_3ED6A7
+            _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+            _button.backgroundColor = .white
+            _button.layer.cornerRadius = 10.0
+            _button.addShadowView()
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(presentFoodCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        pillBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage(named: "tag-4")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setTitle("PILLS", for: .normal)
+            _button.tintColor = .green_3ED6A7
+            _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+            _button.backgroundColor = .white
+            _button.layer.cornerRadius = 10.0
+            _button.addShadowView()
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(presentFoodCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        activityBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage(named: "tag-2")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setTitle("ACTIVITIES", for: .normal)
+            _button.tintColor = .green_3ED6A7
+            _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+            _button.backgroundColor = .white
+            _button.layer.cornerRadius = 10.0
+            _button.addShadowView()
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(presentFoodCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        diseaseBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage(named: "tag-3")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setTitle("DISEASES", for: .normal)
+            _button.tintColor = .green_3ED6A7
+            _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+            _button.backgroundColor = .white
+            _button.layer.cornerRadius = 10.0
+            _button.addShadowView()
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(presentFoodCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        guideIllustImgView = {
+            let _imageView = UIImageView()
+            _imageView.image = .itemIllustGirl2
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.isHidden = true
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
         
         if diaryMode == DiaryMode.editor {
             navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeBtn)
@@ -1512,7 +1618,14 @@ extension DiaryViewController {
         
         // Setup subviews
         view.addSubview(logGroupTable)
+        view.addSubview(guideLabel)
+        view.addSubview(foodBtn)
+        view.addSubview(pillBtn)
+        view.addSubview(activityBtn)
+        view.addSubview(diseaseBtn)
+        view.addSubview(guideIllustImgView)
         view.addSubview(calendarView)
+        view.addSubview(pullToRefreshLabel)
         view.addSubview(diseaseHistoryBtn)
         view.addSubview(toggleBtn)
         view.addSubview(blindView)
@@ -1625,11 +1738,40 @@ extension DiaryViewController {
         toggleBtn.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
         toggleBtn.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
         
+        pullToRefreshLabel.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 20).isActive = true
+        pullToRefreshLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        
         logGroupTable.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
         logGroupTable.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         logGroupTable.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         logGroupTable.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
         logGroupTable.panGestureRecognizer.require(toFail: scopeGesture)
+        
+        guideLabel.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: -(view.frame.height * 0.16)).isActive = true
+        guideLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        
+        foodBtn.topAnchor.constraint(equalTo: guideLabel.bottomAnchor, constant: 20).isActive = true
+        foodBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        foodBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 2.5).isActive = true
+        foodBtn.heightAnchor.constraint(equalToConstant: view.frame.height / 13).isActive = true
+        
+        pillBtn.topAnchor.constraint(equalTo: foodBtn.bottomAnchor, constant: 10).isActive = true
+        pillBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        pillBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 2.5).isActive = true
+        pillBtn.heightAnchor.constraint(equalToConstant: view.frame.height / 13).isActive = true
+        
+        activityBtn.topAnchor.constraint(equalTo: pillBtn.bottomAnchor, constant: 10).isActive = true
+        activityBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        activityBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 2.5).isActive = true
+        activityBtn.heightAnchor.constraint(equalToConstant: view.frame.height / 13).isActive = true
+        
+        diseaseBtn.topAnchor.constraint(equalTo: activityBtn.bottomAnchor, constant: 10).isActive = true
+        diseaseBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        diseaseBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 2.5).isActive = true
+        diseaseBtn.heightAnchor.constraint(equalToConstant: view.frame.height / 13).isActive = true
+        
+        guideIllustImgView.topAnchor.constraint(equalTo: diseaseBtn.bottomAnchor, constant: -15).isActive = true
+        guideIllustImgView.leadingAnchor.constraint(equalTo: diseaseBtn.trailingAnchor, constant: 2).isActive = true
     }
     
     private func updateLogGroupTable(completion: (() -> Void)? = nil) {
@@ -1735,6 +1877,28 @@ extension DiaryViewController {
                 self.isFirstAppear = false
                 if self.diaryMode == DiaryMode.logger {
                     self.popoverLogger(self.calendarView.today!)
+                }
+            }
+            
+            if self.diaryMode == DiaryMode.editor {
+                UIView.animate(withDuration: 0.5) {
+                    if logGroups.count <= 0 {
+                        self.pullToRefreshLabel.isHidden = false
+                        self.guideLabel.isHidden = false
+                        self.foodBtn.isHidden = false
+                        self.pillBtn.isHidden = false
+                        self.activityBtn.isHidden = false
+                        self.diseaseBtn.isHidden = false
+                        self.guideIllustImgView.isHidden = false
+                    } else {
+                        self.pullToRefreshLabel.isHidden = true
+                        self.guideLabel.isHidden = true
+                        self.foodBtn.isHidden = true
+                        self.pillBtn.isHidden = true
+                        self.activityBtn.isHidden = true
+                        self.diseaseBtn.isHidden = true
+                        self.guideIllustImgView.isHidden = true
+                    }
                 }
             }
         }

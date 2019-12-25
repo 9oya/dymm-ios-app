@@ -107,7 +107,10 @@ struct AvatarInfoTarget {
 }
 
 struct TagId {
+    static let activity = 2
     static let disease = 3
+    static let pill = 4
+    static let food = 5
     static let home = 16
     static let diary = 17
     static let bookmarks = 18

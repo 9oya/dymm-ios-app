@@ -38,6 +38,7 @@ extension UIImage {
     }
     
     // Items
+    static let item3dCube = UIImage(named: "item-3d-cube")!
     static let itemArrowCircle = UIImage(named: "item-arrow-circle")!
     static let itemArrowDown = UIImage(named: "item-arrow-down")!
     static let itemArrowLeft = UIImage(named: "item-arrow-left")!
@@ -57,20 +58,19 @@ extension UIImage {
     static let itemClose = UIImage(named: "item-close")!
     static let itemDivBig = UIImage(named: "item-div-big")!
     static let itemDivSmall = UIImage(named: "item-div-small")!
-    static let itemFingerClick = UIImage(named: "item-finger-click")!
-    static let itemGradientBack = UIImage(named: "item-gradient-back")!
     static let itemGtMoon = UIImage(named: "item-gt-moon")!
     static let itemGtSun = UIImage(named: "item-gt-sun")!
     static let itemGtSunrise = UIImage(named: "item-gt-sunrise")!
     static let itemGtSunset = UIImage(named: "item-gt-sunset")!
     static let itemHeartbeat = UIImage(named: "item-heartbeat")!
     static let itemHome = UIImage(named: "item-home")!
-    static let itemLoading = UIImage(named: "item-loading")!
+    static let itemLogoMPurple = UIImage(named: "item-logo-m-purple")!
     static let itemLogoM = UIImage(named: "item-logo-m")!
     static let itemLogoS = UIImage(named: "item-logo-s")!
     static let itemNoteGray = UIImage(named: "item-note-gray")!
     static let itemNoteYellow = UIImage(named: "item-note-yellow")!
     static let itemNotes = UIImage(named: "item-notes")!
+    static let itemOpinion = UIImage(named: "item-opinion")!
     static let itemProfileDef = UIImage(named: "item-profile-def")!
     static let itemReload = UIImage(named: "item-reload")!
     static let itemRemove = UIImage(named: "item-remove")!
@@ -94,7 +94,6 @@ extension UIImage {
     static let itemTrendUp = UIImage(named: "item-trend-up")!
     static let itemTriangleDown = UIImage(named: "item-triangle-down")!
     
-    static let itemOpinion = UIImage(named: "item-opinion")!
-    static let item3dCube = UIImage(named: "item-3d-cube")!
-    static let itemLogoMPurple = UIImage(named: "item-logo-m-purple")!
+    static let itemIllustGirl1 = UIImage(named: "item-illust-girl1")!
+    static let itemIllustGirl2 = UIImage(named: "item-illust-girl2")!
 }

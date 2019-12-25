@@ -72,6 +72,7 @@ struct LangPack {
     var titlePhoneNum: String!
     var titlePhotolibrary: String!
     var titlePrivaryPolocy: String!
+    var titlePullToRefresh: String!
     var titlePurchaseCompl: String!
     var titlePurchaseFail: String!
     var titlePurchaseDisable: String!
@@ -125,6 +126,7 @@ struct LangPack {
     var msgFloatingInvalidPassword: String!
     var msgFloatingMismatchConfirmPassword: String!
     var msgFreeTrialExpired: String!
+    var msgGuideDiary: String!
     var msgInactiveFood: String!
     var msgInvalidEmail: String!
     var msgLifeSpan: String!
@@ -567,6 +569,12 @@ struct LangPack {
             case LanguageId.kor: return "개인정보처리방침"
             default: fatalError()}
         }()
+        self.titlePullToRefresh = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Pull to refresh\n\u{02193}"
+            case LanguageId.kor: return "당겨서 새로고침\n\u{02193}"
+            default: fatalError()}
+        }()
         self.titlePurchaseCompl = {
             switch currentLanguageId {
             case LanguageId.eng: return "Purchase complete"
@@ -838,8 +846,8 @@ struct LangPack {
         }()
         self.msgDiarySelect = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Select a calendar date or a below group."
-            case LanguageId.kor: return "달력에 일자또는 아래 그룹중에 선택해 주세요."
+            case LanguageId.eng: return "Select a calendar date or a group below."
+            case LanguageId.kor: return "아래에서 달력 날짜 또는 그룹을 선택해주세요."
             default: fatalError()}
         }()
         self.msgDuplicatedEmail = {
@@ -888,6 +896,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Your free trial has expired. Please renew your membership."
             case LanguageId.kor: return "무료 체험이 만료되었습니다. 멤버쉽을 갱신해 주세요."
+            default: fatalError()}
+        }()
+        self.msgGuideDiary = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Make your first track this week!"
+            case LanguageId.kor: return "이번주 첫번째 기록을 만들어 보세요!"
             default: fatalError()}
         }()
         self.msgInvalidEmail = {
@@ -1055,7 +1069,7 @@ struct LangPack {
         }()
         self.msgSignUpYet = {
             switch currentLanguageId {
-            case LanguageId.eng: return "I can't find an account logged in."
+            case LanguageId.eng: return "I can't find a logged in account."
             case LanguageId.kor: return "로그인된 계정을 찾지 못했어요."
             default: fatalError()}
         }()

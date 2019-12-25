@@ -207,9 +207,11 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             }
             switch tag.id {
             case TagId.diary:
-                cell.label.textColor = .green_3ED6A7
+                cell.label.textColor = UIColor(hex: "#FF7187")
             case TagId.ranking:
-                cell.label.textColor = .green_3ED6A7
+                cell.label.textColor = UIColor(hex: "#948BFF")
+            case TagId.bookmarks:
+                cell.label.textColor = UIColor(hex: "#FFBF67")
             default:
                 cell.label.textColor = .green_3ED6A7
             }

@@ -36,6 +36,9 @@ class AuthViewController: UIViewController {
     var titleLabel: UILabel!
     var messageLabel: UILabel!
     
+    // UIImageView
+    var illustGirlImgView: UIImageView!
+    
     // NSLayoutConstraint
     var formContainerTop: NSLayoutConstraint!
     var formContainerHeight: NSLayoutConstraint!
@@ -488,6 +491,13 @@ extension AuthViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
+        illustGirlImgView = {
+            let _imageView = UIImageView()
+            _imageView.image = .itemIllustGirl1
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
         firstNameTextField.delegate = self
@@ -497,6 +507,7 @@ extension AuthViewController {
         confirmPassTextField.delegate = self
         
         // Setup subviews
+        view.addSubview(illustGirlImgView)
         view.addSubview(formContainerView)
         view.addSubview(topBarView)
         
@@ -522,6 +533,9 @@ extension AuthViewController {
         forgotButton.topAnchor.constraint(equalTo: topBarView.topAnchor, constant: 0).isActive = true
         forgotButton.trailingAnchor.constraint(equalTo: topBarView.trailingAnchor, constant: -20).isActive = true
         forgotButton.bottomAnchor.constraint(equalTo: topBarView.bottomAnchor, constant: 0).isActive = true
+        
+        illustGirlImgView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
+        illustGirlImgView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
         
         formContainerTop = formContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt))
         formContainerTop.priority = UILayoutPriority(rawValue: 999)
