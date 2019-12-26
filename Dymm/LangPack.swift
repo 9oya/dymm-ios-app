@@ -22,6 +22,7 @@ struct LangPack {
     var titleCancel: String!
     var titleChooseColor: String!
     var titleChangeProfileImg: String!
+    var titleClick: String!
     var titleClose: String!
     var titleComplete: String!
     var titleMoodScore: String!
@@ -97,6 +98,10 @@ struct LangPack {
     var titleStay: String!
     var titleSubmit: String!
     var titleSubscribe: String!
+    var titleTagFood: String!
+    var titleTagPill: String!
+    var titleTagActivity: String!
+    var titleTagDisease: String!
     var titleTerms: String!
     var titleToday: String!
     var titleThisMonth: String!
@@ -265,6 +270,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Change profile image"
             case LanguageId.kor: return "프로필 이미지를 변경합니다"
+            default: fatalError()}
+        }()
+        self.titleClick = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "\u{02190} Click!"
+            case LanguageId.kor: return "\u{02190} 클릭!"
             default: fatalError()}
         }()
         self.titleClose = {
@@ -717,6 +728,30 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Subscribe"
             case LanguageId.kor: return "구독하기"
+            default: fatalError()}
+        }()
+        self.titleTagFood = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "FOODS"
+            case LanguageId.kor: return "음식"
+            default: fatalError()}
+        }()
+        self.titleTagPill = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "PILLS"
+            case LanguageId.kor: return "제약"
+            default: fatalError()}
+        }()
+        self.titleTagActivity = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "ACTIVITIES"
+            case LanguageId.kor: return "활동"
+            default: fatalError()}
+        }()
+        self.titleTagDisease = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "DISEASES"
+            case LanguageId.kor: return "질병"
             default: fatalError()}
         }()
         self.titleTerms = {

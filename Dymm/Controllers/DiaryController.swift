@@ -489,6 +489,30 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         present(nc, animated: true, completion: nil)
     }
     
+    @objc func presentPillCategory() {
+        let vc = CategoryViewController()
+        vc.topLeftButtonType = ButtonType.close
+        vc.superTagId = TagId.pill
+        let nc = UINavigationController(rootViewController: vc)
+        present(nc, animated: true, completion: nil)
+    }
+    
+    @objc func presentActivityCategory() {
+        let vc = CategoryViewController()
+        vc.topLeftButtonType = ButtonType.close
+        vc.superTagId = TagId.activity
+        let nc = UINavigationController(rootViewController: vc)
+        present(nc, animated: true, completion: nil)
+    }
+    
+    @objc func presentDiseaseCategory() {
+        let vc = CategoryViewController()
+        vc.topLeftButtonType = ButtonType.close
+        vc.superTagId = TagId.disease
+        let nc = UINavigationController(rootViewController: vc)
+        present(nc, animated: true, completion: nil)
+    }
+    
     // MARK: - UIGestureRecognizerDelegate
     
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -607,7 +631,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
         case DiaryMode.editor:
             let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
             cell.arrowImageView.isHidden = false
-            cell.condScoreImageView.isHidden = false
+            cell.moodScoreImageView.isHidden = false
             cell.nameLabel.text = lang.getLogGroupTypeName(logGroup.group_type)
             cell.groupTypeImageView.image = getLogGroupTypeImage(logGroup.group_type)
             cell.nameLabel.textColor = UIColor.black
@@ -621,11 +645,13 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.drugLogBulletView.isHidden = false
             }
             if let condScore = logGroup.cond_score {
-                cell.condScoreImageView.image = getCondScoreImageSmall(condScore)
-                cell.condScoreButton.setImage(getCondScoreImageSmall(condScore), for: .normal)
+                cell.moodScoreImageView.image = getCondScoreImageSmall(condScore)
+                cell.moodScoreButton.setImage(getCondScoreImageSmall(condScore), for: .normal)
+                cell.moodBtnGuideLabel.textColor = .clear
             } else {
-                cell.condScoreImageView.image = .itemScoreNone
-                cell.condScoreButton.setImage(.itemScoreNone, for: .normal)
+                cell.moodScoreImageView.image = .itemScoreNone
+                cell.moodScoreButton.setImage(.itemScoreNone, for: .normal)
+                cell.moodBtnGuideLabel.textColor = .purple_948BFF
             }
             if logGroup.note != nil {
                 cell.noteImageView.isHidden = false
@@ -634,7 +660,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.noteImageView.isHidden = true
                 cell.noteButton.setImage(.itemNoteGray, for: .normal)
             }
-            cell.condScoreButton.addTarget(self, action: #selector(alertCondScorePicker), for: .touchUpInside)
+            cell.moodScoreButton.addTarget(self, action: #selector(alertCondScorePicker), for: .touchUpInside)
             cell.noteButton.addTarget(self, action: #selector(alertNoteTextView(_:)), for: .touchUpInside)
             
             cell.logCellButton.addTarget(self, action: #selector(presentCategoryWhenGroupOfALogCellTapped(sender:)), for: .touchUpInside)
@@ -714,9 +740,10 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     }, completion: { _ in
                         UIView.transition(with: cell.groupOfLogsTableView, duration: 0.3, options: .transitionCrossDissolve, animations: {
                             cell.groupOfLogsTableView.isHidden = true
-                            cell.condScoreButton.isHidden = true
+                            cell.moodScoreButton.isHidden = true
+                            cell.moodBtnGuideLabel.isHidden = true
                             cell.noteButton.isHidden = true
-                            cell.condScoreImageView.isHidden = false
+                            cell.moodScoreImageView.isHidden = false
                             if self.selectedLogGroup!.food_cnt > 0 {
                                 cell.foodLogBulletView.isHidden = false
                             }
@@ -749,9 +776,10 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     }, completion: { _ in
                         UIView.transition(with: cell.groupOfLogsTableView, duration: 0.3, options: .transitionCrossDissolve, animations: {
                             cell.groupOfLogsTableView.isHidden = false
-                            cell.condScoreButton.isHidden = false
+                            cell.moodScoreButton.isHidden = false
+                            cell.moodBtnGuideLabel.isHidden = false
                             cell.noteButton.isHidden = false
-                            cell.condScoreImageView.isHidden = true
+                            cell.moodScoreImageView.isHidden = true
                             cell.foodLogBulletView.isHidden = true
                             cell.actLogBulletView.isHidden = true
                             cell.drugLogBulletView.isHidden = true
@@ -823,8 +851,9 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.containerViewHight.constant = CGFloat(logGroupCellHeightInt - 7)
                 cell.arrowImageView.transform = CGAffineTransform.identity
                 cell.groupOfLogsTableView.isHidden = true
-                cell.condScoreImageView.isHidden = false
-                cell.condScoreButton.isHidden = true
+                cell.moodScoreImageView.isHidden = false
+                cell.moodScoreButton.isHidden = true
+                cell.moodBtnGuideLabel.isHidden = true
                 cell.noteButton.isHidden = true
                 if diaryMode == DiaryMode.editor {
                     let logGroup = self.logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
@@ -874,19 +903,21 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             cell.containerViewHight.constant = CGFloat((total * logTableCellHeightInt) + logGroupCellHeightInt + logGroupFooterHeightInt)
             cell.arrowImageView.transform = CGAffineTransform(rotationAngle: (.pi / 2))
             cell.groupOfLogsTableView.isHidden = false
-            cell.condScoreImageView.isHidden = true
+            cell.moodScoreImageView.isHidden = true
             cell.foodLogBulletView.isHidden = true
             cell.actLogBulletView.isHidden = true
             cell.drugLogBulletView.isHidden = true
             cell.noteImageView.isHidden = true
-            cell.condScoreButton.isHidden = false
+            cell.moodScoreButton.isHidden = false
+            cell.moodBtnGuideLabel.isHidden = false
             cell.noteButton.isHidden = false
         } else {
             cell.containerViewHight.constant = CGFloat(logGroupCellHeightInt - 7)
             cell.arrowImageView.transform = CGAffineTransform.identity
             cell.groupOfLogsTableView.isHidden = true
-            cell.condScoreImageView.isHidden = false
-            cell.condScoreButton.isHidden = true
+            cell.moodScoreImageView.isHidden = false
+            cell.moodScoreButton.isHidden = true
+            cell.moodBtnGuideLabel.isHidden = true
             cell.noteButton.isHidden = true
             let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
             if diaryMode == DiaryMode.editor {
@@ -1526,7 +1557,7 @@ extension DiaryViewController {
         foodBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage(named: "tag-5")!.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.setTitle("FOODS", for: .normal)
+            _button.setTitle(lang.titleTagFood, for: .normal)
             _button.tintColor = .green_3ED6A7
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             _button.backgroundColor = .white
@@ -1541,7 +1572,7 @@ extension DiaryViewController {
         pillBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage(named: "tag-4")!.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.setTitle("PILLS", for: .normal)
+            _button.setTitle(lang.titleTagPill, for: .normal)
             _button.tintColor = .green_3ED6A7
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             _button.backgroundColor = .white
@@ -1549,14 +1580,14 @@ extension DiaryViewController {
             _button.addShadowView()
             _button.isHidden = true
             _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(presentFoodCategory), for: .touchUpInside)
+            _button.addTarget(self, action: #selector(presentPillCategory), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
         activityBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage(named: "tag-2")!.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.setTitle("ACTIVITIES", for: .normal)
+            _button.setTitle(lang.titleTagActivity, for: .normal)
             _button.tintColor = .green_3ED6A7
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             _button.backgroundColor = .white
@@ -1564,14 +1595,14 @@ extension DiaryViewController {
             _button.addShadowView()
             _button.isHidden = true
             _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(presentFoodCategory), for: .touchUpInside)
+            _button.addTarget(self, action: #selector(presentActivityCategory), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
         diseaseBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage(named: "tag-3")!.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.setTitle("DISEASES", for: .normal)
+            _button.setTitle(lang.titleTagDisease, for: .normal)
             _button.tintColor = .green_3ED6A7
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             _button.backgroundColor = .white
@@ -1579,7 +1610,7 @@ extension DiaryViewController {
             _button.addShadowView()
             _button.isHidden = true
             _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(presentFoodCategory), for: .touchUpInside)
+            _button.addTarget(self, action: #selector(presentDiseaseCategory), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
@@ -1624,8 +1655,8 @@ extension DiaryViewController {
         view.addSubview(activityBtn)
         view.addSubview(diseaseBtn)
         view.addSubview(guideIllustImgView)
-        view.addSubview(calendarView)
         view.addSubview(pullToRefreshLabel)
+        view.addSubview(calendarView)
         view.addSubview(diseaseHistoryBtn)
         view.addSubview(toggleBtn)
         view.addSubview(blindView)
@@ -1738,14 +1769,14 @@ extension DiaryViewController {
         toggleBtn.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
         toggleBtn.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
         
-        pullToRefreshLabel.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 20).isActive = true
-        pullToRefreshLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        
         logGroupTable.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
         logGroupTable.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         logGroupTable.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         logGroupTable.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
         logGroupTable.panGestureRecognizer.require(toFail: scopeGesture)
+        
+        pullToRefreshLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 120).isActive = true
+        pullToRefreshLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
         
         guideLabel.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: -(view.frame.height * 0.16)).isActive = true
         guideLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true

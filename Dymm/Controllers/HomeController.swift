@@ -46,6 +46,7 @@ class HomeViewController: UIViewController {
     // UIButton
     var profileButton: UIButton!
     
+    // Non-view properties
     var lang: LangPack!
     var retryFunction: (() -> Void)?
     var banners: [BaseModel.Banner]?

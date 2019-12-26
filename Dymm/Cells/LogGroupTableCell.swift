@@ -13,22 +13,35 @@ private let logTableCellId = "LogTableCell"
 private let logTableCellHeightInt = 45
 
 class LogGroupTableCell: UITableViewCell {
+    // UIView
     var containerView: UIView!
-    var containerViewHight: NSLayoutConstraint!
-    var arrowImageView: UIImageView!
-    var groupTypeImageView: UIImageView!
-    var condScoreImageView: UIImageView!
-    var noteImageView: UIImageView!
-    var nameLabel: UILabel!
     var foodLogBulletView: UIView!
     var actLogBulletView: UIView!
     var drugLogBulletView: UIView!
+    
+    // UITableView
     var groupOfLogsTableView: UITableView!
-    var groupOfLogsTableHeight: NSLayoutConstraint!
-    var condScoreButton: UIButton!
+    
+    // UIImageView
+    var arrowImageView: UIImageView!
+    var groupTypeImageView: UIImageView!
+    var moodScoreImageView: UIImageView!
+    var noteImageView: UIImageView!
+    
+    // UILabel
+    var nameLabel: UILabel!
+    var moodBtnGuideLabel: UILabel!
+    
+    // UIButton
+    var moodScoreButton: UIButton!
     var noteButton: UIButton!
     var logCellButton: UIButton!
     
+    // NSLayoutConstraint
+    var containerViewHight: NSLayoutConstraint!
+    var groupOfLogsTableHeight: NSLayoutConstraint!
+    
+    // Non-view properties
     var lang: LangPack!
     var selectedLogGroup: BaseModel.LogGroup?
     var groupOfLogSetForCnt: CustomModel.GroupOfLogSet?
@@ -208,7 +221,7 @@ extension LogGroupTableCell {
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
-        condScoreImageView = {
+        moodScoreImageView = {
             let _imageView = UIImageView()
             _imageView.frame = CGRect(x: 0, y: 0, width: 21, height: 21)
             _imageView.contentMode = .scaleAspectFit
@@ -225,7 +238,7 @@ extension LogGroupTableCell {
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
-        condScoreButton = {
+        moodScoreButton = {
             let _button = UIButton()
             _button.addShadowView()
             _button.adjustsImageSizeForAccessibilityContentSizeCategory = true
@@ -247,6 +260,16 @@ extension LogGroupTableCell {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 15)
             _label.textAlignment = .left
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        moodBtnGuideLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 15)
+            _label.textAlignment = .left
+            _label.textColor = .purple_948BFF
+            _label.text = lang.titleClick
+            _label.isHidden = true
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -301,13 +324,14 @@ extension LogGroupTableCell {
         containerView.addSubview(arrowImageView)
         containerView.addSubview(groupTypeImageView)
         containerView.addSubview(nameLabel)
-        containerView.addSubview(condScoreImageView)
+        containerView.addSubview(moodScoreImageView)
         containerView.addSubview(noteImageView)
         containerView.addSubview(foodLogBulletView)
         containerView.addSubview(actLogBulletView)
         containerView.addSubview(drugLogBulletView)
         containerView.addSubview(groupOfLogsTableView)
-        containerView.addSubview(condScoreButton)
+        containerView.addSubview(moodScoreButton)
+        containerView.addSubview(moodBtnGuideLabel)
         containerView.addSubview(noteButton)
         
         containerView.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
@@ -326,11 +350,11 @@ extension LogGroupTableCell {
         nameLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 15).isActive = true
         nameLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor, constant: 0).isActive = true
         
-        condScoreImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12).isActive = true
-        condScoreImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -((frame.width / 4) + 10)).isActive = true
+        moodScoreImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12).isActive = true
+        moodScoreImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -((frame.width / 4) + 10)).isActive = true
         
         noteImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 13).isActive = true
-        noteImageView.leadingAnchor.constraint(equalTo: condScoreImageView.trailingAnchor, constant: 12).isActive = true
+        noteImageView.leadingAnchor.constraint(equalTo: moodScoreImageView.trailingAnchor, constant: 12).isActive = true
         
         foodLogBulletView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 20).isActive = true
         foodLogBulletView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20).isActive = true
@@ -354,10 +378,13 @@ extension LogGroupTableCell {
         groupOfLogsTableHeight.priority = UILayoutPriority(rawValue: 999)
         groupOfLogsTableHeight.isActive = true
         
-        condScoreButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor, constant: 0).isActive = true
-        condScoreButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: 0).isActive = true
-        condScoreButton.widthAnchor.constraint(equalToConstant: CGFloat(logGroupFooterHeightInt)).isActive = true
-        condScoreButton.heightAnchor.constraint(equalToConstant: CGFloat(logGroupFooterHeightInt)).isActive = true
+        moodScoreButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor, constant: 0).isActive = true
+        moodScoreButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: 0).isActive = true
+        moodScoreButton.widthAnchor.constraint(equalToConstant: CGFloat(logGroupFooterHeightInt)).isActive = true
+        moodScoreButton.heightAnchor.constraint(equalToConstant: CGFloat(logGroupFooterHeightInt)).isActive = true
+        
+        moodBtnGuideLabel.leadingAnchor.constraint(equalTo: moodScoreButton.trailingAnchor, constant: 15).isActive = true
+        moodBtnGuideLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16).isActive = true
         
         noteButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: 0).isActive = true
         noteButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 0).isActive = true

@@ -57,7 +57,7 @@ class RankingViewController: UIViewController {
     var lastContentOffset: CGFloat = 0.0
     var isScrollToLoading: Bool = false
     var currPageNum: Int = 1
-    var minimumCnt: Int = 15
+    var minimumCnt: Int = 20
     
     var startingPickKeys = [1, 2, 3, 4]
     var ageGroupPickKeys = [1, 2, 3, 4, 5]
@@ -93,6 +93,10 @@ class RankingViewController: UIViewController {
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             self.startingPickButton.setTitle(LangHelper.getStartingPickName(key: self.selectedStartingKey), for: .normal)
+            self.currPageNum = 1
+            self.minimumCnt = 20
+            self.isScrollToLoading = false
+            self.lastContentOffset = 0.0
             self.loadRankings()
         })
         alert.view.tintColor = .purple_B847FF
@@ -114,6 +118,10 @@ class RankingViewController: UIViewController {
                 self.ageGroupPickButton.setTitle(LangHelper.getAgeGroupKorPickName(key: self.selectedAgeGroupKey), for: .normal)
             default: fatalError()}
             self.loadMyRanking()
+            self.currPageNum = 1
+            self.minimumCnt = 20
+            self.isScrollToLoading = false
+            self.lastContentOffset = 0.0
             self.loadRankings()
         })
         alert.view.tintColor = .purple_B847FF
@@ -216,7 +224,7 @@ extension RankingViewController: UITableViewDataSource, UITableViewDelegate {
             if _rankings.count == minimumCnt {
                 isScrollToLoading = true
                 currPageNum += 1
-                minimumCnt += 15
+                minimumCnt += 20
                 loadRankings()
             }
         }
@@ -565,6 +573,7 @@ extension RankingViewController {
                     self.rankings!.append(contentsOf: newRankings)
                     self.rankingTableView.reloadData()
                 }
+                self.view.hideSpinner()
                 return
             }
             self.rankings = rankingSet.rankings
