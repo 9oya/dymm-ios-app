@@ -2143,7 +2143,7 @@ extension DiaryViewController {
         yearNumber = Int(selectedDateArr[0])!
         monthNumber = Int(selectedDateArr[1])!
         let service = Service(lang: lang)
-        service.getAvgCondScore(yearNumber: selectedDateArr[0], monthNumber: Int(selectedDateArr[1])!, weekOfYear: weekOfYear, popoverAlert: { (message) in
+        service.getAvgCondScore(yearNumber: yearNumber!, yearForWeekOfYear: yearForWeekOfYear!, monthNumber: monthNumber, weekOfYear: weekOfYear, popoverAlert: { (message) in
             self.retryFunction = self.loadAvgCondScore
             self.alertError(message)
         }, tokenRefreshCompletion: {
