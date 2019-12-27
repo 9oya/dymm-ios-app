@@ -359,7 +359,8 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        Alamofire.request("\(URI.host)\(URI.avatar)/\(avatarId)/group-note/\(page)", headers: headers)
+        // TODO: Remove /new
+        Alamofire.request("\(URI.host)\(URI.avatar)/new/\(avatarId)/group-note/\(page)", headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {

@@ -488,6 +488,10 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if collectionView == tagCollection {
+            let tag = subTags?[indexPath.item]
+            if tag!.id == TagId.history {
+                return CGSize(width: view.frame.width - 14, height: CGFloat(tagCellHeightInt))
+            }
             return CGSize(width: (view.frame.width / 2) - 10.5, height: CGFloat(tagCellHeightInt))
         } else if collectionView == stepCollection {
             let tag = stepTags[indexPath.row]

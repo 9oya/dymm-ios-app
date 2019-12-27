@@ -116,6 +116,7 @@ struct TagId {
     static let bookmarks = 18
     static let language = 20
     static let dateOfBirth = 23
+    static let history = 24
     static let subscription = 14641
     static let password = 14642
     static let ranking = 14644
