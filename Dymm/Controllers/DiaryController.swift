@@ -106,6 +106,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var selectedLogGroupId: Int?
     var selectedCalScope: Int?
     var selectedWeekOfYear: Int?
+    var yearForWeekOfYear: Int?
     var selectedDate: String?
     var selectedOnceCellIdxPath: IndexPath?
     var selectedDiseasePickerIdx = 3
@@ -382,6 +383,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             toggleBtn.setImage(UIImage.itemArrowMaximize.withRenderingMode(.alwaysOriginal), for: .normal)
             selectedCalScope = CalScope.week
             selectedWeekOfYear = Calendar.current.component(.weekOfYear, from: calendarView.currentPage)
+            yearForWeekOfYear = Calendar.current.component(.yearForWeekOfYear, from: calendarView.currentPage)
             loadLogGroups()
         } else {
             calendarView.setScope(.month, animated: true)
@@ -447,7 +449,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         })
     }
     
-    @objc func condRefreshButtonTapped() {
+    @objc func diseaseRefreshButtonTapped() {
         loadAvatarDiseasHistory()
     }
     
@@ -555,6 +557,8 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         selectedTableSection = nil
         selectedTableRow = nil
         let weekOfYear = Calendar.current.component(.weekOfYear, from: calendar.currentPage)
+//        let month = Calendar.current.component(.month, from: calendar.currentPage)
+        yearForWeekOfYear = Calendar.current.component(.yearForWeekOfYear, from: calendar.currentPage)
         if calendar.scope == .week {
             selectedCalScope = CalScope.week
             selectedWeekOfYear = weekOfYear
@@ -1523,7 +1527,7 @@ extension DiaryViewController {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemReload.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(condRefreshButtonTapped), for: .touchUpInside)
+            _button.addTarget(self, action: #selector(diseaseRefreshButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
@@ -1644,6 +1648,8 @@ extension DiaryViewController {
         groupTypePicker.delegate = self
         
         selectedWeekOfYear = Calendar.current.component(.weekOfYear, from: calendarView.today!)
+        yearNumber = Calendar.current.component(.year, from: calendarView.today!)
+        yearForWeekOfYear = Calendar.current.component(.yearForWeekOfYear, from: calendarView.today!)
         selectedCalScope = CalScope.week
         groupType = LogGroupType.morning
         
@@ -1844,6 +1850,7 @@ extension DiaryViewController {
     private func afterLoadGroupOfLogs(_ collectionViewHeightVal: Int) {
         let logGroup = selectedLogGroup!
         yearNumber = logGroup.year_number
+        yearForWeekOfYear = logGroup.year_forweekofyear
         monthNumber = logGroup.month_number
         dayNumber = logGroup.day_number
         weekOfYear = logGroup.week_of_year
@@ -1864,7 +1871,7 @@ extension DiaryViewController {
     private func loadLogGroups() {
         let selectedDateArr = dateFormatter.string(from: calendarView.currentPage).components(separatedBy: "-")
         let service = Service(lang: lang)
-        service.getLogGroups(yearNumber: selectedDateArr[0], monthNumber: Int(selectedDateArr[1])!, weekOfYear: selectedWeekOfYear, popoverAlert: { message in
+        service.getLogGroups(yearNumber: Int(selectedDateArr[0])!, yearForWeekOfYear: yearForWeekOfYear!, monthNumber: Int(selectedDateArr[1])!, weekOfYear: selectedWeekOfYear, popoverAlert: { message in
             self.retryFunction = self.loadLogGroups
             self.alertError(message)
         }, tokenRefreshCompletion: {
@@ -2032,6 +2039,7 @@ extension DiaryViewController {
             "avatar_id": avatarId,
             "tag_id": selectedTag!.id,
             "year_number": yearNumber!,
+            "year_forweekofyear": yearForWeekOfYear!,
             "month_number": monthNumber!,
             "week_of_year": weekOfYear!,
             "day_of_year": dayOfYear!,

@@ -300,7 +300,7 @@ struct Service {
         }
     }
     
-    func getLogGroups(yearNumber: String, monthNumber: Int, weekOfYear: Int?, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping ([BaseModel.LogGroup]) -> Void) {
+    func getLogGroups(yearNumber: Int, yearForWeekOfYear: Int, monthNumber: Int, weekOfYear: Int?, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping ([BaseModel.LogGroup]) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -312,9 +312,10 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        var url = "\(URI.host)\(URI.avatar)/\(avatarId)/group/\(yearNumber)/\(monthNumber)"
+        // TODO: Remove /new
+        var url = "\(URI.host)\(URI.avatar)/new/\(avatarId)/group/\(yearNumber)/\(monthNumber)"
         if let weekOfYear = weekOfYear {
-            url += "/\(weekOfYear)"
+            url = "\(URI.host)\(URI.avatar)/new/\(avatarId)/group/\(yearForWeekOfYear)/\(monthNumber)/\(weekOfYear)"
         }
         Alamofire.request(url, headers: headers)
             .validate(contentType: ["application/json"])
@@ -856,7 +857,8 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        Alamofire.request("\(URI.host)\(URI.avatar)/log", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
+        // TODO: Remove /new
+        Alamofire.request("\(URI.host)\(URI.avatar)/new/log", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {

@@ -221,7 +221,7 @@ class ProfileViewController: UIViewController {
             NotificationCenter.default.addObserver(forName: UITextField.textDidChangeNotification, object: textField, queue: OperationQueue.main) { (notification) in
                 if textField.text! == "" {
                     confirmAction.isEnabled = false
-                } else if textField.text!.count < 2 {
+                } else if textField.text!.count < 1 {
                     confirmAction.isEnabled = false
                 } else {
                     confirmAction.isEnabled = true

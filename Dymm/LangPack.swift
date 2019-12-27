@@ -1104,7 +1104,7 @@ struct LangPack {
         }()
         self.msgSignUpYet = {
             switch currentLanguageId {
-            case LanguageId.eng: return "I can't find a logged in account."
+            case LanguageId.eng: return "I can't find a signed in account."
             case LanguageId.kor: return "로그인된 계정을 찾지 못했어요."
             default: fatalError()}
         }()
