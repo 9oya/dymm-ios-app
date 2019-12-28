@@ -87,7 +87,7 @@ struct LangPack {
     var titleRetry: String!
     var titleSearch: String!
     var titleSend: String!
-    var titleSendAgain: String!
+    var titleSendVerifMail: String!
     var titleSignIn: String!
     var titleSignOut: String!
     var titleSignUp: String!
@@ -664,10 +664,10 @@ struct LangPack {
             case LanguageId.kor: return "전송"
             default: fatalError()}
         }()
-        self.titleSendAgain = {
+        self.titleSendVerifMail = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Send it again"
-            case LanguageId.kor: return "다시 보내기"
+            case LanguageId.eng: return "Send Verification Mail"
+            case LanguageId.kor: return "인증메일 보내기"
             default: fatalError()}
         }()
         self.titleSignIn = {
@@ -977,14 +977,14 @@ struct LangPack {
         }()
         self.msgMailNotConfirmed = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your email address is not verified. \nPlease verify your email."
-            case LanguageId.kor: return "메일주소가 검증되지 않았습니다.\n메일을 확인해 주세요."
+            case LanguageId.eng: return "Your email address is not currently verified. \nPlease check your mailbox and click the verify link."
+            case LanguageId.kor: return "메일주소가 현재 검증되지 않았습니다.\n메일계정의 편지함을 확인하고 검증링크를 클릭해 주세요."
             default: fatalError()}
         }()
         self.msgMailSendAgainComplete = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your account verification email has been resent.\nPlease verify your new email."
-            case LanguageId.kor: return "계정 확인 메일이 다시 보내졌습니다.\n새 메일을 확인해 주세요."
+            case LanguageId.eng: return "Your account verification email has been sent.\nPlease check your mailbox and click the verify link."
+            case LanguageId.kor: return "계정 확인메일이 보내졌습니다.\n메일계정의 편지함을 확인하고 검증링크를 클릭해 주세요."
             default: fatalError()}
         }()
         func _msgMailSendValidCode(_ email: String) -> String {

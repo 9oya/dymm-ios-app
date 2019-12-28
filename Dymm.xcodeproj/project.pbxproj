@@ -46,6 +46,7 @@
 		F59C14DD235BC418004A3B41 /* IAPController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59C14DC235BC418004A3B41 /* IAPController.swift */; };
 		F59C14E1235BF993004A3B41 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59C14E0235BF992004A3B41 /* Utilities.swift */; };
 		F5A194912390BBD20020C082 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5A194902390BBD20020C082 /* Assets.xcassets */; };
+		F5C9CC9823B7EA490054916E /* UIButton+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5C9CC9723B7EA490054916E /* UIButton+Helpers.swift */; };
 		F5D6A653236AC19C00E9CDE9 /* RankingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D6A652236AC19C00E9CDE9 /* RankingController.swift */; };
 		F5D6A655236AC27600E9CDE9 /* RankingTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D6A654236AC27600E9CDE9 /* RankingTableCell.swift */; };
 		F5FC19CB233C4D2600116F71 /* ColorCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FC19CA233C4D2600116F71 /* ColorCollectionCell.swift */; };
@@ -254,6 +255,7 @@
 		F59C14DC235BC418004A3B41 /* IAPController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPController.swift; sourceTree = "<group>"; };
 		F59C14E0235BF992004A3B41 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		F5A194902390BBD20020C082 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F5C9CC9723B7EA490054916E /* UIButton+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Helpers.swift"; sourceTree = "<group>"; };
 		F5D6A652236AC19C00E9CDE9 /* RankingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingController.swift; sourceTree = "<group>"; };
 		F5D6A654236AC27600E9CDE9 /* RankingTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingTableCell.swift; sourceTree = "<group>"; };
 		F5FC19CA233C4D2600116F71 /* ColorCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCollectionCell.swift; sourceTree = "<group>"; };
@@ -371,6 +373,7 @@
 				6A8D899C22F8898B00A7F333 /* UIView+LayerHelpers.swift */,
 				6A8D899A22F8898B00A7F333 /* UIViewController+Views.swift */,
 				F5451EEC233593A80094B3D9 /* UIImageView+Download.swift */,
+				F5C9CC9723B7EA490054916E /* UIButton+Helpers.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -702,6 +705,7 @@
 				F5344083231E5D9A00FAC84B /* NoteController.swift in Sources */,
 				6A62B36D230C75C20012C83D /* NSMutableAttributedString+Coloring.swift in Sources */,
 				6A8D898022F8891E00A7F333 /* LogGroupTableCell.swift in Sources */,
+				F5C9CC9823B7EA490054916E /* UIButton+Helpers.swift in Sources */,
 				6A8D89A322F8898B00A7F333 /* UserDefaults+GetSet.swift in Sources */,
 				6A62B36B230750E60012C83D /* UIImage+Assets.swift in Sources */,
 				6A8D89A122F8898B00A7F333 /* String+Validation.swift in Sources */,
@@ -874,7 +878,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.6.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.9oya.Dymm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Dymm/bridge-header.h";
@@ -899,7 +903,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.6.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.9oya.Dymm;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Dymm/bridge-header.h";

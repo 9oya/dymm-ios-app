@@ -21,17 +21,19 @@ struct Service {
     
     func badRequest(_ responseData: Data) {
         guard let decodedData = try? self.decoder.decode(BadRequest.self, from: responseData) else {
-            fatalError("Decode \(BadRequest.self) failed")
+            print("Decode \(BadRequest.self) failed")
+            return
         }
-        fatalError("\(decodedData.message)")
+        print("\(decodedData.message)")
     }
     
     func unexpectedResponse(_ statusCode: Int, _ data: Data, _ name: String) {
         print("Request \(name) failed \nStatus Code: \(statusCode)")
         guard let json = ((try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]) as [String : Any]??) else {
-            fatalError("Decode error message failed")
+            print("Decode error message failed")
+            return
         }
-        fatalError(String(describing: json))
+        print(String(describing: json))
     }
     
     func convertLogGroupsIntoTwoDimLogGroupSectArr(_ logGroups: [BaseModel.LogGroup]) -> [[CustomModel.LogGroupSection]] {
@@ -441,7 +443,7 @@ struct Service {
         }
     }
     
-    func getScoreBoard(yearNumber: String, monthNumber: Int?, unauthorized: @escaping (_ pattern: Int) -> Void, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.ScoreBoardSet) -> Void) {
+    func getScoreBoard(yearNumber: Int, monthNumber: Int?, unauthorized: @escaping (_ pattern: Int) -> Void, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.ScoreBoardSet) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -910,7 +912,10 @@ struct Service {
                     self.badRequest(responseData)
                 case 401:
                     UserDefaults.standard.setIsSignIn(value: false)
-                    fatalError()
+                    return
+                case 403:
+                    UserDefaults.standard.setIsSignIn(value: false)
+                    return
                 default:
                     self.unexpectedResponse(statusCode, responseData, "sendMailConfLinkAgain()")
                     return
@@ -939,13 +944,11 @@ struct Service {
                 case 400:
                     self.badRequest(responseData)
                 case 401:
-                    UserDefaults.standard.setIsSignIn(value: false)
                     return
                 case 403:
-                    UserDefaults.standard.setIsSignIn(value: false)
                     return
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "sendMailConfLinkAgain()")
+                    self.unexpectedResponse(statusCode, responseData, "sendUserOpinionMail()")
                     return
                 }
         }

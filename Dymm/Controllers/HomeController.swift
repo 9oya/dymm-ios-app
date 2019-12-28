@@ -369,9 +369,8 @@ extension HomeViewController {
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = .whiteSmoke
         let date = Date()
-        let calendar = Calendar.current
-        currentYear = calendar.component(.year, from: date)
-        currentMonth = calendar.component(.month, from: date)
+        currentYear = Calendar.current.component(.year, from: date)
+        currentMonth = Calendar.current.component(.month, from: date)
         
         // Initialize subveiw properties
         tagCollectionView = getCategoryCollectionView()
@@ -658,7 +657,7 @@ extension HomeViewController {
     
     private func loadScoreboard() {
         let service = Service(lang: lang)
-        service.getScoreBoard(yearNumber: "\(selectedYear!)", monthNumber: selectedMonth, unauthorized: { (errorCode) in
+        service.getScoreBoard(yearNumber: selectedYear!, monthNumber: selectedMonth, unauthorized: { (errorCode) in
             self.alertUnauthError(self.lang.msgAccountInvalid)
         }, popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
