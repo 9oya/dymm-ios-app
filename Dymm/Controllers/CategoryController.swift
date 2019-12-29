@@ -184,10 +184,11 @@ class CategoryViewController: UIViewController {
     
     @objc func alertCompl(_ title: String, _ message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let confirmAction = UIAlertAction(title: lang.titleYes, style: .default) { _ in
-            self.dismiss(animated: true, completion: nil)
+        let confirmAction = UIAlertAction(title: lang.titleReturn, style: .default) { _ in
+            let controller = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 2]
+            self.navigationController?.popToViewController(controller!, animated: true)
         }
-        let cancelAction = UIAlertAction(title: lang.titleNo, style: .cancel) { _ in
+        let cancelAction = UIAlertAction(title: lang.titleStay, style: .cancel) { _ in
             _ = self.navigationController?.popViewController(animated: true)
         }
         alert.addAction(confirmAction)
@@ -252,8 +253,8 @@ class CategoryViewController: UIViewController {
     }
     
     @objc func presentIAPController() {
-            let vc = IAPController()
-            self.navigationController?.pushViewController(vc, animated: true)
+        let vc = IAPController()
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func homeButtonTapped() {
@@ -835,12 +836,11 @@ extension CategoryViewController {
         }()
         homeButton = {
             let _button = UIButton(type: .system)
-            switch topLeftButtonType {
-            case ButtonType.home:
+            if topLeftButtonType == ButtonType.home {
                 _button.setImage(UIImage.itemHome.withRenderingMode(.alwaysOriginal), for: .normal)
-            case ButtonType.close:
+            } else if topLeftButtonType == ButtonType.close {
                 _button.setImage(UIImage.itemCloseThin.withRenderingMode(.alwaysOriginal), for: .normal)
-            default: fatalError()}
+            }
             _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
@@ -928,7 +928,9 @@ extension CategoryViewController {
         searchTextField.delegate = self
         
         // Setup subviews
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
+        if topLeftButtonType != ButtonType.back {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
+        }
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: sendOpinionBtn)
         view.addSubview(stepCollection)
         view.addSubview(searchTextField)
@@ -1340,7 +1342,7 @@ extension CategoryViewController {
             "log_date": selectedDate!
         ]
         let service = Service(lang: lang)
-        service.postAvatarCond(params: params, popoverAlert: { (message) in
+        service.postAvatarDisease(params: params, popoverAlert: { (message) in
             self.retryFunction = self.createAMoodScoreLog
             self.detailContainer.isHidden = true
             self.alertError(message)

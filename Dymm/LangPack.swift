@@ -17,7 +17,6 @@ struct LangPack {
     var titleAll: String!
     var titleAvgMoodScoreWeek: String!
     var titleAvgMoodScoreMonth: String!
-    var titleBackHome: String!
     var titleCamera: String!
     var titleCancel: String!
     var titleChooseColor: String!
@@ -50,6 +49,7 @@ struct LangPack {
     var titleFreeTrial: String!
     var titleGender: String!
     var titleGuest: String!
+    var titleHome: String!
     var titleIncorrectEmailCode: String!
     var titleIncorrectOldPassword: String!
     var titleIntro: String!
@@ -85,6 +85,7 @@ struct LangPack {
     var titleRestoreCompl: String!
     var titleRestoreProduct: String!
     var titleRetry: String!
+    var titleReturn: String!
     var titleSearch: String!
     var titleSend: String!
     var titleSendVerifMail: String!
@@ -240,12 +241,6 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "My Weekly Mood Score"
             case LanguageId.kor: return "나의 주간 기분점수"
-            default: fatalError()}
-        }()
-        self.titleBackHome = {
-            switch currentLanguageId {
-            case LanguageId.eng: return "Back to Home"
-            case LanguageId.kor: return "홈으로 돌아가기"
             default: fatalError()}
         }()
         self.titleCamera = {
@@ -438,6 +433,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Guest"
             case LanguageId.kor: return "게스트"
+            default: fatalError()}
+        }()
+        self.titleHome = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Home"
+            case LanguageId.kor: return "홈"
             default: fatalError()}
         }()
         self.titleIncorrectEmailCode = {
@@ -650,6 +651,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Retry"
             case LanguageId.kor: return "다시하기"
+            default: fatalError()}
+        }()
+        self.titleReturn = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Return"
+            case LanguageId.kor: return "돌아가기"
             default: fatalError()}
         }()
         self.titleSearch = {
@@ -959,8 +966,8 @@ struct LangPack {
         }()
         self.msgLogComplete = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Successfully recorded!\n\nWant to back Home?"
-            case LanguageId.kor: return "성공적으로 기록되었습니다!\n\n홈으로 이동하시겠습니까?"
+            case LanguageId.eng: return "Successfully recorded!"
+            case LanguageId.kor: return "성공적으로 기록되었습니다!"
             default: fatalError()}
         }()
         self.msgMailEnter = {
@@ -971,8 +978,8 @@ struct LangPack {
         }()
         self.msgMailModified = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your email address has changed.\nPlease verify your new email."
-            case LanguageId.kor: return "메일주소가 변경되었습니다.\n새 메일을 확인해 주세요."
+            case LanguageId.eng: return "Your email address has changed.\nPlease check your mailbox and click the verify link."
+            case LanguageId.kor: return "메일주소가 변경되었습니다.\n메일계정의 편지함을 확인하고 검증링크를 클릭해 주세요."
             default: fatalError()}
         }()
         self.msgMailNotConfirmed = {
@@ -1002,7 +1009,7 @@ struct LangPack {
         }()
         self.msgNetworkFailure = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Unable to access the server.\n\nWant to try again?"
+            case LanguageId.eng: return "Communication with the server is not smooth.\n\nWould you like to try again?"
             case LanguageId.kor: return "서버와의 통신이 원활하지 않습니다.\n\n다시 시도하시겠습니다?"
             default: fatalError()}
         }()

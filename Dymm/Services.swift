@@ -779,7 +779,7 @@ struct Service {
         }
     }
     
-    func postAvatarCond(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+    func postAvatarDisease(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             print("Load UserDefaults.standard.getAccessToken() failed")
             return
@@ -909,12 +909,19 @@ struct Service {
                 case 200:
                     completion()
                 case 400:
-                    self.badRequest(responseData)
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
                 case 401:
-                    UserDefaults.standard.setIsSignIn(value: false)
+                    popoverAlert(self.lang.msgNetworkFailure)
                     return
                 case 403:
-                    UserDefaults.standard.setIsSignIn(value: false)
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                case 404:
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                case 500:
+                    popoverAlert(self.lang.msgNetworkFailure)
                     return
                 default:
                     self.unexpectedResponse(statusCode, responseData, "sendMailConfLinkAgain()")
@@ -942,10 +949,19 @@ struct Service {
                 case 200:
                     completion()
                 case 400:
-                    self.badRequest(responseData)
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
                 case 401:
+                    popoverAlert(self.lang.msgNetworkFailure)
                     return
                 case 403:
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                case 404:
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                case 500:
+                    popoverAlert(self.lang.msgNetworkFailure)
                     return
                 default:
                     self.unexpectedResponse(statusCode, responseData, "sendUserOpinionMail()")

@@ -90,6 +90,7 @@ struct DiaryMode {
 struct ButtonType {
     static let home = 1
     static let close = 2
+    static let back = 3
 }
 
 struct CalScope {

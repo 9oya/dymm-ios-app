@@ -158,7 +158,8 @@ class ProfileViewController: UIViewController {
     @objc func signOutButtonTapped() {
         UserDefaults.standard.setIsSignIn(value: false)
         UserDefaults.standard.setAvatarId(value: 0)
-        dismiss(animated: true, completion: nil)
+        _ = navigationController?.popViewController(animated: true)
+//        dismiss(animated: true, completion: nil)
     }
     
     @objc func sendMailAgainBtnTapped() {
@@ -977,7 +978,7 @@ extension ProfileViewController {
         colorContainer.addSubview(colorRightButton)
         
         setupLangProperties()
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
+//        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
         tagCollection.dataSource = self
         tagCollection.delegate = self
         colorCollection.dataSource = self

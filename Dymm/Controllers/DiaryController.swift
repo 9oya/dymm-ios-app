@@ -68,6 +68,15 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var pillBtn: UIButton!
     var activityBtn: UIButton!
     var diseaseBtn: UIButton!
+    var plusBtn: UIButton!
+    var foodPlusBtn: UIButton!
+    var pillPlusBtn: UIButton!
+    var activityPlusBtn: UIButton!
+    var diseasePlusBtn: UIButton!
+    var plusBtns: [UIButton]!
+    
+    // UI
+    var plusBtnStackView: UIStackView!
     
     // UIImageView
     var guideIllustImgView: UIImageView!
@@ -130,6 +139,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var isLogGroupTableEdited: Bool = false
     var isCondEditBtnTapped: Bool = false
     var isFirstAppear: Bool = true
+    var isPlusBtnTapped: Bool = false
     var superTag: BaseModel.Tag?
     
     override func viewDidLoad() {
@@ -140,6 +150,10 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     override func viewWillAppear(_ animated: Bool) {
         diseaseLeftBtnTapped()
+        selectedOnceCellIdxPath = nil
+        selectedTableSection = nil
+        selectedTableRow = nil
+        loadLogGroups()
     }
     
     // MARK: - Actions
@@ -161,11 +175,12 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     @objc func alertCompl(_ title: String, _ message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: lang.titleNo, style: .cancel) { _ in
+        alert.addAction(UIAlertAction(title: lang.titleStay, style: .cancel) { _ in
             _ = self.navigationController?.popViewController(animated: true)
         })
-        alert.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
-            self.dismiss(animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: lang.titleReturn, style: .default) { _ in
+            let controller = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 3]
+            self.navigationController?.popToViewController(controller!, animated: true)
         })
         alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
@@ -477,42 +492,55 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     @objc func presentCategoryWhenGroupOfALogCellTapped(sender: UIButton) {
         let vc = CategoryViewController()
-        vc.topLeftButtonType = ButtonType.close
         vc.superTagId = sender.tag
-        let nc = UINavigationController(rootViewController: vc)
-        present(nc, animated: true, completion: nil)
+        vc.topLeftButtonType = ButtonType.back
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentFoodCategory() {
         let vc = CategoryViewController()
-        vc.topLeftButtonType = ButtonType.close
         vc.superTagId = TagId.food
-        let nc = UINavigationController(rootViewController: vc)
-        present(nc, animated: true, completion: nil)
+        vc.topLeftButtonType = ButtonType.back
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentPillCategory() {
         let vc = CategoryViewController()
-        vc.topLeftButtonType = ButtonType.close
         vc.superTagId = TagId.pill
-        let nc = UINavigationController(rootViewController: vc)
-        present(nc, animated: true, completion: nil)
+        vc.topLeftButtonType = ButtonType.back
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentActivityCategory() {
         let vc = CategoryViewController()
-        vc.topLeftButtonType = ButtonType.close
         vc.superTagId = TagId.activity
-        let nc = UINavigationController(rootViewController: vc)
-        present(nc, animated: true, completion: nil)
+        vc.topLeftButtonType = ButtonType.back
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentDiseaseCategory() {
         let vc = CategoryViewController()
-        vc.topLeftButtonType = ButtonType.close
         vc.superTagId = TagId.disease
-        let nc = UINavigationController(rootViewController: vc)
-        present(nc, animated: true, completion: nil)
+        vc.topLeftButtonType = ButtonType.back
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc func plusBtnTapped() {
+        UIView.animate(withDuration: 0.3, animations: {
+            if self.isPlusBtnTapped {
+                self.plusBtn.transform = CGAffineTransform(rotationAngle: 0)
+                self.plusBtn.backgroundColor = .purple_921BEA
+                self.isPlusBtnTapped = false
+            } else {
+                self.plusBtn.transform = CGAffineTransform(rotationAngle: (.pi / 2))
+                self.plusBtn.backgroundColor = .green_3ED6A7
+                self.isPlusBtnTapped = true
+            }
+            self.plusBtns.forEach { (button) in
+                button.isHidden = !button.isHidden
+                self.view.layoutIfNeeded()
+            }
+        })
     }
     
     // MARK: - UIGestureRecognizerDelegate
@@ -1119,8 +1147,8 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             let vc = CategoryViewController()
             vc.topLeftButtonType = ButtonType.close
             vc.superTagId = avtCondList![indexPath.item].tag_id
-            let nc = UINavigationController(rootViewController: vc)
-            present(nc, animated: true, completion: nil)
+            vc.topLeftButtonType = ButtonType.back
+            self.navigationController?.pushViewController(vc, animated: true)
         default:
             fatalError()
         }
@@ -1618,6 +1646,68 @@ extension DiaryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
+        plusBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemBtnPlusTrans.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.backgroundColor = .purple_921BEA
+            _button.layer.cornerRadius = 13.0
+            _button.addShadowView()
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(plusBtnTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        foodPlusBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemPlusFood.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addShadowView()
+            _button.addTarget(self, action: #selector(presentFoodCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        pillPlusBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemPlusPill.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addShadowView()
+            _button.addTarget(self, action: #selector(presentPillCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        activityPlusBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemPlusActivity.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addShadowView()
+            _button.addTarget(self, action: #selector(presentActivityCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        diseasePlusBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemPlusDisease.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addShadowView()
+            _button.addTarget(self, action: #selector(presentDiseaseCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        plusBtnStackView = {
+            let stackView = UIStackView()
+            stackView.axis = .vertical
+            stackView.distribution = .equalSpacing
+            stackView.alignment = .center
+            stackView.spacing = 10.0
+            stackView.translatesAutoresizingMaskIntoConstraints = false
+            return stackView
+        }()
+        
         guideIllustImgView = {
             let _imageView = UIImageView()
             _imageView.image = .itemIllustGirl2
@@ -1628,10 +1718,18 @@ extension DiaryViewController {
         }()
         
         if diaryMode == DiaryMode.editor {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeBtn)
+//            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeBtn)
             navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: notesBtn), UIBarButtonItem(customView: avgScoreBtn)]
             calendarView.appearance.titleDefaultColor = UIColor.black
             diseaseHistoryBtn.isHidden = false
+            plusBtn.isHidden = false
+            plusBtns = [foodPlusBtn, pillPlusBtn, activityPlusBtn, diseasePlusBtn]
+            
+            plusBtnStackView.addArrangedSubview(diseasePlusBtn)
+            plusBtnStackView.addArrangedSubview(activityPlusBtn)
+            plusBtnStackView.addArrangedSubview(pillPlusBtn)
+            plusBtnStackView.addArrangedSubview(foodPlusBtn)
+            plusBtnStackView.addArrangedSubview(plusBtn)
         }
         
         calendarView.dataSource = self
@@ -1667,6 +1765,7 @@ extension DiaryViewController {
         view.addSubview(toggleBtn)
         view.addSubview(blindView)
         view.addSubview(diseaseLeftBtn)
+        view.addSubview(plusBtnStackView)
         view.addGestureRecognizer(scopeGesture)
         
         // TODO
@@ -1753,6 +1852,9 @@ extension DiaryViewController {
         diseaseLeftBtn.bottomAnchor.constraint(equalTo: diseaseContainer.bottomAnchor, constant: -5).isActive = true
         diseaseLeftBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
         diseaseLeftBtn.heightAnchor.constraint(equalToConstant: 45).isActive = true
+        
+        plusBtnStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -15).isActive = true
+        plusBtnStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -15).isActive = true
         
         diseaseRightBtn.trailingAnchor.constraint(equalTo: diseaseContainer.trailingAnchor, constant: 0).isActive = true
         diseaseRightBtn.bottomAnchor.constraint(equalTo: diseaseContainer.bottomAnchor, constant: -5).isActive = true

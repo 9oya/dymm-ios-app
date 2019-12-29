@@ -136,38 +136,49 @@ class HomeViewController: UIViewController {
     @objc func presentDiaryNavigation() {
         let vc = DiaryViewController()
         vc.superTag = self.selectedTag!
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .fullScreen
-        present(nc, animated: true, completion: nil)
+//        let nc = UINavigationController(rootViewController: vc)
+//        nc.modalPresentationStyle = .fullScreen
+//        present(nc, animated: true, completion: nil)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentCategoryNavigation() {
         let vc = CategoryViewController()
         vc.superTag = self.selectedTag!
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .fullScreen
-        present(nc, animated: true, completion: nil)
+//        let nc = UINavigationController(rootViewController: vc)
+//        nc.modalPresentationStyle = .fullScreen
+//        present(nc, animated: true, completion: nil)
+        vc.topLeftButtonType = ButtonType.back
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentAuthNavigation() {
         let vc = AuthViewController()
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .fullScreen
-        present(nc, animated: true, completion: nil)
+//        let nc = UINavigationController(rootViewController: vc)
+//        nc.modalPresentationStyle = .fullScreen
+//        present(nc, animated: true, completion: nil)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentProfileNavigation() {
         let vc = ProfileViewController()
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .fullScreen
-        present(nc, animated: true, completion: nil)
+//        let nc = UINavigationController(rootViewController: vc)
+//        nc.modalPresentationStyle = .fullScreen
+//        present(nc, animated: true, completion: nil)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentRankingNavigation() {
         let vc = RankingViewController()
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .fullScreen
-        present(nc, animated: true, completion: nil)
+//        let nc = UINavigationController(rootViewController: vc)
+//        nc.modalPresentationStyle = .fullScreen
+//        present(nc, animated: true, completion: nil)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func profileButtonTapped() {

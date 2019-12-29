@@ -458,7 +458,7 @@ extension RankingViewController {
             return _view
         }()
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
+//        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
         rankingTableView.dataSource = self
         rankingTableView.delegate = self
         startingPickerView.dataSource = self

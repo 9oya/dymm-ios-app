@@ -96,4 +96,9 @@ extension UIImage {
     
     static let itemIllustGirl1 = UIImage(named: "item-illust-girl1")!
     static let itemIllustGirl2 = UIImage(named: "item-illust-girl2")!
+    static let itemBtnPlusTrans = UIImage(named: "item-btn-plus-trans")!
+    static let itemPlusFood = UIImage(named: "item-plus-food")!
+    static let itemPlusPill = UIImage(named: "item-plus-pill")!
+    static let itemPlusActivity = UIImage(named: "item-plus-activity")!
+    static let itemPlusDisease = UIImage(named: "item-plus-disease")!
 }
