@@ -101,4 +101,5 @@ extension UIImage {
     static let itemPlusPill = UIImage(named: "item-plus-pill")!
     static let itemPlusActivity = UIImage(named: "item-plus-activity")!
     static let itemPlusDisease = UIImage(named: "item-plus-disease")!
+    static let itemPlusBookmark = UIImage(named: "item-plus-bookmark")!
 }

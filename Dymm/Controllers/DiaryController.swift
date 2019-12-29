@@ -73,6 +73,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var pillPlusBtn: UIButton!
     var activityPlusBtn: UIButton!
     var diseasePlusBtn: UIButton!
+    var bookmarkPlusBtn: UIButton!
     var plusBtns: [UIButton]!
     
     // UI
@@ -521,6 +522,13 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     @objc func presentDiseaseCategory() {
         let vc = CategoryViewController()
         vc.superTagId = TagId.disease
+        vc.topLeftButtonType = ButtonType.back
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc func presentBookmarkCategory() {
+        let vc = CategoryViewController()
+        vc.superTagId = TagId.bookmarks
         vc.topLeftButtonType = ButtonType.back
         self.navigationController?.pushViewController(vc, animated: true)
     }
@@ -1698,6 +1706,16 @@ extension DiaryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
+        bookmarkPlusBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemPlusBookmark.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addShadowView()
+            _button.addTarget(self, action: #selector(presentBookmarkCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
         plusBtnStackView = {
             let stackView = UIStackView()
             stackView.axis = .vertical
@@ -1723,8 +1741,9 @@ extension DiaryViewController {
             calendarView.appearance.titleDefaultColor = UIColor.black
             diseaseHistoryBtn.isHidden = false
             plusBtn.isHidden = false
-            plusBtns = [foodPlusBtn, pillPlusBtn, activityPlusBtn, diseasePlusBtn]
+            plusBtns = [foodPlusBtn, pillPlusBtn, activityPlusBtn, diseasePlusBtn, bookmarkPlusBtn]
             
+            plusBtnStackView.addArrangedSubview(bookmarkPlusBtn)
             plusBtnStackView.addArrangedSubview(diseasePlusBtn)
             plusBtnStackView.addArrangedSubview(activityPlusBtn)
             plusBtnStackView.addArrangedSubview(pillPlusBtn)

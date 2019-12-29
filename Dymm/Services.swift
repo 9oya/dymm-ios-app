@@ -901,30 +901,15 @@ struct Service {
         Alamofire.request("\(URI.host)\(URI.mail)/conf-link", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                guard let statusCode = response.response?.statusCode else {
                     popoverAlert(self.lang.msgNetworkFailure)
                     return
                 }
                 switch statusCode {
                 case 200:
                     completion()
-                case 400:
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                case 401:
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                case 403:
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                case 404:
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                case 500:
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "sendMailConfLinkAgain()")
+                    popoverAlert(self.lang.msgNetworkFailure)
                     return
                 }
         }
@@ -941,30 +926,15 @@ struct Service {
         Alamofire.request("\(URI.host)\(URI.mail)/opinion", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                guard let statusCode = response.response?.statusCode else {
                     popoverAlert(self.lang.msgNetworkFailure)
                     return
                 }
                 switch statusCode {
                 case 200:
                     completion()
-                case 400:
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                case 401:
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                case 403:
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                case 404:
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
-                case 500:
-                    popoverAlert(self.lang.msgNetworkFailure)
-                    return
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "sendUserOpinionMail()")
+                    popoverAlert(self.lang.msgNetworkFailure)
                     return
                 }
         }
