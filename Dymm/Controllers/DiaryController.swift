@@ -804,7 +804,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     cell.selectedLogGroup = self.selectedLogGroup!
                     cell.groupOfLogSetForCnt = self.groupOfLogSet!
                     cell.groupOfLogSetForPop = self.groupOfLogSet!
-                    cell.logsArray = []
+                    cell.logsArray = []  // Reset logsArray, Do not chage this line!
                     cell.groupOfLogsTableView.reloadData()
                     self.selectedOnceCellIdxPath = indexPath
                     let total = self.getGroupOfLogsTotalCnt(groupOfLogSet)

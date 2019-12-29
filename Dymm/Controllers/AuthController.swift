@@ -9,8 +9,10 @@
 import UIKit
 import Alamofire
 import SkyFloatingLabelTextField
+import FBSDKCoreKit
+import FBSDKLoginKit
 
-class AuthViewController: UIViewController {
+class AuthViewController: UIViewController, LoginButtonDelegate {
     
     // MARK: - Properties
     
@@ -31,6 +33,7 @@ class AuthViewController: UIViewController {
     var closeButton: UIButton!
     var formSwapButton: UIButton!
     var submitButton: UIButton!
+    var fbLoginButton: FBLoginButton!
     
     // UILabel
     var titleLabel: UILabel!
@@ -59,7 +62,31 @@ class AuthViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
+        
+        if let fbAccessToken = AccessToken.current {
+            print("User already logged in.")
+            print(fbAccessToken)
+        }
     }
+    
+    func loginButton(_ loginButton: FBLoginButton, didCompleteWith result: LoginManagerLoginResult?, error: Error?) {
+        if let error = error {
+            print(error)
+        }
+        if let result = result {
+            if result.isCancelled {
+                print("fb login cancelled")
+                print(result.grantedPermissions)
+            } else {
+                print("success")
+            }
+        }
+    }
+    
+    func loginButtonDidLogOut(_ loginButton: FBLoginButton) {
+        print("fb user logged out")
+    }
+    
     
     // MARK: - Actions
     
@@ -491,6 +518,11 @@ extension AuthViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
+        fbLoginButton = {
+            let _fbButton = FBLoginButton(frame: .zero, permissions: [.publicProfile, .email])
+            _fbButton.translatesAutoresizingMaskIntoConstraints = false
+            return _fbButton
+        }()
         illustGirlImgView = {
             let _imageView = UIImageView()
             _imageView.image = .itemIllustGirl1
@@ -505,10 +537,12 @@ extension AuthViewController {
         emailTextField.delegate = self
         passwordTextField.delegate = self
         confirmPassTextField.delegate = self
+        fbLoginButton.delegate = self
         
         // Setup subviews
         view.addSubview(illustGirlImgView)
         view.addSubview(formContainerView)
+        view.addSubview(fbLoginButton)
         view.addSubview(topBarView)
         
         topBarView.addSubview(forgotButton)
@@ -545,6 +579,9 @@ extension AuthViewController {
         formContainerHeight = formContainerView.heightAnchor.constraint(equalToConstant: 260)
         formContainerHeight.priority = UILayoutPriority(rawValue: 999)
         formContainerHeight.isActive = true
+        
+        fbLoginButton.topAnchor.constraint(equalTo: formContainerView.bottomAnchor, constant: 10).isActive = true
+        fbLoginButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
         
         titleLabel.topAnchor.constraint(equalTo: formContainerView.topAnchor, constant: 20).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: formContainerView.leadingAnchor, constant: 0).isActive = true

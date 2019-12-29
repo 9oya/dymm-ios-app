@@ -47,6 +47,8 @@
 		F59C14E1235BF993004A3B41 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59C14E0235BF992004A3B41 /* Utilities.swift */; };
 		F5A194912390BBD20020C082 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5A194902390BBD20020C082 /* Assets.xcassets */; };
 		F5C9CC9823B7EA490054916E /* UIButton+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5C9CC9723B7EA490054916E /* UIButton+Helpers.swift */; };
+		F5C9CCA423B9043A0054916E /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5C9CCA223B9043A0054916E /* FBSDKCoreKit.framework */; };
+		F5C9CCA623B9043A0054916E /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5C9CCA323B9043A0054916E /* FBSDKLoginKit.framework */; };
 		F5D6A653236AC19C00E9CDE9 /* RankingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D6A652236AC19C00E9CDE9 /* RankingController.swift */; };
 		F5D6A655236AC27600E9CDE9 /* RankingTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D6A654236AC27600E9CDE9 /* RankingTableCell.swift */; };
 		F5FC19CB233C4D2600116F71 /* ColorCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FC19CA233C4D2600116F71 /* ColorCollectionCell.swift */; };
@@ -256,6 +258,8 @@
 		F59C14E0235BF992004A3B41 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		F5A194902390BBD20020C082 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F5C9CC9723B7EA490054916E /* UIButton+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Helpers.swift"; sourceTree = "<group>"; };
+		F5C9CCA223B9043A0054916E /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FBSDKCoreKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5C9CCA323B9043A0054916E /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FBSDKLoginKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5D6A652236AC19C00E9CDE9 /* RankingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingController.swift; sourceTree = "<group>"; };
 		F5D6A654236AC27600E9CDE9 /* RankingTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingTableCell.swift; sourceTree = "<group>"; };
 		F5FC19CA233C4D2600116F71 /* ColorCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCollectionCell.swift; sourceTree = "<group>"; };
@@ -268,9 +272,11 @@
 			files = (
 				F57D7CFD23A75743000EA9F5 /* objects.h in Frameworks */,
 				F57D7CFE23A75743000EA9F5 /* evp.h in Frameworks */,
+				F5C9CCA623B9043A0054916E /* FBSDKLoginKit.framework in Frameworks */,
 				F57D7CFF23A75743000EA9F5 /* ssl.h in Frameworks */,
 				F57D7D0023A75743000EA9F5 /* asn1.h in Frameworks */,
 				F57D7CFC23A75700000EA9F5 /* pkcs7.h in Frameworks */,
+				F5C9CCA423B9043A0054916E /* FBSDKCoreKit.framework in Frameworks */,
 				8B0DD06DDA438DCAC06682BF /* Pods_Dymm.framework in Frameworks */,
 				F56B8036235B132800D3300D /* StoreKit.framework in Frameworks */,
 			);
@@ -282,6 +288,8 @@
 		18D694621290DE5EE65EC40B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F5C9CCA223B9043A0054916E /* FBSDKCoreKit.framework */,
+				F5C9CCA323B9043A0054916E /* FBSDKLoginKit.framework */,
 				F57D7CA923A75684000EA9F5 /* include */,
 				F57D7C5723A7566A000EA9F5 /* openssl */,
 				F56B8035235B132800D3300D /* StoreKit.framework */,
