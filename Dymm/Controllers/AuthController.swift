@@ -58,15 +58,11 @@ class AuthViewController: UIViewController, LoginButtonDelegate {
     var confPassword: String?
     var isEmailFound = true
     var isCodeCorrect = true
+    var fbParams: Parameters?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
-        
-        if let fbAccessToken = AccessToken.current {
-            print("User already logged in.")
-            print(fbAccessToken)
-        }
     }
     
     func loginButton(_ loginButton: FBLoginButton, didCompleteWith result: LoginManagerLoginResult?, error: Error?) {
@@ -76,17 +72,16 @@ class AuthViewController: UIViewController, LoginButtonDelegate {
         if let result = result {
             if result.isCancelled {
                 print("fb login cancelled")
-                print(result.grantedPermissions)
             } else {
-                print("success")
+                print("fb login success")
+                fetchFbAccessToken()
             }
         }
     }
     
     func loginButtonDidLogOut(_ loginButton: FBLoginButton) {
-        print("fb user logged out")
+        print("logged out")
     }
-    
     
     // MARK: - Actions
     
@@ -520,6 +515,7 @@ extension AuthViewController {
         }()
         fbLoginButton = {
             let _fbButton = FBLoginButton(frame: .zero, permissions: [.publicProfile, .email])
+            _fbButton.addShadowView()
             _fbButton.translatesAutoresizingMaskIntoConstraints = false
             return _fbButton
         }()
@@ -582,6 +578,8 @@ extension AuthViewController {
         
         fbLoginButton.topAnchor.constraint(equalTo: formContainerView.bottomAnchor, constant: 10).isActive = true
         fbLoginButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        fbLoginButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        fbLoginButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         
         titleLabel.topAnchor.constraint(equalTo: formContainerView.topAnchor, constant: 20).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: formContainerView.leadingAnchor, constant: 0).isActive = true
@@ -714,8 +712,19 @@ extension AuthViewController {
             UserDefaults.standard.setIsSignIn(value: true)
             UserDefaults.standard.set(_avatar.id, forKey: _avatar.email)
             _ = self.navigationController?.popViewController(animated: true)
-//            self.dismiss(animated: true, completion: nil)
         }
+    }
+    
+    private func afterSignUp(_ auth: CustomModel.Auth) {
+        let _avatar = auth.avatar
+        UserDefaults.standard.setIsEmailConfirmed(value: _avatar.is_confirmed)
+        UserDefaults.standard.setAccessToken(value: _avatar.access_token!)
+        UserDefaults.standard.setRefreshToken(value: _avatar.refresh_token!)
+        UserDefaults.standard.setAvatarId(value: _avatar.id)
+        UserDefaults.standard.setCurrentLanguageId(value: auth.language_id)
+        UserDefaults.standard.setIsSignIn(value: true)
+        UserDefaults.standard.set(_avatar.id, forKey: _avatar.email)
+        _ = self.navigationController?.popViewController(animated: true)
     }
     
     private func accountSignUp() {
@@ -768,16 +777,7 @@ extension AuthViewController {
             self.retryFunction = self.accountSignUp
             self.alertError(message)
         }) { (auth) in
-            let _avatar = auth.avatar
-            UserDefaults.standard.setIsEmailConfirmed(value: _avatar.is_confirmed)
-            UserDefaults.standard.setAccessToken(value: _avatar.access_token!)
-            UserDefaults.standard.setRefreshToken(value: _avatar.refresh_token!)
-            UserDefaults.standard.setAvatarId(value: _avatar.id)
-            UserDefaults.standard.setCurrentLanguageId(value: auth.language_id)
-            UserDefaults.standard.setIsSignIn(value: true)
-            UserDefaults.standard.set(_avatar.id, forKey: _avatar.email)
-            _ = self.navigationController?.popViewController(animated: true)
-//            self.dismiss(animated: true, completion: nil)
+            self.afterSignUp(auth)
         }
     }
     
@@ -872,6 +872,41 @@ extension AuthViewController {
                 self.view.hideSpinner()
             })
             self.alertChangePasswordCompl()
+        }
+    }
+    
+    private func fetchFbAccessToken() {
+        if let fbAccessToken = AccessToken.current {
+            // Case user signed with facebook
+            // parameters: gender, picture.type(large)
+            let req = GraphRequest(graphPath: "me", parameters: ["fields":"email, first_name, last_name"], tokenString: fbAccessToken.tokenString, version: nil, httpMethod: .get)
+            req.start { (connection, result, error) in
+                if let error = error {
+                    print("error \(error)")
+                } else {
+                    let jsonResult = result! as! Dictionary<String, AnyObject>
+                    self.fbParams = [
+                        "fb_id": jsonResult["id"]!,
+                        "first_name": jsonResult["first_name"]!,
+                        "last_name": jsonResult["last_name"]!,
+                        "language_id": getDeviceLanguage()
+                    ]
+                    if let email = jsonResult["email"] {
+                        self.fbParams!["email"] = email
+                    }
+                    self.signWithFacebook()
+                }
+            }
+        }
+    }
+    
+    private func signWithFacebook() {
+        let service = Service(lang: lang)
+        service.authWithFacebook(params: self.fbParams!, popoverAlert: { (message) in
+            self.retryFunction = self.signWithFacebook
+            self.alertError(message)
+        }) { (auth) in
+            self.afterSignUp(auth)
         }
     }
 }

@@ -159,7 +159,6 @@ class ProfileViewController: UIViewController {
         UserDefaults.standard.setIsSignIn(value: false)
         UserDefaults.standard.setAvatarId(value: 0)
         _ = navigationController?.popViewController(animated: true)
-//        dismiss(animated: true, completion: nil)
     }
     
     @objc func sendMailAgainBtnTapped() {

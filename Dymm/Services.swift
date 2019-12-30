@@ -779,6 +779,29 @@ struct Service {
         }
     }
     
+    func authWithFacebook(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, completion: @escaping (_ auth: CustomModel.Auth) -> Void) {
+        Alamofire.request("\(URI.host)\(URI.avatar)/fb-auth", method: .post, parameters: params, encoding: JSONEncoding.default)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<CustomModel.Auth>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    guard let auth = decodedData.data else {
+                        fatalError()
+                    }
+                    completion(auth)
+                default:
+                    popoverAlert(self.lang.msgNetworkFailure)
+                }
+        }
+    }
+    
     func postAvatarDisease(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             print("Load UserDefaults.standard.getAccessToken() failed")

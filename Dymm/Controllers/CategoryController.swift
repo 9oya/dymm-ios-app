@@ -248,8 +248,7 @@ class CategoryViewController: UIViewController {
     
     @objc func presentAuthNavigation() {
         let vc = AuthViewController()
-        let nc = UINavigationController(rootViewController: vc)
-        present(nc, animated: true, completion: nil)
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentIAPController() {
