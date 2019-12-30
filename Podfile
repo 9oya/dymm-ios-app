@@ -11,4 +11,5 @@ target 'Dymm' do
   pod 'OpenSSL-Universal'
   pod 'FBSDKCoreKit/Swift'
   pod 'FBSDKLoginKit/Swift'
+  pod 'GoogleSignIn'
 end

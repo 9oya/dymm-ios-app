@@ -601,6 +601,7 @@
 				6A8D895C22F8874000A7F333 /* Frameworks */,
 				6A8D895D22F8874000A7F333 /* Resources */,
 				364534B6C6639612FCF20BFE /* [CP] Embed Pods Frameworks */,
+				9FD23E783A0C63A2BC3B07A7 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -695,6 +696,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Dymm/Pods-Dymm-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9FD23E783A0C63A2BC3B07A7 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Dymm/Pods-Dymm-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Dymm/Pods-Dymm-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Dymm/Pods-Dymm-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

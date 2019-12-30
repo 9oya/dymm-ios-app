@@ -11,8 +11,9 @@ import Alamofire
 import SkyFloatingLabelTextField
 import FBSDKCoreKit
 import FBSDKLoginKit
+import GoogleSignIn
 
-class AuthViewController: UIViewController, LoginButtonDelegate {
+class AuthViewController: UIViewController {
     
     // MARK: - Properties
     
@@ -33,7 +34,8 @@ class AuthViewController: UIViewController, LoginButtonDelegate {
     var closeButton: UIButton!
     var formSwapButton: UIButton!
     var submitButton: UIButton!
-    var fbLoginButton: FBLoginButton!
+    var fbLoginBtn: FBLoginButton!
+    var gSignInBtn: GIDSignInButton!
     
     // UILabel
     var titleLabel: UILabel!
@@ -59,28 +61,11 @@ class AuthViewController: UIViewController, LoginButtonDelegate {
     var isEmailFound = true
     var isCodeCorrect = true
     var fbParams: Parameters?
+    var gParams: Parameters?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
-    }
-    
-    func loginButton(_ loginButton: FBLoginButton, didCompleteWith result: LoginManagerLoginResult?, error: Error?) {
-        if let error = error {
-            print(error)
-        }
-        if let result = result {
-            if result.isCancelled {
-                print("fb login cancelled")
-            } else {
-                print("fb login success")
-                fetchFbAccessToken()
-            }
-        }
-    }
-    
-    func loginButtonDidLogOut(_ loginButton: FBLoginButton) {
-        print("logged out")
     }
     
     // MARK: - Actions
@@ -378,6 +363,50 @@ extension AuthViewController: UITextFieldDelegate {
     }
 }
 
+extension AuthViewController: LoginButtonDelegate {
+    
+    // MARK: Facebook login
+    
+    func loginButton(_ loginButton: FBLoginButton, didCompleteWith result: LoginManagerLoginResult?, error: Error?) {
+        if let error = error {
+            print(error)
+        }
+        if let result = result {
+            if result.isCancelled {
+                print("fb login cancelled")
+            } else {
+                print("fb login success")
+                fetchFbAccessToken()
+            }
+        }
+    }
+    
+    func loginButtonDidLogOut(_ loginButton: FBLoginButton) {
+        print("logged out")
+    }
+}
+
+extension AuthViewController: GIDSignInDelegate {
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        if let error = error {
+            print("\(error.localizedDescription)")
+        } else {
+            // Perform any operations on signed in user here.
+            self.gParams = [
+                "email": user.profile.email!,
+                "first_name": user.profile.givenName ?? "Noob",
+                "last_name": user.profile.familyName ?? user.profile.givenName!,
+                "language_id": getDeviceLanguage()
+            ]
+            self.signWithGoogle()
+        }
+    }
+    
+    func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
+        print("User has disconnected")
+    }
+}
+
 extension AuthViewController {
     
     // MARK: Private methods
@@ -513,11 +542,18 @@ extension AuthViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        fbLoginButton = {
+        fbLoginBtn = {
             let _fbButton = FBLoginButton(frame: .zero, permissions: [.publicProfile, .email])
             _fbButton.addShadowView()
             _fbButton.translatesAutoresizingMaskIntoConstraints = false
             return _fbButton
+        }()
+        gSignInBtn = {
+            let _gButton = GIDSignInButton()
+            _gButton.addShadowView()
+            _gButton.style = .wide
+            _gButton.translatesAutoresizingMaskIntoConstraints = false
+            return _gButton
         }()
         illustGirlImgView = {
             let _imageView = UIImageView()
@@ -527,18 +563,20 @@ extension AuthViewController {
             return _imageView
         }()
         
-//        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
         firstNameTextField.delegate = self
         lastNameTextField.delegate = self
         emailTextField.delegate = self
         passwordTextField.delegate = self
         confirmPassTextField.delegate = self
-        fbLoginButton.delegate = self
+        fbLoginBtn.delegate = self
+        GIDSignIn.sharedInstance().delegate = self
+        GIDSignIn.sharedInstance().presentingViewController = self
         
         // Setup subviews
         view.addSubview(illustGirlImgView)
         view.addSubview(formContainerView)
-        view.addSubview(fbLoginButton)
+        view.addSubview(fbLoginBtn)
+        view.addSubview(gSignInBtn)
         view.addSubview(topBarView)
         
         topBarView.addSubview(forgotButton)
@@ -576,10 +614,11 @@ extension AuthViewController {
         formContainerHeight.priority = UILayoutPriority(rawValue: 999)
         formContainerHeight.isActive = true
         
-        fbLoginButton.topAnchor.constraint(equalTo: formContainerView.bottomAnchor, constant: 10).isActive = true
-        fbLoginButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        fbLoginButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
-        fbLoginButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        fbLoginBtn.topAnchor.constraint(equalTo: formContainerView.bottomAnchor, constant: 15).isActive = true
+        fbLoginBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        
+        gSignInBtn.topAnchor.constraint(equalTo: fbLoginBtn.bottomAnchor, constant: 15).isActive = true
+        gSignInBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
         
         titleLabel.topAnchor.constraint(equalTo: formContainerView.topAnchor, constant: 20).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: formContainerView.leadingAnchor, constant: 0).isActive = true
@@ -904,6 +943,16 @@ extension AuthViewController {
         let service = Service(lang: lang)
         service.authWithFacebook(params: self.fbParams!, popoverAlert: { (message) in
             self.retryFunction = self.signWithFacebook
+            self.alertError(message)
+        }) { (auth) in
+            self.afterSignUp(auth)
+        }
+    }
+    
+    private func signWithGoogle() {
+        let service = Service(lang: lang)
+        service.authWithGoogle(params: self.gParams!, popoverAlert: { (message) in
+            self.retryFunction = self.signWithGoogle
             self.alertError(message)
         }) { (auth) in
             self.afterSignUp(auth)

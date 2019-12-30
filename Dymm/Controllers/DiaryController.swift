@@ -1381,6 +1381,7 @@ extension DiaryViewController {
             case LanguageId.kor: navigationItem.title = superTag?.kor_name
             case LanguageId.jpn: navigationItem.title = superTag?.jpn_name
             default: return }
+            navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 20, weight: .regular)]
         } else {
             navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15, weight: .regular)]
             navigationItem.title = lang.msgDiarySelect
