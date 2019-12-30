@@ -634,7 +634,7 @@ extension HomeViewController {
             
             self.scoreEmoImgView.image = getCondScoreImageLarge(0)
             
-            self.scoreTitleLabel.text = self.lang.getCondScoreName(0)
+            self.scoreTitleLabel.text = self.lang.getMoodScoreName(0)
             self.scoreNumberLabel.text = String(format: "%.1f", 0.0)
             self.scoreMessageLabel.text = self.lang.titleMyCondScore
             
@@ -665,7 +665,7 @@ extension HomeViewController {
             self.thisAvgScore = formatter.number(from: scoreBoardSet.avg_score)!.floatValue
             UIView.animate(withDuration: 0.5) {
                 self.scoreEmoImgView.image = getCondScoreImageLarge(self.thisAvgScore)
-                self.scoreTitleLabel.text = self.lang.getCondScoreName(self.thisAvgScore)
+                self.scoreTitleLabel.text = self.lang.getMoodScoreName(self.thisAvgScore)
                 self.scoreNumberLabel.text = String(format: "%.1f", self.thisAvgScore)
                 self.scoreMessageLabel.text = self.lang.titleMyCondScore
                 if let genderTag = scoreBoardSet.gender_tag {
@@ -684,6 +684,11 @@ extension HomeViewController {
                 self.ageLabel.textColor = .green_3ED6A7
                 self.genderLabel.textColor = .green_3ED6A7
                 self.scoreboardView.isHidden = false
+            }
+            if self.thisAvgScore > 0.0 {
+                self.aiMsgLabel.text = self.lang.getMoodScoreMessage(self.thisAvgScore)
+            } else {
+                self.aiMsgLabel.text = self.lang.msgLifeSpan
             }
         }
     }
@@ -721,7 +726,6 @@ extension HomeViewController {
                 default: fatalError()}
                 self.lifespanLabel.isHidden = false
                 self.aiMsgLabel.textColor = .green_3ED6A7
-                self.aiMsgLabel.text = self.lang.msgLifeSpan
                 self.aiBoardView.isHidden = false
                 self.cubeImgView.isHidden = false
             }

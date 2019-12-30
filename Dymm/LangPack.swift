@@ -143,6 +143,11 @@ struct LangPack {
     var msgMailSendAgainComplete: String!
     var msgMailSendValidCode: ((String) -> String)!
     var msgMismatchConfirmPassword: String!
+    var msgMoodAwfulMsgs: [String]!
+    var msgMoodBadMsgs: [String]!
+    var msgMoodSosoMsgs: [String]!
+    var msgMoodGoodMsgs: [String]!
+    var msgMoodExcellentMsgs: [String]!
     var msgNetworkFailure: String!
     var msgOpinionCompl: String!
     var msgPremiumRestored: String!
@@ -169,7 +174,7 @@ struct LangPack {
         let idx = key - 1
         return titleLogGroups[idx]
     }
-    func getCondScoreName(_ key: Float) -> String {
+    func getMoodScoreName(_ key: Float) -> String {
         var idx = 0
         if key < 1 {
             idx = 0
@@ -186,6 +191,22 @@ struct LangPack {
         }
         return titleCondScores[idx]
     }
+    func getMoodScoreMessage(_ key: Float) -> String {
+        if key < 1 {
+            return msgLifeSpan
+        } else if key < 2.5 {
+            return msgMoodAwfulMsgs[Int.random(in: 0..<3)]
+        } else if key < 4.5 {
+            return msgMoodBadMsgs[Int.random(in: 0..<3)]
+        } else if key < 6.5 {
+            return msgMoodSosoMsgs[Int.random(in: 0..<3)]
+        } else if key < 8.5 {
+            return msgMoodGoodMsgs[Int.random(in: 0..<3)]
+        } else {
+            return msgMoodExcellentMsgs[Int.random(in: 0..<3)]
+        }
+    }
+    
     func getWeekdayName(_ key: Int) -> String {
         let idx = key - 1
         return titleWeekdays[idx]
@@ -1005,6 +1026,56 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Those password didn't match. Try again"
             case LanguageId.kor: return "패스워드가 일치하지 않습니다."
+            default: fatalError()}
+        }()
+        self.msgMoodAwfulMsgs = {
+            switch currentLanguageId {
+            case LanguageId.eng: return ["If you need help, don't be afraid to ask.",
+                                         "I'm worried about you. Find someone to help you.",
+                                         "You don't have to handle everything alone. Ask for help."]
+            case LanguageId.kor: return ["괜찮으신가요? 주변에 도움을 청하는 것을 두려워하지 마세요.",
+                                         "당신이 걱정되요. 가까운 곳에서 도와줄 사람을 찾아보세요.",
+                                         "혼자 모든것을 감당할 필요는 없어요. 도움을 청하세요."]
+            default: fatalError()}
+        }()
+        self.msgMoodBadMsgs = {
+            switch currentLanguageId {
+            case LanguageId.eng: return ["Sometimes it's good to be bad.",
+                                         "Sometimes it's okay to feel sad.",
+                                         "Bad mood will get better over time."]
+            case LanguageId.kor: return ["가끔은 나쁜기분을 갖는 것도 좋을 수 있어요.",
+                                         "가끔은 슬픈 기분을 느끼는 것도 좋아요.",
+                                         "나쁜 기분은 시간이 지나면 나아질 거에요."]
+            default: fatalError()}
+        }()
+        self.msgMoodSosoMsgs = {
+            switch currentLanguageId {
+            case LanguageId.eng: return ["If you try a little more, a good day will come.",
+                                         "It's okay to get better slowly.",
+                                         "Find out what affects your mood."]
+            case LanguageId.kor: return ["조금더 노력하면 좋은 날이 올거에요.",
+                                         "천천히 좋아지는 것도 괜찮아요.",
+                                         "어떤 것들이 당신의 기분에 영향을 주는 지 찾아 보아요."]
+            default: fatalError()}
+        }()
+        self.msgMoodGoodMsgs = {
+            switch currentLanguageId {
+            case LanguageId.eng: return ["You're balancing your life.",
+                                         "Try to stay mood now.",
+                                         "I wish you a good day every day."]
+            case LanguageId.kor: return ["당신은 삶에 균형을 유지하고 있어요.",
+                                         "지금 기분을 유지하기 위해 노력해 봐요.",
+                                         "당신에게 매일 좋은 날이 함께하길 바래요."]
+            default: fatalError()}
+        }()
+        self.msgMoodExcellentMsgs = {
+            switch currentLanguageId {
+            case LanguageId.eng: return ["If you keep it this way, you will see the future.",
+                                         "You are having the best time in life.",
+                                         "I admire you for maintaining the best mood."]
+            case LanguageId.kor: return ["이대로 계속 유지한다면 당신은 미래를 볼 거예요.",
+                                         "당신은 삶에서 최고의 시간을 보내고 있어요.",
+                                         "최고의 기분을 유지하는 당신을 존경합니다."]
             default: fatalError()}
         }()
         self.msgNetworkFailure = {
