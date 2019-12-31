@@ -1240,7 +1240,14 @@ struct LangHelper {
         switch alpha2 {
         case "en": return LanguageId.eng
         case "kr": return LanguageId.kor
-//        TODO: case "jp": return LanguageId.jpn
+        default: return LanguageId.eng
+        }
+    }
+    
+    static func getLanguageIdByRegion(alpha2: String) -> Int {
+        switch alpha2 {
+        case "EN": return LanguageId.eng
+        case "KR": return LanguageId.kor
         default: return LanguageId.eng
         }
     }

@@ -142,7 +142,11 @@ struct LanguageId {
 }
 
 func getDeviceLanguage() -> Int {
-    return LangHelper.getLanguageId(alpha2: String(Locale.preferredLanguages[0].prefix(2)))
+    guard let regionCode = Locale.current.regionCode else {
+        return LangHelper.getLanguageIdByRegion(alpha2: "EN")
+    }
+    return LangHelper.getLanguageIdByRegion(alpha2: regionCode)
+//    return LangHelper.getLanguageId(alpha2: String(Locale.preferredLanguages[0].prefix(2)))
 }
 
 func getUserCountryCode() -> String {

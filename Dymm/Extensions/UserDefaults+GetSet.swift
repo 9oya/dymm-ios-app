@@ -102,7 +102,11 @@ extension UserDefaults {
     func getCurrentLanguageId() -> Int? {
         let currentLanguageId = integer(forKey: UserDefaultsKeys.currentLanguageId.rawValue)
         if currentLanguageId <= 0 {
-            return LangHelper.getLanguageId(alpha2: String(Locale.preferredLanguages[0].prefix(2)))
+            guard let regionCode = Locale.current.regionCode else {
+                return LangHelper.getLanguageIdByRegion(alpha2: "EN")
+            }
+            print(regionCode)
+            return LangHelper.getLanguageIdByRegion(alpha2: regionCode)
         }
         return currentLanguageId
     }
