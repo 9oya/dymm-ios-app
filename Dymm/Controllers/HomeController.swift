@@ -79,15 +79,6 @@ class HomeViewController: UIViewController {
         if UserDefaults.standard.isSignIn() {
             selectedYear = currentYear
             selectedMonth = nil
-            monthArr = {
-                var month = currentMonth
-                var months = [Int]()
-                while month! > 0 {
-                    months.append(month!)
-                    month! -= 1
-                }
-                return months
-            }()
             yearPicker.selectRow(0, inComponent: 0, animated: true)
             monthPicker.selectRow(0, inComponent: 0, animated: true)
             loadScoreboard()
