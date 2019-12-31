@@ -604,4 +604,20 @@ struct CustomModel {
             self.rankings = try valueContainer.decode([CustomModel.Ranking].self, forKey: CodingKeys.rankings)
         }
     }
+    
+    struct RemainingLifespanSet: Codable {
+        let avg_score: String
+        let r_lifespan_day: Int
+        
+        enum CodingKeys: String, CodingKey {
+            case avg_score
+            case r_lifespan_day
+        }
+        
+        init(from decoder: Decoder) throws {
+            let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
+            self.avg_score = try valueContainer.decode(String.self, forKey: CodingKeys.avg_score)
+            self.r_lifespan_day = try valueContainer.decode(Int.self, forKey: CodingKeys.r_lifespan_day)
+        }
+    }
 }

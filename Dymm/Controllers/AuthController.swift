@@ -693,11 +693,15 @@ extension AuthViewController {
             self.view.hideSpinner()
             UIView.transition(with: formContainerView, duration: 0.6, options: .transitionCrossDissolve, animations: {
                 self.formContainerView.isHidden = false
+                self.fbLoginBtn.isHidden = false
+                self.gSignInBtn.isHidden = false
             })
         } else {
             self.view.showSpinner()
             UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.formContainerView.isHidden = true
+                self.fbLoginBtn.isHidden = true
+                self.gSignInBtn.isHidden = true
             })
         }
     }
@@ -734,6 +738,8 @@ extension AuthViewController {
         self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
+            self.fbLoginBtn.isHidden = true
+            self.gSignInBtn.isHidden = true
         })
         let service = Service(lang: lang)
         service.authOldAvatar(params: params, unauthorized: { pattern in
@@ -809,6 +815,8 @@ extension AuthViewController {
         self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
+            self.fbLoginBtn.isHidden = true
+            self.gSignInBtn.isHidden = true
         })
         let service = Service(lang: lang)
         service.createNewAvatar(params: params, unauthorized: { pattern in
@@ -842,9 +850,12 @@ extension AuthViewController {
         self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
+            self.fbLoginBtn.isHidden = true
+            self.gSignInBtn.isHidden = true
         })
         let params: Parameters = [
-            "email": emailToFind!
+            "email": emailToFind!,
+            "language_id": lang.currentLanguageId!
         ]
         let service = Service(lang: lang)
         service.solveAvatarEmail(option: MailOption.verify, params: params, unauthorized: {
@@ -856,6 +867,8 @@ extension AuthViewController {
             self.isCodeCorrect = true
             UIView.transition(with: self.formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.formContainerView.isHidden = false
+                self.fbLoginBtn.isHidden = false
+                self.gSignInBtn.isHidden = false
                 self.view.hideSpinner()
             })
             self.alertVerificationCode()
@@ -866,6 +879,8 @@ extension AuthViewController {
         self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
+            self.fbLoginBtn.isHidden = true
+            self.gSignInBtn.isHidden = true
         })
         let params: Parameters = [
             "email": emailToFind!,
@@ -882,6 +897,8 @@ extension AuthViewController {
             self.isCodeCorrect = true
             UIView.transition(with: self.formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.formContainerView.isHidden = false
+                self.fbLoginBtn.isHidden = false
+                self.gSignInBtn.isHidden = false
                 self.view.hideSpinner()
             })
             self.alertChangePassword()
@@ -892,6 +909,8 @@ extension AuthViewController {
         self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
+            self.fbLoginBtn.isHidden = true
+            self.gSignInBtn.isHidden = true
         })
         let params: Parameters = [
             "email": emailToFind!,
@@ -909,6 +928,8 @@ extension AuthViewController {
         }) { (newInfoTxt) in
             UIView.transition(with: self.formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.formContainerView.isHidden = false
+                self.fbLoginBtn.isHidden = false
+                self.gSignInBtn.isHidden = false
                 self.view.hideSpinner()
             })
             self.alertChangePasswordCompl()

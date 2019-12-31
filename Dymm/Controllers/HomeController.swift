@@ -685,11 +685,6 @@ extension HomeViewController {
                 self.genderLabel.textColor = .green_3ED6A7
                 self.scoreboardView.isHidden = false
             }
-            if self.thisAvgScore > 0.0 {
-                self.aiMsgLabel.text = self.lang.getMoodScoreMessage(self.thisAvgScore)
-            } else {
-                self.aiMsgLabel.text = self.lang.msgLifeSpan
-            }
         }
     }
     
@@ -714,9 +709,9 @@ extension HomeViewController {
                 self.cubeImgView.isHidden = true
                 self.lifespanLabel.isHidden = true
             }
-        }) { (lifeSpan) in
-            let year = lifeSpan / 365
-            let days = lifeSpan % 365
+        }) { (lifeSpanSet) in
+            let year = lifeSpanSet.r_lifespan_day / 365
+            let days = lifeSpanSet.r_lifespan_day % 365
             UIView.animate(withDuration: 0.5) {
                 switch self.lang.currentLanguageId {
                 case LanguageId.eng:
@@ -728,6 +723,14 @@ extension HomeViewController {
                 self.aiMsgLabel.textColor = .green_3ED6A7
                 self.aiBoardView.isHidden = false
                 self.cubeImgView.isHidden = false
+                
+                if let avgScore = Float(lifeSpanSet.avg_score) {
+                    if avgScore > 0.0 {
+                        self.aiMsgLabel.text = self.lang.getMoodScoreMessage(avgScore)
+                    } else {
+                        self.aiMsgLabel.text = self.lang.msgLifeSpan
+                    }
+                }
             }
         }
     }

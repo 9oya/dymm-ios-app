@@ -255,7 +255,7 @@ struct Service {
         }
     }
     
-    func getRemainingLifeSpan(popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, unauthorized: @escaping (_ pattern: Int) -> Void, completion: @escaping (_ lifeSpan: Int) -> Void) {
+    func getRemainingLifeSpan(popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, unauthorized: @escaping (_ pattern: Int) -> Void, completion: @escaping (_ lifeSpanSet: CustomModel.RemainingLifespanSet) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -267,7 +267,8 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)"
         ]
-        Alamofire.request("\(URI.host)\(URI.avatar)/\(avatarId)/life-span", method: .get, headers: headers)
+        // TODO: Remove /new
+        Alamofire.request("\(URI.host)\(URI.avatar)/new/\(avatarId)/life-span", method: .get, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -276,13 +277,13 @@ struct Service {
                 }
                 switch statusCode {
                 case 200:
-                    guard let decodedData = try? self.decoder.decode(Ok<Int>.self, from: responseData) else {
+                    guard let decodedData = try? self.decoder.decode(Ok<CustomModel.RemainingLifespanSet>.self, from: responseData) else {
                         fatalError()
                     }
-                    guard let lifeSpan = decodedData.data else {
+                    guard let lifeSpanSet = decodedData.data else {
                         fatalError()
                     }
-                    completion(lifeSpan)
+                    completion(lifeSpanSet)
                 case 400:
                     self.badRequest(responseData)
                 case 401:
@@ -749,7 +750,8 @@ struct Service {
     }
     
     func createNewAvatar(params: Parameters, unauthorized: @escaping (_ pattern: Int) -> Void, popoverAlert: @escaping (_ message: String) -> Void, completion: @escaping (_ auth: CustomModel.Auth) -> Void) {
-        Alamofire.request("\(URI.host)\(URI.avatar)/create", method: .post, parameters: params, encoding: JSONEncoding.default)
+        // TODO: Remove /new
+        Alamofire.request("\(URI.host)\(URI.avatar)/new/create", method: .post, parameters: params, encoding: JSONEncoding.default)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -944,7 +946,8 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        Alamofire.request("\(URI.host)\(URI.mail)/conf-link", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
+        // TODO: Remove /new
+        Alamofire.request("\(URI.host)\(URI.mail)/new/conf-link", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let statusCode = response.response?.statusCode else {
@@ -1025,7 +1028,8 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        Alamofire.request("\(URI.host)\(URI.avatar)/email/\(option)", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
+        // TODO: Remove /new
+        Alamofire.request("\(URI.host)\(URI.avatar)/new/email/\(option)", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
