@@ -458,7 +458,7 @@ extension HomeViewController {
         }()
         lifespanLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 18, weight: .regular)
+            _label.font = .systemFont(ofSize: 16, weight: .regular)
             _label.textColor = .green_3ED6A7
             _label.textAlignment = .center
             _label.numberOfLines = 3
@@ -720,9 +720,9 @@ extension HomeViewController {
             UIView.animate(withDuration: 0.5) {
                 switch self.lang.currentLanguageId {
                 case LanguageId.eng:
-                    self.lifespanLabel.text = "\(year)Y \(days)D"
+                    self.lifespanLabel.text = "You have \(year)Y \(days)D"
                 case LanguageId.kor:
-                    self.lifespanLabel.text = "\(year)년 \(days)일"
+                    self.lifespanLabel.text = "\(year)년 \(days)일 남았습니다."
                 default: fatalError()}
                 self.lifespanLabel.isHidden = false
                 self.aiMsgLabel.textColor = .green_3ED6A7

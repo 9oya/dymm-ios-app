@@ -1381,7 +1381,7 @@ extension DiaryViewController {
             case LanguageId.kor: navigationItem.title = superTag?.kor_name
             case LanguageId.jpn: navigationItem.title = superTag?.jpn_name
             default: return }
-            navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 20, weight: .regular)]
+            navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16, weight: .medium)]
         } else {
             navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15, weight: .regular)]
             navigationItem.title = lang.msgDiarySelect
@@ -1784,9 +1784,9 @@ extension DiaryViewController {
         view.addSubview(calendarView)
         view.addSubview(diseaseHistoryBtn)
         view.addSubview(toggleBtn)
+        view.addSubview(plusBtnStackView)
         view.addSubview(blindView)
         view.addSubview(diseaseLeftBtn)
-        view.addSubview(plusBtnStackView)
         view.addGestureRecognizer(scopeGesture)
         
         // TODO

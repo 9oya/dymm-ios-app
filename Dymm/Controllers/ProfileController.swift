@@ -754,6 +754,7 @@ extension ProfileViewController {
         // Initialize super view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = UIColor.whiteSmoke
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16, weight: .medium)]
         view.showSpinner()
         
         // Initialize subveiw properties

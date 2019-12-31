@@ -755,6 +755,7 @@ extension AuthViewController {
     }
     
     private func afterSignUp(_ auth: CustomModel.Auth) {
+        view.hideSpinner()
         let _avatar = auth.avatar
         UserDefaults.standard.setIsEmailConfirmed(value: _avatar.is_confirmed)
         UserDefaults.standard.setAccessToken(value: _avatar.access_token!)
@@ -940,6 +941,7 @@ extension AuthViewController {
     }
     
     private func signWithFacebook() {
+        view.showSpinner()
         let service = Service(lang: lang)
         service.authWithFacebook(params: self.fbParams!, popoverAlert: { (message) in
             self.retryFunction = self.signWithFacebook
@@ -950,6 +952,7 @@ extension AuthViewController {
     }
     
     private func signWithGoogle() {
+        view.showSpinner()
         let service = Service(lang: lang)
         service.authWithGoogle(params: self.gParams!, popoverAlert: { (message) in
             self.retryFunction = self.signWithGoogle

@@ -707,6 +707,7 @@ extension CategoryViewController {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = .whiteSmoke
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16, weight: .medium)]
         
         // Initialize subveiw properties
         detailContainer = {

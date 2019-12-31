@@ -1055,7 +1055,7 @@ struct LangPack {
                                          "Find out what affects your mood."]
             case LanguageId.kor: return ["조금더 노력하면 좋은 날이 올거에요.",
                                          "천천히 좋아지는 것도 괜찮아요.",
-                                         "어떤 것들이 당신의 기분에 영향을 주는 지 찾아 보아요."]
+                                         "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요."]
             default: fatalError()}
         }()
         self.msgMoodGoodMsgs = {
