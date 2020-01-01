@@ -79,9 +79,22 @@ class HomeViewController: UIViewController {
         })
         if UserDefaults.standard.isSignIn() {
             selectedYear = currentYear
-            selectedMonth = nil
             yearPicker.selectRow(0, inComponent: 0, animated: true)
+            selectedMonth = nil
+            if selectedYear == currentYear {
+                var month = currentMonth
+                var months = [Int]()
+                while month! > 0 {
+                    months.append(month!)
+                    month! -= 1
+                }
+                monthArr = months
+            } else {
+                monthArr = [12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+            }
+            monthPicker.reloadAllComponents()
             monthPicker.selectRow(0, inComponent: 0, animated: true)
+            
             loadScoreboard()
             loadAvatar()
             loadRemainingLifeSpan()
@@ -198,7 +211,7 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             case TagId.diary:
                 cell.label.textColor = UIColor(hex: "#FF7187")
             case TagId.ranking:
-                cell.label.textColor = UIColor(hex: "#948BFF")
+                cell.label.textColor = .purple_948BFF
             case TagId.bookmarks:
                 cell.label.textColor = UIColor(hex: "#FFBF67")
             default:
@@ -271,12 +284,11 @@ extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        switch pickerView {
-        case yearPicker:
+        if pickerView == yearPicker {
             return yearArr.count
-        case monthPicker:
+        } else if pickerView == monthPicker {
             return monthArr.count + 1
-        default:
+        } else {
             return 0
         }
     }
@@ -286,10 +298,9 @@ extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
         label.textColor = .green_3ED6A7
         label.font = .systemFont(ofSize: 20, weight: .regular)
         label.textAlignment = .center
-        switch pickerView {
-        case yearPicker:
+        if pickerView == yearPicker {
             label.text = "\(yearArr[row])"
-        case monthPicker:
+        } else if pickerView == monthPicker {
             if row == 0 {
                 label.text = "-"
             } else {
@@ -302,8 +313,6 @@ extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
                     fatalError()
                 }
             }
-        default:
-            fatalError()
         }
         return label
     }
@@ -311,8 +320,7 @@ extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     // MARK: - UIPickerViewDelegate
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        switch pickerView {
-        case yearPicker:
+        if pickerView == yearPicker {
             selectedYear = yearArr[row]
             selectedMonth = nil
             if selectedYear == currentYear {
@@ -328,16 +336,13 @@ extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
             }
             monthPicker.reloadAllComponents()
             monthPicker.selectRow(0, inComponent: 0, animated: true)
-        case monthPicker:
+        } else if pickerView == monthPicker {
             if row == 0 {
                 selectedMonth = nil
             } else {
                 selectedMonth = monthArr[row - 1]
             }
-        default:
-            fatalError()
         }
-        
         if UserDefaults.standard.isSignIn() {
             loadScoreboard()
         }
