@@ -1228,7 +1228,7 @@ struct LangPack {
         func _getLogGroupSection(monthNumber: Int, dayNumber: Int) -> String {
             switch currentLanguageId {
             case LanguageId.eng: return "\(dayNumber) \(LangHelper.getEngNameOfMonth(monthNumber: monthNumber))"
-            case LanguageId.kor: return "\(dayNumber)일 \(monthNumber)월"
+            case LanguageId.kor: return "\(monthNumber)월 \(dayNumber)일"
             default: fatalError()}
         }
         self.getLogGroupSection = _getLogGroupSection

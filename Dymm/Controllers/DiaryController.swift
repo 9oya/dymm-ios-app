@@ -41,7 +41,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     // UICollectionView
     var diseaseCollection: UICollectionView!
-    var pickerCollection: UICollectionView!
+    var groupOfLogsCollection: UICollectionView!
     
     // UIPickerView
     var groupTypePicker: UIPickerView!
@@ -653,7 +653,6 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 // If the date of the currently selected section is today add the emoji in it to prefix
                 weekday = "\u{26A1}" + weekday
             }
-            
             // Set view layout
             let label = UILabel()
             label.text = "\(weekday), \(lang.getLogGroupSection(logGroup.month_number, logGroup.day_number))"
@@ -1003,8 +1002,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        switch collectionView {
-        case pickerCollection:
+        if collectionView == groupOfLogsCollection {
             var total = 0
             if let foodLogs = groupOfLogSet?.food_logs {
                 total += (foodLogs.count)
@@ -1016,23 +1014,22 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 total += (drugLogs.count)
             }
             return total
-        case diseaseCollection:
+        } else if collectionView == diseaseCollection {
             return avtCondList?.count ?? 0
-        default:
-            fatalError()
+        } else {
+            return 0
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         switch collectionView {
-        case pickerCollection:
+        case groupOfLogsCollection:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: logCollectionCellId, for: indexPath) as? LogCollectionCell else {
                 fatalError()
             }
             if ((groupOfLogSet!.food_logs?.count) != nil && ((groupOfLogSet!.food_logs?.count)!) > 0) {
                 let foodLog = groupOfLogSet!.food_logs!.popLast()
                 tempStoredLogs.append(foodLog!)
-                
                 cell.bulletView.backgroundColor = UIColor.tomato
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.nameLabel.text = foodLog!.eng_name
@@ -1055,7 +1052,6 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             } else if ((groupOfLogSet!.act_logs?.count) != nil && ((groupOfLogSet!.act_logs?.count)!) > 0) {
                 let actLog = groupOfLogSet!.act_logs!.popLast()
                 tempStoredLogs.append(actLog!)
-                
                 cell.bulletView.backgroundColor = .cornflowerBlue
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.nameLabel.text = actLog!.eng_name
@@ -1074,7 +1070,6 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             } else if ((groupOfLogSet!.drug_logs?.count) != nil && ((groupOfLogSet!.drug_logs?.count)!) > 0) {
                 let drugLog = groupOfLogSet!.drug_logs!.popLast()
                 tempStoredLogs.append(drugLog!)
-                
                 cell.bulletView.backgroundColor = .green_72E5EA
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.nameLabel.text = drugLog!.eng_name
@@ -1145,10 +1140,9 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
     // MARK: - UICollectionViewDelegate
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        switch collectionView {
-        case pickerCollection:
+        if collectionView == groupOfLogsCollection {
             return
-        case diseaseCollection:
+        } else if collectionView == diseaseCollection {
             if isCondEditBtnTapped {
                 selectedAvatarDiseaseId = avtCondList![indexPath.item].id
                 updateAvatarCondRemove()
@@ -1159,8 +1153,6 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             vc.superTagId = avtCondList![indexPath.item].tag_id
             vc.topLeftButtonType = ButtonType.back
             self.navigationController?.pushViewController(vc, animated: true)
-        default:
-            fatalError()
         }
     }
     
@@ -1190,7 +1182,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             } else {
                 cell.endDateLabel.isHidden = true
             }
-        } else if collectionView == pickerCollection {
+        } else if collectionView == groupOfLogsCollection {
             // The cells has not store data itself.
             // So when they vanished from the screen, they lost view layout infos.
             // That means they need to resetting view layouts, when they reappear from vanishing.
@@ -1256,7 +1248,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenWidth = UIScreen.main.bounds.width
         switch collectionView {
-        case pickerCollection:
+        case groupOfLogsCollection:
             return CGSize(width: screenWidth - (screenWidth / 7), height: CGFloat(30))
         case diseaseCollection:
             return CGSize(width: screenWidth - (screenWidth / 7), height: CGFloat(45))
@@ -1448,7 +1440,7 @@ extension DiaryViewController {
             _tableView.translatesAutoresizingMaskIntoConstraints = false
             return _tableView
         }()
-        pickerCollection = {
+        groupOfLogsCollection = {
             let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
             _collectionView.backgroundColor = .clear
             _collectionView.register(LogCollectionCell.self, forCellWithReuseIdentifier: logCollectionCellId)
@@ -1745,8 +1737,8 @@ extension DiaryViewController {
         calendarView.delegate = self
         logGroupTable.dataSource = self
         logGroupTable.delegate = self
-        pickerCollection.dataSource = self
-        pickerCollection.delegate = self
+        groupOfLogsCollection.dataSource = self
+        groupOfLogsCollection.delegate = self
         moodScorePicker.dataSource = self
         moodScorePicker.delegate = self
         diseaseCollection.dataSource = self
@@ -1785,7 +1777,7 @@ extension DiaryViewController {
         
         pickerContainerView.addSubview(pickerDateLabel)
         pickerContainerView.addSubview(groupTypePicker)
-        pickerContainerView.addSubview(pickerCollection)
+        pickerContainerView.addSubview(groupOfLogsCollection)
         pickerContainerView.addSubview(pickerGrayLineView)
         pickerContainerView.addSubview(pickerCancelBtn)
         pickerContainerView.addSubview(pickerCheckBtn)
@@ -1828,10 +1820,10 @@ extension DiaryViewController {
         groupTypePicker.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: 0).isActive = true
         groupTypePicker.heightAnchor.constraint(equalToConstant: 215).isActive = true
         
-        pickerCollection.topAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: 170).isActive = true
-        pickerCollection.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: 0).isActive = true
-        pickerCollection.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: 0).isActive = true
-        pickerCollectionHeight = pickerCollection.heightAnchor.constraint(equalToConstant: 210)
+        groupOfLogsCollection.topAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: 170).isActive = true
+        groupOfLogsCollection.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: 0).isActive = true
+        groupOfLogsCollection.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: 0).isActive = true
+        pickerCollectionHeight = groupOfLogsCollection.heightAnchor.constraint(equalToConstant: 210)
         pickerCollectionHeight.priority = UILayoutPriority(rawValue: 999)
         pickerCollectionHeight.isActive = true
         
@@ -1935,7 +1927,7 @@ extension DiaryViewController {
         if CGFloat(collectionViewHeightVal + 220) > (UIScreen.main.bounds.height * 0.84) {
             dynamicHeightVal = UIScreen.main.bounds.height * 0.5
         }
-        pickerCollection.reloadData()
+        groupOfLogsCollection.reloadData()
         UIView.animate(withDuration: 0.5) {
             self.pickerCollectionHeight.constant = dynamicHeightVal
             self.pickerContainerHeight.constant = dynamicHeightVal + 220
