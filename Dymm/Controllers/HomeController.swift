@@ -42,6 +42,7 @@ class HomeViewController: UIViewController {
     var profileImgView: UIImageView!
     var scoreEmoImgView: UIImageView!
     var cubeImgView: UIImageView!
+    var aiBoardBgImgView: UIImageView!
     
     // UIButton
     var profileButton: UIButton!
@@ -441,7 +442,7 @@ extension HomeViewController {
         aiMsgLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 16, weight: .regular)
-            _label.textColor = .green_3ED6A7
+            _label.textColor = .yellow_F8F6E9
             _label.textAlignment = .center
             _label.numberOfLines = 3
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -450,7 +451,7 @@ extension HomeViewController {
         lifespanLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 16, weight: .regular)
-            _label.textColor = .green_3ED6A7
+            _label.textColor = .yellow_F8F6E9
             _label.textAlignment = .center
             _label.numberOfLines = 3
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -461,6 +462,16 @@ extension HomeViewController {
             _imageView.contentMode = .scaleAspectFit
             _imageView.image = .item3dCube
             _imageView.isHidden = true
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        aiBoardBgImgView = {
+            let _imageView = UIImageView()
+            _imageView.contentMode = .scaleAspectFill
+            _imageView.image = .itemBgWave
+            _imageView.layer.cornerRadius = 10.0
+            _imageView.clipsToBounds = true
+            _imageView.isHidden = false
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
@@ -537,6 +548,7 @@ extension HomeViewController {
         scoreboardView.addSubview(ageLabel)
         scoreboardView.addSubview(genderLabel)
         
+        aiBoardView.addSubview(aiBoardBgImgView)
         aiBoardView.addSubview(aiMsgLabel)
         aiBoardView.addSubview(lifespanLabel)
         aiBoardView.addSubview(cubeImgView)
@@ -579,6 +591,11 @@ extension HomeViewController {
         aiBoardView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 7).isActive = true
         aiBoardView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
         aiBoardView.heightAnchor.constraint(equalToConstant: view.frame.height / 8.2).isActive = true
+        
+        aiBoardBgImgView.topAnchor.constraint(equalTo: aiBoardView.topAnchor, constant: 0).isActive = true
+        aiBoardBgImgView.leadingAnchor.constraint(equalTo: aiBoardView.leadingAnchor, constant: 0).isActive = true
+        aiBoardBgImgView.trailingAnchor.constraint(equalTo: aiBoardView.trailingAnchor, constant: 0).isActive = true
+        aiBoardBgImgView.bottomAnchor.constraint(equalTo: aiBoardView.bottomAnchor, constant: 0).isActive = true
         
         aiMsgLabel.centerYAnchor.constraint(equalTo: aiBoardView.centerYAnchor, constant: -10).isActive = true
         aiMsgLabel.centerXAnchor.constraint(equalTo: aiBoardView.centerXAnchor, constant: 0).isActive = true
@@ -711,7 +728,6 @@ extension HomeViewController {
                     self.lifespanLabel.text = "\(year)년 \(days)일 남았습니다."
                 default: fatalError()}
                 self.lifespanLabel.isHidden = false
-                self.aiMsgLabel.textColor = .green_3ED6A7
                 self.aiBoardView.isHidden = false
                 self.cubeImgView.isHidden = false
                 

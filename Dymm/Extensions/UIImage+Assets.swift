@@ -102,4 +102,5 @@ extension UIImage {
     static let itemPlusActivity = UIImage(named: "item-plus-activity")!
     static let itemPlusDisease = UIImage(named: "item-plus-disease")!
     static let itemPlusBookmark = UIImage(named: "item-plus-bookmark")!
+    static let itemBgWave = UIImage(named: "item-bg-wave")!
 }
