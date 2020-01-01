@@ -2000,9 +2000,36 @@ extension DiaryViewController {
         }, tokenRefreshCompletion: {
             self.loadLogGroups()
         }) { (logGroups) in
-            self.logGroups = logGroups
-            self.logGroupSectTwoDimArr = service.convertLogGroupsIntoTwoDimLogGroupSectArr(logGroups)
-            self.logGroupDictTwoDimArr = service.convertSortedLogGroupSectTwoDimArrIntoLogGroupDictTwoDimArr(self.logGroupSectTwoDimArr)
+            var logGroups1 = [BaseModel.LogGroup]()
+            var logGroups2 = [BaseModel.LogGroup]()
+            if logGroups.count > 0 {
+                let year1 = logGroups[0].year_number
+                var year2 = 0
+                for logGroup in logGroups {
+                    if logGroup.year_number == year1 {
+                        logGroups1.append(logGroup)
+                    } else {
+                        year2 = logGroup.year_number
+                        logGroups2.append(logGroup)
+                    }
+                }
+                let logGroupSectTwoDimArr1 = service.convertLogGroupsIntoTwoDimLogGroupSectArr(logGroups1)
+                if year2 != 0 {
+                    let logGroupSectTwoDimArr2 = service.convertLogGroupsIntoTwoDimLogGroupSectArr(logGroups2)
+                    if year2 > year1 {
+                        self.logGroupSectTwoDimArr = logGroupSectTwoDimArr2 + logGroupSectTwoDimArr1
+                    } else {
+                        self.logGroupSectTwoDimArr = logGroupSectTwoDimArr1 + logGroupSectTwoDimArr2
+                    }
+                } else {
+                    self.logGroupSectTwoDimArr = logGroupSectTwoDimArr1
+                }
+                self.logGroupDictTwoDimArr = service.convertSortedLogGroupSectTwoDimArrIntoLogGroupDictTwoDimArr(self.logGroupSectTwoDimArr)
+            } else {
+                self.logGroups = logGroups
+                self.logGroupSectTwoDimArr = [[CustomModel.LogGroupSection]]()
+                self.logGroupDictTwoDimArr = [Int:[Int:BaseModel.LogGroup]]()
+            }
             self.calendarView.reloadData()
             self.logGroupTable.reloadData()
             
