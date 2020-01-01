@@ -77,24 +77,23 @@ class HomeViewController: UIViewController {
             self.monthPicker.reloadAllComponents()
             self.tagCollectionView.reloadData()
         })
-        if UserDefaults.standard.isSignIn() {
-            selectedYear = currentYear
-            yearPicker.selectRow(0, inComponent: 0, animated: true)
-            selectedMonth = nil
-            if selectedYear == currentYear {
-                var month = currentMonth
-                var months = [Int]()
-                while month! > 0 {
-                    months.append(month!)
-                    month! -= 1
-                }
-                monthArr = months
-            } else {
-                monthArr = [12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+        selectedYear = currentYear
+        yearPicker.selectRow(0, inComponent: 0, animated: true)
+        selectedMonth = nil
+        if selectedYear == currentYear {
+            var month = currentMonth
+            var months = [Int]()
+            while month! > 0 {
+                months.append(month!)
+                month! -= 1
             }
-            monthPicker.reloadAllComponents()
-            monthPicker.selectRow(0, inComponent: 0, animated: true)
-            
+            monthArr = months
+        } else {
+            monthArr = [12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+        }
+        monthPicker.reloadAllComponents()
+        monthPicker.selectRow(0, inComponent: 0, animated: true)
+        if UserDefaults.standard.isSignIn() {
             loadScoreboard()
             loadAvatar()
             loadRemainingLifeSpan()
@@ -501,7 +500,7 @@ extension HomeViewController {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemProfileDef.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 31, height: 31)
-            _button.layer.cornerRadius = _button.frame.width / 2
+            _button.layer.cornerRadius = _button.frame.height / 2
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(profileButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -629,34 +628,17 @@ extension HomeViewController {
     }
     
     private func showGuestScene() {
-        monthArr = {
-            var month = currentMonth
-            var months = [Int]()
-            while month! > 0 {
-                months.append(month!)
-                month! -= 1
-            }
-            return months
-        }()
-        yearPicker.selectRow(0, inComponent: 0, animated: true)
-        monthPicker.selectRow(0, inComponent: 0, animated: true)
-        
         UIView.transition(with: profileButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
             self.scoreboardView.isHidden = false
             self.aiBoardView.isHidden = false
-            
             self.scoreEmoImgView.image = getCondScoreImageLarge(0)
-            
             self.scoreTitleLabel.text = self.lang.getMoodScoreName(0)
             self.scoreNumberLabel.text = String(format: "%.1f", 0.0)
             self.scoreMessageLabel.text = self.lang.titleMyCondScore
-            
             self.ageLabel.text = self.lang.titleAge
             self.genderLabel.text = self.lang.titleGender
-            
             self.aiMsgLabel.text = self.lang.msgSignUpYet
             self.lifespanLabel.text = ""
-            
             self.profileButton.setTitleColor(.clear, for: .normal)
             self.profileButton.backgroundColor = .clear
             self.profileButton.setBackgroundImage(.itemProfileDef, for: .normal)
