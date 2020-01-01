@@ -41,7 +41,6 @@ class ProfileViewController: UIViewController {
     
     // UIButton
     var signOutButton: UIButton!
-    var closeButton: UIButton!
     var notConfirmedEmailButton: UIButton!
     var sendVerifMailBtn: UIButton!
     var colorLeftButton: UIButton!
@@ -149,10 +148,6 @@ class ProfileViewController: UIViewController {
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel, handler: nil))
         alert.view.tintColor = .purple_B847FF
         present(alert, animated: true, completion:{})
-    }
-    
-    @objc func closeButtonTapped() {
-        dismiss(animated: true, completion: nil)
     }
     
     @objc func signOutButtonTapped() {
@@ -450,27 +445,6 @@ class ProfileViewController: UIViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    @objc func alertTempFreeTriar() {
-        let alert = UIAlertController(title: lang.titleMembership, message: "\(lang.titleFreeTrial!)!", preferredStyle: .alert)
-        let logoImageView: UIImageView = {
-            let imageView = UIImageView()
-            imageView.contentMode = .scaleAspectFit
-            imageView.image = .itemLogoM
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-            return imageView
-        }()
-        alert.view.addSubview(logoImageView)
-        
-        logoImageView.centerXAnchor.constraint(equalTo: alert.view.centerXAnchor, constant: 0).isActive = true
-        logoImageView.centerYAnchor.constraint(equalTo: alert.view.centerYAnchor, constant: 10).isActive = true
-        
-        let height = NSLayoutConstraint(item: alert.view!, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 220)
-        alert.view.addConstraint(height)
-        alert.addAction(UIAlertAction(title: lang.titleDone, style: .cancel) { _ in })
-        alert.view.tintColor = .purple_B847FF
-        present(alert, animated: true, completion: nil)
-    }
-    
     @objc func colorRightButtonTapped() {
         if selectedColorItem == nil {
             colorLeftButtonTapped()
@@ -588,7 +562,6 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
                 return
             case TagId.subscription:
                 presentIAPController()
-//                alertTempFreeTriar()
                 return
             default:
                 loadProfileTagsOnPicker()
@@ -762,8 +735,6 @@ extension ProfileViewController {
         topBarContainer = getAddtionalTopBarView()
         signOutButton = getBasicTextButton()
         signOutButton.addTarget(self, action: #selector(signOutButtonTapped), for: .touchUpInside)
-        closeButton = getCloseButton()
-        closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         notConfirmedEmailButton = {
             let _button = UIButton(type: .system)
             _button.titleLabel?.font = .systemFont(ofSize: 16)
@@ -978,7 +949,6 @@ extension ProfileViewController {
         colorContainer.addSubview(colorRightButton)
         
         setupLangProperties()
-//        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
         tagCollection.dataSource = self
         tagCollection.delegate = self
         colorCollection.dataSource = self

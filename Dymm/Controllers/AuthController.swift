@@ -387,6 +387,9 @@ extension AuthViewController: LoginButtonDelegate {
 }
 
 extension AuthViewController: GIDSignInDelegate {
+    
+    // MARK: Google sign in
+    
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if let error = error {
             print("\(error.localizedDescription)")

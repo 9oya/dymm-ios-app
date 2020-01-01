@@ -543,7 +543,6 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         guard let _subTags = subTags else {
             return
         }
-        
         if lastContentOffset > scrollView.contentOffset.y {
             // Case scolled up
             return
@@ -554,8 +553,6 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         } else {
             lastContentOffset = scrollView.contentOffset.y
         }
-        
-        
         if (scrollView.frame.size.height + scrollView.contentOffset.y) > (scrollView.contentSize.height - 200) {
             if _subTags.count == minimumCnt {
                 isScrollToLoading = true

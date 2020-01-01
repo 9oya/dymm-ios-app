@@ -345,7 +345,6 @@ extension IAPController {
         productDsc1Label.trailingAnchor.constraint(equalTo: descScrollView.trailingAnchor, constant: -7).isActive = true
         
         privacyPolicyLink.topAnchor.constraint(equalTo: productDsc1Label.bottomAnchor, constant: 1).isActive = true
-//        privacyPolicyLink.centerXAnchor.constraint(equalTo: descScrollView.centerXAnchor, constant: 0).isActive = true
         privacyPolicyLink.trailingAnchor.constraint(equalTo: termsLink.leadingAnchor, constant: -7).isActive = true
         
         termsLink.topAnchor.constraint(equalTo: productDsc1Label.bottomAnchor, constant: 1).isActive = true

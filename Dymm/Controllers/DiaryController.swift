@@ -57,7 +57,6 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var toggleBtn: UIButton!
     var pickerCancelBtn: UIButton!
     var pickerCheckBtn: UIButton!
-    var homeBtn: UIButton!
     var notesBtn: UIButton!
     var avgScoreBtn: UIButton!
     var diseaseHistoryBtn: UIButton!
@@ -141,6 +140,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var isCondEditBtnTapped: Bool = false
     var isFirstAppear: Bool = true
     var isPlusBtnTapped: Bool = false
+    var isDiseaseHistoyPoped: Bool = false
     var superTag: BaseModel.Tag?
     
     override func viewDidLoad() {
@@ -150,7 +150,11 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        diseaseLeftBtnTapped()
+        if isDiseaseHistoyPoped {
+            diseaseRefreshButtonTapped()
+        } else {
+            diseaseLeftBtnTapped()
+        }
         selectedOnceCellIdxPath = nil
         selectedTableSection = nil
         selectedTableRow = nil
@@ -462,6 +466,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             self.isCondEditBtnTapped = false
             self.diseaseRightBtn.setTitle(self.lang.titleEdit, for: .normal)
             self.diseaseRightBtn.setTitleColor(.purple_B847FF, for: .normal)
+            self.isDiseaseHistoyPoped = false
         })
     }
     
@@ -645,10 +650,8 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             var weekday = lang.getWeekdayName(Calendar.current.component(.weekday, from: date!))
             let strTodayDateArr = dateFormatter.string(from: calendarView.today!).components(separatedBy: "-")
             if Int(strTodayDateArr[1]) == logGroup.month_number && Int(strTodayDateArr[2]) == logGroup.day_number {
-                // If the date of the currently selected section is today add the ✨ emoji in it to prefix
-//                weekday = "\u{2728}" + weekday
+                // If the date of the currently selected section is today add the emoji in it to prefix
                 weekday = "\u{26A1}" + weekday
-//                weekday = "\u{1F31F}" + weekday
             }
             
             // Set view layout
@@ -702,9 +705,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             }
             cell.moodScoreButton.addTarget(self, action: #selector(alertCondScorePicker), for: .touchUpInside)
             cell.noteButton.addTarget(self, action: #selector(alertNoteTextView(_:)), for: .touchUpInside)
-            
             cell.logCellButton.addTarget(self, action: #selector(presentCategoryWhenGroupOfALogCellTapped(sender:)), for: .touchUpInside)
-            
             return cell
         case DiaryMode.logger:
             if indexPath.row == 0 {
@@ -1256,7 +1257,6 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
         let screenWidth = UIScreen.main.bounds.width
         switch collectionView {
         case pickerCollection:
-//            return CGSize(width: screenWidth - (screenWidth / 5), height: CGFloat(30))
             return CGSize(width: screenWidth - (screenWidth / 7), height: CGFloat(30))
         case diseaseCollection:
             return CGSize(width: screenWidth - (screenWidth / 7), height: CGFloat(45))
@@ -1503,15 +1503,6 @@ extension DiaryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        homeBtn = {
-            let _button = UIButton(type: .system)
-            _button.setImage(UIImage.itemHome.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
-            _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
-            _button.translatesAutoresizingMaskIntoConstraints = false
-            return _button
-        }()
         notesBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemNotes.withRenderingMode(.alwaysOriginal), for: .normal)
@@ -1727,7 +1718,6 @@ extension DiaryViewController {
             stackView.translatesAutoresizingMaskIntoConstraints = false
             return stackView
         }()
-        
         guideIllustImgView = {
             let _imageView = UIImageView()
             _imageView.image = .itemIllustGirl2
@@ -1738,18 +1728,16 @@ extension DiaryViewController {
         }()
         
         if diaryMode == DiaryMode.editor {
-//            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeBtn)
             navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: notesBtn), UIBarButtonItem(customView: avgScoreBtn)]
             calendarView.appearance.titleDefaultColor = UIColor.black
             diseaseHistoryBtn.isHidden = false
             plusBtn.isHidden = false
-            plusBtns = [foodPlusBtn, pillPlusBtn, activityPlusBtn, diseasePlusBtn, bookmarkPlusBtn]
-            
+            plusBtns = [diseasePlusBtn, activityPlusBtn, pillPlusBtn, foodPlusBtn, bookmarkPlusBtn]
             plusBtnStackView.addArrangedSubview(bookmarkPlusBtn)
-            plusBtnStackView.addArrangedSubview(diseasePlusBtn)
-            plusBtnStackView.addArrangedSubview(activityPlusBtn)
-            plusBtnStackView.addArrangedSubview(pillPlusBtn)
             plusBtnStackView.addArrangedSubview(foodPlusBtn)
+            plusBtnStackView.addArrangedSubview(pillPlusBtn)
+            plusBtnStackView.addArrangedSubview(activityPlusBtn)
+            plusBtnStackView.addArrangedSubview(diseasePlusBtn)
             plusBtnStackView.addArrangedSubview(plusBtn)
         }
         
@@ -2000,6 +1988,7 @@ extension DiaryViewController {
         }, tokenRefreshCompletion: {
             self.loadLogGroups()
         }) { (logGroups) in
+            self.logGroups = logGroups
             var logGroups1 = [BaseModel.LogGroup]()
             var logGroups2 = [BaseModel.LogGroup]()
             if logGroups.count > 0 {
@@ -2026,18 +2015,15 @@ extension DiaryViewController {
                 }
                 self.logGroupDictTwoDimArr = service.convertSortedLogGroupSectTwoDimArrIntoLogGroupDictTwoDimArr(self.logGroupSectTwoDimArr)
             } else {
-                self.logGroups = logGroups
                 self.logGroupSectTwoDimArr = [[CustomModel.LogGroupSection]]()
                 self.logGroupDictTwoDimArr = [Int:[Int:BaseModel.LogGroup]]()
             }
             self.calendarView.reloadData()
             self.logGroupTable.reloadData()
-            
             if let section = self.selectedTableSection, let row = self.selectedTableRow {
                 self.selectedLogGroup = self.logGroupSectTwoDimArr[section][row].logGroup
                 self.updateLogGroupTable()
             }
-            
             if self.isToggleBtnTapped && logGroups.count > 0 {
                 self.isToggleBtnTapped = false
                 self.updateLogGroupTable(completion: {
@@ -2045,7 +2031,6 @@ extension DiaryViewController {
                     self.logGroupTable.scrollToRow(at: indexPath, at: .top, animated: true)
                 })
             }
-            
             if self.isPullToRefresh && logGroups.count > 0 {
                 DispatchQueue.main.async {
                     self.refreshControler.endRefreshing()
@@ -2053,21 +2038,18 @@ extension DiaryViewController {
                 self.isPullToRefresh = false
                 self.updateLogGroupTable()
             }
-            
             if self.isLogGroupTableEdited {
                 self.isLogGroupTableEdited = false
                 self.updateLogGroupTable(completion: {
                     self.editedCellIdxPath = nil
                 })
             }
-            
             if self.isFirstAppear {
                 self.isFirstAppear = false
                 if self.diaryMode == DiaryMode.logger {
                     self.popoverLogger(self.calendarView.today!)
                 }
             }
-            
             if self.diaryMode == DiaryMode.editor {
                 UIView.animate(withDuration: 0.5) {
                     if logGroups.count <= 0 {
@@ -2161,7 +2143,6 @@ extension DiaryViewController {
             self.avtCondList = avtCondList
             self.diseaseCollection.reloadData()
             self.diseaseLeftBtn.setTitleColor(.purple_B847FF, for: .normal)
-            
             var collectionViewHeight = CGFloat(45 * self.avtCondList!.count)
             if CGFloat(collectionViewHeight + 105) > (UIScreen.main.bounds.height * 0.84) {
                 collectionViewHeight = UIScreen.main.bounds.height * 0.5
@@ -2176,6 +2157,7 @@ extension DiaryViewController {
                 self.diseaseContainer.isHidden = false
                 self.blindView.isHidden = false
             })
+            self.isDiseaseHistoyPoped = true
         }
     }
     

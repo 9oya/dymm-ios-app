@@ -28,7 +28,6 @@ class RankingViewController: UIViewController {
     var startingPickerView: UIPickerView!
     
     // UIButton
-    var homeButton: UIButton!
     var ageGroupPickButton: UIButton!
     var startingPickButton: UIButton!
     
@@ -52,7 +51,6 @@ class RankingViewController: UIViewController {
     var lang: LangPack!
     var retryFunction: (() -> Void)?
     
-//    var myRanking:
     var rankings: [CustomModel.Ranking]?
     var lastContentOffset: CGFloat = 0.0
     var isScrollToLoading: Bool = false
@@ -126,10 +124,6 @@ class RankingViewController: UIViewController {
         })
         alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil )
-    }
-    
-    @objc func homeButtonTapped() {
-        dismiss(animated: true, completion: nil)
     }
 }
 
@@ -297,15 +291,6 @@ extension RankingViewController {
         view.backgroundColor = .whiteSmoke
         navigationItem.title = lang.titleRanking.uppercased()
         
-        homeButton = {
-            let _button = UIButton(type: .system)
-            _button.setImage(UIImage.itemHome.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
-            _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
-            _button.translatesAutoresizingMaskIntoConstraints = false
-            return _button
-        }()
         myRankingContainer = {
             let _view = UIView()
             _view.backgroundColor = .white
@@ -434,7 +419,6 @@ extension RankingViewController {
         myYearsBarBg = {
             let _view = UIView()
             _view.backgroundColor = UIColor(hex: "#CBF5E8")
-//            _view.backgroundColor = UIColor.green_00E9CC.withAlphaComponent(0.37)
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
@@ -447,7 +431,6 @@ extension RankingViewController {
         myDaysBarBg = {
             let _view = UIView()
             _view.backgroundColor = UIColor(hex: "#CBF5E8")
-//            _view.backgroundColor = UIColor.green_00E9CC.withAlphaComponent(0.37)
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
@@ -458,7 +441,6 @@ extension RankingViewController {
             return _view
         }()
         
-//        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
         rankingTableView.dataSource = self
         rankingTableView.delegate = self
         startingPickerView.dataSource = self
