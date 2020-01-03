@@ -155,10 +155,13 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         } else {
             diseaseLeftBtnTapped()
         }
-        selectedOnceCellIdxPath = nil
-        selectedTableSection = nil
-        selectedTableRow = nil
-        loadLogGroups()
+        if UserDefaults.standard.isCreateNewLog() {
+            selectedOnceCellIdxPath = nil
+            selectedTableSection = nil
+            selectedTableRow = nil
+            loadLogGroups()
+            UserDefaults.standard.setIsCreateNewLog(value: false)
+        }
     }
     
     // MARK: - Actions
@@ -184,6 +187,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             _ = self.navigationController?.popViewController(animated: true)
         })
         alert.addAction(UIAlertAction(title: lang.titleReturn, style: .default) { _ in
+            UserDefaults.standard.setIsCreateNewLog(value: true)
             let controller = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 3]
             self.navigationController?.popToViewController(controller!, animated: true)
         })
@@ -1120,12 +1124,12 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 if let startDate = avtCond.start_date {
                     let dateArr = startDate.split(separator: "/")
                     let month = LangHelper.getKorNameOfMonth(monthNumber: nil, engMMM: String(dateArr[0]))
-                    cell.startDateLabel.text = "\(month)/\(dateArr[1])/\(dateArr[2])\u{021E2}"
+                    cell.startDateLabel.text = "\(dateArr[2])/\(month)/\(dateArr[1])일\u{021E2}"
                 }
                 if let endDate = avtCond.end_date {
                     let dateArr = endDate.split(separator: "/")
                     let month = LangHelper.getKorNameOfMonth(monthNumber: nil, engMMM: String(dateArr[0]))
-                    cell.endDateLabel.text = "\u{2713}\(month)/\(dateArr[1])/\(dateArr[2])"
+                    cell.endDateLabel.text = "\u{2713}\(dateArr[2])/\(month)/\(dateArr[1])일"
                 }
             case LanguageId.jpn:
                 cell.titleLabel.text = avtCond.jpn_name

@@ -910,7 +910,7 @@ struct LangPack {
         self.msgDiarySelect = {
             switch currentLanguageId {
             case LanguageId.eng: return "Select a calendar date or a group below."
-            case LanguageId.kor: return "아래에서 달력 날짜 또는 그룹을 선택해주세요."
+            case LanguageId.kor: return "아래에서 달력날짜 또는 그룹을 선택해주세요."
             default: fatalError()}
         }()
         self.msgDuplicatedEmail = {

@@ -15,6 +15,7 @@ extension UserDefaults {
         case isEmailConfirmed
         case isFreeTrial
         case isPurchased
+        case isCreateNewLog
         case accessToken
         case refreshToken
         case avatarId
@@ -40,6 +41,11 @@ extension UserDefaults {
     
     func setIsPurchased(value: Bool) {
         set(value, forKey: UserDefaultsKeys.isPurchased.rawValue)
+        synchronize()
+    }
+    
+    func setIsCreateNewLog(value: Bool) {
+        set(value, forKey: UserDefaultsKeys.isCreateNewLog.rawValue)
         synchronize()
     }
     
@@ -79,6 +85,10 @@ extension UserDefaults {
     
     func isPurchased() -> Bool {
         return bool(forKey: UserDefaultsKeys.isPurchased.rawValue)
+    }
+    
+    func isCreateNewLog() -> Bool {
+        return bool(forKey: UserDefaultsKeys.isCreateNewLog.rawValue)
     }
     
     func getAccessToken() -> String? {
