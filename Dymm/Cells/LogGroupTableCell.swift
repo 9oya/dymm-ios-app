@@ -86,7 +86,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
         }
         if ((groupOfLogSetForPop!.food_logs?.count) != nil && ((groupOfLogSetForPop!.food_logs?.count)!) > 0) {
             let foodLog = groupOfLogSetForPop!.food_logs!.popLast()
-            cell.bulletView.backgroundColor = .red_FF4779
+            cell.bulletView.backgroundColor = .red_FF7187
             switch lang.currentLanguageId {
             case LanguageId.eng: cell.nameLabel.text = foodLog!.eng_name
             case LanguageId.kor: cell.nameLabel.text = foodLog!.kor_name
@@ -108,7 +108,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
             logsArray.append(foodLog!)
         } else if ((groupOfLogSetForPop!.act_logs?.count) != nil && ((groupOfLogSetForPop!.act_logs?.count)!) > 0) {
             let actLog = groupOfLogSetForPop!.act_logs!.popLast()
-            cell.bulletView.backgroundColor = .cornflowerBlue
+            cell.bulletView.backgroundColor = .green_7AE8AB
             switch lang.currentLanguageId {
             case LanguageId.eng: cell.nameLabel.text = actLog!.eng_name
             case LanguageId.kor: cell.nameLabel.text = actLog!.kor_name
@@ -126,7 +126,7 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
             logsArray.append(actLog!)
         } else if ((groupOfLogSetForPop!.drug_logs?.count) != nil && ((groupOfLogSetForPop!.drug_logs?.count)!) > 0) {
             let drugLog = groupOfLogSetForPop!.drug_logs!.popLast()
-            cell.bulletView.backgroundColor = .green_72E5EA
+            cell.bulletView.backgroundColor = .blue_81E4FC
             switch lang.currentLanguageId {
             case LanguageId.eng: cell.nameLabel.text = drugLog!.eng_name
             case LanguageId.kor: cell.nameLabel.text = drugLog!.kor_name
@@ -258,7 +258,7 @@ extension LogGroupTableCell {
         }()
         nameLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 15)
+            _label.font = .systemFont(ofSize: 15, weight: .bold)
             _label.textAlignment = .left
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
@@ -275,28 +275,25 @@ extension LogGroupTableCell {
         }()
         foodLogBulletView = {
             let _view = UIView(frame: CGRect(x: 0, y: 0, width: 7, height: 7))
-            _view.backgroundColor = .red_FF4779
+            _view.backgroundColor = .red_FF7187
             _view.layer.cornerRadius = 3.5
             _view.isHidden = true
-            _view.addShadowView()
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
         actLogBulletView = {
             let _view = UIView(frame: CGRect(x: 0, y: 0, width: 7, height: 7))
-            _view.backgroundColor = .cornflowerBlue
+            _view.backgroundColor = .green_7AE8AB
             _view.layer.cornerRadius = 3.5
             _view.isHidden = true
-            _view.addShadowView()
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
         drugLogBulletView = {
             let _view = UIView(frame: CGRect(x: 0, y: 0, width: 7, height: 7))
-            _view.backgroundColor = .green_72E5EA
+            _view.backgroundColor = .blue_81E4FC
             _view.layer.cornerRadius = 3.5
             _view.isHidden = true
-            _view.addShadowView()
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
@@ -344,8 +341,8 @@ extension LogGroupTableCell {
         arrowImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 20).isActive = true
         arrowImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20).isActive = true
         
-        groupTypeImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 6).isActive = true
-        groupTypeImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: frame.width / 4).isActive = true
+        groupTypeImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 0).isActive = true
+        groupTypeImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: frame.width / 5.5).isActive = true
         
         nameLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 15).isActive = true
         nameLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor, constant: 0).isActive = true

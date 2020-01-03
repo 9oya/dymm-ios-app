@@ -450,7 +450,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         } else {
             isCondEditBtnTapped = true
             diseaseRightBtn.setTitle(lang.titleDone, for: .normal)
-            diseaseRightBtn.setTitleColor(.red_FF4779, for: .normal)
+            diseaseRightBtn.setTitleColor(.red_FF7187, for: .normal)
             UIView.animate(withDuration: 0.5) {
                 self.diseaseCollection.reloadData()
             }
@@ -651,7 +651,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             let strTodayDateArr = dateFormatter.string(from: calendarView.today!).components(separatedBy: "-")
             if Int(strTodayDateArr[1]) == logGroup.month_number && Int(strTodayDateArr[2]) == logGroup.day_number {
                 // If the date of the currently selected section is today add the emoji in it to prefix
-                weekday = "\u{26A1}" + weekday
+                weekday = "\u{2728}" + weekday
             }
             // Set view layout
             let label = UILabel()
@@ -675,8 +675,9 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             cell.arrowImageView.isHidden = false
             cell.moodScoreImageView.isHidden = false
             cell.nameLabel.text = lang.getLogGroupTypeName(logGroup.group_type)
+            cell.nameLabel.textColor = getLogGroupTypeColor(logGroup.group_type)
             cell.groupTypeImageView.image = getLogGroupTypeImage(logGroup.group_type)
-            cell.nameLabel.textColor = UIColor.black
+//            cell.nameLabel.textColor = UIColor.black
             if logGroup.food_cnt > 0 {
                 cell.foodLogBulletView.isHidden = false
             }
@@ -1052,7 +1053,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             } else if ((groupOfLogSet!.act_logs?.count) != nil && ((groupOfLogSet!.act_logs?.count)!) > 0) {
                 let actLog = groupOfLogSet!.act_logs!.popLast()
                 tempStoredLogs.append(actLog!)
-                cell.bulletView.backgroundColor = .cornflowerBlue
+                cell.bulletView.backgroundColor = .green_7AE8AB
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.nameLabel.text = actLog!.eng_name
                 case LanguageId.kor: cell.nameLabel.text = actLog!.kor_name
@@ -1070,7 +1071,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             } else if ((groupOfLogSet!.drug_logs?.count) != nil && ((groupOfLogSet!.drug_logs?.count)!) > 0) {
                 let drugLog = groupOfLogSet!.drug_logs!.popLast()
                 tempStoredLogs.append(drugLog!)
-                cell.bulletView.backgroundColor = .green_72E5EA
+                cell.bulletView.backgroundColor = .blue_81E4FC
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.nameLabel.text = drugLog!.eng_name
                 case LanguageId.kor: cell.nameLabel.text = drugLog!.kor_name
@@ -1210,7 +1211,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                     cell.quantityLabel.text = "\(x_val)¾"
                 }
             } else if tagLog.tag_type == TagType.activity {
-                cell.bulletView.backgroundColor = .cornflowerBlue
+                cell.bulletView.backgroundColor = .green_7AE8AB
                 var hr = ""
                 var min = ""
                 if tagLog.x_val! > 0 {
@@ -1221,7 +1222,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 }
                 cell.quantityLabel.text = "\(hr)\(min)"
             } else if tagLog.tag_type == TagType.drug {
-                cell.bulletView.backgroundColor = .green_72E5EA
+                cell.bulletView.backgroundColor = .blue_81E4FC
                 var x_val = ""
                 if tagLog.x_val! > 0 {
                     x_val = "\(tagLog.x_val!)"
@@ -1288,10 +1289,12 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
         if pickerView == groupTypePicker {
             let containerView = UIView(frame: CGRect(x: 0, y: 0, width: pickerView.bounds.width, height: 60))
-            let imageView = UIImageView(frame: CGRect(x: pickerView.bounds.midX - 80, y: 15, width: 33, height: 33))
+            let imageView = UIImageView(frame: CGRect(x: pickerView.bounds.midX - 95, y: 15, width: 75, height: 45))
             let label = UILabel(frame: CGRect(x: pickerView.bounds.midX - 15, y: 0, width: pickerView.bounds.width - 50, height: 60))
+            label.font = .systemFont(ofSize: 17, weight: .bold)
             imageView.image = getLogGroupTypeImage(4 - row)
             label.text = lang.getLogGroupTypeName(4 - row)
+            label.textColor = getLogGroupTypeColor(4 - row)
             containerView.addSubview(imageView)
             containerView.addSubview(label)
             return containerView
@@ -1405,9 +1408,9 @@ extension DiaryViewController {
             _calendar.appearance.weekdayTextColor = .black
             _calendar.appearance.titleDefaultColor = .green_3ED6A7
             _calendar.appearance.titlePlaceholderColor = .lightGray
-            _calendar.appearance.eventDefaultColor = .red_FF4779
-            _calendar.appearance.eventSelectionColor = .red_FF4779
-            _calendar.appearance.selectionColor = .red_FF4779
+            _calendar.appearance.eventDefaultColor = .red_FF7187
+            _calendar.appearance.eventSelectionColor = .red_FF7187
+            _calendar.appearance.selectionColor = .red_FF7187
             _calendar.appearance.headerDateFormat = lang.calendarHeaderDateFormat
             _calendar.appearance.caseOptions = FSCalendarCaseOptions.weekdayUsesUpperCase
             _calendar.scope = .week

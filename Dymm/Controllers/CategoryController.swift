@@ -150,7 +150,7 @@ class CategoryViewController: UIViewController {
         if cond_log_type == CondLogType.startDate {
             alert.view.tintColor = UIColor(hex: "#00A792")
         } else {
-            alert.view.tintColor = .red_FF4779
+            alert.view.tintColor = .red_FF7187
         }
         present(alert, animated: true, completion:{})
     }

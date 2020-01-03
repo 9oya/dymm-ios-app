@@ -165,6 +165,16 @@ func getLogGroupTypeImage(_ groupType: Int) -> UIImage? {
     }
 }
 
+func getLogGroupTypeColor(_ groupType: Int) -> UIColor? {
+    switch groupType {
+    case LogGroupType.morning: return .yellow_EBCE61
+    case LogGroupType.daytime: return .green_CBD049
+    case LogGroupType.evening: return .orange_EA9D6C
+    case LogGroupType.nighttime: return .navy_29496E
+    default: return nil
+    }
+}
+
 func getCondScoreImageSmall(_ condScore: Int) -> UIImage? {
     if condScore < 3 {
         return .itemScoreAwful

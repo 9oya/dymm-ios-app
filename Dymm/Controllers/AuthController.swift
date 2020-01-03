@@ -437,7 +437,7 @@ extension AuthViewController {
         }()
         titleLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 20, weight: .light)
+            _label.font = .systemFont(ofSize: 25, weight: .bold)
             _label.textColor = .green_3ED6A7
             _label.textAlignment = .center
             _label.text = lang.titleSignIn
@@ -449,7 +449,7 @@ extension AuthViewController {
             _textField.font = .systemFont(ofSize: 15, weight: .light)
             _textField.selectedTitleColor = .green_3ED6A7
             _textField.selectedLineColor = .green_3ED6A7
-            _textField.errorColor = .red_FF4779
+            _textField.errorColor = .red_FF7187
             _textField.selectedLineHeight = 1
             _textField.placeholder = lang.titleFirstName
             _textField.title = lang.titleFirstName
@@ -465,7 +465,7 @@ extension AuthViewController {
             _textField.font = .systemFont(ofSize: 15, weight: .light)
             _textField.selectedTitleColor = .green_3ED6A7
             _textField.selectedLineColor = .green_3ED6A7
-            _textField.errorColor = .red_FF4779
+            _textField.errorColor = .red_FF7187
             _textField.placeholder = lang.titleLastName
             _textField.title = lang.titleLastName
             _textField.autocapitalizationType = .words
@@ -479,7 +479,7 @@ extension AuthViewController {
             _textField.font = .systemFont(ofSize: 15, weight: .light)
             _textField.selectedTitleColor = .green_3ED6A7
             _textField.selectedLineColor = .green_3ED6A7
-            _textField.errorColor = .red_FF4779
+            _textField.errorColor = .red_FF7187
             _textField.placeholder = lang.titleEmail
             _textField.title = lang.titleEmail
             _textField.textContentType = .emailAddress
@@ -494,7 +494,7 @@ extension AuthViewController {
             _textField.font = .systemFont(ofSize: 15, weight: .light)
             _textField.selectedTitleColor = .green_3ED6A7
             _textField.selectedLineColor = .green_3ED6A7
-            _textField.errorColor = .red_FF4779
+            _textField.errorColor = .red_FF7187
             _textField.placeholder = lang.titlePassword
             _textField.title = lang.titlePassword
             _textField.isSecureTextEntry = true
@@ -507,7 +507,7 @@ extension AuthViewController {
             _textField.font = .systemFont(ofSize: 15, weight: .light)
             _textField.selectedTitleColor = .green_3ED6A7
             _textField.selectedLineColor = .green_3ED6A7
-            _textField.errorColor = .red_FF4779
+            _textField.errorColor = .red_FF7187
             _textField.placeholder = lang.titlePasswordConfirm
             _textField.title = lang.titlePasswordConfirm
             _textField.isSecureTextEntry = true
@@ -519,7 +519,7 @@ extension AuthViewController {
         messageLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 14)
-            _label.textColor = .red_FF4779
+            _label.textColor = .red_FF7187
             _label.textAlignment = .center
             _label.numberOfLines = 2
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -528,7 +528,7 @@ extension AuthViewController {
         formSwapButton = {
             let _button = UIButton(type: .system)
             _button.setTitleColor(.green_3ED6A7, for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 16, weight: .regular)
+            _button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
             _button.setTitle("\u{021C5}" + lang.titleSignUp.uppercased(), for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(formSwapButtonTapped), for: .touchUpInside)
