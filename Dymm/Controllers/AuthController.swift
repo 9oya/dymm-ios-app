@@ -966,6 +966,11 @@ extension AuthViewController {
     
     private func signWithFacebook() {
         view.showSpinner()
+        UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.formContainerView.isHidden = true
+            self.fbLoginBtn.isHidden = true
+            self.gSignInBtn.isHidden = true
+        })
         let service = Service(lang: lang)
         service.authWithFacebook(params: self.fbParams!, popoverAlert: { (message) in
             self.retryFunction = self.signWithFacebook
@@ -977,6 +982,11 @@ extension AuthViewController {
     
     private func signWithGoogle() {
         view.showSpinner()
+        UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.formContainerView.isHidden = true
+            self.fbLoginBtn.isHidden = true
+            self.gSignInBtn.isHidden = true
+        })
         let service = Service(lang: lang)
         service.authWithGoogle(params: self.gParams!, popoverAlert: { (message) in
             self.retryFunction = self.signWithGoogle
