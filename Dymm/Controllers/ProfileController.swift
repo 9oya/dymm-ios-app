@@ -805,7 +805,7 @@ extension ProfileViewController {
             _label.font = .systemFont(ofSize: 15, weight: .regular)
             _label.textColor = .gray
             _label.textAlignment = .center
-            _label.numberOfLines = 2
+            _label.numberOfLines = 4
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()

@@ -118,6 +118,10 @@ struct TagId {
     static let language = 20
     static let dateOfBirth = 23
     static let history = 24
+    static let bookFood = 25
+    static let bookActivity = 26
+    static let bookPill = 27
+    static let bookDisease = 28
     static let subscription = 14641
     static let password = 14642
     static let ranking = 14644

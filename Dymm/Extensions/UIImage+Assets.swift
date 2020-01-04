@@ -101,6 +101,13 @@ extension UIImage {
     static let itemPlusPill = UIImage(named: "item-plus-pill")!
     static let itemPlusActivity = UIImage(named: "item-plus-activity")!
     static let itemPlusDisease = UIImage(named: "item-plus-disease")!
-    static let itemPlusBookmark = UIImage(named: "item-plus-bookmark")!
+    static let itemPlusHistory = UIImage(named: "item-plus-history")!
     static let itemBgWave = UIImage(named: "item-bg-wave")!
+    static let itemStarWhite = UIImage(named: "item-star-white")!
+    static let itemSearch = UIImage(named: "item-search")!
+    static let itemDefFood = UIImage(named: "item-def-food")!
+    static let itemDefPill = UIImage(named: "item-def-pill")!
+    static let itemDefActivity = UIImage(named: "item-def-activity")!
+    static let itemDefDisease = UIImage(named: "item-def-disease")!
+    static let itemMedicalCross = UIImage(named: "item-medical-cross")!
 }

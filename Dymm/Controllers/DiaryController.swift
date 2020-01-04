@@ -72,14 +72,15 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var pillPlusBtn: UIButton!
     var activityPlusBtn: UIButton!
     var diseasePlusBtn: UIButton!
-    var bookmarkPlusBtn: UIButton!
+    var historyPlusBtn: UIButton!
     var plusBtns: [UIButton]!
     
-    // UI
+    // UIStackView
     var plusBtnStackView: UIStackView!
     
     // UIImageView
     var guideIllustImgView: UIImageView!
+    var medicalCrossImgView: UIImageView!
     
     // NSLayoutConstraint
     var calendarViewHeight: NSLayoutConstraint!
@@ -535,9 +536,9 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
-    @objc func presentBookmarkCategory() {
+    @objc func presentHistoryCategory() {
         let vc = CategoryViewController()
-        vc.superTagId = TagId.bookmarks
+        vc.superTagId = TagId.history
         vc.topLeftButtonType = ButtonType.back
         self.navigationController?.pushViewController(vc, animated: true)
     }
@@ -546,11 +547,11 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         UIView.animate(withDuration: 0.3, animations: {
             if self.isPlusBtnTapped {
                 self.plusBtn.transform = CGAffineTransform(rotationAngle: 0)
-                self.plusBtn.backgroundColor = .purple_921BEA
+                self.plusBtn.backgroundColor = UIColor.purple_921BEA.withAlphaComponent(0.8)
                 self.isPlusBtnTapped = false
             } else {
                 self.plusBtn.transform = CGAffineTransform(rotationAngle: (.pi / 2))
-                self.plusBtn.backgroundColor = .green_3ED6A7
+                self.plusBtn.backgroundColor = UIColor.green_3ED6A7.withAlphaComponent(0.9)
                 self.isPlusBtnTapped = true
             }
             self.plusBtns.forEach { (button) in
@@ -991,6 +992,15 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        let deleteButton = UITableViewRowAction(style: .default, title: lang.titleDelete) { (action, indexPath) in
+            self.logGroupTable.dataSource?.tableView!(self.logGroupTable, commit: .delete, forRowAt: indexPath)
+            return
+        }
+        deleteButton.backgroundColor = .red_FF7187
+        return [deleteButton]
+    }
+    
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if diaryMode == DiaryMode.editor && isPullToRefresh {
             loadLogGroups()
@@ -1115,9 +1125,12 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 cell.titleLabel.text = avtCond.eng_name
                 if let startDate = avtCond.start_date {
                     cell.startDateLabel.text = "\(startDate)\u{021E2}"
+                    cell.startDateLabel.textColor = .green_00A792
                 }
                 if let endDate = avtCond.end_date {
                     cell.endDateLabel.text = "\u{2713}\(endDate)"
+                    cell.startDateLabel.textColor = .red_FF7187
+                    cell.endDateLabel.textColor = .red_FF7187
                 }
             case LanguageId.kor:
                 cell.titleLabel.text = avtCond.kor_name
@@ -1125,11 +1138,14 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                     let dateArr = startDate.split(separator: "/")
                     let month = LangHelper.getKorNameOfMonth(monthNumber: nil, engMMM: String(dateArr[0]))
                     cell.startDateLabel.text = "\(dateArr[2])/\(month)/\(dateArr[1])일\u{021E2}"
+                    cell.startDateLabel.textColor = .green_00A792
                 }
                 if let endDate = avtCond.end_date {
                     let dateArr = endDate.split(separator: "/")
                     let month = LangHelper.getKorNameOfMonth(monthNumber: nil, engMMM: String(dateArr[0]))
                     cell.endDateLabel.text = "\u{2713}\(dateArr[2])/\(month)/\(dateArr[1])일"
+                    cell.startDateLabel.textColor = .red_FF7187
+                    cell.endDateLabel.textColor = .red_FF7187
                 }
             case LanguageId.jpn:
                 cell.titleLabel.text = avtCond.jpn_name
@@ -1545,7 +1561,7 @@ extension DiaryViewController {
             let _button = UIButton(type: .system)
             _button.setTitle(lang.titleEdit, for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            _button.setTitleColor(.purple_B847FF, for: .normal)
+            _button.setTitleColor(.purple_DB8BFF, for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(diseaseRightBtnTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -1568,7 +1584,7 @@ extension DiaryViewController {
         pullToRefreshLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 16, weight: .bold)
-            _label.textColor = .purple_948BFF
+            _label.textColor = .purple_C3C0E3
             _label.textAlignment = .center
             _label.text = lang.titlePullToRefresh
             _label.numberOfLines = 2
@@ -1579,7 +1595,7 @@ extension DiaryViewController {
         guideLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 18, weight: .bold)
-            _label.textColor = .green_3ED6A7
+            _label.textColor = .purple_C3C0E3
             _label.textAlignment = .center
             _label.text = lang.msgGuideDiary
             _label.isHidden = true
@@ -1588,9 +1604,9 @@ extension DiaryViewController {
         }()
         foodBtn = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage(named: "tag-5")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.itemDefFood.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.setTitle(lang.titleTagFood, for: .normal)
-            _button.tintColor = .green_3ED6A7
+            _button.tintColor = .red_FF7187
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             _button.backgroundColor = .white
             _button.layer.cornerRadius = 10.0
@@ -1603,9 +1619,9 @@ extension DiaryViewController {
         }()
         pillBtn = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage(named: "tag-4")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.itemDefPill.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.setTitle(lang.titleTagPill, for: .normal)
-            _button.tintColor = .green_3ED6A7
+            _button.tintColor = .blue_81E4FC
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             _button.backgroundColor = .white
             _button.layer.cornerRadius = 10.0
@@ -1618,7 +1634,7 @@ extension DiaryViewController {
         }()
         activityBtn = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage(named: "tag-2")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.itemDefActivity.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.setTitle(lang.titleTagActivity, for: .normal)
             _button.tintColor = .green_3ED6A7
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
@@ -1633,9 +1649,9 @@ extension DiaryViewController {
         }()
         diseaseBtn = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage(named: "tag-3")!.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.itemDefDisease.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.setTitle(lang.titleTagDisease, for: .normal)
-            _button.tintColor = .green_3ED6A7
+            _button.tintColor = .purple_DB8BFF
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             _button.backgroundColor = .white
             _button.layer.cornerRadius = 10.0
@@ -1649,7 +1665,7 @@ extension DiaryViewController {
         plusBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemBtnPlusTrans.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.backgroundColor = .purple_921BEA
+            _button.backgroundColor = UIColor.purple_921BEA.withAlphaComponent(0.8)
             _button.layer.cornerRadius = 13.0
             _button.addShadowView()
             _button.isHidden = true
@@ -1698,13 +1714,13 @@ extension DiaryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        bookmarkPlusBtn = {
+        historyPlusBtn = {
             let _button = UIButton(type: .system)
-            _button.setImage(UIImage.itemPlusBookmark.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setImage(UIImage.itemPlusHistory.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.isHidden = true
             _button.showsTouchWhenHighlighted = true
             _button.addShadowView()
-            _button.addTarget(self, action: #selector(presentBookmarkCategory), for: .touchUpInside)
+            _button.addTarget(self, action: #selector(presentHistoryCategory), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
@@ -1725,14 +1741,21 @@ extension DiaryViewController {
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
+        medicalCrossImgView = {
+            let _imageView = UIImageView()
+            _imageView.image = .itemMedicalCross
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
         
         if diaryMode == DiaryMode.editor {
             navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: notesBtn), UIBarButtonItem(customView: avgScoreBtn)]
             calendarView.appearance.titleDefaultColor = UIColor.black
             diseaseHistoryBtn.isHidden = false
             plusBtn.isHidden = false
-            plusBtns = [diseasePlusBtn, activityPlusBtn, pillPlusBtn, foodPlusBtn, bookmarkPlusBtn]
-            plusBtnStackView.addArrangedSubview(bookmarkPlusBtn)
+            plusBtns = [diseasePlusBtn, activityPlusBtn, pillPlusBtn, foodPlusBtn, historyPlusBtn]
+            plusBtnStackView.addArrangedSubview(historyPlusBtn)
             plusBtnStackView.addArrangedSubview(foodPlusBtn)
             plusBtnStackView.addArrangedSubview(pillPlusBtn)
             plusBtnStackView.addArrangedSubview(activityPlusBtn)
@@ -1789,6 +1812,7 @@ extension DiaryViewController {
         pickerContainerView.addSubview(pickerCancelBtn)
         pickerContainerView.addSubview(pickerCheckBtn)
         
+        diseaseContainer.addSubview(medicalCrossImgView)
         diseaseContainer.addSubview(diseaseTitleLabel)
         diseaseContainer.addSubview(diseaseCollection)
         diseaseContainer.addSubview(diseaseRightBtn)
@@ -1819,8 +1843,11 @@ extension DiaryViewController {
         pickerDateLabel.topAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: 10).isActive = true
         pickerDateLabel.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: 20).isActive = true
         
+        medicalCrossImgView.topAnchor.constraint(equalTo: diseaseContainer.topAnchor, constant: 5).isActive = true
+        medicalCrossImgView.leadingAnchor.constraint(equalTo: diseaseContainer.leadingAnchor, constant: 10).isActive = true
+        
         diseaseTitleLabel.topAnchor.constraint(equalTo: diseaseContainer.topAnchor, constant: 10).isActive = true
-        diseaseTitleLabel.leadingAnchor.constraint(equalTo: diseaseContainer.leadingAnchor, constant: 20).isActive = true
+        diseaseTitleLabel.leadingAnchor.constraint(equalTo: medicalCrossImgView.trailingAnchor, constant: 7).isActive = true
         
         groupTypePicker.topAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: 0).isActive = true
         groupTypePicker.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: 0).isActive = true
@@ -2141,7 +2168,7 @@ extension DiaryViewController {
         }) { (avtCondList) in
             self.avtCondList = avtCondList
             self.diseaseCollection.reloadData()
-            self.diseaseLeftBtn.setTitleColor(.purple_B847FF, for: .normal)
+            self.diseaseLeftBtn.setTitleColor(.purple_DB8BFF, for: .normal)
             var collectionViewHeight = CGFloat(45 * self.avtCondList!.count)
             if CGFloat(collectionViewHeight + 105) > (UIScreen.main.bounds.height * 0.84) {
                 collectionViewHeight = UIScreen.main.bounds.height * 0.5

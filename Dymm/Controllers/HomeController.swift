@@ -216,6 +216,7 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             default:
                 cell.label.textColor = .green_3ED6A7
             }
+            cell.label.font = .systemFont(ofSize: 15, weight: .bold)
         }
         return cell
     }
@@ -313,6 +314,7 @@ extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
                 }
             }
         }
+        label.font = .systemFont(ofSize: 20, weight: .bold)
         return label
     }
     
@@ -402,7 +404,7 @@ extension HomeViewController {
         }()
         scoreTitleLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 30, weight: .medium)
+            _label.font = .systemFont(ofSize: 30, weight: .bold)
             _label.textColor = .dimGray
             _label.textAlignment = .center
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -410,7 +412,7 @@ extension HomeViewController {
         }()
         scoreNumberLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 40, weight: .medium)
+            _label.font = .systemFont(ofSize: 40, weight: .bold)
             _label.textColor = .green_3ED6A7
             _label.textAlignment = .center
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -418,7 +420,7 @@ extension HomeViewController {
         }()
         scoreMessageLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 20, weight: .medium)
+            _label.font = .systemFont(ofSize: 20, weight: .bold)
             _label.textColor = .green_3ED6A7
             _label.textAlignment = .center
             _label.numberOfLines = 2
@@ -427,7 +429,7 @@ extension HomeViewController {
         }()
         ageLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 18, weight: .medium)
+            _label.font = .systemFont(ofSize: 18, weight: .bold)
             _label.textColor = .green_3ED6A7
             _label.textAlignment = .right
             _label.numberOfLines = 1
@@ -436,7 +438,7 @@ extension HomeViewController {
         }()
         genderLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 18, weight: .medium)
+            _label.font = .systemFont(ofSize: 18, weight: .bold)
             _label.textColor = .green_3ED6A7
             _label.textAlignment = .right
             _label.numberOfLines = 1

@@ -36,8 +36,9 @@ class CategoryViewController: UIViewController {
     var langPicker: UIPickerView!
     
     // UIImageViews
-    var downArrowImageView: UIImageView!
-    var photoImageView: UIImageView!
+    var downArrowImgView: UIImageView!
+    var photoImgView: UIImageView!
+    var searchImgView: UIImageView!
     
     // UITextField
     var searchTextField: UITextField!
@@ -148,7 +149,7 @@ class CategoryViewController: UIViewController {
         }))
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: UIAlertAction.Style.cancel, handler: nil))
         if cond_log_type == CondLogType.startDate {
-            alert.view.tintColor = UIColor(hex: "#00A792")
+            alert.view.tintColor = .green_00A792
         } else {
             alert.view.tintColor = .red_FF7187
         }
@@ -412,26 +413,91 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
                 fatalError()
             }
             let tag = subTags[indexPath.row]
-            var _text = ""
-            switch lang.currentLanguageId {
-            case LanguageId.eng: _text = tag.eng_name
-            case LanguageId.kor: _text = tag.kor_name!
-            default: fatalError()}
-            if typedKeyword != nil {
+            if (superTag!.id == TagId.food || superTag!.id == TagId.activity || superTag!.id == TagId.pill || superTag!.id == TagId.disease) && (tag.id == TagId.bookFood || tag.id == TagId.bookActivity || tag.id == TagId.bookPill || tag.id == TagId.bookDisease) {
+                cell.backgroundColor = .yellow_FFD067
+                switch lang.currentLanguageId {
+                case LanguageId.eng: cell.label.text = tag.eng_name
+                case LanguageId.kor: cell.label.text = tag.kor_name!
+                default: fatalError()}
+                cell.label.textColor = .white
+                cell.label.font = .systemFont(ofSize: 14, weight: .bold)
+                cell.imageView.image = .itemStarWhite
+            } else if tag.id == TagId.history {
+                switch lang.currentLanguageId {
+                case LanguageId.eng: cell.label.text = tag.eng_name
+                case LanguageId.kor: cell.label.text = tag.kor_name!
+                default: fatalError()}
+                cell.backgroundColor = .dodgerBlue
+                cell.label.textColor = .white
+                cell.label.font = .systemFont(ofSize: 14, weight: .bold)
+                cell.imageView.image = UIImage(named: "tag-\(tag.id)")
+            } else if tag.tag_type == TagType.bookmark {
+                switch lang.currentLanguageId {
+                case LanguageId.eng: cell.label.text = tag.eng_name
+                case LanguageId.kor: cell.label.text = tag.kor_name!
+                default: fatalError()}
+                cell.backgroundColor = .white
+                cell.label.textColor = .yellow_FFD067
+                cell.label.font = .systemFont(ofSize: 14, weight: .bold)
+                cell.imageView.image = UIImage(named: "tag-\(tag.id)")
+            } else if superTag!.id == TagId.history || superTag!.tag_type == TagType.bookmark {
+                cell.backgroundColor = .white
+                cell.label.font = .systemFont(ofSize: 14, weight: .regular)
                 cell.label.textColor = .black
-                let attributedString: NSMutableAttributedString = NSMutableAttributedString(string: _text)
-                attributedString.setColorForText(textForAttribute: typedKeyword!, withColor: .orange)
-                cell.label.attributedText = attributedString
+                switch lang.currentLanguageId {
+                case LanguageId.eng: cell.label.text = tag.eng_name
+                case LanguageId.kor: cell.label.text = tag.kor_name!
+                default: fatalError()}
+                if tag.tag_type == TagType.food {
+                    cell.imageView.image = .itemDefFood
+                } else if tag.tag_type == TagType.drug {
+                    cell.imageView.image = .itemDefPill
+                } else if tag.tag_type == TagType.activity {
+                    cell.imageView.image = .itemDefActivity
+                } else if tag.tag_type == TagType.disease {
+                    cell.imageView.image = .itemDefDisease
+                }
             } else {
-                cell.label.text = _text
-                switch tag.id {
-                case TagId.supplements:
-                    cell.label.textColor = .webOrange
-                default:
+                cell.backgroundColor = .white
+                cell.label.font = .systemFont(ofSize: 14, weight: .regular)
+                var _text = ""
+                switch lang.currentLanguageId {
+                case LanguageId.eng: _text = tag.eng_name
+                case LanguageId.kor: _text = tag.kor_name!
+                default: fatalError()}
+                if typedKeyword != nil {
                     cell.label.textColor = .black
+                    let attributedString: NSMutableAttributedString = NSMutableAttributedString(string: _text)
+                    attributedString.setColorForText(textForAttribute: typedKeyword!, withColor: .orange)
+                    cell.label.attributedText = attributedString
+                } else {
+                    cell.label.text = _text
+                    switch tag.id {
+                    case TagId.supplements:
+                        cell.label.textColor = .red_FF71EF
+                        cell.label.font = .systemFont(ofSize: 14, weight: .bold)
+                    default:
+                        cell.label.textColor = .black
+                        cell.label.font = .systemFont(ofSize: 14, weight: .regular)
+                    }
+                }
+                if let tagImage = UIImage(named: "tag-\(tag.id)") {
+                    cell.imageView.image = tagImage
+                } else {
+                    if tag.tag_type == TagType.food {
+                        cell.imageView.image = .itemDefFood
+                    } else if tag.tag_type == TagType.drug {
+                        cell.imageView.image = .itemDefPill
+                    } else if tag.tag_type == TagType.activity {
+                        cell.imageView.image = .itemDefActivity
+                    } else if tag.tag_type == TagType.disease {
+                        cell.imageView.image = .itemDefDisease
+                    } else {
+                        cell.imageView.image = nil
+                    }
                 }
             }
-            cell.imageView.image = UIImage(named: "tag-\(tag.id)")
+            
             return cell
         } else if collectionView == stepCollection {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: stepCellId, for: indexPath) as? StepCollectionCell else {
@@ -460,6 +526,16 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
         isScrollToLoading = false
         if collectionView == tagCollection {
             let selected_tag = subTags[indexPath.item]
+            if !UserDefaults.standard.isSignIn() {
+                if selected_tag.tag_type == TagType.bookmark {
+                    presentAuthNavigation()
+                    return
+                }
+            }
+            if selected_tag.id == 117333 {
+                // Empty tag
+                return
+            }
             stepTags.append(superTag!)
             UIView.transition(with: stepCollection, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.stepCollection.reloadData()
@@ -488,10 +564,15 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if collectionView == tagCollection {
-            let tag = subTags?[indexPath.item]
-            if tag!.id == TagId.history {
+            let tag = subTags![indexPath.item]
+            if tag.id == TagId.history {
                 return CGSize(width: view.frame.width - 14, height: CGFloat(tagCellHeightInt))
             }
+            
+            if (superTag!.id == TagId.food || superTag!.id == TagId.activity || superTag!.id == TagId.pill || superTag!.id == TagId.disease) && (tag.id == TagId.bookFood || tag.id == TagId.bookActivity || tag.id == TagId.bookPill || tag.id == TagId.bookDisease) {
+                return CGSize(width: view.frame.width - 14, height: CGFloat(tagCellHeightInt))
+            }
+            
             return CGSize(width: (view.frame.width / 2) - 10.5, height: CGFloat(tagCellHeightInt))
         } else if collectionView == stepCollection {
             let tag = stepTags[indexPath.row]
@@ -718,30 +799,39 @@ extension CategoryViewController {
         }()
         searchTextField = {
             let _textField = UITextField()
-            _textField.font = .systemFont(ofSize: 15, weight: .light)
-            _textField.textColor = UIColor.dimGray
-            _textField.backgroundColor = UIColor.white
+            _textField.font = .systemFont(ofSize: 15, weight: .bold)
+            _textField.textColor = .yellow_FFD667
+            _textField.backgroundColor = .purple_948BFF
             _textField.textAlignment = .center
             _textField.textContentType = .namePrefix
             _textField.autocapitalizationType = .none
             _textField.keyboardType = .default
             _textField.borderStyle = .none
             _textField.layer.cornerRadius = 10.0
-            _textField.placeholder = lang.titleSearch
+            _textField.attributedPlaceholder = NSAttributedString(string: lang.titleSearch, attributes: [NSAttributedString.Key.foregroundColor: UIColor.yellow_FFD667])
+            _textField.tintColor = .yellow_FFD667
             _textField.addShadowView()
             _textField.addTarget(self, action: #selector(textFieldDidChanged(_:)), for: .editingChanged)
             _textField.isHidden = true
             _textField.translatesAutoresizingMaskIntoConstraints = false
             return _textField
         }()
+        searchImgView = {
+            let _imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.image = .itemSearch
+            _imageView.isHidden = true
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
         langPickButton = {
             let _button = UIButton(type: .system)
-            _button.setTitleColor(UIColor.darkGray, for: .normal)
+            _button.setTitleColor(.green_3ED6A7, for: .normal)
             _button.setTitle(LangHelper.getLanguageName(lang.currentLanguageId), for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 15)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(langPickBtnTapped), for: .touchUpInside)
-            _button.backgroundColor = UIColor.white
+            _button.backgroundColor = .white
             _button.layer.cornerRadius = 10.0
             _button.addShadowView()
             _button.isHidden = true
@@ -796,14 +886,14 @@ extension CategoryViewController {
             _pickerView.translatesAutoresizingMaskIntoConstraints = false
             return _pickerView
         }()
-        downArrowImageView = {
+        downArrowImgView = {
             let _imageView = UIImageView()
             _imageView.image = .itemTriangleDown
             _imageView.contentMode = .scaleAspectFit
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
-        photoImageView = {
+        photoImgView = {
             let _imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 290, height: 150))
             _imageView.contentMode = .scaleAspectFit
             _imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -931,6 +1021,7 @@ extension CategoryViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: sendOpinionBtn)
         view.addSubview(stepCollection)
         view.addSubview(searchTextField)
+        view.addSubview(searchImgView)
         view.addSubview(langPickButton)
         view.addSubview(detailContainer)
         view.addSubview(tagCollection)
@@ -938,14 +1029,14 @@ extension CategoryViewController {
         detailContainer.addSubview(titleLabel)
         detailContainer.addSubview(starButton)
         detailContainer.addSubview(bookmarksTotalLabel)
-        detailContainer.addSubview(photoImageView)
+        detailContainer.addSubview(photoImgView)
         detailContainer.addSubview(logSizeLabel)
         detailContainer.addSubview(logSizeButton)
         detailContainer.addSubview(logTimeLabel)
         detailContainer.addSubview(startDateButton)
         detailContainer.addSubview(endDateButton)
         detailContainer.addSubview(sizePickerContainer)
-        detailContainer.addSubview(downArrowImageView)
+        detailContainer.addSubview(downArrowImgView)
         detailContainer.addSubview(timePicker)
         
         sizePickerContainer.addSubview(sizePicker)
@@ -958,12 +1049,15 @@ extension CategoryViewController {
         
         searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
         searchTextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
-        searchTextField.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) + CGFloat(marginInt)).isActive = true
+        searchTextField.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) + (7 * 2)).isActive = true
         searchTextField.heightAnchor.constraint(equalToConstant: CGFloat(searchBarHeightInt)).isActive = true
+        
+        searchImgView.centerYAnchor.constraint(equalTo: searchTextField.centerYAnchor, constant: 0).isActive = true
+        searchImgView.leadingAnchor.constraint(equalTo: searchTextField.leadingAnchor, constant: 10).isActive = true
         
         langPickButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
         langPickButton.leadingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
-        langPickButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - 28).isActive = true
+        langPickButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - (7 * 5)).isActive = true
         langPickButton.heightAnchor.constraint(equalTo: searchTextField.heightAnchor, constant: 0).isActive = true
         
         detailContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
@@ -983,8 +1077,8 @@ extension CategoryViewController {
         bookmarksTotalLabel.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 1).isActive = true
         bookmarksTotalLabel.trailingAnchor.constraint(equalTo: starButton.leadingAnchor, constant: -2).isActive = true
         
-        photoImageView.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 55).isActive = true
-        photoImageView.centerXAnchor.constraint(equalTo: detailContainer.centerXAnchor, constant: 0).isActive = true
+        photoImgView.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 55).isActive = true
+        photoImgView.centerXAnchor.constraint(equalTo: detailContainer.centerXAnchor, constant: 0).isActive = true
         
         logSizeLabel.centerXAnchor.constraint(equalTo: detailContainer.centerXAnchor, constant: 0).isActive = true
         logSizeLabel.bottomAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -4).isActive = true
@@ -1016,8 +1110,8 @@ extension CategoryViewController {
         sizePicker.widthAnchor.constraint(equalToConstant: 58).isActive = true
         sizePicker.heightAnchor.constraint(equalToConstant: view.frame.width + 200).isActive = true
         
-        downArrowImageView.centerXAnchor.constraint(equalTo: detailContainer.centerXAnchor, constant: 0).isActive = true
-        downArrowImageView.topAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -1).isActive = true
+        downArrowImgView.centerXAnchor.constraint(equalTo: detailContainer.centerXAnchor, constant: 0).isActive = true
+        downArrowImgView.topAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -1).isActive = true
         
         tagCollectionTop = tagCollection.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt))
         tagCollectionTop.priority = UILayoutPriority(rawValue: 999)
@@ -1089,48 +1183,48 @@ extension CategoryViewController {
     
     private func setDetailPhotoImage(tag: BaseModel.Tag) {
         if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-\(tag.division2!)-\(tag.division3!)-\(tag.division4!)-\(tag.division5!)") {
-            self.photoImageView.image = image
+            self.photoImgView.image = image
         } else {
             if tag.division2 == 0 {
-                self.photoImageView.image = UIImage(named: "photo-\(tag.class1!)-0-0-0-0-0")
+                self.photoImgView.image = UIImage(named: "photo-\(tag.class1!)-0-0-0-0-0")
             } else if tag.division3 == 0 {
                 if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-\(tag.division2!)-0-0-0") {
-                    self.photoImageView.image = image
+                    self.photoImgView.image = image
                 } else {
                     if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-0-0-0-0") {
-                        self.photoImageView.image = image
+                        self.photoImgView.image = image
                     } else {
-                        self.photoImageView.image = UIImage(named: "photo-\(tag.class1!)-0-0-0-0-0")
+                        self.photoImgView.image = UIImage(named: "photo-\(tag.class1!)-0-0-0-0-0")
                     }
                 }
             } else if tag.division4 == 0 {
                 if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-\(tag.division2!)-\(tag.division3!)-0-0") {
-                    self.photoImageView.image = image
+                    self.photoImgView.image = image
                 } else {
                     if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-\(tag.division2!)-0-0-0") {
-                        self.photoImageView.image = image
+                        self.photoImgView.image = image
                     } else {
                         if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-0-0-0-0") {
-                            self.photoImageView.image = image
+                            self.photoImgView.image = image
                         } else {
-                            self.photoImageView.image = UIImage(named: "photo-\(tag.class1!)-0-0-0-0-0")
+                            self.photoImgView.image = UIImage(named: "photo-\(tag.class1!)-0-0-0-0-0")
                         }
                     }
                 }
             } else if tag.division5 == 0 {
                 if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-\(tag.division2!)-\(tag.division3!)-\(tag.division4!)-0") {
-                    self.photoImageView.image = image
+                    self.photoImgView.image = image
                 } else {
                     if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-\(tag.division2!)-\(tag.division3!)-0-0") {
-                        self.photoImageView.image = image
+                        self.photoImgView.image = image
                     } else {
                         if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-\(tag.division2!)-0-0-0") {
-                            self.photoImageView.image = image
+                            self.photoImgView.image = image
                         } else {
                             if let image = UIImage(named: "photo-\(tag.class1!)-\(tag.division1!)-0-0-0-0") {
-                                self.photoImageView.image = image
+                                self.photoImgView.image = image
                             } else {
-                                self.photoImageView.image = UIImage(named: "photo-\(tag.class1!)-0-0-0-0-0")
+                                self.photoImgView.image = UIImage(named: "photo-\(tag.class1!)-0-0-0-0-0")
                             }
                         }
                     }
@@ -1161,10 +1255,12 @@ extension CategoryViewController {
                 self.detailContainer.isHidden = true
                 if _superTag.id == TagId.bookmarks {
                     self.searchTextField.isHidden = true
+                    self.searchImgView.isHidden = true
                     self.langPickButton.isHidden = true
                     self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt)
                 } else {
                     self.searchTextField.isHidden = false
+                    self.searchImgView.isHidden = false
                     self.langPickButton.isHidden = false
                     self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt)
                 }
@@ -1180,6 +1276,7 @@ extension CategoryViewController {
         if _superTag.tag_type == TagType.bookmark || _superTag.tag_type == TagType.history {
             UIView.animate(withDuration: 0.5) {
                 self.searchTextField.isHidden = true
+                self.searchImgView.isHidden = true
                 self.langPickButton.isHidden = true
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt)
             }
@@ -1190,11 +1287,12 @@ extension CategoryViewController {
             UIView.animate(withDuration: 0.5) {
                 self.detailContainer.isHidden = false
                 self.searchTextField.isHidden = true
+                self.searchImgView.isHidden = true
                 self.langPickButton.isHidden = true
                 self.detailContainerHeight.constant = CGFloat(detailBoxAHeightInt)
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxAHeightInt + marginInt)
                 
-                self.downArrowImageView.isHidden = false
+                self.downArrowImgView.isHidden = false
                 self.logSizeButton.isHidden = false
                 self.logSizeLabel.isHidden = false
                 self.sizePickerContainer.isHidden = false
@@ -1225,11 +1323,12 @@ extension CategoryViewController {
             UIView.animate(withDuration: 0.5) {
                 self.detailContainer.isHidden = false
                 self.searchTextField.isHidden = true
+                self.searchImgView.isHidden = true
                 self.langPickButton.isHidden = true
                 self.detailContainerHeight.constant = CGFloat(detailBoxBHeightInt)
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxBHeightInt + marginInt)
                 
-                self.downArrowImageView.isHidden = true
+                self.downArrowImgView.isHidden = true
                 self.logSizeButton.isHidden = false
                 self.logSizeLabel.isHidden = true
                 self.sizePickerContainer.isHidden = true
@@ -1247,11 +1346,12 @@ extension CategoryViewController {
             UIView.animate(withDuration: 0.5) {
                 self.detailContainer.isHidden = false
                 self.searchTextField.isHidden = true
+                self.searchImgView.isHidden = true
                 self.langPickButton.isHidden = true
                 self.detailContainerHeight.constant = CGFloat(detailBoxCHeightInt)
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxCHeightInt + marginInt)
                 
-                self.downArrowImageView.isHidden = true
+                self.downArrowImgView.isHidden = true
                 self.logSizeButton.isHidden = true
                 self.logSizeLabel.isHidden = true
                 self.sizePickerContainer.isHidden = true
@@ -1293,6 +1393,7 @@ extension CategoryViewController {
                 self.detailContainer.isHidden = true
                 self.tagCollection.isHidden = true
                 self.searchTextField.isHidden = true
+                self.searchImgView.isHidden = true
                 self.langPickButton.isHidden = true
             })
         }

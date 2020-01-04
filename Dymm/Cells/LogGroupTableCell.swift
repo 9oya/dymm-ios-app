@@ -191,6 +191,15 @@ extension LogGroupTableCell: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return CGFloat(logTableCellHeightInt)
     }
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        let deleteButton = UITableViewRowAction(style: .default, title: lang.titleDelete) { (action, indexPath) in
+            self.groupOfLogsTableView.dataSource?.tableView!(self.groupOfLogsTableView, commit: .delete, forRowAt: indexPath)
+            return
+        }
+        deleteButton.backgroundColor = .red_FF7187
+        return [deleteButton]
+    }
 }
 
 extension LogGroupTableCell {
