@@ -104,6 +104,10 @@ class HomeViewController: UIViewController {
             UserDefaults.standard.setIsPurchased(value: false)
             cubeImgView.isHidden = true
         }
+        if UserDefaults.standard.isSignInChanged() {
+            UserDefaults.standard.setIsSignInChanged(value: false)
+            loadCategories()
+        }
         cubeImgView.startRotating(duration: 5)
     }
     
@@ -211,19 +215,25 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
                 case LanguageId.eng: cell.label.text = tag.eng_name + "\u{02936}"
                 case LanguageId.kor: cell.label.text = tag.kor_name! + "\u{02936}"
                 default: fatalError()}
-                cell.imageView.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
                 cell.label.textColor = .magenta
                 cell.label.font = .systemFont(ofSize: 20, weight: .heavy)
                 cell.label.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+                cell.imageView.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             case TagId.ranking:
                 cell.label.font = .systemFont(ofSize: 15, weight: .bold)
                 cell.label.textColor = .purple_948BFF
+                cell.label.addShadowView(offset: CGSize(width: 0, height: 0), opacity: 0.0, radius: 0, color: UIColor.clear.cgColor)
+                cell.imageView.addShadowView(offset: CGSize(width: 0, height: 0), opacity: 0.0, radius: 0, color: UIColor.clear.cgColor)
             case TagId.bookmarks:
                 cell.label.font = .systemFont(ofSize: 15, weight: .bold)
                 cell.label.textColor = UIColor(hex: "#FFBF67")
+                cell.label.addShadowView(offset: CGSize(width: 0, height: 0), opacity: 0.0, radius: 0, color: UIColor.clear.cgColor)
+                cell.imageView.addShadowView(offset: CGSize(width: 0, height: 0), opacity: 0.0, radius: 0, color: UIColor.clear.cgColor)
             default:
                 cell.label.font = .systemFont(ofSize: 15, weight: .bold)
                 cell.label.textColor = .green_3ED6A7
+                cell.label.addShadowView(offset: CGSize(width: 0, height: 0), opacity: 0.0, radius: 0, color: UIColor.clear.cgColor)
+                cell.imageView.addShadowView(offset: CGSize(width: 0, height: 0), opacity: 0.0, radius: 0, color: UIColor.clear.cgColor)
             }
         }
         return cell
@@ -268,10 +278,19 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let tag = tags?[indexPath.item]
-        if tag!.id == TagId.diary {
-            return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 14.5)
+        if UserDefaults.standard.isSignIn() {
+            if tag!.id == TagId.diary {
+                return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 8)
+            } else {
+                return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 14.5)
+            }
+        } else {
+            if tag!.id == TagId.diary {
+                return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 14.5)
+            } else {
+                return CGSize(width: (UIScreen.main.bounds.width / 2) - 10.5, height: UIScreen.main.bounds.height / 14.5)
+            }
         }
-        return CGSize(width: (UIScreen.main.bounds.width / 2) - 10.5, height: UIScreen.main.bounds.height / 14.5)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
@@ -741,8 +760,12 @@ extension HomeViewController {
     
     private func loadCategories() {
         view.showSpinner()
+        var tagId = TagId.home
+        if UserDefaults.standard.isSignIn() {
+            tagId = TagId.home2
+        }
         let service = Service(lang: lang)
-        service.getTagSetList(tagId: TagId.home, sortType: SortType.priority, popoverAlert: { (message) in
+        service.getTagSetList(tagId: tagId, sortType: SortType.priority, popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }) { (tagSet) in
@@ -793,7 +816,7 @@ extension HomeViewController {
                     let firstName = auth.avatar.first_name
                     let index = firstName.index(firstName.startIndex, offsetBy: 0)
                     self.profileButton.setImage(nil, for: .normal)
-                    self.profileButton.setTitle(String(firstName[index]), for: .normal)
+                    self.profileButton.setTitle(String(firstName[index].uppercased()), for: .normal)
                     self.profileButton.setTitleColor(.white, for: .normal)
                     self.profileButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
                     self.profileButton.backgroundColor = getProfileUIColor(key: auth.avatar.color_code)

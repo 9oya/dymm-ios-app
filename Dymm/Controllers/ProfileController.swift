@@ -152,6 +152,7 @@ class ProfileViewController: UIViewController {
     
     @objc func signOutButtonTapped() {
         UserDefaults.standard.setIsSignIn(value: false)
+        UserDefaults.standard.setIsSignInChanged(value: true)
         UserDefaults.standard.setAvatarId(value: 0)
         _ = navigationController?.popViewController(animated: true)
     }
@@ -1140,7 +1141,7 @@ extension ProfileViewController {
                 }
             } else {
                 let index = firstName.index(firstName.startIndex, offsetBy: 0)
-                self.infoImageLabel.text = String(firstName[index])
+                self.infoImageLabel.text = String(firstName[index].uppercased())
                 self.infoImageLabel.textColor = .white
                 self.infoImageView.image = nil
                 self.infoImageView.backgroundColor = getProfileUIColor(key: profile.avatar.color_code)

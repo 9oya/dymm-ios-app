@@ -160,7 +160,7 @@ extension RankingViewController: UITableViewDataSource, UITableViewDelegate {
         } else {
             let firstName = ranking.first_name
             let index = firstName.index(firstName.startIndex, offsetBy: 0)
-            cell.profileImgLabel.text = String(firstName[index])
+            cell.profileImgLabel.text = String(firstName[index].uppercased())
             cell.profileImgLabel.textColor = .white
             cell.profileImgView.backgroundColor = getProfileUIColor(key: ranking.color_code)
             cell.profileImgView.image = nil
@@ -585,7 +585,7 @@ extension RankingViewController {
             } else {
                 let firstName = ranking.first_name
                 let index = firstName.index(firstName.startIndex, offsetBy: 0)
-                self.myProfileImgLabel.text = String(firstName[index])
+                self.myProfileImgLabel.text = String(firstName[index].uppercased())
                 self.myProfileImgLabel.textColor = .white
                 self.myProfileImgView.backgroundColor = getProfileUIColor(key: ranking.color_code)
             }

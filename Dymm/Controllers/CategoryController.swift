@@ -1078,11 +1078,11 @@ extension CategoryViewController {
         logTimeLabel.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -36).isActive = true
         logTimeLabel.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 17)).isActive = true
         
-        logSizeBtnGuideLabel.leadingAnchor.constraint(equalTo: photoImgView.trailingAnchor, constant: -40).isActive = true
+        logSizeBtnGuideLabel.leadingAnchor.constraint(equalTo: logSizeBtn.trailingAnchor, constant: -65).isActive = true
         logSizeBtnGuideLabel.bottomAnchor.constraint(equalTo: logSizeBtn.topAnchor, constant: -47).isActive = true
         
         logSizeBtn.bottomAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -18).isActive = true
-        logSizeBtn.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -15).isActive = true
+        logSizeBtn.leadingAnchor.constraint(equalTo: photoImgView.trailingAnchor, constant: -20).isActive = true
         
         startDateBtn.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -15).isActive = true
         startDateBtn.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
@@ -1289,6 +1289,7 @@ extension CategoryViewController {
                 
                 self.downArrowImgView.isHidden = false
                 self.logSizeBtn.isHidden = false
+                self.logSizeBtnGuideLabel.isHidden = false
                 self.logSizeLabel.isHidden = false
                 self.sizePickerContainer.isHidden = false
                 self.logTimeLabel.isHidden = true
@@ -1325,6 +1326,7 @@ extension CategoryViewController {
                 
                 self.downArrowImgView.isHidden = true
                 self.logSizeBtn.isHidden = false
+                self.logSizeBtnGuideLabel.isHidden = false
                 self.logSizeLabel.isHidden = true
                 self.sizePickerContainer.isHidden = true
                 self.logTimeLabel.isHidden = false
@@ -1348,6 +1350,7 @@ extension CategoryViewController {
                 
                 self.downArrowImgView.isHidden = true
                 self.logSizeBtn.isHidden = true
+                self.logSizeBtnGuideLabel.isHidden = true
                 self.logSizeLabel.isHidden = true
                 self.sizePickerContainer.isHidden = true
                 self.logTimeLabel.isHidden = true

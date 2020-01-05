@@ -758,6 +758,7 @@ extension AuthViewController {
             UserDefaults.standard.setAvatarId(value: _avatar.id)
             UserDefaults.standard.setCurrentLanguageId(value: auth.language_id)
             UserDefaults.standard.setIsSignIn(value: true)
+            UserDefaults.standard.setIsSignInChanged(value: true)
             UserDefaults.standard.set(_avatar.id, forKey: _avatar.email)
             _ = self.navigationController?.popViewController(animated: true)
         }
@@ -772,6 +773,7 @@ extension AuthViewController {
         UserDefaults.standard.setAvatarId(value: _avatar.id)
         UserDefaults.standard.setCurrentLanguageId(value: auth.language_id)
         UserDefaults.standard.setIsSignIn(value: true)
+        UserDefaults.standard.setIsSignInChanged(value: true)
         UserDefaults.standard.set(_avatar.id, forKey: _avatar.email)
         _ = self.navigationController?.popViewController(animated: true)
     }

@@ -12,6 +12,7 @@ extension UserDefaults {
     
     enum UserDefaultsKeys: String {
         case isSignIn
+        case isSignInChanged
         case isEmailConfirmed
         case isFreeTrial
         case isPurchased
@@ -26,6 +27,11 @@ extension UserDefaults {
     
     func setIsSignIn(value: Bool) {
         set(value, forKey: UserDefaultsKeys.isSignIn.rawValue)
+        synchronize()
+    }
+    
+    func setIsSignInChanged(value: Bool) {
+        set(value, forKey: UserDefaultsKeys.isSignInChanged.rawValue)
         synchronize()
     }
     
@@ -75,6 +81,10 @@ extension UserDefaults {
         return bool(forKey: UserDefaultsKeys.isSignIn.rawValue)
     }
     
+    func isSignInChanged() -> Bool {
+        return bool(forKey: UserDefaultsKeys.isSignInChanged.rawValue)
+    }
+    
     func isEmailConfirmed() -> Bool {
         return bool(forKey: UserDefaultsKeys.isEmailConfirmed.rawValue)
     }
@@ -115,7 +125,6 @@ extension UserDefaults {
             guard let regionCode = Locale.current.regionCode else {
                 return LangHelper.getLanguageIdByRegion(alpha2: "EN")
             }
-            print(regionCode)
             return LangHelper.getLanguageIdByRegion(alpha2: regionCode)
         }
         return currentLanguageId

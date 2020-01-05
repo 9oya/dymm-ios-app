@@ -163,6 +163,11 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             loadLogGroups()
             UserDefaults.standard.setIsCreateNewLog(value: false)
         }
+        if isFirstAppear && diaryMode == DiaryMode.editor {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.plusBtnTapped()
+            }
+        }
     }
     
     // MARK: - Actions

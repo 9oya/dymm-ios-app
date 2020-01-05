@@ -107,6 +107,7 @@ struct TagId {
     static let pill = 4
     static let food = 5
     static let home = 16
+    static let home2 = 117336
     static let diary = 17
     static let bookmarks = 18
     static let language = 20
