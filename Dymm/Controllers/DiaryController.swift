@@ -2136,7 +2136,14 @@ extension DiaryViewController {
         }
         groupTypePicker.selectRow(LogGroupType.nighttime - groupType!, inComponent: 0, animated: true)
         UIView.transition(with: self.pickerContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            self.pickerDateLabel.text = "\(self.monthNumber!)월 \(self.dayNumber!)일"
+            switch self.lang.currentLanguageId {
+            case LanguageId.eng:
+                self.pickerDateLabel.text = "\(self.dayNumber!) / \(LangHelper.getEngNameOfMonth (monthNumber: self.monthNumber!))"
+            case LanguageId.kor:
+                self.pickerDateLabel.text = "\(self.monthNumber!)월 \(self.dayNumber!)일"
+            default:
+                fatalError()
+            }
             self.blindView.isHidden = false
             self.pickerContainerView.isHidden = false
         })
