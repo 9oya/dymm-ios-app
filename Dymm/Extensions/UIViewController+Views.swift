@@ -96,15 +96,6 @@ extension UIViewController {
     func getCancelButton() -> UIButton {
         let _button = UIButton(type: .system)
         _button.setImage(UIImage.itemClose.withRenderingMode(.alwaysOriginal), for: .normal)
-        //        _button.frame = CGRect(x: 0, y: 0, width: 21, height: 21)
-        _button.showsTouchWhenHighlighted = true
-        _button.translatesAutoresizingMaskIntoConstraints = false
-        return _button
-    }
-    func getCheckButton() -> UIButton {
-        let _button = UIButton(type: .system)
-        _button.setImage(UIImage.itemCheck.withRenderingMode(.alwaysOriginal), for: .normal)
-        //        _button.frame = CGRect(x: 0, y: 0, width: 26, height: 21)
         _button.showsTouchWhenHighlighted = true
         _button.translatesAutoresizingMaskIntoConstraints = false
         return _button

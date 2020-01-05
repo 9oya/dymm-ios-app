@@ -294,6 +294,7 @@ extension UIColor {
     static let tomato = UIColor(hex: "Tomato")
     static let red_E96464 = UIColor(hex: "#E96464")
     static let red_FF71EF = UIColor(hex: "#FF71EF")
+    static let magenta = UIColor(hex: "Magenta")
     
     
     // Orange

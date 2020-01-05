@@ -87,12 +87,6 @@ struct DiaryMode {
     static let editor = 2
 }
 
-struct ButtonType {
-    static let home = 1
-    static let close = 2
-    static let back = 3
-}
-
 struct CalScope {
     static let week = 1
     static let month = 2

@@ -123,6 +123,8 @@ struct LangPack {
     var msgAvgScoreUpMonth: ((String) -> String)!
     var msgCameraDisable: String!
     var msgChangePasswordCompl: String!
+    var msgClickToAdd: String!
+    var msgCompleteTheAdd: String!
     var msgCondScoreNone: String!
     var msgDateOfBirthNone: String!
     var msgDiarySelect: String!
@@ -298,8 +300,8 @@ struct LangPack {
         }()
         self.titleClick = {
             switch currentLanguageId {
-            case LanguageId.eng: return "\u{02190} Click!"
-            case LanguageId.kor: return "\u{02190} 클릭!"
+            case LanguageId.eng: return "\u{02196} Click to Score Mood!"
+            case LanguageId.kor: return "\u{02196} 클릭해서 기분점수 매기기!"
             default: fatalError()}
         }()
         self.titleClose = {
@@ -522,8 +524,8 @@ struct LangPack {
         }()
         self.titleMoodScore = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Mood score"
-            case LanguageId.kor: return "기분점수"
+            case LanguageId.eng: return "My Mood Score 1 ~ 10"
+            case LanguageId.kor: return "나의 기분점수 1 ~ 10"
             default: fatalError()}
         }()
         self.titleMyAvtCond = {
@@ -907,6 +909,18 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Your new password has been successfully changed."
             case LanguageId.kor: return "당신의 새 패스워드가 성공적으로 변경되었습니다."
+            default: fatalError()}
+        }()
+        self.msgClickToAdd = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Click to add!\u{02198}"
+            case LanguageId.kor: return "클릭해서 추가!\u{02198}"
+            default: fatalError()}
+        }()
+        self.msgCompleteTheAdd = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Done!"
+            case LanguageId.kor: return "완료하기!"
             default: fatalError()}
         }()
         self.msgCondScoreNone = {

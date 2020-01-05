@@ -147,7 +147,6 @@ class HomeViewController: UIViewController {
     @objc func presentCategoryNavigation() {
         let vc = CategoryViewController()
         vc.superTag = self.selectedTag!
-        vc.topLeftButtonType = ButtonType.back
         navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
         navigationController?.pushViewController(vc, animated: true)
     }
@@ -208,15 +207,24 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             }
             switch tag.id {
             case TagId.diary:
-                cell.label.textColor = UIColor(hex: "#FF7187")
+                switch lang.currentLanguageId {
+                case LanguageId.eng: cell.label.text = tag.eng_name + "\u{02936}"
+                case LanguageId.kor: cell.label.text = tag.kor_name! + "\u{02936}"
+                default: fatalError()}
+                cell.imageView.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+                cell.label.textColor = .magenta
+                cell.label.font = .systemFont(ofSize: 20, weight: .heavy)
+                cell.label.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             case TagId.ranking:
+                cell.label.font = .systemFont(ofSize: 15, weight: .bold)
                 cell.label.textColor = .purple_948BFF
             case TagId.bookmarks:
+                cell.label.font = .systemFont(ofSize: 15, weight: .bold)
                 cell.label.textColor = UIColor(hex: "#FFBF67")
             default:
+                cell.label.font = .systemFont(ofSize: 15, weight: .bold)
                 cell.label.textColor = .green_3ED6A7
             }
-            cell.label.font = .systemFont(ofSize: 15, weight: .bold)
         }
         return cell
     }

@@ -504,42 +504,36 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     @objc func presentCategoryWhenGroupOfALogCellTapped(sender: UIButton) {
         let vc = CategoryViewController()
         vc.superTagId = sender.tag
-        vc.topLeftButtonType = ButtonType.back
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentFoodCategory() {
         let vc = CategoryViewController()
         vc.superTagId = TagId.food
-        vc.topLeftButtonType = ButtonType.back
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentPillCategory() {
         let vc = CategoryViewController()
         vc.superTagId = TagId.pill
-        vc.topLeftButtonType = ButtonType.back
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentActivityCategory() {
         let vc = CategoryViewController()
         vc.superTagId = TagId.activity
-        vc.topLeftButtonType = ButtonType.back
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentDiseaseCategory() {
         let vc = CategoryViewController()
         vc.superTagId = TagId.disease
-        vc.topLeftButtonType = ButtonType.back
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentHistoryCategory() {
         let vc = CategoryViewController()
         vc.superTagId = TagId.history
-        vc.topLeftButtonType = ButtonType.back
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -682,7 +676,6 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             cell.nameLabel.text = lang.getLogGroupTypeName(logGroup.group_type)
             cell.nameLabel.textColor = getLogGroupTypeColor(logGroup.group_type)
             cell.groupTypeImageView.image = getLogGroupTypeImage(logGroup.group_type)
-//            cell.nameLabel.textColor = UIColor.black
             if logGroup.food_cnt > 0 {
                 cell.foodLogBulletView.isHidden = false
             }
@@ -699,7 +692,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             } else {
                 cell.moodScoreImageView.image = .itemScoreNone
                 cell.moodScoreButton.setImage(.itemScoreNone, for: .normal)
-                cell.moodBtnGuideLabel.textColor = .purple_948BFF
+                cell.moodBtnGuideLabel.textColor = .magenta
             }
             if logGroup.note != nil {
                 cell.noteImageView.isHidden = false
@@ -1170,9 +1163,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 return
             }
             let vc = CategoryViewController()
-            vc.topLeftButtonType = ButtonType.close
             vc.superTagId = avtCondList![indexPath.item].tag_id
-            vc.topLeftButtonType = ButtonType.back
             self.navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -1507,8 +1498,17 @@ extension DiaryViewController {
         }()
         pickerCancelBtn = getCancelButton()
         pickerCancelBtn.addTarget(self, action: #selector(pickerCancelButtonTapped), for: .touchUpInside)
-        pickerCheckBtn = getCheckButton()
-        pickerCheckBtn.addTarget(self, action: #selector(pickerCheckButtonTapped), for: .touchUpInside)
+        pickerCheckBtn = {
+            let _button = UIButton(type: .system)
+            _button.setTitle(lang.msgCompleteTheAdd, for: .normal)
+            _button.setTitleColor(.magenta, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 20, weight: .heavy)
+            _button.showsTouchWhenHighlighted = true
+            _button.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _button.addTarget(self, action: #selector(pickerCheckButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
         toggleBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemArrowMaximize.withRenderingMode(.alwaysOriginal), for: .normal)
@@ -1595,9 +1595,10 @@ extension DiaryViewController {
         guideLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 18, weight: .bold)
-            _label.textColor = .purple_C3C0E3
             _label.textAlignment = .center
+            _label.textColor = .magenta
             _label.text = lang.msgGuideDiary
+            _label.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _label.isHidden = true
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
@@ -1610,7 +1611,7 @@ extension DiaryViewController {
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             _button.backgroundColor = .white
             _button.layer.cornerRadius = 10.0
-            _button.addShadowView()
+            _button.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.isHidden = true
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(presentFoodCategory), for: .touchUpInside)
@@ -1625,7 +1626,7 @@ extension DiaryViewController {
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             _button.backgroundColor = .white
             _button.layer.cornerRadius = 10.0
-            _button.addShadowView()
+            _button.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.isHidden = true
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(presentPillCategory), for: .touchUpInside)
@@ -1640,7 +1641,7 @@ extension DiaryViewController {
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             _button.backgroundColor = .white
             _button.layer.cornerRadius = 10.0
-            _button.addShadowView()
+            _button.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.isHidden = true
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(presentActivityCategory), for: .touchUpInside)
@@ -1655,7 +1656,7 @@ extension DiaryViewController {
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             _button.backgroundColor = .white
             _button.layer.cornerRadius = 10.0
-            _button.addShadowView()
+            _button.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.isHidden = true
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(presentDiseaseCategory), for: .touchUpInside)
@@ -1667,7 +1668,7 @@ extension DiaryViewController {
             _button.setImage(UIImage.itemBtnPlusTrans.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.backgroundColor = UIColor.purple_921BEA.withAlphaComponent(0.8)
             _button.layer.cornerRadius = 13.0
-            _button.addShadowView()
+            _button.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.isHidden = true
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(plusBtnTapped), for: .touchUpInside)
@@ -1878,9 +1879,8 @@ extension DiaryViewController {
         pickerCancelBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
         pickerCancelBtn.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        pickerCheckBtn.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: 0).isActive = true
+        pickerCheckBtn.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: -30).isActive = true
         pickerCheckBtn.bottomAnchor.constraint(equalTo: pickerContainerView.bottomAnchor, constant: 0).isActive = true
-        pickerCheckBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
         pickerCheckBtn.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         diseaseLeftBtn.leadingAnchor.constraint(equalTo: diseaseContainer.leadingAnchor, constant: 0).isActive = true

@@ -48,14 +48,14 @@ class CategoryViewController: UIViewController {
     var bookmarksTotalLabel: UILabel!
     var logSizeLabel: UILabel!
     var logTimeLabel: UILabel!
+    var logSizeBtnGuideLabel: UILabel!
     
     // UIButtons
-    var homeButton: UIButton!
-    var starButton: UIButton!
-    var logSizeButton: UIButton!
-    var startDateButton: UIButton!
-    var endDateButton: UIButton!
-    var langPickButton: UIButton!
+    var starBtn: UIButton!
+    var logSizeBtn: UIButton!
+    var startDateBtn: UIButton!
+    var endDateBtn: UIButton!
+    var langPickBtn: UIButton!
     var sendOpinionBtn: UIButton!
     
     // NSLayoutConstraints
@@ -88,7 +88,6 @@ class CategoryViewController: UIViewController {
     var selectedMinPickerRow: Int = 1
     let hours: [Int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     let mins: [Int] = [0, 10, 20, 30, 40, 50]
-    var topLeftButtonType = ButtonType.home
     var bookmark_id: Int?
     var typedKeyword: String?
     let hangulChars = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ".unicodeScalars
@@ -165,13 +164,13 @@ class CategoryViewController: UIViewController {
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let langId = self.selectedLangTag?.id {
                 self.lang = LangPack(langId)
-                UIView.transition(with: self.langPickButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                    self.langPickButton.setTitle(LangHelper.getLanguageName(langId), for: .normal)
+                UIView.transition(with: self.langPickBtn, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                    self.langPickBtn.setTitle(LangHelper.getLanguageName(langId), for: .normal)
                 })
             } else {
                 self.lang = LangPack(LanguageId.eng)
-                UIView.transition(with: self.langPickButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                    self.langPickButton.setTitle(LangHelper.getLanguageName(LanguageId.eng), for: .normal)
+                UIView.transition(with: self.langPickBtn, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                    self.langPickBtn.setTitle(LangHelper.getLanguageName(LanguageId.eng), for: .normal)
                 })
             }
             self.tagCollection.reloadData()
@@ -255,10 +254,6 @@ class CategoryViewController: UIViewController {
     @objc func presentIAPController() {
         let vc = IAPController()
         self.navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    @objc func homeButtonTapped() {
-        dismiss(animated: true, completion: nil)
     }
     
     @objc func starButtonTapped() {
@@ -824,7 +819,7 @@ extension CategoryViewController {
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
-        langPickButton = {
+        langPickBtn = {
             let _button = UIButton(type: .system)
             _button.setTitleColor(.green_3ED6A7, for: .normal)
             _button.setTitle(LangHelper.getLanguageName(lang.currentLanguageId), for: .normal)
@@ -921,19 +916,6 @@ extension CategoryViewController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-        homeButton = {
-            let _button = UIButton(type: .system)
-            if topLeftButtonType == ButtonType.home {
-                _button.setImage(UIImage.itemHome.withRenderingMode(.alwaysOriginal), for: .normal)
-            } else if topLeftButtonType == ButtonType.close {
-                _button.setImage(UIImage.itemCloseThin.withRenderingMode(.alwaysOriginal), for: .normal)
-            }
-            _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
-            _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
-            _button.translatesAutoresizingMaskIntoConstraints = false
-            return _button
-        }()
         sendOpinionBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemOpinion.withRenderingMode(.alwaysOriginal), for: .normal)
@@ -943,7 +925,7 @@ extension CategoryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        starButton = {
+        starBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.addTarget(self, action:#selector(starButtonTapped), for: .touchUpInside)
@@ -968,18 +950,30 @@ extension CategoryViewController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-        logSizeButton = {
+        logSizeBtn = {
             let _button = UIButton(type: .custom)
             _button.setImage(UIImage.itemBtnPlus.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 54, height: 54)
             _button.showsTouchWhenHighlighted = false
             _button.adjustsImageWhenHighlighted = false
-            _button.addShadowView()
+            _button.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.addTarget(self, action: #selector(logButtonTapped(_:)), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        startDateButton = {
+        logSizeBtnGuideLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 17, weight: .bold)
+            _label.textColor = .magenta
+            _label.textAlignment = .center
+            _label.numberOfLines = 1
+            _label.text = lang.msgClickToAdd
+            _label.transform = CGAffineTransform(rotationAngle: CGFloat.pi / 2)
+            _label.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        startDateBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemArrowCircle.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 16, height: 17)
@@ -991,7 +985,7 @@ extension CategoryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        endDateButton = {
+        endDateBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemCheckThin.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 16, height: 16)
@@ -1015,26 +1009,24 @@ extension CategoryViewController {
         searchTextField.delegate = self
         
         // Setup subviews
-        if topLeftButtonType != ButtonType.back {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
-        }
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: sendOpinionBtn)
         view.addSubview(stepCollection)
         view.addSubview(searchTextField)
         view.addSubview(searchImgView)
-        view.addSubview(langPickButton)
+        view.addSubview(langPickBtn)
         view.addSubview(detailContainer)
         view.addSubview(tagCollection)
         
         detailContainer.addSubview(titleLabel)
-        detailContainer.addSubview(starButton)
+        detailContainer.addSubview(starBtn)
         detailContainer.addSubview(bookmarksTotalLabel)
         detailContainer.addSubview(photoImgView)
         detailContainer.addSubview(logSizeLabel)
-        detailContainer.addSubview(logSizeButton)
+        detailContainer.addSubview(logSizeBtnGuideLabel)
+        detailContainer.addSubview(logSizeBtn)
         detailContainer.addSubview(logTimeLabel)
-        detailContainer.addSubview(startDateButton)
-        detailContainer.addSubview(endDateButton)
+        detailContainer.addSubview(startDateBtn)
+        detailContainer.addSubview(endDateBtn)
         detailContainer.addSubview(sizePickerContainer)
         detailContainer.addSubview(downArrowImgView)
         detailContainer.addSubview(timePicker)
@@ -1055,10 +1047,10 @@ extension CategoryViewController {
         searchImgView.centerYAnchor.constraint(equalTo: searchTextField.centerYAnchor, constant: 0).isActive = true
         searchImgView.leadingAnchor.constraint(equalTo: searchTextField.leadingAnchor, constant: 10).isActive = true
         
-        langPickButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
-        langPickButton.leadingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
-        langPickButton.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - (7 * 5)).isActive = true
-        langPickButton.heightAnchor.constraint(equalTo: searchTextField.heightAnchor, constant: 0).isActive = true
+        langPickBtn.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
+        langPickBtn.leadingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
+        langPickBtn.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - (7 * 5)).isActive = true
+        langPickBtn.heightAnchor.constraint(equalTo: searchTextField.heightAnchor, constant: 0).isActive = true
         
         detailContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
         detailContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
@@ -1071,11 +1063,11 @@ extension CategoryViewController {
         titleLabel.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: 10).isActive = true
         titleLabel.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(27 + 7)).isActive = true
         
-        starButton.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 7).isActive = true
-        starButton.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -7).isActive = true
+        starBtn.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 7).isActive = true
+        starBtn.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -7).isActive = true
         
         bookmarksTotalLabel.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 1).isActive = true
-        bookmarksTotalLabel.trailingAnchor.constraint(equalTo: starButton.leadingAnchor, constant: -2).isActive = true
+        bookmarksTotalLabel.trailingAnchor.constraint(equalTo: starBtn.leadingAnchor, constant: -2).isActive = true
         
         photoImgView.topAnchor.constraint(equalTo: detailContainer.topAnchor, constant: 55).isActive = true
         photoImgView.centerXAnchor.constraint(equalTo: detailContainer.centerXAnchor, constant: 0).isActive = true
@@ -1086,14 +1078,17 @@ extension CategoryViewController {
         logTimeLabel.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -36).isActive = true
         logTimeLabel.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 17)).isActive = true
         
-        logSizeButton.bottomAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -18).isActive = true
-        logSizeButton.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -15).isActive = true
+        logSizeBtnGuideLabel.leadingAnchor.constraint(equalTo: photoImgView.trailingAnchor, constant: -40).isActive = true
+        logSizeBtnGuideLabel.bottomAnchor.constraint(equalTo: logSizeBtn.topAnchor, constant: -47).isActive = true
         
-        startDateButton.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -15).isActive = true
-        startDateButton.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
+        logSizeBtn.bottomAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -18).isActive = true
+        logSizeBtn.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -15).isActive = true
         
-        endDateButton.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -15).isActive = true
-        endDateButton.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: view.frame.width / 10).isActive = true
+        startDateBtn.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -15).isActive = true
+        startDateBtn.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true
+        
+        endDateBtn.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -15).isActive = true
+        endDateBtn.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: view.frame.width / 10).isActive = true
         
         timePicker.leadingAnchor.constraint(equalTo: detailContainer.leadingAnchor, constant: 7).isActive = true
         timePicker.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: 0).isActive = true
@@ -1256,12 +1251,12 @@ extension CategoryViewController {
                 if _superTag.id == TagId.bookmarks {
                     self.searchTextField.isHidden = true
                     self.searchImgView.isHidden = true
-                    self.langPickButton.isHidden = true
+                    self.langPickBtn.isHidden = true
                     self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt)
                 } else {
                     self.searchTextField.isHidden = false
                     self.searchImgView.isHidden = false
-                    self.langPickButton.isHidden = false
+                    self.langPickBtn.isHidden = false
                     self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt)
                 }
             }
@@ -1277,7 +1272,7 @@ extension CategoryViewController {
             UIView.animate(withDuration: 0.5) {
                 self.searchTextField.isHidden = true
                 self.searchImgView.isHidden = true
-                self.langPickButton.isHidden = true
+                self.langPickBtn.isHidden = true
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt)
             }
         } else if _superTag.tag_type == TagType.food || _superTag.tag_type == TagType.drug {
@@ -1288,18 +1283,18 @@ extension CategoryViewController {
                 self.detailContainer.isHidden = false
                 self.searchTextField.isHidden = true
                 self.searchImgView.isHidden = true
-                self.langPickButton.isHidden = true
+                self.langPickBtn.isHidden = true
                 self.detailContainerHeight.constant = CGFloat(detailBoxAHeightInt)
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxAHeightInt + marginInt)
                 
                 self.downArrowImgView.isHidden = false
-                self.logSizeButton.isHidden = false
+                self.logSizeBtn.isHidden = false
                 self.logSizeLabel.isHidden = false
                 self.sizePickerContainer.isHidden = false
                 self.logTimeLabel.isHidden = true
                 self.timePicker.isHidden = true
-                self.startDateButton.isHidden = true
-                self.endDateButton.isHidden = true
+                self.startDateBtn.isHidden = true
+                self.endDateBtn.isHidden = true
                 if _superTag.class1 != nil {
                     self.setDetailPhotoImage(tag: _superTag)
                 }
@@ -1324,18 +1319,18 @@ extension CategoryViewController {
                 self.detailContainer.isHidden = false
                 self.searchTextField.isHidden = true
                 self.searchImgView.isHidden = true
-                self.langPickButton.isHidden = true
+                self.langPickBtn.isHidden = true
                 self.detailContainerHeight.constant = CGFloat(detailBoxBHeightInt)
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxBHeightInt + marginInt)
                 
                 self.downArrowImgView.isHidden = true
-                self.logSizeButton.isHidden = false
+                self.logSizeBtn.isHidden = false
                 self.logSizeLabel.isHidden = true
                 self.sizePickerContainer.isHidden = true
                 self.logTimeLabel.isHidden = false
                 self.timePicker.isHidden = false
-                self.startDateButton.isHidden = true
-                self.endDateButton.isHidden = true
+                self.startDateBtn.isHidden = true
+                self.endDateBtn.isHidden = true
                 
                 if _superTag.class1 != nil {
                     self.setDetailPhotoImage(tag: _superTag)
@@ -1347,18 +1342,18 @@ extension CategoryViewController {
                 self.detailContainer.isHidden = false
                 self.searchTextField.isHidden = true
                 self.searchImgView.isHidden = true
-                self.langPickButton.isHidden = true
+                self.langPickBtn.isHidden = true
                 self.detailContainerHeight.constant = CGFloat(detailBoxCHeightInt)
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxCHeightInt + marginInt)
                 
                 self.downArrowImgView.isHidden = true
-                self.logSizeButton.isHidden = true
+                self.logSizeBtn.isHidden = true
                 self.logSizeLabel.isHidden = true
                 self.sizePickerContainer.isHidden = true
                 self.logTimeLabel.isHidden = true
                 self.timePicker.isHidden = true
-                self.startDateButton.isHidden = false
-                self.endDateButton.isHidden = false
+                self.startDateBtn.isHidden = false
+                self.endDateBtn.isHidden = false
                 
                 if _superTag.class1 != nil {
                     self.setDetailPhotoImage(tag: _superTag)
@@ -1394,7 +1389,7 @@ extension CategoryViewController {
                 self.tagCollection.isHidden = true
                 self.searchTextField.isHidden = true
                 self.searchImgView.isHidden = true
-                self.langPickButton.isHidden = true
+                self.langPickBtn.isHidden = true
             })
         }
         if superTag != nil {
@@ -1407,10 +1402,10 @@ extension CategoryViewController {
         }) { (tagSet) in
             if tagSet.bookmark_id != nil {
                 self.bookmark_id = tagSet.bookmark_id
-                self.starButton.setImage(UIImage.itemStarFilled.withRenderingMode(.alwaysOriginal), for: .normal)
+                self.starBtn.setImage(UIImage.itemStarFilled.withRenderingMode(.alwaysOriginal), for: .normal)
             } else {
                 self.bookmark_id = nil
-                self.starButton.setImage(UIImage.itemStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
+                self.starBtn.setImage(UIImage.itemStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
             }
             self.bookmarksTotalLabel.text = "\(tagSet.bookmarks_total ?? 0)"
             self.afterFetchCategoriesTransition(tagSet.tag, tagSet.sub_tags)
@@ -1478,7 +1473,7 @@ extension CategoryViewController {
         }) { (postBookmark) in
             self.bookmark_id = postBookmark.bookmark_id
             UIView.animate(withDuration: 0.5, animations: {
-                self.starButton.setImage(UIImage.itemStarFilled.withRenderingMode(.alwaysOriginal), for: .normal)
+                self.starBtn.setImage(UIImage.itemStarFilled.withRenderingMode(.alwaysOriginal), for: .normal)
                 self.bookmarksTotalLabel.text = "\(postBookmark.bookmarks_total)"
             })
         }
@@ -1494,7 +1489,7 @@ extension CategoryViewController {
         }) { (bookmakrsTotal) in
             self.bookmark_id = nil
             UIView.animate(withDuration: 0.5, animations: {
-                self.starButton.setImage(UIImage.itemStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
+                self.starBtn.setImage(UIImage.itemStarEmpty.withRenderingMode(.alwaysOriginal), for: .normal)
                 self.bookmarksTotalLabel.text = "\(bookmakrsTotal)"
             })
         }

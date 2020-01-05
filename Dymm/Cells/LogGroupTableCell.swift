@@ -274,10 +274,11 @@ extension LogGroupTableCell {
         }()
         moodBtnGuideLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 15)
+            _label.font = .systemFont(ofSize: 15, weight: .bold)
             _label.textAlignment = .left
-            _label.textColor = .purple_948BFF
+            _label.textColor = .magenta
             _label.text = lang.titleClick
+            _label.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _label.isHidden = true
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
@@ -389,8 +390,8 @@ extension LogGroupTableCell {
         moodScoreButton.widthAnchor.constraint(equalToConstant: CGFloat(logGroupFooterHeightInt)).isActive = true
         moodScoreButton.heightAnchor.constraint(equalToConstant: CGFloat(logGroupFooterHeightInt)).isActive = true
         
-        moodBtnGuideLabel.leadingAnchor.constraint(equalTo: moodScoreButton.trailingAnchor, constant: 15).isActive = true
-        moodBtnGuideLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16).isActive = true
+        moodBtnGuideLabel.leadingAnchor.constraint(equalTo: moodScoreButton.trailingAnchor, constant: 0).isActive = true
+        moodBtnGuideLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -2).isActive = true
         
         noteButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: 0).isActive = true
         noteButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 0).isActive = true
