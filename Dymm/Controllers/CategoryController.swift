@@ -1082,7 +1082,7 @@ extension CategoryViewController {
         logSizeBtnGuideLabel.bottomAnchor.constraint(equalTo: logSizeBtn.topAnchor, constant: -47).isActive = true
         
         logSizeBtn.bottomAnchor.constraint(equalTo: sizePickerContainer.topAnchor, constant: -18).isActive = true
-        logSizeBtn.leadingAnchor.constraint(equalTo: photoImgView.trailingAnchor, constant: -20).isActive = true
+        logSizeBtn.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -15).isActive = true
         
         startDateBtn.bottomAnchor.constraint(equalTo: detailContainer.bottomAnchor, constant: -15).isActive = true
         startDateBtn.trailingAnchor.constraint(equalTo: detailContainer.trailingAnchor, constant: -(view.frame.width / 10)).isActive = true

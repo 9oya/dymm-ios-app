@@ -760,6 +760,13 @@ extension AuthViewController {
             UserDefaults.standard.setIsSignIn(value: true)
             UserDefaults.standard.setIsSignInChanged(value: true)
             UserDefaults.standard.set(_avatar.id, forKey: _avatar.email)
+            
+            if auth.avatar.is_free_trial {
+                UserDefaults.standard.setIsFreeTrial(value: true)
+            } else {
+                UserDefaults.standard.setIsFreeTrial(value: false)
+            }
+            
             _ = self.navigationController?.popViewController(animated: true)
         }
     }
@@ -775,6 +782,13 @@ extension AuthViewController {
         UserDefaults.standard.setIsSignIn(value: true)
         UserDefaults.standard.setIsSignInChanged(value: true)
         UserDefaults.standard.set(_avatar.id, forKey: _avatar.email)
+        
+        if auth.avatar.is_free_trial {
+            UserDefaults.standard.setIsFreeTrial(value: true)
+        } else {
+            UserDefaults.standard.setIsFreeTrial(value: false)
+        }
+        
         _ = self.navigationController?.popViewController(animated: true)
     }
     
