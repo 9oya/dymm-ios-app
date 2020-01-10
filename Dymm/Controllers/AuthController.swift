@@ -9,6 +9,9 @@
 import UIKit
 import Alamofire
 import SkyFloatingLabelTextField
+import FBSDKCoreKit
+import FBSDKLoginKit
+import GoogleSignIn
 
 class AuthViewController: UIViewController {
     
@@ -31,10 +34,15 @@ class AuthViewController: UIViewController {
     var closeButton: UIButton!
     var formSwapButton: UIButton!
     var submitButton: UIButton!
+    var fbLoginBtn: FBLoginButton!
+    var gSignInBtn: GIDSignInButton!
     
     // UILabel
     var titleLabel: UILabel!
     var messageLabel: UILabel!
+    
+    // UIImageView
+    var illustGirlImgView: UIImageView!
     
     // NSLayoutConstraint
     var formContainerTop: NSLayoutConstraint!
@@ -52,6 +60,9 @@ class AuthViewController: UIViewController {
     var confPassword: String?
     var isEmailFound = true
     var isCodeCorrect = true
+    var fbParams: Parameters?
+    var gParams: Parameters?
+    var receiptString: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -353,6 +364,53 @@ extension AuthViewController: UITextFieldDelegate {
     }
 }
 
+extension AuthViewController: LoginButtonDelegate {
+    
+    // MARK: Facebook login
+    
+    func loginButton(_ loginButton: FBLoginButton, didCompleteWith result: LoginManagerLoginResult?, error: Error?) {
+        if let error = error {
+            print(error)
+        }
+        if let result = result {
+            if result.isCancelled {
+                print("fb login cancelled")
+            } else {
+                print("fb login success")
+                fetchFbAccessToken()
+            }
+        }
+    }
+    
+    func loginButtonDidLogOut(_ loginButton: FBLoginButton) {
+        print("logged out")
+    }
+}
+
+extension AuthViewController: GIDSignInDelegate {
+    
+    // MARK: Google sign in
+    
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        if let error = error {
+            print("\(error.localizedDescription)")
+        } else {
+            // Perform any operations on signed in user here.
+            self.gParams = [
+                "email": user.profile.email!,
+                "first_name": user.profile.givenName ?? "Noob",
+                "last_name": user.profile.familyName ?? user.profile.givenName!,
+                "language_id": getDeviceLanguage()
+            ]
+            self.signWithGoogle()
+        }
+    }
+    
+    func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
+        print("User has disconnected")
+    }
+}
+
 extension AuthViewController {
     
     // MARK: Private methods
@@ -380,7 +438,7 @@ extension AuthViewController {
         }()
         titleLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 20, weight: .light)
+            _label.font = .systemFont(ofSize: 25, weight: .bold)
             _label.textColor = .green_3ED6A7
             _label.textAlignment = .center
             _label.text = lang.titleSignIn
@@ -392,7 +450,7 @@ extension AuthViewController {
             _textField.font = .systemFont(ofSize: 15, weight: .light)
             _textField.selectedTitleColor = .green_3ED6A7
             _textField.selectedLineColor = .green_3ED6A7
-            _textField.errorColor = .red_FF4779
+            _textField.errorColor = .red_FF7187
             _textField.selectedLineHeight = 1
             _textField.placeholder = lang.titleFirstName
             _textField.title = lang.titleFirstName
@@ -408,7 +466,7 @@ extension AuthViewController {
             _textField.font = .systemFont(ofSize: 15, weight: .light)
             _textField.selectedTitleColor = .green_3ED6A7
             _textField.selectedLineColor = .green_3ED6A7
-            _textField.errorColor = .red_FF4779
+            _textField.errorColor = .red_FF7187
             _textField.placeholder = lang.titleLastName
             _textField.title = lang.titleLastName
             _textField.autocapitalizationType = .words
@@ -422,7 +480,7 @@ extension AuthViewController {
             _textField.font = .systemFont(ofSize: 15, weight: .light)
             _textField.selectedTitleColor = .green_3ED6A7
             _textField.selectedLineColor = .green_3ED6A7
-            _textField.errorColor = .red_FF4779
+            _textField.errorColor = .red_FF7187
             _textField.placeholder = lang.titleEmail
             _textField.title = lang.titleEmail
             _textField.textContentType = .emailAddress
@@ -437,7 +495,7 @@ extension AuthViewController {
             _textField.font = .systemFont(ofSize: 15, weight: .light)
             _textField.selectedTitleColor = .green_3ED6A7
             _textField.selectedLineColor = .green_3ED6A7
-            _textField.errorColor = .red_FF4779
+            _textField.errorColor = .red_FF7187
             _textField.placeholder = lang.titlePassword
             _textField.title = lang.titlePassword
             _textField.isSecureTextEntry = true
@@ -450,7 +508,7 @@ extension AuthViewController {
             _textField.font = .systemFont(ofSize: 15, weight: .light)
             _textField.selectedTitleColor = .green_3ED6A7
             _textField.selectedLineColor = .green_3ED6A7
-            _textField.errorColor = .red_FF4779
+            _textField.errorColor = .red_FF7187
             _textField.placeholder = lang.titlePasswordConfirm
             _textField.title = lang.titlePasswordConfirm
             _textField.isSecureTextEntry = true
@@ -462,7 +520,7 @@ extension AuthViewController {
         messageLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 14)
-            _label.textColor = .red_FF4779
+            _label.textColor = .red_FF7187
             _label.textAlignment = .center
             _label.numberOfLines = 2
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -471,7 +529,7 @@ extension AuthViewController {
         formSwapButton = {
             let _button = UIButton(type: .system)
             _button.setTitleColor(.green_3ED6A7, for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 16, weight: .regular)
+            _button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
             _button.setTitle("\u{021C5}" + lang.titleSignUp.uppercased(), for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(formSwapButtonTapped), for: .touchUpInside)
@@ -488,16 +546,41 @@ extension AuthViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
+        fbLoginBtn = {
+            let _fbButton = FBLoginButton(frame: .zero, permissions: [.publicProfile, .email])
+            _fbButton.addShadowView()
+            _fbButton.translatesAutoresizingMaskIntoConstraints = false
+            return _fbButton
+        }()
+        gSignInBtn = {
+            let _gButton = GIDSignInButton()
+            _gButton.addShadowView()
+            _gButton.style = .wide
+            _gButton.translatesAutoresizingMaskIntoConstraints = false
+            return _gButton
+        }()
+        illustGirlImgView = {
+            let _imageView = UIImageView()
+            _imageView.image = .itemIllustGirl1
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
         firstNameTextField.delegate = self
         lastNameTextField.delegate = self
         emailTextField.delegate = self
         passwordTextField.delegate = self
         confirmPassTextField.delegate = self
+        fbLoginBtn.delegate = self
+        GIDSignIn.sharedInstance().delegate = self
+        GIDSignIn.sharedInstance().presentingViewController = self
         
         // Setup subviews
+        view.addSubview(illustGirlImgView)
         view.addSubview(formContainerView)
+        view.addSubview(fbLoginBtn)
+        view.addSubview(gSignInBtn)
         view.addSubview(topBarView)
         
         topBarView.addSubview(forgotButton)
@@ -523,6 +606,9 @@ extension AuthViewController {
         forgotButton.trailingAnchor.constraint(equalTo: topBarView.trailingAnchor, constant: -20).isActive = true
         forgotButton.bottomAnchor.constraint(equalTo: topBarView.bottomAnchor, constant: 0).isActive = true
         
+        illustGirlImgView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
+        illustGirlImgView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+        
         formContainerTop = formContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt))
         formContainerTop.priority = UILayoutPriority(rawValue: 999)
         formContainerTop.isActive = true
@@ -531,6 +617,12 @@ extension AuthViewController {
         formContainerHeight = formContainerView.heightAnchor.constraint(equalToConstant: 260)
         formContainerHeight.priority = UILayoutPriority(rawValue: 999)
         formContainerHeight.isActive = true
+        
+        fbLoginBtn.topAnchor.constraint(equalTo: formContainerView.bottomAnchor, constant: 15).isActive = true
+        fbLoginBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        
+        gSignInBtn.topAnchor.constraint(equalTo: fbLoginBtn.bottomAnchor, constant: 15).isActive = true
+        gSignInBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
         
         titleLabel.topAnchor.constraint(equalTo: formContainerView.topAnchor, constant: 20).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: formContainerView.leadingAnchor, constant: 0).isActive = true
@@ -605,11 +697,15 @@ extension AuthViewController {
             self.view.hideSpinner()
             UIView.transition(with: formContainerView, duration: 0.6, options: .transitionCrossDissolve, animations: {
                 self.formContainerView.isHidden = false
+                self.fbLoginBtn.isHidden = false
+                self.gSignInBtn.isHidden = false
             })
         } else {
             self.view.showSpinner()
             UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.formContainerView.isHidden = true
+                self.fbLoginBtn.isHidden = true
+                self.gSignInBtn.isHidden = true
             })
         }
     }
@@ -646,6 +742,8 @@ extension AuthViewController {
         self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
+            self.fbLoginBtn.isHidden = true
+            self.gSignInBtn.isHidden = true
         })
         let service = Service(lang: lang)
         service.authOldAvatar(params: params, unauthorized: { pattern in
@@ -661,9 +759,42 @@ extension AuthViewController {
             UserDefaults.standard.setAvatarId(value: _avatar.id)
             UserDefaults.standard.setCurrentLanguageId(value: auth.language_id)
             UserDefaults.standard.setIsSignIn(value: true)
+            UserDefaults.standard.setIsSignInChanged(value: true)
             UserDefaults.standard.set(_avatar.id, forKey: _avatar.email)
-            self.dismiss(animated: true, completion: nil)
+            
+            if auth.avatar.is_free_trial {
+                UserDefaults.standard.setIsFreeTrial(value: true)
+            } else {
+                UserDefaults.standard.setIsFreeTrial(value: false)
+            }
+            
+            self.loadReceipt()
+            
+            _ = self.navigationController?.popViewController(animated: true)
         }
+    }
+    
+    private func afterSignUp(_ auth: CustomModel.Auth) {
+        view.hideSpinner()
+        let _avatar = auth.avatar
+        UserDefaults.standard.setIsEmailConfirmed(value: _avatar.is_confirmed)
+        UserDefaults.standard.setAccessToken(value: _avatar.access_token!)
+        UserDefaults.standard.setRefreshToken(value: _avatar.refresh_token!)
+        UserDefaults.standard.setAvatarId(value: _avatar.id)
+        UserDefaults.standard.setCurrentLanguageId(value: auth.language_id)
+        UserDefaults.standard.setIsSignIn(value: true)
+        UserDefaults.standard.setIsSignInChanged(value: true)
+        UserDefaults.standard.set(_avatar.id, forKey: _avatar.email)
+        
+        if auth.avatar.is_free_trial {
+            UserDefaults.standard.setIsFreeTrial(value: true)
+        } else {
+            UserDefaults.standard.setIsFreeTrial(value: false)
+        }
+        
+        loadReceipt()
+        
+        _ = self.navigationController?.popViewController(animated: true)
     }
     
     private func accountSignUp() {
@@ -708,6 +839,8 @@ extension AuthViewController {
         self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
+            self.fbLoginBtn.isHidden = true
+            self.gSignInBtn.isHidden = true
         })
         let service = Service(lang: lang)
         service.createNewAvatar(params: params, unauthorized: { pattern in
@@ -716,15 +849,7 @@ extension AuthViewController {
             self.retryFunction = self.accountSignUp
             self.alertError(message)
         }) { (auth) in
-            let _avatar = auth.avatar
-            UserDefaults.standard.setIsEmailConfirmed(value: _avatar.is_confirmed)
-            UserDefaults.standard.setAccessToken(value: _avatar.access_token!)
-            UserDefaults.standard.setRefreshToken(value: _avatar.refresh_token!)
-            UserDefaults.standard.setAvatarId(value: _avatar.id)
-            UserDefaults.standard.setCurrentLanguageId(value: auth.language_id)
-            UserDefaults.standard.setIsSignIn(value: true)
-            UserDefaults.standard.set(_avatar.id, forKey: _avatar.email)
-            self.dismiss(animated: true, completion: nil)
+            self.afterSignUp(auth)
         }
     }
     
@@ -749,9 +874,12 @@ extension AuthViewController {
         self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
+            self.fbLoginBtn.isHidden = true
+            self.gSignInBtn.isHidden = true
         })
         let params: Parameters = [
-            "email": emailToFind!
+            "email": emailToFind!,
+            "language_id": lang.currentLanguageId!
         ]
         let service = Service(lang: lang)
         service.solveAvatarEmail(option: MailOption.verify, params: params, unauthorized: {
@@ -763,6 +891,8 @@ extension AuthViewController {
             self.isCodeCorrect = true
             UIView.transition(with: self.formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.formContainerView.isHidden = false
+                self.fbLoginBtn.isHidden = false
+                self.gSignInBtn.isHidden = false
                 self.view.hideSpinner()
             })
             self.alertVerificationCode()
@@ -773,6 +903,8 @@ extension AuthViewController {
         self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
+            self.fbLoginBtn.isHidden = true
+            self.gSignInBtn.isHidden = true
         })
         let params: Parameters = [
             "email": emailToFind!,
@@ -789,6 +921,8 @@ extension AuthViewController {
             self.isCodeCorrect = true
             UIView.transition(with: self.formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.formContainerView.isHidden = false
+                self.fbLoginBtn.isHidden = false
+                self.gSignInBtn.isHidden = false
                 self.view.hideSpinner()
             })
             self.alertChangePassword()
@@ -799,6 +933,8 @@ extension AuthViewController {
         self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.formContainerView.isHidden = true
+            self.fbLoginBtn.isHidden = true
+            self.gSignInBtn.isHidden = true
         })
         let params: Parameters = [
             "email": emailToFind!,
@@ -816,9 +952,99 @@ extension AuthViewController {
         }) { (newInfoTxt) in
             UIView.transition(with: self.formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.formContainerView.isHidden = false
+                self.fbLoginBtn.isHidden = false
+                self.gSignInBtn.isHidden = false
                 self.view.hideSpinner()
             })
             self.alertChangePasswordCompl()
+        }
+    }
+    
+    private func fetchFbAccessToken() {
+        if let fbAccessToken = AccessToken.current {
+            // Case user signed with facebook
+            // parameters: gender, picture.type(large)
+            let req = GraphRequest(graphPath: "me", parameters: ["fields":"email, first_name, last_name"], tokenString: fbAccessToken.tokenString, version: nil, httpMethod: .get)
+            req.start { (connection, result, error) in
+                if let error = error {
+                    print("error \(error)")
+                } else {
+                    let jsonResult = result! as! Dictionary<String, AnyObject>
+                    self.fbParams = [
+                        "fb_id": jsonResult["id"]!,
+                        "first_name": jsonResult["first_name"]!,
+                        "last_name": jsonResult["last_name"]!,
+                        "language_id": getDeviceLanguage()
+                    ]
+                    if let email = jsonResult["email"] {
+                        self.fbParams!["email"] = email
+                    }
+                    self.signWithFacebook()
+                }
+            }
+        }
+    }
+    
+    private func signWithFacebook() {
+        view.showSpinner()
+        UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.formContainerView.isHidden = true
+            self.fbLoginBtn.isHidden = true
+            self.gSignInBtn.isHidden = true
+        })
+        let service = Service(lang: lang)
+        service.authWithFacebook(params: self.fbParams!, popoverAlert: { (message) in
+            self.retryFunction = self.signWithFacebook
+            self.alertError(message)
+        }) { (auth) in
+            self.afterSignUp(auth)
+        }
+    }
+    
+    private func signWithGoogle() {
+        view.showSpinner()
+        UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            self.formContainerView.isHidden = true
+            self.fbLoginBtn.isHidden = true
+            self.gSignInBtn.isHidden = true
+        })
+        let service = Service(lang: lang)
+        service.authWithGoogle(params: self.gParams!, popoverAlert: { (message) in
+            self.retryFunction = self.signWithGoogle
+            self.alertError(message)
+        }) { (auth) in
+            self.afterSignUp(auth)
+        }
+    }
+    
+    private func loadReceipt() {
+        if let appStoreReceiptURL = Bundle.main.appStoreReceiptURL,
+            FileManager.default.fileExists(atPath: appStoreReceiptURL.path) {
+            do {
+                let receiptData = try Data(contentsOf: appStoreReceiptURL, options: .alwaysMapped)
+                receiptString = receiptData.base64EncodedString(options: [])
+                verifyReceipt()
+            }
+            catch { print("Couldn't read receipt data with error: " + error.localizedDescription) }
+        }
+    }
+    
+    private func verifyReceipt() {
+        let params: Parameters = [
+            "receipt_data": receiptString!
+        ]
+        let service = Service(lang: lang)
+        service.verifyReceipt(params: params, popoverAlert: { (message) in
+            self.retryFunction = self.verifyReceipt
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.verifyReceipt()
+        }) { (isReceiptVerified) in
+            if isReceiptVerified {
+                UserDefaults.standard.setIsPurchased(value: true)
+            } else {
+                UserDefaults.standard.setIsPurchased(value: false)
+            }
         }
     }
 }

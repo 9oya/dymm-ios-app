@@ -41,9 +41,8 @@ class ProfileViewController: UIViewController {
     
     // UIButton
     var signOutButton: UIButton!
-    var closeButton: UIButton!
     var notConfirmedEmailButton: UIButton!
-    var sendAgainButton: UIButton!
+    var sendVerifMailBtn: UIButton!
     var colorLeftButton: UIButton!
     var colorRightButton: UIButton!
     
@@ -151,14 +150,11 @@ class ProfileViewController: UIViewController {
         present(alert, animated: true, completion:{})
     }
     
-    @objc func closeButtonTapped() {
-        dismiss(animated: true, completion: nil)
-    }
-    
     @objc func signOutButtonTapped() {
         UserDefaults.standard.setIsSignIn(value: false)
+        UserDefaults.standard.setIsSignInChanged(value: true)
         UserDefaults.standard.setAvatarId(value: 0)
-        dismiss(animated: true, completion: nil)
+        _ = navigationController?.popViewController(animated: true)
     }
     
     @objc func sendMailAgainBtnTapped() {
@@ -221,7 +217,7 @@ class ProfileViewController: UIViewController {
             NotificationCenter.default.addObserver(forName: UITextField.textDidChangeNotification, object: textField, queue: OperationQueue.main) { (notification) in
                 if textField.text! == "" {
                     confirmAction.isEnabled = false
-                } else if textField.text!.count < 2 {
+                } else if textField.text!.count < 1 {
                     confirmAction.isEnabled = false
                 } else {
                     confirmAction.isEnabled = true
@@ -251,6 +247,7 @@ class ProfileViewController: UIViewController {
             UIView.transition(with: self.tagCollection, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 if self.notConfirmedEmail != nil {
                     self.verifMailContainer.isHidden = false
+                    self.sendVerifMailBtn.isHidden = false
                 } else {
                     self.infoContainer.isHidden = false
                     self.tagCollection.isHidden = false
@@ -416,7 +413,7 @@ class ProfileViewController: UIViewController {
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
         alert.addAction(UIAlertAction(title: lang.titleChooseColor, style: .default) { _ in
-            self.colorLeftButton.setTitleColor(.green_3ED6A7, for: .normal)
+            self.colorLeftButton.setTitleColor(.purple_B847FF, for: .normal)
             UIView.transition(with: self.colorLeftButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.colorLeftButton.isHidden = false
             })
@@ -449,27 +446,6 @@ class ProfileViewController: UIViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    @objc func alertTempFreeTriar() {
-        let alert = UIAlertController(title: lang.titleMembership, message: "\(lang.titleFreeTrial!)!", preferredStyle: .alert)
-        let logoImageView: UIImageView = {
-            let imageView = UIImageView()
-            imageView.contentMode = .scaleAspectFit
-            imageView.image = .itemLogoM
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-            return imageView
-        }()
-        alert.view.addSubview(logoImageView)
-        
-        logoImageView.centerXAnchor.constraint(equalTo: alert.view.centerXAnchor, constant: 0).isActive = true
-        logoImageView.centerYAnchor.constraint(equalTo: alert.view.centerYAnchor, constant: 10).isActive = true
-        
-        let height = NSLayoutConstraint(item: alert.view!, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 220)
-        alert.view.addConstraint(height)
-        alert.addAction(UIAlertAction(title: lang.titleDone, style: .cancel) { _ in })
-        alert.view.tintColor = .purple_B847FF
-        present(alert, animated: true, completion: nil)
-    }
-    
     @objc func colorRightButtonTapped() {
         if selectedColorItem == nil {
             colorLeftButtonTapped()
@@ -484,7 +460,7 @@ class ProfileViewController: UIViewController {
     @objc func colorLeftButtonTapped() {
         UIView.transition(with: self.blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.blindView.isHidden = true
-            self.colorLeftButton.setTitleColor(UIColor.clear, for: .normal)
+            self.colorLeftButton.setTitleColor(.clear, for: .normal)
         }, completion: { (_) in
             self.colorLeftButton.isHidden = true
         })
@@ -587,7 +563,6 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
                 return
             case TagId.subscription:
                 presentIAPController()
-//                alertTempFreeTriar()
                 return
             default:
                 loadProfileTagsOnPicker()
@@ -753,6 +728,7 @@ extension ProfileViewController {
         // Initialize super view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = UIColor.whiteSmoke
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16, weight: .medium)]
         view.showSpinner()
         
         // Initialize subveiw properties
@@ -760,19 +736,29 @@ extension ProfileViewController {
         topBarContainer = getAddtionalTopBarView()
         signOutButton = getBasicTextButton()
         signOutButton.addTarget(self, action: #selector(signOutButtonTapped), for: .touchUpInside)
-        closeButton = getCloseButton()
-        closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         notConfirmedEmailButton = {
             let _button = UIButton(type: .system)
             _button.titleLabel?.font = .systemFont(ofSize: 16)
             _button.setTitleColor(.green_3ED6A7, for: .normal)
             _button.showsTouchWhenHighlighted = true
+            _button.addUnderline()
             _button.addTarget(self, action: #selector(alertEmailTextField(_:)), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        sendAgainButton = getBasicTextButton(.green_3ED6A7)
-        sendAgainButton.addTarget(self, action: #selector(sendMailAgainBtnTapped), for: .touchUpInside)
+        sendVerifMailBtn = {
+            let _button = UIButton(type: .system)
+            _button.setTitle(lang.titleSendVerifMail.uppercased(), for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .bold)
+            _button.tintColor = .white
+            _button.backgroundColor = .green_3ED6A7
+            _button.layer.cornerRadius = 10.0
+            _button.addShadowView()
+            _button.isHidden = true
+            _button.addTarget(self, action: #selector(sendMailAgainBtnTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
         firstNameContainer = getProfileLabelContainerView()
         firstNameContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.alertFirstNameTextField(_:))))
         lastNameContainer = getProfileLabelContainerView()
@@ -820,7 +806,7 @@ extension ProfileViewController {
             _label.font = .systemFont(ofSize: 15, weight: .regular)
             _label.textColor = .gray
             _label.textAlignment = .center
-            _label.numberOfLines = 2
+            _label.numberOfLines = 4
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -897,7 +883,7 @@ extension ProfileViewController {
         introLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 15, weight: .regular)
-            _label.textColor = UIColor.black
+            _label.textColor = .black
             _label.textAlignment = .left
             _label.numberOfLines = 4
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -906,8 +892,8 @@ extension ProfileViewController {
         colorLeftButton = {
             let _button = UIButton(type: .system)
             _button.setTitle(lang.titleClose, for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            _button.setTitleColor(UIColor.clear, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .bold)
+            _button.setTitleColor(.clear, for: .normal)
             _button.showsTouchWhenHighlighted = false
             _button.isHidden = true
             _button.addTarget(self, action:#selector(colorLeftButtonTapped), for: .touchUpInside)
@@ -918,7 +904,7 @@ extension ProfileViewController {
             let _button = UIButton(type: .system)
             _button.setTitle(lang.titleDone, for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            _button.setTitleColor(.green_3ED6A7, for: .normal)
+            _button.setTitleColor(.purple_B847FF, for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(colorRightButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
@@ -932,13 +918,13 @@ extension ProfileViewController {
         view.addSubview(tagCollection)
         view.addSubview(blindView)
         view.addSubview(colorLeftButton)
+        view.addSubview(sendVerifMailBtn)
         
         topBarContainer.addSubview(signOutButton)
         
         verifMailContainer.addSubview(verifMailTitleLabel)
         verifMailContainer.addSubview(verifMailMsgLabel)
         verifMailContainer.addSubview(notConfirmedEmailButton)
-        verifMailContainer.addSubview(sendAgainButton)
         
         infoContainer.addSubview(memberStatusLabel)
         infoContainer.addSubview(infoImageView)
@@ -964,7 +950,6 @@ extension ProfileViewController {
         colorContainer.addSubview(colorRightButton)
         
         setupLangProperties()
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
         tagCollection.dataSource = self
         tagCollection.delegate = self
         colorCollection.dataSource = self
@@ -984,7 +969,7 @@ extension ProfileViewController {
         verifMailContainer.topAnchor.constraint(equalTo: topBarContainer.bottomAnchor, constant: 7).isActive = true
         verifMailContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         verifMailContainer.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        verifMailContainer.heightAnchor.constraint(equalToConstant: 220).isActive = true
+        verifMailContainer.heightAnchor.constraint(equalToConstant: 200).isActive = true
         
         verifMailTitleLabel.topAnchor.constraint(equalTo: verifMailContainer.topAnchor, constant: 20).isActive = true
         verifMailTitleLabel.leadingAnchor.constraint(equalTo: verifMailContainer.leadingAnchor, constant: 0).isActive = true
@@ -994,10 +979,13 @@ extension ProfileViewController {
         verifMailMsgLabel.leadingAnchor.constraint(equalTo: verifMailContainer.leadingAnchor, constant: 0).isActive = true
         verifMailMsgLabel.trailingAnchor.constraint(equalTo: verifMailContainer.trailingAnchor, constant: 0).isActive = true
         
-        sendAgainButton.bottomAnchor.constraint(equalTo: verifMailContainer.bottomAnchor, constant: -15).isActive = true
-        sendAgainButton.trailingAnchor.constraint(equalTo: verifMailContainer.trailingAnchor, constant: -15).isActive = true
+        sendVerifMailBtn.topAnchor.constraint(equalTo: verifMailContainer.bottomAnchor, constant: 7).isActive = true
+        sendVerifMailBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        sendVerifMailBtn.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        sendVerifMailBtn.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        sendVerifMailBtn.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        notConfirmedEmailButton.bottomAnchor.constraint(equalTo: sendAgainButton.topAnchor, constant: -15).isActive = true
+        notConfirmedEmailButton.bottomAnchor.constraint(equalTo: verifMailContainer.bottomAnchor, constant: -20).isActive = true
         notConfirmedEmailButton.centerXAnchor.constraint(equalTo: verifMailContainer.centerXAnchor, constant: 0).isActive = true
         
         infoContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(topBarHeightInt + marginInt)).isActive = true
@@ -1086,13 +1074,13 @@ extension ProfileViewController {
         colorContainer.trailingAnchor.constraint(equalTo: blindView.trailingAnchor, constant: -7).isActive = true
         colorContainer.centerXAnchor.constraint(equalTo: blindView.centerXAnchor, constant: 0).isActive = true
         colorContainer.centerYAnchor.constraint(equalTo: blindView.centerYAnchor, constant: 0).isActive = true
-        colorContainer.heightAnchor.constraint(equalToConstant: (60 * 3) + 100).isActive = true
+        colorContainer.heightAnchor.constraint(equalToConstant: (view.frame.height * 0.27) + 100).isActive = true
         
         colorCollection.topAnchor.constraint(equalTo: colorContainer.topAnchor, constant: 40).isActive = true
         colorCollection.centerXAnchor.constraint(equalTo: colorContainer.centerXAnchor, constant: 0).isActive = true
         colorCollection.leadingAnchor.constraint(equalTo: colorContainer.leadingAnchor, constant: 15).isActive = true
         colorCollection.trailingAnchor.constraint(equalTo: colorContainer.trailingAnchor, constant: -15).isActive = true
-        colorCollection.heightAnchor.constraint(equalToConstant: 60 * 3).isActive = true
+        colorCollection.heightAnchor.constraint(equalToConstant: view.frame.height * 0.27).isActive = true
         
         colorTitleLabel.topAnchor.constraint(equalTo: colorContainer.topAnchor, constant: 10).isActive = true
         colorTitleLabel.centerXAnchor.constraint(equalTo: colorContainer.centerXAnchor, constant: 0).isActive = true
@@ -1117,7 +1105,7 @@ extension ProfileViewController {
         introGuideLabel.text = lang.titleIntro.uppercased()
         introPlaceHolderLabel.text = lang.titleIntro
         signOutButton.setTitle(lang.titleSignOut, for: .normal)
-        sendAgainButton.setTitle(lang.titleSendAgain, for: .normal)
+        sendVerifMailBtn.setTitle(lang.titleSendVerifMail, for: .normal)
     }
     
     private func loadProfile() {
@@ -1129,8 +1117,10 @@ extension ProfileViewController {
             self.notConfirmedEmail = email
             UIView.transition(with: self.verifMailContainer, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.infoContainer.isHidden = true
-                self.notConfirmedEmailButton.setTitle(email, for: .normal)
+                self.notConfirmedEmailButton.setTitle(self.lang.titleEdit + ": " + email, for: .normal)
+                self.notConfirmedEmailButton.addUnderline()
                 self.verifMailContainer.isHidden = false
+                self.sendVerifMailBtn.isHidden = false
                 self.view.hideSpinner()
             })
         }, tokenRefreshCompletion: {
@@ -1151,7 +1141,7 @@ extension ProfileViewController {
                 }
             } else {
                 let index = firstName.index(firstName.startIndex, offsetBy: 0)
-                self.infoImageLabel.text = String(firstName[index])
+                self.infoImageLabel.text = String(firstName[index].uppercased())
                 self.infoImageLabel.textColor = .white
                 self.infoImageView.image = nil
                 self.infoImageView.backgroundColor = getProfileUIColor(key: profile.avatar.color_code)
@@ -1242,6 +1232,7 @@ extension ProfileViewController {
             self.tagCollection.isHidden = true
             if self.notConfirmedEmail != nil {
                 self.verifMailContainer.isHidden = true
+                self.sendVerifMailBtn.isHidden = true
             }
         })
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
@@ -1292,6 +1283,7 @@ extension ProfileViewController {
         self.view.showSpinner()
         UIView.transition(with: verifMailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.verifMailContainer.isHidden = true
+            self.sendVerifMailBtn.isHidden = true
         })
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
             UserDefaults.standard.setIsSignIn(value: false)
@@ -1311,6 +1303,7 @@ extension ProfileViewController {
             })
             UIView.transition(with: self.verifMailContainer, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.verifMailContainer.isHidden = false
+                self.sendVerifMailBtn.isHidden = false
                 self.view.hideSpinner()
             })
         }

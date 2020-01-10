@@ -239,6 +239,7 @@ struct BaseModel {
     struct LogGroup: Codable {
         let id: Int
         let year_number: Int
+        let year_forweekofyear: Int
         let month_number: Int
         let week_of_year: Int
         let day_of_year: Int
@@ -253,6 +254,7 @@ struct BaseModel {
         enum CodingKeys: String, CodingKey {
             case id
             case year_number
+            case year_forweekofyear
             case month_number
             case week_of_year
             case day_of_year
@@ -269,6 +271,7 @@ struct BaseModel {
             let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
             self.id = try valueContainer.decode(Int.self, forKey: CodingKeys.id)
             self.year_number = try valueContainer.decode(Int.self, forKey: CodingKeys.year_number)
+            self.year_forweekofyear = try valueContainer.decode(Int.self, forKey: CodingKeys.year_forweekofyear)
             self.month_number = try valueContainer.decode(Int.self, forKey: CodingKeys.month_number)
             self.week_of_year = try valueContainer.decode(Int.self, forKey: CodingKeys.week_of_year)
             self.day_of_year = try valueContainer.decode(Int.self, forKey: CodingKeys.day_of_year)
@@ -599,6 +602,22 @@ struct CustomModel {
         init(from decoder: Decoder) throws {
             let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
             self.rankings = try valueContainer.decode([CustomModel.Ranking].self, forKey: CodingKeys.rankings)
+        }
+    }
+    
+    struct RemainingLifespanSet: Codable {
+        let avg_score: String
+        let r_lifespan_day: Int
+        
+        enum CodingKeys: String, CodingKey {
+            case avg_score
+            case r_lifespan_day
+        }
+        
+        init(from decoder: Decoder) throws {
+            let valueContainer = try decoder.container(keyedBy: CodingKeys.self)
+            self.avg_score = try valueContainer.decode(String.self, forKey: CodingKeys.avg_score)
+            self.r_lifespan_day = try valueContainer.decode(Int.self, forKey: CodingKeys.r_lifespan_day)
         }
     }
 }

@@ -17,18 +17,19 @@ struct LangPack {
     var titleAll: String!
     var titleAvgMoodScoreWeek: String!
     var titleAvgMoodScoreMonth: String!
-    var titleBackHome: String!
+    var titleBookmarks: String!
     var titleCamera: String!
     var titleCancel: String!
     var titleChooseColor: String!
     var titleChangeProfileImg: String!
+    var titleClick: String!
     var titleClose: String!
     var titleComplete: String!
-    var titleMoodScore: String!
     var titleCondScores: [String]!
     var titleContinue: String!
     var titleCreateNew: String!
     var titleCreateNewGroup: String!
+    var titleDelete: String!
     var titleDiary: String!
     var titleDone: String!
     var titleEdit: String!
@@ -49,6 +50,7 @@ struct LangPack {
     var titleFreeTrial: String!
     var titleGender: String!
     var titleGuest: String!
+    var titleHome: String!
     var titleIncorrectEmailCode: String!
     var titleIncorrectOldPassword: String!
     var titleIntro: String!
@@ -57,6 +59,7 @@ struct LangPack {
     var titleLastWeek: String!
     var titleLogGroups: [String]!
     var titleMembership: String!
+    var titleMoodScore: String!
     var titleMyAvtCond: String!
     var titleMyCondScore: String!
     var titleNo: String!
@@ -72,6 +75,7 @@ struct LangPack {
     var titlePhoneNum: String!
     var titlePhotolibrary: String!
     var titlePrivaryPolocy: String!
+    var titlePullToRefresh: String!
     var titlePurchaseCompl: String!
     var titlePurchaseFail: String!
     var titlePurchaseDisable: String!
@@ -83,9 +87,10 @@ struct LangPack {
     var titleRestoreCompl: String!
     var titleRestoreProduct: String!
     var titleRetry: String!
+    var titleReturn: String!
     var titleSearch: String!
     var titleSend: String!
-    var titleSendAgain: String!
+    var titleSendVerifMail: String!
     var titleSignIn: String!
     var titleSignOut: String!
     var titleSignUp: String!
@@ -96,6 +101,10 @@ struct LangPack {
     var titleStay: String!
     var titleSubmit: String!
     var titleSubscribe: String!
+    var titleTagFood: String!
+    var titleTagPill: String!
+    var titleTagActivity: String!
+    var titleTagDisease: String!
     var titleTerms: String!
     var titleToday: String!
     var titleThisMonth: String!
@@ -114,8 +123,11 @@ struct LangPack {
     var msgAvgScoreUpMonth: ((String) -> String)!
     var msgCameraDisable: String!
     var msgChangePasswordCompl: String!
+    var msgClickToAdd: String!
+    var msgCompleteTheAdd: String!
     var msgCondScoreNone: String!
     var msgDateOfBirthNone: String!
+    var msgDiarySelect: String!
     var msgDuplicatedEmail: String!
     var msgEmptyEmail: String!
     var msgEmptyName: String!
@@ -124,6 +136,7 @@ struct LangPack {
     var msgFloatingInvalidPassword: String!
     var msgFloatingMismatchConfirmPassword: String!
     var msgFreeTrialExpired: String!
+    var msgGuideDiary: String!
     var msgInactiveFood: String!
     var msgInvalidEmail: String!
     var msgLifeSpan: String!
@@ -134,6 +147,11 @@ struct LangPack {
     var msgMailSendAgainComplete: String!
     var msgMailSendValidCode: ((String) -> String)!
     var msgMismatchConfirmPassword: String!
+    var msgMoodAwfulMsgs: [String]!
+    var msgMoodBadMsgs: [String]!
+    var msgMoodSosoMsgs: [String]!
+    var msgMoodGoodMsgs: [String]!
+    var msgMoodExcellentMsgs: [String]!
     var msgNetworkFailure: String!
     var msgOpinionCompl: String!
     var msgPremiumRestored: String!
@@ -160,7 +178,7 @@ struct LangPack {
         let idx = key - 1
         return titleLogGroups[idx]
     }
-    func getCondScoreName(_ key: Float) -> String {
+    func getMoodScoreName(_ key: Float) -> String {
         var idx = 0
         if key < 1 {
             idx = 0
@@ -177,6 +195,22 @@ struct LangPack {
         }
         return titleCondScores[idx]
     }
+    func getMoodScoreMessage(_ key: Float) -> String {
+        if key < 1 {
+            return msgLifeSpan
+        } else if key < 2.5 {
+            return msgMoodAwfulMsgs[Int.random(in: 0..<7)]
+        } else if key < 4.5 {
+            return msgMoodBadMsgs[Int.random(in: 0..<7)]
+        } else if key < 6.5 {
+            return msgMoodSosoMsgs[Int.random(in: 0..<7)]
+        } else if key < 8.5 {
+            return msgMoodGoodMsgs[Int.random(in: 0..<7)]
+        } else {
+            return msgMoodExcellentMsgs[Int.random(in: 0..<7)]
+        }
+    }
+    
     func getWeekdayName(_ key: Int) -> String {
         let idx = key - 1
         return titleWeekdays[idx]
@@ -234,10 +268,10 @@ struct LangPack {
             case LanguageId.kor: return "나의 주간 기분점수"
             default: fatalError()}
         }()
-        self.titleBackHome = {
+        self.titleBookmarks = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Back to Home"
-            case LanguageId.kor: return "홈으로 돌아가기"
+            case LanguageId.eng: return "Bookmarks"
+            case LanguageId.kor: return "즐겨찾기"
             default: fatalError()}
         }()
         self.titleCamera = {
@@ -264,6 +298,12 @@ struct LangPack {
             case LanguageId.kor: return "프로필 이미지를 변경합니다"
             default: fatalError()}
         }()
+        self.titleClick = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "\u{02196} Click to Score Mood!"
+            case LanguageId.kor: return "\u{02196} 클릭해서 기분점수 매기기!"
+            default: fatalError()}
+        }()
         self.titleClose = {
             switch currentLanguageId {
             case LanguageId.eng: return "Close"
@@ -274,12 +314,6 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Complete!"
             case LanguageId.kor: return "전송완료!"
-            default: fatalError()}
-        }()
-        self.titleMoodScore = {
-            switch currentLanguageId {
-            case LanguageId.eng: return "Mood score"
-            case LanguageId.kor: return "기분점수"
             default: fatalError()}
         }()
         self.titleCondScores = {
@@ -304,6 +338,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Create New Group"
             case LanguageId.kor: return "새 그룹 만들기"
+            default: fatalError()}
+        }()
+        self.titleDelete = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Delete"
+            case LanguageId.kor: return "지우기"
             default: fatalError()}
         }()
         self.titleDiary = {
@@ -426,6 +466,12 @@ struct LangPack {
             case LanguageId.kor: return "게스트"
             default: fatalError()}
         }()
+        self.titleHome = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Home"
+            case LanguageId.kor: return "홈"
+            default: fatalError()}
+        }()
         self.titleIncorrectEmailCode = {
             switch currentLanguageId {
             case LanguageId.eng: return "\u{26A0}Incorrect or expired verification code"
@@ -474,6 +520,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Membership"
             case LanguageId.kor: return "멤버쉽"
+            default: fatalError()}
+        }()
+        self.titleMoodScore = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "My Mood Score 1 ~ 10"
+            case LanguageId.kor: return "나의 기분점수 1 ~ 10"
             default: fatalError()}
         }()
         self.titleMyAvtCond = {
@@ -566,6 +618,12 @@ struct LangPack {
             case LanguageId.kor: return "개인정보처리방침"
             default: fatalError()}
         }()
+        self.titlePullToRefresh = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Pull to refresh\n\u{021E3}"
+            case LanguageId.kor: return "당겨서 새로고침\n\u{021E3}"
+            default: fatalError()}
+        }()
         self.titlePurchaseCompl = {
             switch currentLanguageId {
             case LanguageId.eng: return "Purchase complete"
@@ -632,6 +690,12 @@ struct LangPack {
             case LanguageId.kor: return "다시하기"
             default: fatalError()}
         }()
+        self.titleReturn = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Return"
+            case LanguageId.kor: return "돌아가기"
+            default: fatalError()}
+        }()
         self.titleSearch = {
             switch currentLanguageId {
             case LanguageId.eng: return "Search"
@@ -644,10 +708,10 @@ struct LangPack {
             case LanguageId.kor: return "전송"
             default: fatalError()}
         }()
-        self.titleSendAgain = {
+        self.titleSendVerifMail = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Send it again"
-            case LanguageId.kor: return "다시 보내기"
+            case LanguageId.eng: return "Send Verification Mail"
+            case LanguageId.kor: return "인증메일 보내기"
             default: fatalError()}
         }()
         self.titleSignIn = {
@@ -708,6 +772,30 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Subscribe"
             case LanguageId.kor: return "구독하기"
+            default: fatalError()}
+        }()
+        self.titleTagFood = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "FOODS"
+            case LanguageId.kor: return "음식"
+            default: fatalError()}
+        }()
+        self.titleTagPill = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "PILLS"
+            case LanguageId.kor: return "제약"
+            default: fatalError()}
+        }()
+        self.titleTagActivity = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "ACTIVITIES"
+            case LanguageId.kor: return "활동"
+            default: fatalError()}
+        }()
+        self.titleTagDisease = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "DISEASES"
+            case LanguageId.kor: return "질병"
             default: fatalError()}
         }()
         self.titleTerms = {
@@ -823,6 +911,18 @@ struct LangPack {
             case LanguageId.kor: return "당신의 새 패스워드가 성공적으로 변경되었습니다."
             default: fatalError()}
         }()
+        self.msgClickToAdd = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Click to add!\u{02198}"
+            case LanguageId.kor: return "클릭해서 추가!\u{02198}"
+            default: fatalError()}
+        }()
+        self.msgCompleteTheAdd = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Done!"
+            case LanguageId.kor: return "완료하기!"
+            default: fatalError()}
+        }()
         self.msgCondScoreNone = {
             switch currentLanguageId {
             case LanguageId.eng: return "I can't find your mood score log."
@@ -833,6 +933,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Please select your date of birth on the Profile tab."
             case LanguageId.kor: return "프로필 탭에서 당신의 생년월일을 선택해주세요."
+            default: fatalError()}
+        }()
+        self.msgDiarySelect = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Select a calendar date or a group below."
+            case LanguageId.kor: return "아래에서 달력날짜 또는 그룹을 선택해주세요."
             default: fatalError()}
         }()
         self.msgDuplicatedEmail = {
@@ -883,6 +989,12 @@ struct LangPack {
             case LanguageId.kor: return "무료 체험이 만료되었습니다. 멤버쉽을 갱신해 주세요."
             default: fatalError()}
         }()
+        self.msgGuideDiary = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Make your first track this week!"
+            case LanguageId.kor: return "이번주 첫번째 기록을 만들어 보세요!"
+            default: fatalError()}
+        }()
         self.msgInvalidEmail = {
             switch currentLanguageId {
             case LanguageId.eng: return "Invalid mail address"
@@ -903,8 +1015,8 @@ struct LangPack {
         }()
         self.msgLogComplete = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Successfully recorded!\n\nWant to back Home?"
-            case LanguageId.kor: return "성공적으로 기록되었습니다!\n\n홈으로 이동하시겠습니까?"
+            case LanguageId.eng: return "Successfully recorded!"
+            case LanguageId.kor: return "성공적으로 기록되었습니다!"
             default: fatalError()}
         }()
         self.msgMailEnter = {
@@ -915,20 +1027,44 @@ struct LangPack {
         }()
         self.msgMailModified = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your email address has changed.\nPlease verify your new email."
-            case LanguageId.kor: return "메일주소가 변경되었습니다.\n새 메일을 확인해 주세요."
+            case LanguageId.eng: return """
+                Your email address has changed.
+                Please check your mailbox and click the link.
+                \u{26A0}If you can't find the mail, check your spam box.
+                """
+            case LanguageId.kor: return """
+                메일주소가 변경되었습니다.
+                메일계정의 편지함을 확인하고 검증링크를 클릭해 주세요.
+                \u{26A0}검증메일을 찾을 수 없다면 스팸함을 확인해 보세요.
+                """
             default: fatalError()}
         }()
         self.msgMailNotConfirmed = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your email address is not verified. \nPleas verify your email."
-            case LanguageId.kor: return "메일주소가 검증되지 않았습니다.\n메일을 확인해 주세요."
+            case LanguageId.eng: return """
+                Your email address is not currently verified.
+                Please check your mailbox and click the link.
+                \u{26A0}If you can't find the mail, check your spam box.
+                """
+            case LanguageId.kor: return """
+                메일주소가 현재 검증되지 않았습니다.
+                메일계정의 편지함을 확인하고 검증링크를 클릭해 주세요.
+                \u{26A0}검증메일을 찾을 수 없다면 스팸함을 확인해 보세요.
+                """
             default: fatalError()}
         }()
         self.msgMailSendAgainComplete = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Your account verification email has been resent.\nPleas verify your new email."
-            case LanguageId.kor: return "계정 확인 메일이 다시 보내졌습니다.\n새 메일을 확인해 주세요."
+            case LanguageId.eng: return """
+                Your account verification email has been sent.
+                Please check your mailbox and click the link.
+                \u{26A0}If you can't find the mail, check your spam box.
+                """
+            case LanguageId.kor: return """
+                계정 확인메일이 보내졌습니다.
+                메일계정의 편지함을 확인하고 검증링크를 클릭해 주세요.
+                \u{26A0}검증메일을 찾을 수 없다면 스팸함을 확인해 보세요.
+                """
             default: fatalError()}
         }()
         func _msgMailSendValidCode(_ email: String) -> String {
@@ -944,9 +1080,119 @@ struct LangPack {
             case LanguageId.kor: return "패스워드가 일치하지 않습니다."
             default: fatalError()}
         }()
+        self.msgMoodAwfulMsgs = {
+            switch currentLanguageId {
+            case LanguageId.eng: return [
+                "If you need help, don't be afraid to ask.", // #1
+                "I'm worried about you. Find someone to help you.", // #2
+                "You don't have to handle everything alone. Ask for help.", // #3
+                "If you need help, don't be afraid to ask.", // #4
+                "You are not alone. Ask for help around you.", // #5
+                "You don't have to handle everything alone. Ask for help.", // #6
+                "Find out what affects your mood." // #7
+                ]
+            case LanguageId.kor: return [
+                "괜찮으신가요? 주변에 도움을 청하는 것을 두려워하지 마세요.", // #1
+                "당신이 걱정되요. 가까운 곳에서 도와줄 사람을 찾아보세요.", // #2
+                "혼자 모든것을 감당할 필요는 없어요. 도움을 청하세요.", // #3
+                "괜찮으신가요? 주변에 도움을 청하는 것을 두려워하지 마세요.", // #4
+                "당신은 혼자가 아닙니다. 주변에 도움을 청하세요.", // #5
+                "혼자 모든것을 감당할 필요는 없어요. 도움을 청하세요.", // #6
+                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요." // #7
+                ]
+            default: fatalError()}
+        }()
+        self.msgMoodBadMsgs = {
+            switch currentLanguageId {
+            case LanguageId.eng: return [
+                "Sometimes it's good to be bad.", // #1
+                "Sometimes it's okay to feel sad.", // #2
+                "Bad mood will get better over time.", // #3
+                "If you need help, don't be afraid to ask.", // #4
+                "I'm worried about you. Find someone to help you.", // #5
+                "You don't have to handle everything alone. Ask for help.", // #6
+                "Find out what affects your mood." // #7
+                ]
+            case LanguageId.kor: return [
+                "가끔은 나쁜기분을 갖는 것도 좋을 수 있어요.", // #1
+                "가끔은 슬픈 기분을 느끼는 것도 좋아요.", // #2
+                "나쁜 기분은 시간이 지나면 나아질 거에요.", // #3
+                "괜찮으신가요? 주변에 도움을 청하는 것을 두려워하지 마세요.", // #4
+                "당신이 걱정되요. 가까운 곳에서 도와줄 사람을 찾아보세요.", // #5
+                "혼자 모든것을 감당할 필요는 없어요. 도움을 청하세요.", // #6
+                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요." // #7
+                ]
+            default: fatalError()}
+        }()
+        self.msgMoodSosoMsgs = {
+            switch currentLanguageId {
+            case LanguageId.eng: return [
+                "If you try a little more, a good day will come.", // #1
+                "It's okay to get better slowly.", // #2
+                "Sometimes it's good to be bad.", // #3
+                "Sometimes it's okay to feel sad.", // #4
+                "Bad mood will get better over time.", // #5
+                "Find out what affects your mood.", // #6
+                "Find out what affects your mood." // #7
+                ]
+            case LanguageId.kor: return [
+                "조금더 노력하면 좋은 날이 올거에요.", // #1
+                "천천히 좋아지는 것도 괜찮아요.", // #2
+                "가끔은 나쁜기분을 갖는 것도 좋을 수 있어요.", // #3
+                "가끔은 슬픈 기분을 느끼는 것도 좋아요.", // #4
+                "나쁜 기분은 시간이 지나면 나아질 거에요.", // #5
+                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요.", // #6
+                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요." // #7
+                ]
+            default: fatalError()}
+        }()
+        self.msgMoodGoodMsgs = {
+            switch currentLanguageId {
+            case LanguageId.eng: return [
+                "You're balancing your life.", // #1
+                "Try to stay mood now.", // #2
+                "I wish you a good day every day.", // #3
+                "Sometimes it's good to be bad.", // #4
+                "Sometimes it's okay to feel sad.", // #5
+                "Find out what affects your mood.", // #6
+                "Find out what affects your mood." // #7
+                ]
+            case LanguageId.kor: return [
+                "당신은 삶에 균형을 유지하고 있어요.", // #1
+                "지금 기분을 유지하기 위해 노력해 봐요.", // #2
+                "당신에게 매일 좋은 날이 함께하길 바래요.", // #3
+                "가끔은 나쁜기분을 갖는 것도 좋을 수 있어요.", // #4
+                "가끔은 슬픈 기분을 느끼는 것도 좋아요.", // #5
+                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요.", // #6
+                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요." // #7
+                ]
+            default: fatalError()}
+        }()
+        self.msgMoodExcellentMsgs = {
+            switch currentLanguageId {
+            case LanguageId.eng: return [
+                "If you keep it this way, you will see the future.", // #1
+                "You are having the best time in life.", // #2
+                "I admire you for maintaining the best mood.", // #3
+                "You're balancing your life.", // #4
+                "Try to stay mood now.", // #5
+                "I wish you a good day every day.", // #6
+                "Find out what affects your mood." // #7
+                ]
+            case LanguageId.kor: return [
+                "이대로 계속 유지한다면 당신은 미래를 볼 거예요.", // #1
+                "당신은 삶에서 최고의 시간을 보내고 있어요.", // #2
+                "최고의 기분을 유지하는 당신을 존경합니다.", // #3
+                "당신은 삶에 균형을 유지하고 있어요.", // #4
+                "지금 기분을 유지하기 위해 노력해 봐요.", // #5
+                "당신에게 매일 좋은 날이 함께하길 바래요.", // #6
+                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요." // #7
+                ]
+            default: fatalError()}
+        }()
         self.msgNetworkFailure = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Unable to access the server.\n\nWant to try again?"
+            case LanguageId.eng: return "Communication with the server is not smooth.\n\nWould you like to try again?"
             case LanguageId.kor: return "서버와의 통신이 원활하지 않습니다.\n\n다시 시도하시겠습니다?"
             default: fatalError()}
         }()
@@ -1048,7 +1294,7 @@ struct LangPack {
         }()
         self.msgSignUpYet = {
             switch currentLanguageId {
-            case LanguageId.eng: return "I can't find an account logged in."
+            case LanguageId.eng: return "I can't find a signed in account."
             case LanguageId.kor: return "로그인된 계정을 찾지 못했어요."
             default: fatalError()}
         }()
@@ -1094,7 +1340,7 @@ struct LangPack {
         func _getLogGroupSection(monthNumber: Int, dayNumber: Int) -> String {
             switch currentLanguageId {
             case LanguageId.eng: return "\(dayNumber) \(LangHelper.getEngNameOfMonth(monthNumber: monthNumber))"
-            case LanguageId.kor: return "\(dayNumber)일 \(monthNumber)월"
+            case LanguageId.kor: return "\(monthNumber)월 \(dayNumber)일"
             default: fatalError()}
         }
         self.getLogGroupSection = _getLogGroupSection
@@ -1106,7 +1352,13 @@ struct LangHelper {
         switch alpha2 {
         case "en": return LanguageId.eng
         case "kr": return LanguageId.kor
-//        TODO: case "jp": return LanguageId.jpn
+        default: return LanguageId.eng
+        }
+    }
+    
+    static func getLanguageIdByRegion(alpha2: String) -> Int {
+        switch alpha2 {
+        case "KR": return LanguageId.kor
         default: return LanguageId.eng
         }
     }

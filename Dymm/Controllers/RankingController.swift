@@ -28,7 +28,6 @@ class RankingViewController: UIViewController {
     var startingPickerView: UIPickerView!
     
     // UIButton
-    var homeButton: UIButton!
     var ageGroupPickButton: UIButton!
     var startingPickButton: UIButton!
     
@@ -52,12 +51,11 @@ class RankingViewController: UIViewController {
     var lang: LangPack!
     var retryFunction: (() -> Void)?
     
-//    var myRanking:
     var rankings: [CustomModel.Ranking]?
     var lastContentOffset: CGFloat = 0.0
     var isScrollToLoading: Bool = false
     var currPageNum: Int = 1
-    var minimumCnt: Int = 15
+    var minimumCnt: Int = 20
     
     var startingPickKeys = [1, 2, 3, 4]
     var ageGroupPickKeys = [1, 2, 3, 4, 5]
@@ -93,6 +91,10 @@ class RankingViewController: UIViewController {
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             self.startingPickButton.setTitle(LangHelper.getStartingPickName(key: self.selectedStartingKey), for: .normal)
+            self.currPageNum = 1
+            self.minimumCnt = 20
+            self.isScrollToLoading = false
+            self.lastContentOffset = 0.0
             self.loadRankings()
         })
         alert.view.tintColor = .purple_B847FF
@@ -114,14 +116,14 @@ class RankingViewController: UIViewController {
                 self.ageGroupPickButton.setTitle(LangHelper.getAgeGroupKorPickName(key: self.selectedAgeGroupKey), for: .normal)
             default: fatalError()}
             self.loadMyRanking()
+            self.currPageNum = 1
+            self.minimumCnt = 20
+            self.isScrollToLoading = false
+            self.lastContentOffset = 0.0
             self.loadRankings()
         })
         alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil )
-    }
-    
-    @objc func homeButtonTapped() {
-        dismiss(animated: true, completion: nil)
     }
 }
 
@@ -146,26 +148,25 @@ extension RankingViewController: UITableViewDataSource, UITableViewDelegate {
         }
         let ranking = rankings![indexPath.row]
         if ranking.photo_name != nil && ranking.color_code == 0 {
+            cell.profileImgView.backgroundColor = .clear
+            cell.profileImgView.image = nil
+            cell.profileImgLabel.textColor = .clear
             let url = "\(URI.host)\(URI.avatar)/\(ranking.avatar_id)/profile/photo/\(ranking.photo_name!)"
             Alamofire.request(url).responseImage { response in
                 if let data = response.data {
                     cell.profileImgView.image = UIImage(data: data)
-                    UIView.transition(with: cell.profileImgLabel, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                        cell.profileImgLabel.textColor = .clear
-                    })
                 }
             }
         } else {
             let firstName = ranking.first_name
             let index = firstName.index(firstName.startIndex, offsetBy: 0)
-            cell.profileImgLabel.text = String(firstName[index])
+            cell.profileImgLabel.text = String(firstName[index].uppercased())
             cell.profileImgLabel.textColor = .white
             cell.profileImgView.backgroundColor = getProfileUIColor(key: ranking.color_code)
             cell.profileImgView.image = nil
         }
         cell.rankNumLabel.text = "#\(ranking.rank_num)"
         cell.nameLabel.text = "\(ranking.first_name) \(ranking.last_name)"
-        
         if let fullLifespan = ranking.full_lifespan {
             let year = fullLifespan / 365
             let days = fullLifespan % 365
@@ -217,7 +218,7 @@ extension RankingViewController: UITableViewDataSource, UITableViewDelegate {
             if _rankings.count == minimumCnt {
                 isScrollToLoading = true
                 currPageNum += 1
-                minimumCnt += 15
+                minimumCnt += 20
                 loadRankings()
             }
         }
@@ -290,15 +291,6 @@ extension RankingViewController {
         view.backgroundColor = .whiteSmoke
         navigationItem.title = lang.titleRanking.uppercased()
         
-        homeButton = {
-            let _button = UIButton(type: .system)
-            _button.setImage(UIImage.itemHome.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
-            _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
-            _button.translatesAutoresizingMaskIntoConstraints = false
-            return _button
-        }()
         myRankingContainer = {
             let _view = UIView()
             _view.backgroundColor = .white
@@ -427,7 +419,6 @@ extension RankingViewController {
         myYearsBarBg = {
             let _view = UIView()
             _view.backgroundColor = UIColor(hex: "#CBF5E8")
-//            _view.backgroundColor = UIColor.green_00E9CC.withAlphaComponent(0.37)
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
@@ -440,7 +431,6 @@ extension RankingViewController {
         myDaysBarBg = {
             let _view = UIView()
             _view.backgroundColor = UIColor(hex: "#CBF5E8")
-//            _view.backgroundColor = UIColor.green_00E9CC.withAlphaComponent(0.37)
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
@@ -451,7 +441,6 @@ extension RankingViewController {
             return _view
         }()
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
         rankingTableView.dataSource = self
         rankingTableView.delegate = self
         startingPickerView.dataSource = self
@@ -566,6 +555,7 @@ extension RankingViewController {
                     self.rankings!.append(contentsOf: newRankings)
                     self.rankingTableView.reloadData()
                 }
+                self.view.hideSpinner()
                 return
             }
             self.rankings = rankingSet.rankings
@@ -595,7 +585,7 @@ extension RankingViewController {
             } else {
                 let firstName = ranking.first_name
                 let index = firstName.index(firstName.startIndex, offsetBy: 0)
-                self.myProfileImgLabel.text = String(firstName[index])
+                self.myProfileImgLabel.text = String(firstName[index].uppercased())
                 self.myProfileImgLabel.textColor = .white
                 self.myProfileImgView.backgroundColor = getProfileUIColor(key: ranking.color_code)
             }

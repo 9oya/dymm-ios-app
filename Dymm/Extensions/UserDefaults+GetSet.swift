@@ -12,9 +12,11 @@ extension UserDefaults {
     
     enum UserDefaultsKeys: String {
         case isSignIn
+        case isSignInChanged
         case isEmailConfirmed
         case isFreeTrial
         case isPurchased
+        case isCreateNewLog
         case accessToken
         case refreshToken
         case avatarId
@@ -25,6 +27,11 @@ extension UserDefaults {
     
     func setIsSignIn(value: Bool) {
         set(value, forKey: UserDefaultsKeys.isSignIn.rawValue)
+        synchronize()
+    }
+    
+    func setIsSignInChanged(value: Bool) {
+        set(value, forKey: UserDefaultsKeys.isSignInChanged.rawValue)
         synchronize()
     }
     
@@ -40,6 +47,11 @@ extension UserDefaults {
     
     func setIsPurchased(value: Bool) {
         set(value, forKey: UserDefaultsKeys.isPurchased.rawValue)
+        synchronize()
+    }
+    
+    func setIsCreateNewLog(value: Bool) {
+        set(value, forKey: UserDefaultsKeys.isCreateNewLog.rawValue)
         synchronize()
     }
     
@@ -69,6 +81,10 @@ extension UserDefaults {
         return bool(forKey: UserDefaultsKeys.isSignIn.rawValue)
     }
     
+    func isSignInChanged() -> Bool {
+        return bool(forKey: UserDefaultsKeys.isSignInChanged.rawValue)
+    }
+    
     func isEmailConfirmed() -> Bool {
         return bool(forKey: UserDefaultsKeys.isEmailConfirmed.rawValue)
     }
@@ -79,6 +95,10 @@ extension UserDefaults {
     
     func isPurchased() -> Bool {
         return bool(forKey: UserDefaultsKeys.isPurchased.rawValue)
+    }
+    
+    func isCreateNewLog() -> Bool {
+        return bool(forKey: UserDefaultsKeys.isCreateNewLog.rawValue)
     }
     
     func getAccessToken() -> String? {
@@ -101,8 +121,11 @@ extension UserDefaults {
     
     func getCurrentLanguageId() -> Int? {
         let currentLanguageId = integer(forKey: UserDefaultsKeys.currentLanguageId.rawValue)
-        if currentLanguageId == 0 {
-            return LangHelper.getLanguageId(alpha2: String(Locale.preferredLanguages[0].prefix(2)))
+        if currentLanguageId <= 0 {
+            guard let regionCode = Locale.current.regionCode else {
+                return LangHelper.getLanguageIdByRegion(alpha2: "EN")
+            }
+            return LangHelper.getLanguageIdByRegion(alpha2: regionCode)
         }
         return currentLanguageId
     }

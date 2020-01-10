@@ -42,10 +42,12 @@ class HomeViewController: UIViewController {
     var profileImgView: UIImageView!
     var scoreEmoImgView: UIImageView!
     var cubeImgView: UIImageView!
+    var aiBoardBgImgView: UIImageView!
     
     // UIButton
     var profileButton: UIButton!
     
+    // Non-view properties
     var lang: LangPack!
     var retryFunction: (() -> Void)?
     var banners: [BaseModel.Banner]?
@@ -75,30 +77,36 @@ class HomeViewController: UIViewController {
             self.monthPicker.reloadAllComponents()
             self.tagCollectionView.reloadData()
         })
+        selectedYear = currentYear
+        yearPicker.selectRow(0, inComponent: 0, animated: true)
+        selectedMonth = nil
+        if selectedYear == currentYear {
+            var month = currentMonth
+            var months = [Int]()
+            while month! > 0 {
+                months.append(month!)
+                month! -= 1
+            }
+            monthArr = months
+        } else {
+            monthArr = [12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+        }
+        monthPicker.reloadAllComponents()
+        monthPicker.selectRow(0, inComponent: 0, animated: true)
         if UserDefaults.standard.isSignIn() {
-            selectedYear = currentYear
-            selectedMonth = nil
-            monthArr = {
-                var month = currentMonth
-                var months = [Int]()
-                while month! > 0 {
-                    months.append(month!)
-                    month! -= 1
-                }
-                return months
-            }()
-            yearPicker.selectRow(0, inComponent: 0, animated: true)
-            monthPicker.selectRow(0, inComponent: 0, animated: true)
             loadScoreboard()
             loadAvatar()
             loadRemainingLifeSpan()
             loadReceipt()
-            cubeImgView.isHidden = false
         } else {
             showGuestScene()
             UserDefaults.standard.setIsFreeTrial(value: false)
             UserDefaults.standard.setIsPurchased(value: false)
             cubeImgView.isHidden = true
+        }
+        if UserDefaults.standard.isSignInChanged() {
+            UserDefaults.standard.setIsSignInChanged(value: false)
+            loadCategories()
         }
         cubeImgView.startRotating(duration: 5)
     }
@@ -136,38 +144,33 @@ class HomeViewController: UIViewController {
     @objc func presentDiaryNavigation() {
         let vc = DiaryViewController()
         vc.superTag = self.selectedTag!
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .fullScreen
-        present(nc, animated: true, completion: nil)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentCategoryNavigation() {
         let vc = CategoryViewController()
         vc.superTag = self.selectedTag!
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .fullScreen
-        present(nc, animated: true, completion: nil)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentAuthNavigation() {
         let vc = AuthViewController()
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .fullScreen
-        present(nc, animated: true, completion: nil)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentProfileNavigation() {
         let vc = ProfileViewController()
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .fullScreen
-        present(nc, animated: true, completion: nil)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentRankingNavigation() {
         let vc = RankingViewController()
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .fullScreen
-        present(nc, animated: true, completion: nil)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func profileButtonTapped() {
@@ -208,11 +211,29 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             }
             switch tag.id {
             case TagId.diary:
-                cell.label.textColor = .green_3ED6A7
+                switch lang.currentLanguageId {
+                case LanguageId.eng: cell.label.text = tag.eng_name + "\u{02936}"
+                case LanguageId.kor: cell.label.text = tag.kor_name! + "\u{02936}"
+                default: fatalError()}
+                cell.label.textColor = .magenta
+                cell.label.font = .systemFont(ofSize: 20, weight: .heavy)
+                cell.label.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+                cell.imageView.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             case TagId.ranking:
-                cell.label.textColor = .green_3ED6A7
+                cell.label.font = .systemFont(ofSize: 15, weight: .bold)
+                cell.label.textColor = .purple_948BFF
+                cell.label.addShadowView(offset: CGSize(width: 0, height: 0), opacity: 0.0, radius: 0, color: UIColor.clear.cgColor)
+                cell.imageView.addShadowView(offset: CGSize(width: 0, height: 0), opacity: 0.0, radius: 0, color: UIColor.clear.cgColor)
+            case TagId.bookmarks:
+                cell.label.font = .systemFont(ofSize: 15, weight: .bold)
+                cell.label.textColor = UIColor(hex: "#FFBF67")
+                cell.label.addShadowView(offset: CGSize(width: 0, height: 0), opacity: 0.0, radius: 0, color: UIColor.clear.cgColor)
+                cell.imageView.addShadowView(offset: CGSize(width: 0, height: 0), opacity: 0.0, radius: 0, color: UIColor.clear.cgColor)
             default:
+                cell.label.font = .systemFont(ofSize: 15, weight: .bold)
                 cell.label.textColor = .green_3ED6A7
+                cell.label.addShadowView(offset: CGSize(width: 0, height: 0), opacity: 0.0, radius: 0, color: UIColor.clear.cgColor)
+                cell.imageView.addShadowView(offset: CGSize(width: 0, height: 0), opacity: 0.0, radius: 0, color: UIColor.clear.cgColor)
             }
         }
         return cell
@@ -257,10 +278,21 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let tag = tags?[indexPath.item]
-        if tag!.id == TagId.diary {
-            return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 14.5)
+        if UserDefaults.standard.isSignIn() {
+            if tag!.id == TagId.diary {
+                return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 8)
+            } else {
+//                return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 14.5)
+                return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 13)
+            }
+        } else {
+            if tag!.id == TagId.diary {
+//                return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 14.5)
+                return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 13)
+            } else {
+                return CGSize(width: (UIScreen.main.bounds.width / 2) - 10.5, height: UIScreen.main.bounds.height / 13)
+            }
         }
-        return CGSize(width: (UIScreen.main.bounds.width / 2) - 10.5, height: UIScreen.main.bounds.height / 14.5)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
@@ -281,12 +313,11 @@ extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        switch pickerView {
-        case yearPicker:
+        if pickerView == yearPicker {
             return yearArr.count
-        case monthPicker:
+        } else if pickerView == monthPicker {
             return monthArr.count + 1
-        default:
+        } else {
             return 0
         }
     }
@@ -296,10 +327,9 @@ extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
         label.textColor = .green_3ED6A7
         label.font = .systemFont(ofSize: 20, weight: .regular)
         label.textAlignment = .center
-        switch pickerView {
-        case yearPicker:
+        if pickerView == yearPicker {
             label.text = "\(yearArr[row])"
-        case monthPicker:
+        } else if pickerView == monthPicker {
             if row == 0 {
                 label.text = "-"
             } else {
@@ -312,17 +342,15 @@ extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
                     fatalError()
                 }
             }
-        default:
-            fatalError()
         }
+        label.font = .systemFont(ofSize: 20, weight: .bold)
         return label
     }
     
     // MARK: - UIPickerViewDelegate
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        switch pickerView {
-        case yearPicker:
+        if pickerView == yearPicker {
             selectedYear = yearArr[row]
             selectedMonth = nil
             if selectedYear == currentYear {
@@ -338,16 +366,13 @@ extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
             }
             monthPicker.reloadAllComponents()
             monthPicker.selectRow(0, inComponent: 0, animated: true)
-        case monthPicker:
+        } else if pickerView == monthPicker {
             if row == 0 {
                 selectedMonth = nil
             } else {
                 selectedMonth = monthArr[row - 1]
             }
-        default:
-            fatalError()
         }
-        
         if UserDefaults.standard.isSignIn() {
             loadScoreboard()
         }
@@ -367,9 +392,8 @@ extension HomeViewController {
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = .whiteSmoke
         let date = Date()
-        let calendar = Calendar.current
-        currentYear = calendar.component(.year, from: date)
-        currentMonth = calendar.component(.month, from: date)
+        currentYear = Calendar.current.component(.year, from: date)
+        currentMonth = Calendar.current.component(.month, from: date)
         
         // Initialize subveiw properties
         tagCollectionView = getCategoryCollectionView()
@@ -409,7 +433,7 @@ extension HomeViewController {
         }()
         scoreTitleLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 30, weight: .medium)
+            _label.font = .systemFont(ofSize: 30, weight: .bold)
             _label.textColor = .dimGray
             _label.textAlignment = .center
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -417,7 +441,7 @@ extension HomeViewController {
         }()
         scoreNumberLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 40, weight: .medium)
+            _label.font = .systemFont(ofSize: 40, weight: .bold)
             _label.textColor = .green_3ED6A7
             _label.textAlignment = .center
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -425,7 +449,7 @@ extension HomeViewController {
         }()
         scoreMessageLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 20, weight: .medium)
+            _label.font = .systemFont(ofSize: 20, weight: .bold)
             _label.textColor = .green_3ED6A7
             _label.textAlignment = .center
             _label.numberOfLines = 2
@@ -434,7 +458,7 @@ extension HomeViewController {
         }()
         ageLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 18, weight: .medium)
+            _label.font = .systemFont(ofSize: 18, weight: .bold)
             _label.textColor = .green_3ED6A7
             _label.textAlignment = .right
             _label.numberOfLines = 1
@@ -443,7 +467,7 @@ extension HomeViewController {
         }()
         genderLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 18, weight: .medium)
+            _label.font = .systemFont(ofSize: 18, weight: .bold)
             _label.textColor = .green_3ED6A7
             _label.textAlignment = .right
             _label.numberOfLines = 1
@@ -453,7 +477,7 @@ extension HomeViewController {
         aiMsgLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 16, weight: .regular)
-            _label.textColor = .green_3ED6A7
+            _label.textColor = .yellow_F8F6E9
             _label.textAlignment = .center
             _label.numberOfLines = 3
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -461,8 +485,8 @@ extension HomeViewController {
         }()
         lifespanLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 18, weight: .regular)
-            _label.textColor = .green_3ED6A7
+            _label.font = .systemFont(ofSize: 16, weight: .regular)
+            _label.textColor = .yellow_F8F6E9
             _label.textAlignment = .center
             _label.numberOfLines = 3
             _label.translatesAutoresizingMaskIntoConstraints = false
@@ -473,6 +497,16 @@ extension HomeViewController {
             _imageView.contentMode = .scaleAspectFit
             _imageView.image = .item3dCube
             _imageView.isHidden = true
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        aiBoardBgImgView = {
+            let _imageView = UIImageView()
+            _imageView.contentMode = .scaleAspectFill
+            _imageView.image = .itemBgWave
+            _imageView.layer.cornerRadius = 10.0
+            _imageView.clipsToBounds = true
+            _imageView.isHidden = false
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
@@ -497,8 +531,9 @@ extension HomeViewController {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemProfileDef.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 31, height: 31)
-            _button.layer.cornerRadius = _button.frame.width / 2
+            _button.layer.cornerRadius = _button.frame.height / 2
             _button.showsTouchWhenHighlighted = true
+            _button.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.addTarget(self, action: #selector(profileButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
@@ -549,6 +584,7 @@ extension HomeViewController {
         scoreboardView.addSubview(ageLabel)
         scoreboardView.addSubview(genderLabel)
         
+        aiBoardView.addSubview(aiBoardBgImgView)
         aiBoardView.addSubview(aiMsgLabel)
         aiBoardView.addSubview(lifespanLabel)
         aiBoardView.addSubview(cubeImgView)
@@ -592,6 +628,11 @@ extension HomeViewController {
         aiBoardView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -7).isActive = true
         aiBoardView.heightAnchor.constraint(equalToConstant: view.frame.height / 8.2).isActive = true
         
+        aiBoardBgImgView.topAnchor.constraint(equalTo: aiBoardView.topAnchor, constant: 0).isActive = true
+        aiBoardBgImgView.leadingAnchor.constraint(equalTo: aiBoardView.leadingAnchor, constant: 0).isActive = true
+        aiBoardBgImgView.trailingAnchor.constraint(equalTo: aiBoardView.trailingAnchor, constant: 0).isActive = true
+        aiBoardBgImgView.bottomAnchor.constraint(equalTo: aiBoardView.bottomAnchor, constant: 0).isActive = true
+        
         aiMsgLabel.centerYAnchor.constraint(equalTo: aiBoardView.centerYAnchor, constant: -10).isActive = true
         aiMsgLabel.centerXAnchor.constraint(equalTo: aiBoardView.centerXAnchor, constant: 0).isActive = true
         aiMsgLabel.leadingAnchor.constraint(equalTo: aiBoardView.leadingAnchor, constant: 3).isActive = true
@@ -619,34 +660,17 @@ extension HomeViewController {
     }
     
     private func showGuestScene() {
-        monthArr = {
-            var month = currentMonth
-            var months = [Int]()
-            while month! > 0 {
-                months.append(month!)
-                month! -= 1
-            }
-            return months
-        }()
-        yearPicker.selectRow(0, inComponent: 0, animated: true)
-        monthPicker.selectRow(0, inComponent: 0, animated: true)
-        
         UIView.transition(with: profileButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
             self.scoreboardView.isHidden = false
             self.aiBoardView.isHidden = false
-            
             self.scoreEmoImgView.image = getCondScoreImageLarge(0)
-            
-            self.scoreTitleLabel.text = self.lang.getCondScoreName(0)
+            self.scoreTitleLabel.text = self.lang.getMoodScoreName(0)
             self.scoreNumberLabel.text = String(format: "%.1f", 0.0)
             self.scoreMessageLabel.text = self.lang.titleMyCondScore
-            
             self.ageLabel.text = self.lang.titleAge
             self.genderLabel.text = self.lang.titleGender
-            
             self.aiMsgLabel.text = self.lang.msgSignUpYet
             self.lifespanLabel.text = ""
-            
             self.profileButton.setTitleColor(.clear, for: .normal)
             self.profileButton.backgroundColor = .clear
             self.profileButton.setBackgroundImage(.itemProfileDef, for: .normal)
@@ -656,7 +680,7 @@ extension HomeViewController {
     
     private func loadScoreboard() {
         let service = Service(lang: lang)
-        service.getScoreBoard(yearNumber: "\(selectedYear!)", monthNumber: selectedMonth, unauthorized: { (errorCode) in
+        service.getScoreBoard(yearNumber: selectedYear!, monthNumber: selectedMonth, unauthorized: { (errorCode) in
             self.alertUnauthError(self.lang.msgAccountInvalid)
         }, popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
@@ -668,7 +692,7 @@ extension HomeViewController {
             self.thisAvgScore = formatter.number(from: scoreBoardSet.avg_score)!.floatValue
             UIView.animate(withDuration: 0.5) {
                 self.scoreEmoImgView.image = getCondScoreImageLarge(self.thisAvgScore)
-                self.scoreTitleLabel.text = self.lang.getCondScoreName(self.thisAvgScore)
+                self.scoreTitleLabel.text = self.lang.getMoodScoreName(self.thisAvgScore)
                 self.scoreNumberLabel.text = String(format: "%.1f", self.thisAvgScore)
                 self.scoreMessageLabel.text = self.lang.titleMyCondScore
                 if let genderTag = scoreBoardSet.gender_tag {
@@ -712,27 +736,40 @@ extension HomeViewController {
                 self.cubeImgView.isHidden = true
                 self.lifespanLabel.isHidden = true
             }
-        }) { (lifeSpan) in
-            let year = lifeSpan / 365
-            let days = lifeSpan % 365
+        }) { (lifeSpanSet) in
+            let year = lifeSpanSet.r_lifespan_day / 365
+            let days = lifeSpanSet.r_lifespan_day % 365
             UIView.animate(withDuration: 0.5) {
                 switch self.lang.currentLanguageId {
                 case LanguageId.eng:
-                    self.lifespanLabel.text = "\(year)Y \(days)D"
+                    self.lifespanLabel.text = "You have \(year)Y \(days)D"
                 case LanguageId.kor:
-                    self.lifespanLabel.text = "\(year)년 \(days)일"
+                    self.lifespanLabel.text = "\(year)년 \(days)일 남았습니다."
                 default: fatalError()}
-                self.aiMsgLabel.textColor = .green_3ED6A7
-                self.aiMsgLabel.text = self.lang.msgLifeSpan
+                self.lifespanLabel.isHidden = false
                 self.aiBoardView.isHidden = false
+                self.cubeImgView.isHidden = false
+                
+                if let avgScore = Float(lifeSpanSet.avg_score) {
+                    if avgScore > 0.0 {
+                        self.aiMsgLabel.text = self.lang.getMoodScoreMessage(avgScore)
+                    } else {
+                        self.aiMsgLabel.text = self.lang.msgLifeSpan
+                    }
+                }
             }
         }
     }
     
     private func loadCategories() {
         view.showSpinner()
+//        var tagId = TagId.home
+        var tagId = TagId.home3
+        if UserDefaults.standard.isSignIn() {
+            tagId = TagId.home4
+        }
         let service = Service(lang: lang)
-        service.getTagSetList(tagId: TagId.home, sortType: SortType.priority, popoverAlert: { (message) in
+        service.getTagSetList(tagId: tagId, sortType: SortType.priority, popoverAlert: { (message) in
             self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }) { (tagSet) in
@@ -783,7 +820,7 @@ extension HomeViewController {
                     let firstName = auth.avatar.first_name
                     let index = firstName.index(firstName.startIndex, offsetBy: 0)
                     self.profileButton.setImage(nil, for: .normal)
-                    self.profileButton.setTitle(String(firstName[index]), for: .normal)
+                    self.profileButton.setTitle(String(firstName[index].uppercased()), for: .normal)
                     self.profileButton.setTitleColor(.white, for: .normal)
                     self.profileButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
                     self.profileButton.backgroundColor = getProfileUIColor(key: auth.avatar.color_code)

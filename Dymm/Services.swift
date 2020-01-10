@@ -21,17 +21,19 @@ struct Service {
     
     func badRequest(_ responseData: Data) {
         guard let decodedData = try? self.decoder.decode(BadRequest.self, from: responseData) else {
-            fatalError("Decode \(BadRequest.self) failed")
+            print("Decode \(BadRequest.self) failed")
+            return
         }
-        fatalError("\(decodedData.message)")
+        print("\(decodedData.message)")
     }
     
     func unexpectedResponse(_ statusCode: Int, _ data: Data, _ name: String) {
         print("Request \(name) failed \nStatus Code: \(statusCode)")
         guard let json = ((try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]) as [String : Any]??) else {
-            fatalError("Decode error message failed")
+            print("Decode error message failed")
+            return
         }
-        fatalError(String(describing: json))
+        print(String(describing: json))
     }
     
     func convertLogGroupsIntoTwoDimLogGroupSectArr(_ logGroups: [BaseModel.LogGroup]) -> [[CustomModel.LogGroupSection]] {
@@ -253,7 +255,7 @@ struct Service {
         }
     }
     
-    func getRemainingLifeSpan(popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, unauthorized: @escaping (_ pattern: Int) -> Void, completion: @escaping (_ lifeSpan: Int) -> Void) {
+    func getRemainingLifeSpan(popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, unauthorized: @escaping (_ pattern: Int) -> Void, completion: @escaping (_ lifeSpanSet: CustomModel.RemainingLifespanSet) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -265,7 +267,8 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)"
         ]
-        Alamofire.request("\(URI.host)\(URI.avatar)/\(avatarId)/life-span", method: .get, headers: headers)
+        // TODO: Remove /new
+        Alamofire.request("\(URI.host)\(URI.avatar)/new/\(avatarId)/life-span", method: .get, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -274,13 +277,13 @@ struct Service {
                 }
                 switch statusCode {
                 case 200:
-                    guard let decodedData = try? self.decoder.decode(Ok<Int>.self, from: responseData) else {
+                    guard let decodedData = try? self.decoder.decode(Ok<CustomModel.RemainingLifespanSet>.self, from: responseData) else {
                         fatalError()
                     }
-                    guard let lifeSpan = decodedData.data else {
+                    guard let lifeSpanSet = decodedData.data else {
                         fatalError()
                     }
-                    completion(lifeSpan)
+                    completion(lifeSpanSet)
                 case 400:
                     self.badRequest(responseData)
                 case 401:
@@ -300,7 +303,7 @@ struct Service {
         }
     }
     
-    func getLogGroups(yearNumber: String, monthNumber: Int, weekOfYear: Int?, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping ([BaseModel.LogGroup]) -> Void) {
+    func getLogGroups(yearNumber: Int, yearForWeekOfYear: Int, monthNumber: Int, weekOfYear: Int?, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping ([BaseModel.LogGroup]) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -312,9 +315,10 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        var url = "\(URI.host)\(URI.avatar)/\(avatarId)/group/\(yearNumber)/\(monthNumber)"
+        // TODO: Remove /new
+        var url = "\(URI.host)\(URI.avatar)/new/\(avatarId)/group/\(yearNumber)/\(monthNumber)"
         if let weekOfYear = weekOfYear {
-            url += "/\(weekOfYear)"
+            url = "\(URI.host)\(URI.avatar)/new/\(avatarId)/group/\(yearForWeekOfYear)/\(monthNumber)/\(weekOfYear)"
         }
         Alamofire.request(url, headers: headers)
             .validate(contentType: ["application/json"])
@@ -358,7 +362,8 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        Alamofire.request("\(URI.host)\(URI.avatar)/\(avatarId)/group-note/\(page)", headers: headers)
+        // TODO: Remove /new
+        Alamofire.request("\(URI.host)\(URI.avatar)/new/\(avatarId)/group-note/\(page)", headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -388,7 +393,7 @@ struct Service {
         }
     }
     
-    func getAvgCondScore(yearNumber: String, monthNumber: Int?, weekOfYear: Int?, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.AvgCondScoreSet) -> Void) {
+    func getAvgCondScore(yearNumber: Int, yearForWeekOfYear: Int, monthNumber: Int?, weekOfYear: Int?, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.AvgCondScoreSet) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -400,11 +405,12 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        var url = "\(URI.host)\(URI.avatar)/\(avatarId)/group/\(yearNumber)/avg-score"
+        // TODO: Remove /new
+        var url = "\(URI.host)\(URI.avatar)/new/\(avatarId)/group/\(yearNumber)/avg-score"
         if monthNumber != nil {
-            url = "\(URI.host)\(URI.avatar)/\(avatarId)/group/\(yearNumber)/\(monthNumber!)/avg-score"
+            url = "\(URI.host)\(URI.avatar)/new/\(avatarId)/group/\(yearNumber)/\(monthNumber!)/avg-score"
             if weekOfYear != nil && weekOfYear! > 0 {
-                url = "\(URI.host)\(URI.avatar)/\(avatarId)/group/\(yearNumber)/\(monthNumber!)/\(weekOfYear!)/avg-score"
+                url = "\(URI.host)\(URI.avatar)/new/\(avatarId)/group/\(yearForWeekOfYear)/\(monthNumber!)/\(weekOfYear!)/avg-score"
             }
         }
         
@@ -438,7 +444,7 @@ struct Service {
         }
     }
     
-    func getScoreBoard(yearNumber: String, monthNumber: Int?, unauthorized: @escaping (_ pattern: Int) -> Void, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.ScoreBoardSet) -> Void) {
+    func getScoreBoard(yearNumber: Int, monthNumber: Int?, unauthorized: @escaping (_ pattern: Int) -> Void, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.ScoreBoardSet) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
             fatalError()
@@ -554,14 +560,15 @@ struct Service {
         }
     }
     
-    func getTagSetList(tagId: Int, sortType: String, pageNum: Int? = nil, langId: Int? = nil, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
-        var url = "\(URI.host)\(URI.tag)/\(tagId)/set/\(sortType)"
+    func getTagSetList(tagId: Int, sortType: String, pageNum: Int? = nil, perPage: Int? = nil, langId: Int? = nil, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
+        // TODO: Remove "/new"
+        var url = "\(URI.host)\(URI.tag)/new/\(tagId)/set/\(sortType)"
         if let _pageNum = pageNum {
             if UserDefaults.standard.getAvatarId() != nil && UserDefaults.standard.getAvatarId() != 0 {
                 let avatarId = UserDefaults.standard.getAvatarId()
-                url += "/avt/\(avatarId!)/page/\(_pageNum)/lang/\(langId!)"
+                url += "/avt/\(avatarId!)/page/\(_pageNum)/\(perPage!)/lang/\(langId!)"
             } else {
-                url += "/page/\(_pageNum)/lang/\(langId!)"
+                url += "/page/\(_pageNum)/\(perPage!)/lang/\(langId!)"
             }
         }
         Alamofire.request(url)
@@ -590,14 +597,16 @@ struct Service {
     }
     
     func getProfileTagSets(tagId: Int, isSelected: Bool, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (_ profileTagSet: CustomModel.ProfileTagSet) -> Void) {
-        guard let accessToken = UserDefaults.standard.getAccessToken() else {
-            UserDefaults.standard.setIsSignIn(value: false)
-            fatalError()
-        }
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(accessToken)"
-        ]
-        Alamofire.request("\(URI.host)\(URI.tag)/\(tagId)/set/match/\(isSelected)", method: .get, headers: headers)
+//        guard let accessToken = UserDefaults.standard.getAccessToken() else {
+//            UserDefaults.standard.setIsSignIn(value: false)
+//            fatalError()
+//        }
+//        let headers: HTTPHeaders = [
+//            "Authorization": "Bearer \(accessToken)"
+//        ]
+//        Alamofire.request("\(URI.host)\(URI.tag)/\(tagId)/set/match/\(isSelected)", method: .get, headers: headers)
+        // TODO: Remove "/new
+        Alamofire.request("\(URI.host)\(URI.tag)/new/\(tagId)/set/match/\(isSelected)", method: .get)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -741,7 +750,8 @@ struct Service {
     }
     
     func createNewAvatar(params: Parameters, unauthorized: @escaping (_ pattern: Int) -> Void, popoverAlert: @escaping (_ message: String) -> Void, completion: @escaping (_ auth: CustomModel.Auth) -> Void) {
-        Alamofire.request("\(URI.host)\(URI.avatar)/create", method: .post, parameters: params, encoding: JSONEncoding.default)
+        // TODO: Remove /new
+        Alamofire.request("\(URI.host)\(URI.avatar)/new/create", method: .post, parameters: params, encoding: JSONEncoding.default)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -771,7 +781,53 @@ struct Service {
         }
     }
     
-    func postAvatarCond(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
+    func authWithFacebook(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, completion: @escaping (_ auth: CustomModel.Auth) -> Void) {
+        Alamofire.request("\(URI.host)\(URI.avatar)/fb-auth", method: .post, parameters: params, encoding: JSONEncoding.default)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<CustomModel.Auth>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    guard let auth = decodedData.data else {
+                        fatalError()
+                    }
+                    completion(auth)
+                default:
+                    popoverAlert(self.lang.msgNetworkFailure)
+                }
+        }
+    }
+    
+    func authWithGoogle(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, completion: @escaping (_ auth: CustomModel.Auth) -> Void) {
+        Alamofire.request("\(URI.host)\(URI.avatar)/g-auth", method: .post, parameters: params, encoding: JSONEncoding.default)
+            .validate(contentType: ["application/json"])
+            .responseData { response in
+                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                    popoverAlert(self.lang.msgNetworkFailure)
+                    return
+                }
+                switch statusCode {
+                case 200:
+                    guard let decodedData = try? self.decoder.decode(Ok<CustomModel.Auth>.self, from: responseData) else {
+                        fatalError()
+                    }
+                    guard let auth = decodedData.data else {
+                        fatalError()
+                    }
+                    completion(auth)
+                default:
+                    popoverAlert(self.lang.msgNetworkFailure)
+                }
+        }
+    }
+    
+    func postAvatarDisease(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping () -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             print("Load UserDefaults.standard.getAccessToken() failed")
             return
@@ -853,7 +909,8 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        Alamofire.request("\(URI.host)\(URI.avatar)/log", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
+        // TODO: Remove /new
+        Alamofire.request("\(URI.host)\(URI.avatar)/new/log", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -889,23 +946,19 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        Alamofire.request("\(URI.host)\(URI.mail)/conf-link", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
+        // TODO: Remove /new
+        Alamofire.request("\(URI.host)\(URI.mail)/new/conf-link", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                guard let statusCode = response.response?.statusCode else {
                     popoverAlert(self.lang.msgNetworkFailure)
                     return
                 }
                 switch statusCode {
                 case 200:
                     completion()
-                case 400:
-                    self.badRequest(responseData)
-                case 401:
-                    UserDefaults.standard.setIsSignIn(value: false)
-                    fatalError()
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "sendMailConfLinkAgain()")
+                    popoverAlert(self.lang.msgNetworkFailure)
                     return
                 }
         }
@@ -922,33 +975,26 @@ struct Service {
         Alamofire.request("\(URI.host)\(URI.mail)/opinion", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
-                guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
+                guard let statusCode = response.response?.statusCode else {
                     popoverAlert(self.lang.msgNetworkFailure)
                     return
                 }
                 switch statusCode {
                 case 200:
                     completion()
-                case 400:
-                    self.badRequest(responseData)
-                case 401:
-                    UserDefaults.standard.setIsSignIn(value: false)
-                    return
-                case 403:
-                    UserDefaults.standard.setIsSignIn(value: false)
-                    return
                 default:
-                    self.unexpectedResponse(statusCode, responseData, "sendMailConfLinkAgain()")
+                    popoverAlert(self.lang.msgNetworkFailure)
                     return
                 }
         }
     }
     
-    func searchTags(tagId: Int, keyWord: String, page: Int, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
+    func searchTags(tagId: Int, keyWord: String, page: Int, perPage: Int, popoverAlert: @escaping (_ message: String) -> Void ,completion: @escaping (_ tagSet: CustomModel.TagSet) -> Void) {
         let params: Parameters = [
             "key_word": keyWord
         ]
-        let url = "\(URI.host)\(URI.tag)/\(tagId)/search/page/\(page)"
+        // TODO: Remove "/new"
+        let url = "\(URI.host)\(URI.tag)/new/\(tagId)/search/page/\(page)/\(perPage)"
         Alamofire.request(url, method: .post, parameters: params, encoding: JSONEncoding.default)
             .validate(contentType: ["application/json"])
             .responseData { response in
@@ -982,7 +1028,8 @@ struct Service {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",
         ]
-        Alamofire.request("\(URI.host)\(URI.avatar)/email/\(option)", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
+        // TODO: Remove /new
+        Alamofire.request("\(URI.host)\(URI.avatar)/new/email/\(option)", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {

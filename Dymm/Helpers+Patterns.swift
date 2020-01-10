@@ -87,11 +87,6 @@ struct DiaryMode {
     static let editor = 2
 }
 
-struct ButtonType {
-    static let home = 1
-    static let close = 2
-}
-
 struct CalScope {
     static let week = 1
     static let month = 2
@@ -107,12 +102,23 @@ struct AvatarInfoTarget {
 }
 
 struct TagId {
+    static let activity = 2
     static let disease = 3
+    static let pill = 4
+    static let food = 5
     static let home = 16
+    static let home2 = 117336
+    static let home3 = 117339
+    static let home4 = 117340
     static let diary = 17
     static let bookmarks = 18
     static let language = 20
     static let dateOfBirth = 23
+    static let history = 24
+    static let bookFood = 25
+    static let bookActivity = 26
+    static let bookPill = 27
+    static let bookDisease = 28
     static let subscription = 14641
     static let password = 14642
     static let ranking = 14644
@@ -137,7 +143,11 @@ struct LanguageId {
 }
 
 func getDeviceLanguage() -> Int {
-    return LangHelper.getLanguageId(alpha2: String(Locale.preferredLanguages[0].prefix(2)))
+    guard let regionCode = Locale.current.regionCode else {
+        return LangHelper.getLanguageIdByRegion(alpha2: "EN")
+    }
+    return LangHelper.getLanguageIdByRegion(alpha2: regionCode)
+//    return LangHelper.getLanguageId(alpha2: String(Locale.preferredLanguages[0].prefix(2)))
 }
 
 func getUserCountryCode() -> String {
@@ -152,6 +162,16 @@ func getLogGroupTypeImage(_ groupType: Int) -> UIImage? {
     case LogGroupType.daytime: return .itemGtSun
     case LogGroupType.evening: return .itemGtSunset
     case LogGroupType.nighttime: return .itemGtMoon
+    default: return nil
+    }
+}
+
+func getLogGroupTypeColor(_ groupType: Int) -> UIColor? {
+    switch groupType {
+    case LogGroupType.morning: return .yellow_EBCE61
+    case LogGroupType.daytime: return .green_CBD049
+    case LogGroupType.evening: return .orange_EA9D6C
+    case LogGroupType.nighttime: return .navy_29496E
     default: return nil
     }
 }

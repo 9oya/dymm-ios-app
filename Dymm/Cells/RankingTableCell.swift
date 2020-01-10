@@ -62,7 +62,7 @@ extension RankingTableCell {
         profileImgLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 17, weight: .medium)
-            _label.textColor = .white
+            _label.textColor = .clear
             _label.textAlignment = .center
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label

@@ -9,4 +9,7 @@ target 'Dymm' do
   pod 'FSCalendar', '~> 2.8'
   pod 'SkyFloatingLabelTextField', '~> 3.7'
   pod 'OpenSSL-Universal'
+  pod 'FBSDKCoreKit/Swift'
+  pod 'FBSDKLoginKit/Swift'
+  pod 'GoogleSignIn'
 end

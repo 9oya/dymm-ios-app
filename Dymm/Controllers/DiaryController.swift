@@ -31,37 +31,56 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var blindView: UIView!
     var pickerContainerView: UIView!
     var pickerGrayLineView: UIView!
-    var condContainerView: UIView!
+    var diseaseContainer: UIView!
     
     // FSCalendar
     var calendarView: FSCalendar!
     
     // UITableView
-    var logGroupTableView: UITableView!
+    var logGroupTable: UITableView!
     
     // UICollectionView
-    var condCollectionView: UICollectionView!
-    var pickerCollectionView: UICollectionView!
+    var diseaseCollection: UICollectionView!
+    var groupOfLogsCollection: UICollectionView!
     
     // UIPickerView
-    var groupTypePickerView: UIPickerView!
-    var condScorePickerView: UIPickerView!
+    var groupTypePicker: UIPickerView!
+    var moodScorePicker: UIPickerView!
     
     // UILabel
     var pickerDateLabel: UILabel!
-    var condTitleLabel: UILabel!
+    var diseaseTitleLabel: UILabel!
+    var guideLabel: UILabel!
+    var pullToRefreshLabel: UILabel!
     
     // UIButton
-    var toggleButton: UIButton!
-    var pickerCancelButton: UIButton!
-    var pickerCheckButton: UIButton!
-    var homeButton: UIButton!
-    var notesButton: UIButton!
-    var avgScoreButton: UIButton!
+    var toggleBtn: UIButton!
+    var pickerCancelBtn: UIButton!
+    var pickerCheckBtn: UIButton!
+    var notesBtn: UIButton!
+    var avgScoreBtn: UIButton!
     var diseaseHistoryBtn: UIButton!
     var diseaseLeftBtn: UIButton!
     var diseaseRightBtn: UIButton!
-    var condRefreshButton: UIButton!
+    var diseaseRefreshBtn: UIButton!
+    var foodBtn: UIButton!
+    var pillBtn: UIButton!
+    var activityBtn: UIButton!
+    var diseaseBtn: UIButton!
+    var plusBtn: UIButton!
+    var foodPlusBtn: UIButton!
+    var pillPlusBtn: UIButton!
+    var activityPlusBtn: UIButton!
+    var diseasePlusBtn: UIButton!
+    var historyPlusBtn: UIButton!
+    var plusBtns: [UIButton]!
+    
+    // UIStackView
+    var plusBtnStackView: UIStackView!
+    
+    // UIImageView
+    var guideIllustImgView: UIImageView!
+    var medicalCrossImgView: UIImageView!
     
     // NSLayoutConstraint
     var calendarViewHeight: NSLayoutConstraint!
@@ -89,7 +108,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var selectedTag: BaseModel.Tag?
     var groupOfLogSet: CustomModel.GroupOfLogSet?
     var tempStoredLogs = [BaseModel.TagLog]()
-    let condScores: [Int] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    let moodScores: [Int] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     
     // Non-view properties
     var selectedTableSection: Int?
@@ -97,11 +116,12 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var selectedLogGroupId: Int?
     var selectedCalScope: Int?
     var selectedWeekOfYear: Int?
+    var yearForWeekOfYear: Int?
     var selectedDate: String?
     var selectedOnceCellIdxPath: IndexPath?
-    var selectedCondPickerIdx = 3
-    var selectedCondScore = 7
-    var selectedAvatarCondId: Int?
+    var selectedDiseasePickerIdx = 3
+    var selectedMoodScore = 7
+    var selectedAvatarDiseaseId: Int?
     let numberOfGroupType = 4
     var editedCellIdxPath: IndexPath?
     var yearNumber: Int?
@@ -119,6 +139,9 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var isPullToRefresh: Bool = false
     var isLogGroupTableEdited: Bool = false
     var isCondEditBtnTapped: Bool = false
+    var isFirstAppear: Bool = true
+    var isPlusBtnTapped: Bool = false
+    var isDiseaseHistoyPoped: Bool = false
     var superTag: BaseModel.Tag?
     
     override func viewDidLoad() {
@@ -128,7 +151,23 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        condLeftButtonTapped()
+        if isDiseaseHistoyPoped {
+            diseaseRefreshButtonTapped()
+        } else {
+            diseaseLeftBtnTapped()
+        }
+        if UserDefaults.standard.isCreateNewLog() {
+            selectedOnceCellIdxPath = nil
+            selectedTableSection = nil
+            selectedTableRow = nil
+            loadLogGroups()
+            UserDefaults.standard.setIsCreateNewLog(value: false)
+        }
+        if isFirstAppear && diaryMode == DiaryMode.editor {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.plusBtnTapped()
+            }
+        }
     }
     
     // MARK: - Actions
@@ -150,11 +189,13 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     @objc func alertCompl(_ title: String, _ message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: lang.titleNo, style: .cancel) { _ in
+        alert.addAction(UIAlertAction(title: lang.titleStay, style: .cancel) { _ in
             _ = self.navigationController?.popViewController(animated: true)
         })
-        alert.addAction(UIAlertAction(title: lang.titleYes, style: .default) { _ in
-            self.dismiss(animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: lang.titleReturn, style: .default) { _ in
+            UserDefaults.standard.setIsCreateNewLog(value: true)
+            let controller = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 3]
+            self.navigationController?.popToViewController(controller!, animated: true)
         })
         alert.view.tintColor = .purple_B847FF
         self.present(alert, animated: true, completion: nil)
@@ -164,13 +205,13 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         let alert = UIAlertController(title: lang.titleMoodScore, message: "\n\n\n\n\n\n\n\n\n\n", preferredStyle: .alert)
         alert.isModalInPopover = true
         if let condScore = selectedLogGroup?.cond_score {
-            condScorePickerView.selectRow(10 - condScore, inComponent: 0, animated: false)
+            moodScorePicker.selectRow(10 - condScore, inComponent: 0, animated: false)
         } else {
-            condScorePickerView.selectRow(3, inComponent: 0, animated: false)
-            selectedCondScore = 7
+            moodScorePicker.selectRow(3, inComponent: 0, animated: false)
+            selectedMoodScore = 7
         }
-        alert.view.addSubview(condScorePickerView)
-        condScorePickerView.widthAnchor.constraint(equalTo: alert.view.widthAnchor, constant: 0).isActive = true
+        alert.view.addSubview(moodScorePicker)
+        moodScorePicker.widthAnchor.constraint(equalTo: alert.view.widthAnchor, constant: 0).isActive = true
         alert.addAction(UIAlertAction(title: lang.titleClose, style: .cancel) { _ in })
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             self.updateLogGroupCondScore()
@@ -369,13 +410,14 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         isToggleBtnTapped = true
         if calendarView.scope == .month {
             calendarView.setScope(.week, animated: true)
-            toggleButton.setImage(UIImage.itemArrowMaximize.withRenderingMode(.alwaysOriginal), for: .normal)
+            toggleBtn.setImage(UIImage.itemArrowMaximize.withRenderingMode(.alwaysOriginal), for: .normal)
             selectedCalScope = CalScope.week
             selectedWeekOfYear = Calendar.current.component(.weekOfYear, from: calendarView.currentPage)
+            yearForWeekOfYear = Calendar.current.component(.yearForWeekOfYear, from: calendarView.currentPage)
             loadLogGroups()
         } else {
             calendarView.setScope(.month, animated: true)
-            toggleButton.setImage(UIImage.itemArrowMinimize.withRenderingMode(.alwaysOriginal), for: .normal)
+            toggleBtn.setImage(UIImage.itemArrowMinimize.withRenderingMode(.alwaysOriginal), for: .normal)
             selectedCalScope = CalScope.month
             selectedWeekOfYear = nil
             loadLogGroups()
@@ -387,13 +429,8 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         selectedOnceCellIdxPath = nil
         selectedTableSection = nil
         selectedTableRow = nil
-        if diaryMode == DiaryMode.logger {
-            refreshControler.endRefreshing()
-        } else {
-            isPullToRefresh = true
-            loadLogGroups()
-            refreshControler.endRefreshing()
-        }
+        isPullToRefresh = true
+        refreshControler.endRefreshing()
     }
     
     @objc func pickerCancelButtonTapped() {
@@ -412,25 +449,25 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         createGroupOfALog()
     }
     
-    @objc func condRightButtonTapped() {
+    @objc func diseaseRightBtnTapped() {
         if isCondEditBtnTapped {
             isCondEditBtnTapped = false
             diseaseRightBtn.setTitle(lang.titleEdit, for: .normal)
             diseaseRightBtn.setTitleColor(.purple_B847FF, for: .normal)
             UIView.animate(withDuration: 0.5) {
-                self.condCollectionView.reloadData()
+                self.diseaseCollection.reloadData()
             }
         } else {
             isCondEditBtnTapped = true
             diseaseRightBtn.setTitle(lang.titleDone, for: .normal)
-            diseaseRightBtn.setTitleColor(.red_FF4779, for: .normal)
+            diseaseRightBtn.setTitleColor(.red_FF7187, for: .normal)
             UIView.animate(withDuration: 0.5) {
-                self.condCollectionView.reloadData()
+                self.diseaseCollection.reloadData()
             }
         }
     }
     
-    @objc func condLeftButtonTapped() {
+    @objc func diseaseLeftBtnTapped() {
         UIView.transition(with: self.blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.blindView.isHidden = true
             self.diseaseLeftBtn.setTitleColor(UIColor.clear, for: .normal)
@@ -439,10 +476,11 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             self.isCondEditBtnTapped = false
             self.diseaseRightBtn.setTitle(self.lang.titleEdit, for: .normal)
             self.diseaseRightBtn.setTitleColor(.purple_B847FF, for: .normal)
+            self.isDiseaseHistoyPoped = false
         })
     }
     
-    @objc func condRefreshButtonTapped() {
+    @objc func diseaseRefreshButtonTapped() {
         loadAvatarDiseasHistory()
     }
     
@@ -470,10 +508,56 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     @objc func presentCategoryWhenGroupOfALogCellTapped(sender: UIButton) {
         let vc = CategoryViewController()
-        vc.topLeftButtonType = ButtonType.close
         vc.superTagId = sender.tag
-        let nc = UINavigationController(rootViewController: vc)
-        present(nc, animated: true, completion: nil)
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc func presentFoodCategory() {
+        let vc = CategoryViewController()
+        vc.superTagId = TagId.food
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc func presentPillCategory() {
+        let vc = CategoryViewController()
+        vc.superTagId = TagId.pill
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc func presentActivityCategory() {
+        let vc = CategoryViewController()
+        vc.superTagId = TagId.activity
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc func presentDiseaseCategory() {
+        let vc = CategoryViewController()
+        vc.superTagId = TagId.disease
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc func presentHistoryCategory() {
+        let vc = CategoryViewController()
+        vc.superTagId = TagId.history
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc func plusBtnTapped() {
+        UIView.animate(withDuration: 0.3, animations: {
+            if self.isPlusBtnTapped {
+                self.plusBtn.transform = CGAffineTransform(rotationAngle: 0)
+                self.plusBtn.backgroundColor = UIColor.purple_921BEA.withAlphaComponent(0.8)
+                self.isPlusBtnTapped = false
+            } else {
+                self.plusBtn.transform = CGAffineTransform(rotationAngle: (.pi / 2))
+                self.plusBtn.backgroundColor = UIColor.green_3ED6A7.withAlphaComponent(0.9)
+                self.isPlusBtnTapped = true
+            }
+            self.plusBtns.forEach { (button) in
+                button.isHidden = !button.isHidden
+                self.view.layoutIfNeeded()
+            }
+        })
     }
     
     // MARK: - UIGestureRecognizerDelegate
@@ -506,49 +590,10 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             calendar.setCurrentPage(date, animated: true)
         }
         
-        switch diaryMode {
-        case DiaryMode.editor:
+        if diaryMode == DiaryMode.logger {
+            popoverLogger(date)
+        } else {
             return
-        case DiaryMode.logger:
-            let selectedDateArr = dateFormatter.string(from: date).components(separatedBy: "-")
-            yearNumber = Int(selectedDateArr[0])
-            monthNumber = Int(selectedDateArr[1])
-            dayNumber = Int(selectedDateArr[2])
-            weekOfYear = Calendar.current.component(.weekOfYear, from: date)
-            dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: date)!
-            selectedDate = dateFormatter.string(from: date)
-            // logGrouDictArr: [groupType:LogGroup]
-            if let logGroupDictArr = logGroupDictTwoDimArr[dayOfYear!] {
-                // Case found some logGroups in section.
-                // Display last log group.
-                let sortedGroupTypes = logGroupDictArr.keys.sorted(by: >)
-                var sortedLogGourpArr = [BaseModel.LogGroup]()
-                sortedGroupTypes.forEach { (key) in
-                    sortedLogGourpArr.append(logGroupDictArr[key]!)
-                }
-                let logGroup = sortedLogGourpArr.first!
-                selectedLogGroupId = logGroup.id
-                selectedLogGroup = logGroup
-                groupType = logGroup.group_type
-                loadGroupOfLogs { (groupOfLogSet) in
-                    let collectionViewHeight = logCollectionCellHeightInt * self.getGroupOfLogsTotalCnt(groupOfLogSet)
-                    self.afterLoadGroupOfLogs(collectionViewHeight)
-                }
-            } else {
-                // Case no logGroups are found in the section
-                groupOfLogSet = nil
-                tempStoredLogs.removeAll()
-                groupType = LogGroupType.morning
-                pickerContainerTransition(pickerCollectionHeightInt)
-            }
-            groupTypePickerView.selectRow(LogGroupType.nighttime - groupType!, inComponent: 0, animated: true)
-            UIView.transition(with: self.pickerContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.pickerDateLabel.text = "\(self.monthNumber!)월 \(self.dayNumber!)일"
-                self.blindView.isHidden = false
-                self.pickerContainerView.isHidden = false
-            })
-        default:
-            fatalError()
         }
     }
     
@@ -557,6 +602,8 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         selectedTableSection = nil
         selectedTableRow = nil
         let weekOfYear = Calendar.current.component(.weekOfYear, from: calendar.currentPage)
+//        let month = Calendar.current.component(.month, from: calendar.currentPage)
+        yearForWeekOfYear = Calendar.current.component(.yearForWeekOfYear, from: calendar.currentPage)
         if calendar.scope == .week {
             selectedCalScope = CalScope.week
             selectedWeekOfYear = weekOfYear
@@ -607,12 +654,9 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             var weekday = lang.getWeekdayName(Calendar.current.component(.weekday, from: date!))
             let strTodayDateArr = dateFormatter.string(from: calendarView.today!).components(separatedBy: "-")
             if Int(strTodayDateArr[1]) == logGroup.month_number && Int(strTodayDateArr[2]) == logGroup.day_number {
-                // If the date of the currently selected section is today add the ✨ emoji in it to prefix
-//                weekday = "\u{2728}" + weekday
-                weekday = "\u{26A1}" + weekday
-//                weekday = "\u{1F31F}" + weekday
+                // If the date of the currently selected section is today add the emoji in it to prefix
+                weekday = "\u{2728}" + weekday
             }
-            
             // Set view layout
             let label = UILabel()
             label.text = "\(weekday), \(lang.getLogGroupSection(logGroup.month_number, logGroup.day_number))"
@@ -633,10 +677,10 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
         case DiaryMode.editor:
             let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
             cell.arrowImageView.isHidden = false
-            cell.condScoreImageView.isHidden = false
+            cell.moodScoreImageView.isHidden = false
             cell.nameLabel.text = lang.getLogGroupTypeName(logGroup.group_type)
+            cell.nameLabel.textColor = getLogGroupTypeColor(logGroup.group_type)
             cell.groupTypeImageView.image = getLogGroupTypeImage(logGroup.group_type)
-            cell.nameLabel.textColor = UIColor.black
             if logGroup.food_cnt > 0 {
                 cell.foodLogBulletView.isHidden = false
             }
@@ -647,11 +691,13 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.drugLogBulletView.isHidden = false
             }
             if let condScore = logGroup.cond_score {
-                cell.condScoreImageView.image = getCondScoreImageSmall(condScore)
-                cell.condScoreButton.setImage(getCondScoreImageSmall(condScore), for: .normal)
+                cell.moodScoreImageView.image = getCondScoreImageSmall(condScore)
+                cell.moodScoreButton.setImage(getCondScoreImageSmall(condScore), for: .normal)
+                cell.moodBtnGuideLabel.textColor = .clear
             } else {
-                cell.condScoreImageView.image = .itemScoreNone
-                cell.condScoreButton.setImage(.itemScoreNone, for: .normal)
+                cell.moodScoreImageView.image = .itemScoreNone
+                cell.moodScoreButton.setImage(.itemScoreNone, for: .normal)
+                cell.moodBtnGuideLabel.textColor = .magenta
             }
             if logGroup.note != nil {
                 cell.noteImageView.isHidden = false
@@ -660,11 +706,9 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.noteImageView.isHidden = true
                 cell.noteButton.setImage(.itemNoteGray, for: .normal)
             }
-            cell.condScoreButton.addTarget(self, action: #selector(alertCondScorePicker), for: .touchUpInside)
+            cell.moodScoreButton.addTarget(self, action: #selector(alertCondScorePicker), for: .touchUpInside)
             cell.noteButton.addTarget(self, action: #selector(alertNoteTextView(_:)), for: .touchUpInside)
-            
             cell.logCellButton.addTarget(self, action: #selector(presentCategoryWhenGroupOfALogCellTapped(sender:)), for: .touchUpInside)
-            
             return cell
         case DiaryMode.logger:
             if indexPath.row == 0 {
@@ -740,9 +784,10 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     }, completion: { _ in
                         UIView.transition(with: cell.groupOfLogsTableView, duration: 0.3, options: .transitionCrossDissolve, animations: {
                             cell.groupOfLogsTableView.isHidden = true
-                            cell.condScoreButton.isHidden = true
+                            cell.moodScoreButton.isHidden = true
+                            cell.moodBtnGuideLabel.isHidden = true
                             cell.noteButton.isHidden = true
-                            cell.condScoreImageView.isHidden = false
+                            cell.moodScoreImageView.isHidden = false
                             if self.selectedLogGroup!.food_cnt > 0 {
                                 cell.foodLogBulletView.isHidden = false
                             }
@@ -763,6 +808,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     cell.selectedLogGroup = self.selectedLogGroup!
                     cell.groupOfLogSetForCnt = self.groupOfLogSet!
                     cell.groupOfLogSetForPop = self.groupOfLogSet!
+                    cell.logsArray = []  // Reset logsArray, Do not chage this line!
                     cell.groupOfLogsTableView.reloadData()
                     self.selectedOnceCellIdxPath = indexPath
                     let total = self.getGroupOfLogsTotalCnt(groupOfLogSet)
@@ -775,9 +821,10 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                     }, completion: { _ in
                         UIView.transition(with: cell.groupOfLogsTableView, duration: 0.3, options: .transitionCrossDissolve, animations: {
                             cell.groupOfLogsTableView.isHidden = false
-                            cell.condScoreButton.isHidden = false
+                            cell.moodScoreButton.isHidden = false
+                            cell.moodBtnGuideLabel.isHidden = false
                             cell.noteButton.isHidden = false
-                            cell.condScoreImageView.isHidden = true
+                            cell.moodScoreImageView.isHidden = true
                             cell.foodLogBulletView.isHidden = true
                             cell.actLogBulletView.isHidden = true
                             cell.drugLogBulletView.isHidden = true
@@ -849,8 +896,9 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.containerViewHight.constant = CGFloat(logGroupCellHeightInt - 7)
                 cell.arrowImageView.transform = CGAffineTransform.identity
                 cell.groupOfLogsTableView.isHidden = true
-                cell.condScoreImageView.isHidden = false
-                cell.condScoreButton.isHidden = true
+                cell.moodScoreImageView.isHidden = false
+                cell.moodScoreButton.isHidden = true
+                cell.moodBtnGuideLabel.isHidden = true
                 cell.noteButton.isHidden = true
                 if diaryMode == DiaryMode.editor {
                     let logGroup = self.logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
@@ -900,19 +948,21 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             cell.containerViewHight.constant = CGFloat((total * logTableCellHeightInt) + logGroupCellHeightInt + logGroupFooterHeightInt)
             cell.arrowImageView.transform = CGAffineTransform(rotationAngle: (.pi / 2))
             cell.groupOfLogsTableView.isHidden = false
-            cell.condScoreImageView.isHidden = true
+            cell.moodScoreImageView.isHidden = true
             cell.foodLogBulletView.isHidden = true
             cell.actLogBulletView.isHidden = true
             cell.drugLogBulletView.isHidden = true
             cell.noteImageView.isHidden = true
-            cell.condScoreButton.isHidden = false
+            cell.moodScoreButton.isHidden = false
+            cell.moodBtnGuideLabel.isHidden = false
             cell.noteButton.isHidden = false
         } else {
             cell.containerViewHight.constant = CGFloat(logGroupCellHeightInt - 7)
             cell.arrowImageView.transform = CGAffineTransform.identity
             cell.groupOfLogsTableView.isHidden = true
-            cell.condScoreImageView.isHidden = false
-            cell.condScoreButton.isHidden = true
+            cell.moodScoreImageView.isHidden = false
+            cell.moodScoreButton.isHidden = true
+            cell.moodBtnGuideLabel.isHidden = true
             cell.noteButton.isHidden = true
             let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
             if diaryMode == DiaryMode.editor {
@@ -939,6 +989,21 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             }
         }
     }
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        let deleteButton = UITableViewRowAction(style: .default, title: lang.titleDelete) { (action, indexPath) in
+            self.logGroupTable.dataSource?.tableView!(self.logGroupTable, commit: .delete, forRowAt: indexPath)
+            return
+        }
+        deleteButton.backgroundColor = .red_FF7187
+        return [deleteButton]
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if diaryMode == DiaryMode.editor && isPullToRefresh {
+            loadLogGroups()
+        }
+    }
 }
 
 extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -950,8 +1015,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        switch collectionView {
-        case pickerCollectionView:
+        if collectionView == groupOfLogsCollection {
             var total = 0
             if let foodLogs = groupOfLogSet?.food_logs {
                 total += (foodLogs.count)
@@ -963,23 +1027,22 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 total += (drugLogs.count)
             }
             return total
-        case condCollectionView:
+        } else if collectionView == diseaseCollection {
             return avtCondList?.count ?? 0
-        default:
-            fatalError()
+        } else {
+            return 0
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         switch collectionView {
-        case pickerCollectionView:
+        case groupOfLogsCollection:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: logCollectionCellId, for: indexPath) as? LogCollectionCell else {
                 fatalError()
             }
             if ((groupOfLogSet!.food_logs?.count) != nil && ((groupOfLogSet!.food_logs?.count)!) > 0) {
                 let foodLog = groupOfLogSet!.food_logs!.popLast()
                 tempStoredLogs.append(foodLog!)
-                
                 cell.bulletView.backgroundColor = UIColor.tomato
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.nameLabel.text = foodLog!.eng_name
@@ -1002,8 +1065,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             } else if ((groupOfLogSet!.act_logs?.count) != nil && ((groupOfLogSet!.act_logs?.count)!) > 0) {
                 let actLog = groupOfLogSet!.act_logs!.popLast()
                 tempStoredLogs.append(actLog!)
-                
-                cell.bulletView.backgroundColor = .cornflowerBlue
+                cell.bulletView.backgroundColor = .green_7AE8AB
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.nameLabel.text = actLog!.eng_name
                 case LanguageId.kor: cell.nameLabel.text = actLog!.kor_name
@@ -1021,8 +1083,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             } else if ((groupOfLogSet!.drug_logs?.count) != nil && ((groupOfLogSet!.drug_logs?.count)!) > 0) {
                 let drugLog = groupOfLogSet!.drug_logs!.popLast()
                 tempStoredLogs.append(drugLog!)
-                
-                cell.bulletView.backgroundColor = .green_72E5EA
+                cell.bulletView.backgroundColor = .blue_81E4FC
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.nameLabel.text = drugLog!.eng_name
                 case LanguageId.kor: cell.nameLabel.text = drugLog!.kor_name
@@ -1043,7 +1104,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 }
             }
             return cell
-        case condCollectionView:
+        case diseaseCollection:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: condCollectionCellId, for: indexPath) as? CondCollectionCell,
                 let avtCond = avtCondList?[indexPath.item] else {
                     fatalError()
@@ -1062,21 +1123,27 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 cell.titleLabel.text = avtCond.eng_name
                 if let startDate = avtCond.start_date {
                     cell.startDateLabel.text = "\(startDate)\u{021E2}"
+                    cell.startDateLabel.textColor = .green_00A792
                 }
                 if let endDate = avtCond.end_date {
                     cell.endDateLabel.text = "\u{2713}\(endDate)"
+                    cell.startDateLabel.textColor = .red_FF7187
+                    cell.endDateLabel.textColor = .red_FF7187
                 }
             case LanguageId.kor:
                 cell.titleLabel.text = avtCond.kor_name
                 if let startDate = avtCond.start_date {
                     let dateArr = startDate.split(separator: "/")
                     let month = LangHelper.getKorNameOfMonth(monthNumber: nil, engMMM: String(dateArr[0]))
-                    cell.startDateLabel.text = "\(month)/\(dateArr[1])/\(dateArr[2])\u{021E2}"
+                    cell.startDateLabel.text = "\(dateArr[2])/\(month)/\(dateArr[1])일\u{021E2}"
+                    cell.startDateLabel.textColor = .green_00A792
                 }
                 if let endDate = avtCond.end_date {
                     let dateArr = endDate.split(separator: "/")
                     let month = LangHelper.getKorNameOfMonth(monthNumber: nil, engMMM: String(dateArr[0]))
-                    cell.endDateLabel.text = "\u{2713}\(month)/\(dateArr[1])/\(dateArr[2])"
+                    cell.endDateLabel.text = "\u{2713}\(dateArr[2])/\(month)/\(dateArr[1])일"
+                    cell.startDateLabel.textColor = .red_FF7187
+                    cell.endDateLabel.textColor = .red_FF7187
                 }
             case LanguageId.jpn:
                 cell.titleLabel.text = avtCond.jpn_name
@@ -1092,27 +1159,22 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
     // MARK: - UICollectionViewDelegate
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        switch collectionView {
-        case pickerCollectionView:
+        if collectionView == groupOfLogsCollection {
             return
-        case condCollectionView:
+        } else if collectionView == diseaseCollection {
             if isCondEditBtnTapped {
-                selectedAvatarCondId = avtCondList![indexPath.item].id
+                selectedAvatarDiseaseId = avtCondList![indexPath.item].id
                 updateAvatarCondRemove()
                 return
             }
             let vc = CategoryViewController()
-            vc.topLeftButtonType = ButtonType.close
             vc.superTagId = avtCondList![indexPath.item].tag_id
-            let nc = UINavigationController(rootViewController: vc)
-            present(nc, animated: true, completion: nil)
-        default:
-            fatalError()
+            self.navigationController?.pushViewController(vc, animated: true)
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        if collectionView == condCollectionView {
+        if collectionView == diseaseCollection {
             // Prevent the display of non-existent dateLabels.
             guard let cell = cell as? CondCollectionCell,
                 let avtCond = avtCondList?[indexPath.item] else {
@@ -1137,7 +1199,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
             } else {
                 cell.endDateLabel.isHidden = true
             }
-        } else if collectionView == pickerCollectionView {
+        } else if collectionView == groupOfLogsCollection {
             // The cells has not store data itself.
             // So when they vanished from the screen, they lost view layout infos.
             // That means they need to resetting view layouts, when they reappear from vanishing.
@@ -1165,7 +1227,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                     cell.quantityLabel.text = "\(x_val)¾"
                 }
             } else if tagLog.tag_type == TagType.activity {
-                cell.bulletView.backgroundColor = .cornflowerBlue
+                cell.bulletView.backgroundColor = .green_7AE8AB
                 var hr = ""
                 var min = ""
                 if tagLog.x_val! > 0 {
@@ -1176,7 +1238,7 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 }
                 cell.quantityLabel.text = "\(hr)\(min)"
             } else if tagLog.tag_type == TagType.drug {
-                cell.bulletView.backgroundColor = .green_72E5EA
+                cell.bulletView.backgroundColor = .blue_81E4FC
                 var x_val = ""
                 if tagLog.x_val! > 0 {
                     x_val = "\(tagLog.x_val!)"
@@ -1203,10 +1265,9 @@ extension DiaryViewController: UICollectionViewDelegate, UICollectionViewDataSou
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenWidth = UIScreen.main.bounds.width
         switch collectionView {
-        case pickerCollectionView:
-//            return CGSize(width: screenWidth - (screenWidth / 5), height: CGFloat(30))
+        case groupOfLogsCollection:
             return CGSize(width: screenWidth - (screenWidth / 7), height: CGFloat(30))
-        case condCollectionView:
+        case diseaseCollection:
             return CGSize(width: screenWidth - (screenWidth / 7), height: CGFloat(45))
         default:
             fatalError()
@@ -1232,29 +1293,31 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         switch pickerView {
-        case groupTypePickerView:
+        case groupTypePicker:
             return numberOfGroupType
-        case condScorePickerView:
-            return condScores.count
+        case moodScorePicker:
+            return moodScores.count
         default:
             fatalError()
         }
     }
     
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
-        if pickerView == groupTypePickerView {
+        if pickerView == groupTypePicker {
             let containerView = UIView(frame: CGRect(x: 0, y: 0, width: pickerView.bounds.width, height: 60))
-            let imageView = UIImageView(frame: CGRect(x: pickerView.bounds.midX - 80, y: 15, width: 33, height: 33))
+            let imageView = UIImageView(frame: CGRect(x: pickerView.bounds.midX - 95, y: 15, width: 75, height: 45))
             let label = UILabel(frame: CGRect(x: pickerView.bounds.midX - 15, y: 0, width: pickerView.bounds.width - 50, height: 60))
+            label.font = .systemFont(ofSize: 17, weight: .bold)
             imageView.image = getLogGroupTypeImage(4 - row)
             label.text = lang.getLogGroupTypeName(4 - row)
+            label.textColor = getLogGroupTypeColor(4 - row)
             containerView.addSubview(imageView)
             containerView.addSubview(label)
             return containerView
-        } else if pickerView == condScorePickerView {
+        } else if pickerView == moodScorePicker {
             let label = UILabel(frame: CGRect(x: pickerView.bounds.midX - 15, y: 0, width: 20, height: 40))
             label.textAlignment = .center
-            label.text = "\(condScores[9 - row])"
+            label.text = "\(moodScores[9 - row])"
             return label
         } else {
             fatalError()
@@ -1265,7 +1328,7 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         switch pickerView {
-        case groupTypePickerView:
+        case groupTypePicker:
             groupType = LogGroupType.nighttime - row
             if let logGroupDict = logGroupDictTwoDimArr[dayOfYear!] {
                 // Case found a logGroup in the section.
@@ -1294,10 +1357,10 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
                 selectedLogGroup = nil
                 pickerContainerTransition(pickerCollectionHeightInt)
             }
-        case condScorePickerView:
-            selectedCondPickerIdx = row
-            selectedCondScore = condScores[9 - row]
-            condScorePickerView.reloadAllComponents()
+        case moodScorePicker:
+            selectedDiseasePickerIdx = row
+            selectedMoodScore = moodScores[9 - row]
+            moodScorePicker.reloadAllComponents()
         default:
             fatalError()
         }
@@ -1305,9 +1368,9 @@ extension DiaryViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     
     func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
         switch pickerView {
-        case groupTypePickerView:
+        case groupTypePicker:
             return CGFloat(groupTypePickerRowHeightInt)
-        case condScorePickerView:
+        case moodScorePicker:
             return CGFloat(condScorePickerRowHeightInt)
         default:
             fatalError()
@@ -1322,15 +1385,17 @@ extension DiaryViewController {
     private func setupLayout() {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
-        switch lang.currentLanguageId {
-        case LanguageId.eng:
-            navigationItem.title = superTag?.eng_name
-        case LanguageId.kor:
-            navigationItem.title = superTag?.kor_name
-        case LanguageId.jpn:
-            navigationItem.title = superTag?.jpn_name
-        default:
-            return
+        
+        if diaryMode == DiaryMode.editor {
+            switch lang.currentLanguageId {
+            case LanguageId.eng: navigationItem.title = superTag?.eng_name
+            case LanguageId.kor: navigationItem.title = superTag?.kor_name
+            case LanguageId.jpn: navigationItem.title = superTag?.jpn_name
+            default: return }
+            navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16, weight: .medium)]
+        } else {
+            navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15, weight: .regular)]
+            navigationItem.title = lang.msgDiarySelect
         }
         view.backgroundColor = .whiteSmoke
         
@@ -1345,7 +1410,7 @@ extension DiaryViewController {
             _view.translatesAutoresizingMaskIntoConstraints = false
             return _view
         }()
-        condContainerView = {
+        diseaseContainer = {
             let _view = UIView()
             _view.backgroundColor = UIColor.white
             _view.layer.cornerRadius = 10.0
@@ -1359,9 +1424,9 @@ extension DiaryViewController {
             _calendar.appearance.weekdayTextColor = .black
             _calendar.appearance.titleDefaultColor = .green_3ED6A7
             _calendar.appearance.titlePlaceholderColor = .lightGray
-            _calendar.appearance.eventDefaultColor = .red_FF4779
-            _calendar.appearance.eventSelectionColor = .red_FF4779
-            _calendar.appearance.selectionColor = .red_FF4779
+            _calendar.appearance.eventDefaultColor = .red_FF7187
+            _calendar.appearance.eventSelectionColor = .red_FF7187
+            _calendar.appearance.selectionColor = .red_FF7187
             _calendar.appearance.headerDateFormat = lang.calendarHeaderDateFormat
             _calendar.appearance.caseOptions = FSCalendarCaseOptions.weekdayUsesUpperCase
             _calendar.scope = .week
@@ -1386,7 +1451,7 @@ extension DiaryViewController {
             panGesture.maximumNumberOfTouches = 2
             return panGesture
             }()
-        logGroupTableView = {
+        logGroupTable = {
             let _tableView = UITableView(frame: CGRect.zero, style: .grouped)
             _tableView.backgroundColor = .clear
             _tableView.separatorStyle = .none
@@ -1394,27 +1459,27 @@ extension DiaryViewController {
             _tableView.translatesAutoresizingMaskIntoConstraints = false
             return _tableView
         }()
-        pickerCollectionView = {
+        groupOfLogsCollection = {
             let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
             _collectionView.backgroundColor = .clear
             _collectionView.register(LogCollectionCell.self, forCellWithReuseIdentifier: logCollectionCellId)
             _collectionView.translatesAutoresizingMaskIntoConstraints = false
             return _collectionView
         }()
-        condCollectionView = {
+        diseaseCollection = {
             let _collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout.init())
-            _collectionView.backgroundColor = UIColor.clear
+            _collectionView.backgroundColor = .clear
             _collectionView.register(CondCollectionCell.self, forCellWithReuseIdentifier: condCollectionCellId)
             _collectionView.dragInteractionEnabled = true
             _collectionView.translatesAutoresizingMaskIntoConstraints = false
             return _collectionView
         }()
-        groupTypePickerView = {
+        groupTypePicker = {
             let _pickerView = UIPickerView()
             _pickerView.translatesAutoresizingMaskIntoConstraints = false
             return _pickerView
         }()
-        condScorePickerView = {
+        moodScorePicker = {
             let _pickerView = UIPickerView(frame: CGRect(x: 5, y: 20, width: 250, height: 140))
             _pickerView.translatesAutoresizingMaskIntoConstraints = false
             return _pickerView
@@ -1422,25 +1487,34 @@ extension DiaryViewController {
         pickerDateLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 18, weight: .regular)
-            _label.textColor = UIColor.black
+            _label.textColor = .black
             _label.textAlignment = .center
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-        condTitleLabel = {
+        diseaseTitleLabel = {
             let _label = UILabel()
             _label.font = .systemFont(ofSize: 18, weight: .regular)
-            _label.textColor = UIColor.black
+            _label.textColor = .black
             _label.textAlignment = .left
             _label.text = lang.titleMyAvtCond
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-        pickerCancelButton = getCancelButton()
-        pickerCancelButton.addTarget(self, action: #selector(pickerCancelButtonTapped), for: .touchUpInside)
-        pickerCheckButton = getCheckButton()
-        pickerCheckButton.addTarget(self, action: #selector(pickerCheckButtonTapped), for: .touchUpInside)
-        toggleButton = {
+        pickerCancelBtn = getCancelButton()
+        pickerCancelBtn.addTarget(self, action: #selector(pickerCancelButtonTapped), for: .touchUpInside)
+        pickerCheckBtn = {
+            let _button = UIButton(type: .system)
+            _button.setTitle(lang.msgCompleteTheAdd, for: .normal)
+            _button.setTitleColor(.magenta, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 20, weight: .heavy)
+            _button.showsTouchWhenHighlighted = true
+            _button.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _button.addTarget(self, action: #selector(pickerCheckButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        toggleBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemArrowMaximize.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 25, height: 25)
@@ -1449,16 +1523,7 @@ extension DiaryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        homeButton = {
-            let _button = UIButton(type: .system)
-            _button.setImage(UIImage.itemHome.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
-            _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action:#selector(homeButtonTapped), for: .touchUpInside)
-            _button.translatesAutoresizingMaskIntoConstraints = false
-            return _button
-        }()
-        notesButton = {
+        notesBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemNotes.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 45, height: 32)
@@ -1467,7 +1532,7 @@ extension DiaryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        avgScoreButton = {
+        avgScoreBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemScoreAvg.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
@@ -1493,7 +1558,7 @@ extension DiaryViewController {
             _button.setTitleColor(UIColor.clear, for: .normal)
             _button.showsTouchWhenHighlighted = false
             _button.isHidden = true
-            _button.addTarget(self, action:#selector(condLeftButtonTapped), for: .touchUpInside)
+            _button.addTarget(self, action:#selector(diseaseLeftBtnTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
@@ -1501,77 +1566,263 @@ extension DiaryViewController {
             let _button = UIButton(type: .system)
             _button.setTitle(lang.titleEdit, for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            _button.setTitleColor(.purple_B847FF, for: .normal)
+            _button.setTitleColor(.purple_DB8BFF, for: .normal)
             _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(condRightButtonTapped), for: .touchUpInside)
+            _button.addTarget(self, action: #selector(diseaseRightBtnTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
-        condRefreshButton = {
+        diseaseRefreshBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemReload.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(condRefreshButtonTapped), for: .touchUpInside)
+            _button.addTarget(self, action: #selector(diseaseRefreshButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
         refreshControler = {
             let _refresh = UIRefreshControl()
-            _refresh.tintColor = UIColor.whiteSmoke
+            _refresh.tintColor = UIColor(hex: "#95EDD2")
             _refresh.addTarget(self, action: #selector(refreshLogGroupTableView(sender:)), for: UIControl.Event.valueChanged)
             return _refresh
         }()
+        pullToRefreshLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 16, weight: .bold)
+            _label.textColor = .purple_C3C0E3
+            _label.textAlignment = .center
+            _label.text = lang.titlePullToRefresh
+            _label.numberOfLines = 2
+            _label.isHidden = true
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        guideLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 18, weight: .bold)
+            _label.textAlignment = .center
+            _label.textColor = .magenta
+            _label.text = lang.msgGuideDiary
+            _label.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _label.isHidden = true
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        foodBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemDefFood.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setTitle(lang.titleTagFood, for: .normal)
+            _button.tintColor = .red_FF7187
+            _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+            _button.backgroundColor = .white
+            _button.layer.cornerRadius = 10.0
+            _button.addShadowView(offset: CGSize(width: 4, height: 2), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(presentFoodCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        pillBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemDefPill.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setTitle(lang.titleTagPill, for: .normal)
+            _button.tintColor = .blue_81E4FC
+            _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+            _button.backgroundColor = .white
+            _button.layer.cornerRadius = 10.0
+            _button.addShadowView(offset: CGSize(width: 4, height: 2), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(presentPillCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        activityBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemDefActivity.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setTitle(lang.titleTagActivity, for: .normal)
+            _button.tintColor = .green_3ED6A7
+            _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+            _button.backgroundColor = .white
+            _button.layer.cornerRadius = 10.0
+            _button.addShadowView(offset: CGSize(width: 4, height: 2), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(presentActivityCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        diseaseBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemDefDisease.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.setTitle(lang.titleTagDisease, for: .normal)
+            _button.tintColor = .purple_DB8BFF
+            _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+            _button.backgroundColor = .white
+            _button.layer.cornerRadius = 10.0
+            _button.addShadowView(offset: CGSize(width: 4, height: 2), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(presentDiseaseCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        plusBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemBtnPlusTrans.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.backgroundColor = UIColor.purple_921BEA.withAlphaComponent(0.8)
+            _button.layer.cornerRadius = 13.0
+            _button.addShadowView(offset: CGSize(width: 3, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(plusBtnTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        foodPlusBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemPlusFood.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addShadowView()
+            _button.addTarget(self, action: #selector(presentFoodCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        pillPlusBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemPlusPill.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addShadowView()
+            _button.addTarget(self, action: #selector(presentPillCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        activityPlusBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemPlusActivity.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addShadowView()
+            _button.addTarget(self, action: #selector(presentActivityCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        diseasePlusBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemPlusDisease.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addShadowView()
+            _button.addTarget(self, action: #selector(presentDiseaseCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        historyPlusBtn = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemPlusHistory.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.isHidden = true
+            _button.showsTouchWhenHighlighted = true
+            _button.addShadowView()
+            _button.addTarget(self, action: #selector(presentHistoryCategory), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
+        plusBtnStackView = {
+            let stackView = UIStackView()
+            stackView.axis = .vertical
+            stackView.distribution = .equalSpacing
+            stackView.alignment = .center
+            stackView.spacing = 10.0
+            stackView.translatesAutoresizingMaskIntoConstraints = false
+            return stackView
+        }()
+        guideIllustImgView = {
+            let _imageView = UIImageView()
+            _imageView.image = .itemIllustGirl2
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.isHidden = true
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        medicalCrossImgView = {
+            let _imageView = UIImageView()
+            _imageView.image = .itemMedicalCross
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
         
         if diaryMode == DiaryMode.editor {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: homeButton)
-            navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: notesButton), UIBarButtonItem(customView: avgScoreButton)]
+            navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: notesBtn), UIBarButtonItem(customView: avgScoreBtn)]
             calendarView.appearance.titleDefaultColor = UIColor.black
             diseaseHistoryBtn.isHidden = false
+            plusBtn.isHidden = false
+            plusBtns = [diseasePlusBtn, activityPlusBtn, pillPlusBtn, foodPlusBtn, historyPlusBtn]
+            plusBtnStackView.addArrangedSubview(historyPlusBtn)
+            plusBtnStackView.addArrangedSubview(foodPlusBtn)
+            plusBtnStackView.addArrangedSubview(pillPlusBtn)
+            plusBtnStackView.addArrangedSubview(activityPlusBtn)
+            plusBtnStackView.addArrangedSubview(diseasePlusBtn)
+            plusBtnStackView.addArrangedSubview(plusBtn)
         }
         
         calendarView.dataSource = self
         calendarView.delegate = self
-        logGroupTableView.dataSource = self
-        logGroupTableView.delegate = self
-        pickerCollectionView.dataSource = self
-        pickerCollectionView.delegate = self
-        condScorePickerView.dataSource = self
-        condScorePickerView.delegate = self
-        condCollectionView.dataSource = self
-        condCollectionView.delegate = self
-        groupTypePickerView.dataSource = self
-        groupTypePickerView.delegate = self
+        logGroupTable.dataSource = self
+        logGroupTable.delegate = self
+        groupOfLogsCollection.dataSource = self
+        groupOfLogsCollection.delegate = self
+        moodScorePicker.dataSource = self
+        moodScorePicker.delegate = self
+        diseaseCollection.dataSource = self
+        diseaseCollection.delegate = self
+        groupTypePicker.dataSource = self
+        groupTypePicker.delegate = self
         
         selectedWeekOfYear = Calendar.current.component(.weekOfYear, from: calendarView.today!)
+        yearNumber = Calendar.current.component(.year, from: calendarView.today!)
+        yearForWeekOfYear = Calendar.current.component(.yearForWeekOfYear, from: calendarView.today!)
         selectedCalScope = CalScope.week
         groupType = LogGroupType.morning
         
         // Setup subviews
-        view.addSubview(logGroupTableView)
+        view.addSubview(logGroupTable)
+        view.addSubview(guideLabel)
+        view.addSubview(foodBtn)
+        view.addSubview(pillBtn)
+        view.addSubview(activityBtn)
+        view.addSubview(diseaseBtn)
+        view.addSubview(guideIllustImgView)
+        view.addSubview(pullToRefreshLabel)
         view.addSubview(calendarView)
         view.addSubview(diseaseHistoryBtn)
-        view.addSubview(toggleButton)
+        view.addSubview(toggleBtn)
+        view.addSubview(plusBtnStackView)
         view.addSubview(blindView)
         view.addSubview(diseaseLeftBtn)
         view.addGestureRecognizer(scopeGesture)
         
         // TODO
-        // logGroupTableView.addSubview(refreshControler)
+        logGroupTable.addSubview(refreshControler)
         
         blindView.addSubview(pickerContainerView)
-        blindView.addSubview(condContainerView)
+        blindView.addSubview(diseaseContainer)
         
         pickerContainerView.addSubview(pickerDateLabel)
-        pickerContainerView.addSubview(groupTypePickerView)
-        pickerContainerView.addSubview(pickerCollectionView)
+        pickerContainerView.addSubview(groupTypePicker)
+        pickerContainerView.addSubview(groupOfLogsCollection)
         pickerContainerView.addSubview(pickerGrayLineView)
-        pickerContainerView.addSubview(pickerCancelButton)
-        pickerContainerView.addSubview(pickerCheckButton)
+        pickerContainerView.addSubview(pickerCancelBtn)
+        pickerContainerView.addSubview(pickerCheckBtn)
         
-        condContainerView.addSubview(condTitleLabel)
-        condContainerView.addSubview(condCollectionView)
-        condContainerView.addSubview(diseaseRightBtn)
-        condContainerView.addSubview(condRefreshButton)
+        diseaseContainer.addSubview(medicalCrossImgView)
+        diseaseContainer.addSubview(diseaseTitleLabel)
+        diseaseContainer.addSubview(diseaseCollection)
+        diseaseContainer.addSubview(diseaseRightBtn)
+        diseaseContainer.addSubview(diseaseRefreshBtn)
         
         // Setup constraints
         blindView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
@@ -1587,36 +1838,39 @@ extension DiaryViewController {
         pickerContainerHeight.priority = UILayoutPriority(rawValue: 999)
         pickerContainerHeight.isActive = true
         
-        condContainerView.leadingAnchor.constraint(equalTo: blindView.leadingAnchor, constant: 7).isActive = true
-        condContainerView.trailingAnchor.constraint(equalTo: blindView.trailingAnchor, constant: -7).isActive = true
-        condContainerView.centerXAnchor.constraint(equalTo: blindView.centerXAnchor, constant: 0).isActive = true
-        condContainerView.centerYAnchor.constraint(equalTo: blindView.centerYAnchor, constant: 0).isActive = true
-        condContainerHeight = condContainerView.heightAnchor.constraint(equalToConstant: 105 + 45)
+        diseaseContainer.leadingAnchor.constraint(equalTo: blindView.leadingAnchor, constant: 7).isActive = true
+        diseaseContainer.trailingAnchor.constraint(equalTo: blindView.trailingAnchor, constant: -7).isActive = true
+        diseaseContainer.centerXAnchor.constraint(equalTo: blindView.centerXAnchor, constant: 0).isActive = true
+        diseaseContainer.centerYAnchor.constraint(equalTo: blindView.centerYAnchor, constant: 0).isActive = true
+        condContainerHeight = diseaseContainer.heightAnchor.constraint(equalToConstant: 105 + 45)
         condContainerHeight.priority = UILayoutPriority(rawValue: 999)
         condContainerHeight.isActive = true
         
         pickerDateLabel.topAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: 10).isActive = true
         pickerDateLabel.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: 20).isActive = true
         
-        condTitleLabel.topAnchor.constraint(equalTo: condContainerView.topAnchor, constant: 10).isActive = true
-        condTitleLabel.leadingAnchor.constraint(equalTo: condContainerView.leadingAnchor, constant: 20).isActive = true
+        medicalCrossImgView.topAnchor.constraint(equalTo: diseaseContainer.topAnchor, constant: 5).isActive = true
+        medicalCrossImgView.leadingAnchor.constraint(equalTo: diseaseContainer.leadingAnchor, constant: 10).isActive = true
         
-        groupTypePickerView.topAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: 0).isActive = true
-        groupTypePickerView.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: 0).isActive = true
-        groupTypePickerView.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: 0).isActive = true
-        groupTypePickerView.heightAnchor.constraint(equalToConstant: 215).isActive = true
+        diseaseTitleLabel.topAnchor.constraint(equalTo: diseaseContainer.topAnchor, constant: 10).isActive = true
+        diseaseTitleLabel.leadingAnchor.constraint(equalTo: medicalCrossImgView.trailingAnchor, constant: 7).isActive = true
         
-        pickerCollectionView.topAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: 170).isActive = true
-        pickerCollectionView.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: 0).isActive = true
-        pickerCollectionView.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: 0).isActive = true
-        pickerCollectionHeight = pickerCollectionView.heightAnchor.constraint(equalToConstant: 210)
+        groupTypePicker.topAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: 0).isActive = true
+        groupTypePicker.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: 0).isActive = true
+        groupTypePicker.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: 0).isActive = true
+        groupTypePicker.heightAnchor.constraint(equalToConstant: 215).isActive = true
+        
+        groupOfLogsCollection.topAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: 170).isActive = true
+        groupOfLogsCollection.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: 0).isActive = true
+        groupOfLogsCollection.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: 0).isActive = true
+        pickerCollectionHeight = groupOfLogsCollection.heightAnchor.constraint(equalToConstant: 210)
         pickerCollectionHeight.priority = UILayoutPriority(rawValue: 999)
         pickerCollectionHeight.isActive = true
         
-        condCollectionView.topAnchor.constraint(equalTo: condContainerView.topAnchor, constant: 45).isActive = true
-        condCollectionView.leadingAnchor.constraint(equalTo: condContainerView.leadingAnchor, constant: 0).isActive = true
-        condCollectionView.trailingAnchor.constraint(equalTo: condContainerView.trailingAnchor, constant: 0).isActive = true
-        condCollectionHeight = condCollectionView.heightAnchor.constraint(equalToConstant: 45)
+        diseaseCollection.topAnchor.constraint(equalTo: diseaseContainer.topAnchor, constant: 45).isActive = true
+        diseaseCollection.leadingAnchor.constraint(equalTo: diseaseContainer.leadingAnchor, constant: 0).isActive = true
+        diseaseCollection.trailingAnchor.constraint(equalTo: diseaseContainer.trailingAnchor, constant: 0).isActive = true
+        condCollectionHeight = diseaseCollection.heightAnchor.constraint(equalToConstant: 45)
         condCollectionHeight.priority = UILayoutPriority(rawValue: 999)
         condCollectionHeight.isActive = true
         
@@ -1625,28 +1879,30 @@ extension DiaryViewController {
         pickerGrayLineView.bottomAnchor.constraint(equalTo: pickerContainerView.bottomAnchor, constant: -50).isActive = true
         pickerGrayLineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
         
-        pickerCancelButton.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: 0).isActive = true
-        pickerCancelButton.bottomAnchor.constraint(equalTo: pickerContainerView.bottomAnchor, constant: 0).isActive = true
-        pickerCancelButton.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
-        pickerCancelButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        pickerCancelBtn.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: 0).isActive = true
+        pickerCancelBtn.bottomAnchor.constraint(equalTo: pickerContainerView.bottomAnchor, constant: 0).isActive = true
+        pickerCancelBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
+        pickerCancelBtn.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        pickerCheckButton.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: 0).isActive = true
-        pickerCheckButton.bottomAnchor.constraint(equalTo: pickerContainerView.bottomAnchor, constant: 0).isActive = true
-        pickerCheckButton.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
-        pickerCheckButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        pickerCheckBtn.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: -30).isActive = true
+        pickerCheckBtn.bottomAnchor.constraint(equalTo: pickerContainerView.bottomAnchor, constant: 0).isActive = true
+        pickerCheckBtn.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        diseaseLeftBtn.leadingAnchor.constraint(equalTo: condContainerView.leadingAnchor, constant: 0).isActive = true
-        diseaseLeftBtn.bottomAnchor.constraint(equalTo: condContainerView.bottomAnchor, constant: -5).isActive = true
+        diseaseLeftBtn.leadingAnchor.constraint(equalTo: diseaseContainer.leadingAnchor, constant: 0).isActive = true
+        diseaseLeftBtn.bottomAnchor.constraint(equalTo: diseaseContainer.bottomAnchor, constant: -5).isActive = true
         diseaseLeftBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
         diseaseLeftBtn.heightAnchor.constraint(equalToConstant: 45).isActive = true
         
-        diseaseRightBtn.trailingAnchor.constraint(equalTo: condContainerView.trailingAnchor, constant: 0).isActive = true
-        diseaseRightBtn.bottomAnchor.constraint(equalTo: condContainerView.bottomAnchor, constant: -5).isActive = true
+        plusBtnStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -15).isActive = true
+        plusBtnStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -15).isActive = true
+        
+        diseaseRightBtn.trailingAnchor.constraint(equalTo: diseaseContainer.trailingAnchor, constant: 0).isActive = true
+        diseaseRightBtn.bottomAnchor.constraint(equalTo: diseaseContainer.bottomAnchor, constant: -5).isActive = true
         diseaseRightBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 4).isActive = true
         diseaseRightBtn.heightAnchor.constraint(equalToConstant: 45).isActive = true
         
-        condRefreshButton.topAnchor.constraint(equalTo: condContainerView.topAnchor, constant: 0).isActive = true
-        condRefreshButton.trailingAnchor.constraint(equalTo: condContainerView.trailingAnchor, constant: 0).isActive = true
+        diseaseRefreshBtn.topAnchor.constraint(equalTo: diseaseContainer.topAnchor, constant: 0).isActive = true
+        diseaseRefreshBtn.trailingAnchor.constraint(equalTo: diseaseContainer.trailingAnchor, constant: 0).isActive = true
         
         calendarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         calendarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
@@ -1658,19 +1914,48 @@ extension DiaryViewController {
         diseaseHistoryBtn.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
         diseaseHistoryBtn.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         
-        toggleButton.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
-        toggleButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
+        toggleBtn.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
+        toggleBtn.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
         
-        logGroupTableView.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
-        logGroupTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
-        logGroupTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
-        logGroupTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
-        logGroupTableView.panGestureRecognizer.require(toFail: scopeGesture)
+        logGroupTable.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
+        logGroupTable.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
+        logGroupTable.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
+        logGroupTable.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+        logGroupTable.panGestureRecognizer.require(toFail: scopeGesture)
+        
+        pullToRefreshLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 120).isActive = true
+        pullToRefreshLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        
+        guideLabel.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: -(view.frame.height * 0.16)).isActive = true
+        guideLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        
+        foodBtn.topAnchor.constraint(equalTo: guideLabel.bottomAnchor, constant: 20).isActive = true
+        foodBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        foodBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 2.5).isActive = true
+        foodBtn.heightAnchor.constraint(equalToConstant: view.frame.height / 13).isActive = true
+        
+        pillBtn.topAnchor.constraint(equalTo: foodBtn.bottomAnchor, constant: 10).isActive = true
+        pillBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        pillBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 2.5).isActive = true
+        pillBtn.heightAnchor.constraint(equalToConstant: view.frame.height / 13).isActive = true
+        
+        activityBtn.topAnchor.constraint(equalTo: pillBtn.bottomAnchor, constant: 10).isActive = true
+        activityBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        activityBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 2.5).isActive = true
+        activityBtn.heightAnchor.constraint(equalToConstant: view.frame.height / 13).isActive = true
+        
+        diseaseBtn.topAnchor.constraint(equalTo: activityBtn.bottomAnchor, constant: 10).isActive = true
+        diseaseBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        diseaseBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 2.5).isActive = true
+        diseaseBtn.heightAnchor.constraint(equalToConstant: view.frame.height / 13).isActive = true
+        
+        guideIllustImgView.topAnchor.constraint(equalTo: diseaseBtn.bottomAnchor, constant: -15).isActive = true
+        guideIllustImgView.leadingAnchor.constraint(equalTo: diseaseBtn.trailingAnchor, constant: 2).isActive = true
     }
     
     private func updateLogGroupTable(completion: (() -> Void)? = nil) {
-        self.logGroupTableView.beginUpdates()
-        self.logGroupTableView.endUpdates()
+        self.logGroupTable.beginUpdates()
+        self.logGroupTable.endUpdates()
         if let completion = completion {
             completion()
         }
@@ -1681,7 +1966,7 @@ extension DiaryViewController {
         if CGFloat(collectionViewHeightVal + 220) > (UIScreen.main.bounds.height * 0.84) {
             dynamicHeightVal = UIScreen.main.bounds.height * 0.5
         }
-        pickerCollectionView.reloadData()
+        groupOfLogsCollection.reloadData()
         UIView.animate(withDuration: 0.5) {
             self.pickerCollectionHeight.constant = dynamicHeightVal
             self.pickerContainerHeight.constant = dynamicHeightVal + 220
@@ -1707,6 +1992,7 @@ extension DiaryViewController {
     private func afterLoadGroupOfLogs(_ collectionViewHeightVal: Int) {
         let logGroup = selectedLogGroup!
         yearNumber = logGroup.year_number
+        yearForWeekOfYear = logGroup.year_forweekofyear
         monthNumber = logGroup.month_number
         dayNumber = logGroup.day_number
         weekOfYear = logGroup.week_of_year
@@ -1714,11 +2000,11 @@ extension DiaryViewController {
         selectedDate = "\(logGroup.year_number)-\(logGroup.month_number)-\(logGroup.day_number)"
         pickerContainerTransition(collectionViewHeightVal)
         if blindView.isHidden {
-            groupTypePickerView.selectRow(LogGroupType.nighttime - (groupType!), inComponent: 0, animated: true)
+            groupTypePicker.selectRow(LogGroupType.nighttime - (groupType!), inComponent: 0, animated: true)
             UIView.transition(with: blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.pickerDateLabel.text = self.lang.getLogGroupSection(logGroup.month_number, logGroup.day_number)
                 self.pickerContainerView.isHidden = false
-                self.condContainerView.isHidden = true
+                self.diseaseContainer.isHidden = true
                 self.blindView.isHidden = false
             })
         }
@@ -1727,43 +2013,145 @@ extension DiaryViewController {
     private func loadLogGroups() {
         let selectedDateArr = dateFormatter.string(from: calendarView.currentPage).components(separatedBy: "-")
         let service = Service(lang: lang)
-        service.getLogGroups(yearNumber: selectedDateArr[0], monthNumber: Int(selectedDateArr[1])!, weekOfYear: selectedWeekOfYear, popoverAlert: { message in
+        service.getLogGroups(yearNumber: Int(selectedDateArr[0])!, yearForWeekOfYear: yearForWeekOfYear!, monthNumber: Int(selectedDateArr[1])!, weekOfYear: selectedWeekOfYear, popoverAlert: { message in
             self.retryFunction = self.loadLogGroups
             self.alertError(message)
         }, tokenRefreshCompletion: {
             self.loadLogGroups()
         }) { (logGroups) in
             self.logGroups = logGroups
-            self.logGroupSectTwoDimArr = service.convertLogGroupsIntoTwoDimLogGroupSectArr(logGroups)
-            self.logGroupDictTwoDimArr = service.convertSortedLogGroupSectTwoDimArrIntoLogGroupDictTwoDimArr(self.logGroupSectTwoDimArr)
+            var logGroups1 = [BaseModel.LogGroup]()
+            var logGroups2 = [BaseModel.LogGroup]()
+            if logGroups.count > 0 {
+                let year1 = logGroups[0].year_number
+                var year2 = 0
+                for logGroup in logGroups {
+                    if logGroup.year_number == year1 {
+                        logGroups1.append(logGroup)
+                    } else {
+                        year2 = logGroup.year_number
+                        logGroups2.append(logGroup)
+                    }
+                }
+                let logGroupSectTwoDimArr1 = service.convertLogGroupsIntoTwoDimLogGroupSectArr(logGroups1)
+                if year2 != 0 {
+                    let logGroupSectTwoDimArr2 = service.convertLogGroupsIntoTwoDimLogGroupSectArr(logGroups2)
+                    if year2 > year1 {
+                        self.logGroupSectTwoDimArr = logGroupSectTwoDimArr2 + logGroupSectTwoDimArr1
+                    } else {
+                        self.logGroupSectTwoDimArr = logGroupSectTwoDimArr1 + logGroupSectTwoDimArr2
+                    }
+                } else {
+                    self.logGroupSectTwoDimArr = logGroupSectTwoDimArr1
+                }
+                self.logGroupDictTwoDimArr = service.convertSortedLogGroupSectTwoDimArrIntoLogGroupDictTwoDimArr(self.logGroupSectTwoDimArr)
+            } else {
+                self.logGroupSectTwoDimArr = [[CustomModel.LogGroupSection]]()
+                self.logGroupDictTwoDimArr = [Int:[Int:BaseModel.LogGroup]]()
+            }
             self.calendarView.reloadData()
-            self.logGroupTableView.reloadData()
-            
+            self.logGroupTable.reloadData()
             if let section = self.selectedTableSection, let row = self.selectedTableRow {
                 self.selectedLogGroup = self.logGroupSectTwoDimArr[section][row].logGroup
                 self.updateLogGroupTable()
             }
-            
             if self.isToggleBtnTapped && logGroups.count > 0 {
                 self.isToggleBtnTapped = false
                 self.updateLogGroupTable(completion: {
                     let indexPath = IndexPath(row: 0, section: 0)
-                    self.logGroupTableView.scrollToRow(at: indexPath, at: .top, animated: true)
+                    self.logGroupTable.scrollToRow(at: indexPath, at: .top, animated: true)
                 })
             }
-            
             if self.isPullToRefresh && logGroups.count > 0 {
+                DispatchQueue.main.async {
+                    self.refreshControler.endRefreshing()
+                }
                 self.isPullToRefresh = false
                 self.updateLogGroupTable()
             }
-            
             if self.isLogGroupTableEdited {
                 self.isLogGroupTableEdited = false
                 self.updateLogGroupTable(completion: {
                     self.editedCellIdxPath = nil
                 })
             }
+            if self.isFirstAppear {
+                self.isFirstAppear = false
+                if self.diaryMode == DiaryMode.logger {
+                    self.popoverLogger(self.calendarView.today!)
+                }
+            }
+            if self.diaryMode == DiaryMode.editor {
+                UIView.animate(withDuration: 0.5) {
+                    if logGroups.count <= 0 {
+                        self.pullToRefreshLabel.isHidden = false
+                        self.guideLabel.isHidden = false
+                        self.foodBtn.isHidden = false
+                        self.pillBtn.isHidden = false
+                        self.activityBtn.isHidden = false
+                        self.diseaseBtn.isHidden = false
+                        self.guideIllustImgView.isHidden = false
+                    } else {
+                        self.pullToRefreshLabel.isHidden = true
+                        self.guideLabel.isHidden = true
+                        self.foodBtn.isHidden = true
+                        self.pillBtn.isHidden = true
+                        self.activityBtn.isHidden = true
+                        self.diseaseBtn.isHidden = true
+                        self.guideIllustImgView.isHidden = true
+                    }
+                }
+            }
         }
+    }
+    
+    private func popoverLogger(_ date: Date) {
+        let selectedDateArr = dateFormatter.string(from: date).components(separatedBy: "-")
+        yearNumber = Int(selectedDateArr[0])
+        monthNumber = Int(selectedDateArr[1])
+        dayNumber = Int(selectedDateArr[2])
+        weekOfYear = Calendar.current.component(.weekOfYear, from: date)
+        dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: date)!
+        selectedDate = dateFormatter.string(from: date)
+        // logGrouDictArr: [groupType:LogGroup]
+        if let logGroupDictArr = logGroupDictTwoDimArr[dayOfYear!] {
+            // Case found some logGroups in section.
+            // Display last log group.
+            let sortedGroupTypes = logGroupDictArr.keys.sorted(by: >)
+            var sortedLogGourpArr = [BaseModel.LogGroup]()
+            sortedGroupTypes.forEach { (key) in
+                sortedLogGourpArr.append(logGroupDictArr[key]!)
+            }
+            let logGroup = sortedLogGourpArr.first!
+            selectedLogGroupId = logGroup.id
+            selectedLogGroup = logGroup
+            groupType = logGroup.group_type
+            loadGroupOfLogs { (groupOfLogSet) in
+                let collectionViewHeight = logCollectionCellHeightInt * self.getGroupOfLogsTotalCnt(groupOfLogSet)
+                self.afterLoadGroupOfLogs(collectionViewHeight)
+            }
+        } else {
+            // Case no logGroups are found in the section
+            selectedLogGroup = nil
+            selectedLogGroupId = nil
+            groupOfLogSet = nil
+            tempStoredLogs.removeAll()
+            groupType = LogGroupType.morning
+            pickerContainerTransition(pickerCollectionHeightInt)
+        }
+        groupTypePicker.selectRow(LogGroupType.nighttime - groupType!, inComponent: 0, animated: true)
+        UIView.transition(with: self.pickerContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+            switch self.lang.currentLanguageId {
+            case LanguageId.eng:
+                self.pickerDateLabel.text = "\(self.dayNumber!) / \(LangHelper.getEngNameOfMonth (monthNumber: self.monthNumber!))"
+            case LanguageId.kor:
+                self.pickerDateLabel.text = "\(self.monthNumber!)월 \(self.dayNumber!)일"
+            default:
+                fatalError()
+            }
+            self.blindView.isHidden = false
+            self.pickerContainerView.isHidden = false
+        })
     }
     
     private func loadGroupOfLogs(_ completion: @escaping (CustomModel.GroupOfLogSet) -> Void) {
@@ -1791,9 +2179,8 @@ extension DiaryViewController {
             self.loadAvatarDiseasHistory()
         }) { (avtCondList) in
             self.avtCondList = avtCondList
-            self.condCollectionView.reloadData()
-            self.diseaseLeftBtn.setTitleColor(.purple_B847FF, for: .normal)
-            
+            self.diseaseCollection.reloadData()
+            self.diseaseLeftBtn.setTitleColor(.purple_DB8BFF, for: .normal)
             var collectionViewHeight = CGFloat(45 * self.avtCondList!.count)
             if CGFloat(collectionViewHeight + 105) > (UIScreen.main.bounds.height * 0.84) {
                 collectionViewHeight = UIScreen.main.bounds.height * 0.5
@@ -1805,9 +2192,10 @@ extension DiaryViewController {
             })
             UIView.transition(with: self.blindView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.pickerContainerView.isHidden = true
-                self.condContainerView.isHidden = false
+                self.diseaseContainer.isHidden = false
                 self.blindView.isHidden = false
             })
+            self.isDiseaseHistoyPoped = true
         }
     }
     
@@ -1821,6 +2209,7 @@ extension DiaryViewController {
             "avatar_id": avatarId,
             "tag_id": selectedTag!.id,
             "year_number": yearNumber!,
+            "year_forweekofyear": yearForWeekOfYear!,
             "month_number": monthNumber!,
             "week_of_year": weekOfYear!,
             "day_of_year": dayOfYear!,
@@ -1855,7 +2244,7 @@ extension DiaryViewController {
     
     private func updateLogGroupCondScore() {
         let params: Parameters = [
-            "cond_score": selectedCondScore
+            "cond_score": selectedMoodScore
         ]
         let service = Service(lang: lang)
         service.putLogGroup(logGroupId: selectedLogGroupId!, option: LogGroupOption.score, params: params, popoverAlert: { (message) in
@@ -1904,7 +2293,7 @@ extension DiaryViewController {
     
     private func updateAvatarCondRemove() {
         let service = Service(lang: lang)
-        service.putAvatarCond(avatarCondId: self.selectedAvatarCondId!, popoverAlert: { (message) in
+        service.putAvatarCond(avatarCondId: self.selectedAvatarDiseaseId!, popoverAlert: { (message) in
             self.retryFunction = self.updateAvatarCondRemove
             self.alertError(message)
         }, tokenRefreshCompletion: {
@@ -1924,7 +2313,7 @@ extension DiaryViewController {
         yearNumber = Int(selectedDateArr[0])!
         monthNumber = Int(selectedDateArr[1])!
         let service = Service(lang: lang)
-        service.getAvgCondScore(yearNumber: selectedDateArr[0], monthNumber: Int(selectedDateArr[1])!, weekOfYear: weekOfYear, popoverAlert: { (message) in
+        service.getAvgCondScore(yearNumber: yearNumber!, yearForWeekOfYear: yearForWeekOfYear!, monthNumber: monthNumber, weekOfYear: weekOfYear, popoverAlert: { (message) in
             self.retryFunction = self.loadAvgCondScore
             self.alertError(message)
         }, tokenRefreshCompletion: {
