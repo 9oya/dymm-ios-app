@@ -282,13 +282,15 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             if tag!.id == TagId.diary {
                 return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 8)
             } else {
-                return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 14.5)
+//                return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 14.5)
+                return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 13)
             }
         } else {
             if tag!.id == TagId.diary {
-                return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 14.5)
+//                return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 14.5)
+                return CGSize(width: UIScreen.main.bounds.width - 14, height: UIScreen.main.bounds.height / 13)
             } else {
-                return CGSize(width: (UIScreen.main.bounds.width / 2) - 10.5, height: UIScreen.main.bounds.height / 14.5)
+                return CGSize(width: (UIScreen.main.bounds.width / 2) - 10.5, height: UIScreen.main.bounds.height / 13)
             }
         }
     }
@@ -531,6 +533,7 @@ extension HomeViewController {
             _button.frame = CGRect(x: 0, y: 0, width: 31, height: 31)
             _button.layer.cornerRadius = _button.frame.height / 2
             _button.showsTouchWhenHighlighted = true
+            _button.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.addTarget(self, action: #selector(profileButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
@@ -760,9 +763,10 @@ extension HomeViewController {
     
     private func loadCategories() {
         view.showSpinner()
-        var tagId = TagId.home
+//        var tagId = TagId.home
+        var tagId = TagId.home3
         if UserDefaults.standard.isSignIn() {
-            tagId = TagId.home2
+            tagId = TagId.home4
         }
         let service = Service(lang: lang)
         service.getTagSetList(tagId: tagId, sortType: SortType.priority, popoverAlert: { (message) in

@@ -199,15 +199,15 @@ struct LangPack {
         if key < 1 {
             return msgLifeSpan
         } else if key < 2.5 {
-            return msgMoodAwfulMsgs[Int.random(in: 0..<4)]
+            return msgMoodAwfulMsgs[Int.random(in: 0..<7)]
         } else if key < 4.5 {
-            return msgMoodBadMsgs[Int.random(in: 0..<4)]
+            return msgMoodBadMsgs[Int.random(in: 0..<7)]
         } else if key < 6.5 {
-            return msgMoodSosoMsgs[Int.random(in: 0..<3)]
+            return msgMoodSosoMsgs[Int.random(in: 0..<7)]
         } else if key < 8.5 {
-            return msgMoodGoodMsgs[Int.random(in: 0..<4)]
+            return msgMoodGoodMsgs[Int.random(in: 0..<7)]
         } else {
-            return msgMoodExcellentMsgs[Int.random(in: 0..<3)]
+            return msgMoodExcellentMsgs[Int.random(in: 0..<7)]
         }
     }
     
@@ -620,8 +620,8 @@ struct LangPack {
         }()
         self.titlePullToRefresh = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Pull to refresh\n\u{02193}"
-            case LanguageId.kor: return "당겨서 새로고침\n\u{02193}"
+            case LanguageId.eng: return "Pull to refresh\n\u{021E3}"
+            case LanguageId.kor: return "당겨서 새로고침\n\u{021E3}"
             default: fatalError()}
         }()
         self.titlePurchaseCompl = {
@@ -1083,79 +1083,110 @@ struct LangPack {
         self.msgMoodAwfulMsgs = {
             switch currentLanguageId {
             case LanguageId.eng: return [
-                "If you need help, don't be afraid to ask.",
-                "I'm worried about you. Find someone to help you.",
-                "You don't have to handle everything alone. Ask for help.",
-                "Find out what affects your mood."
+                "If you need help, don't be afraid to ask.", // #1
+                "I'm worried about you. Find someone to help you.", // #2
+                "You don't have to handle everything alone. Ask for help.", // #3
+                "If you need help, don't be afraid to ask.", // #4
+                "You are not alone. Ask for help around you.", // #5
+                "You don't have to handle everything alone. Ask for help.", // #6
+                "Find out what affects your mood." // #7
                 ]
             case LanguageId.kor: return [
-                "괜찮으신가요? 주변에 도움을 청하는 것을 두려워하지 마세요.",
-                "당신이 걱정되요. 가까운 곳에서 도와줄 사람을 찾아보세요.",
-                "혼자 모든것을 감당할 필요는 없어요. 도움을 청하세요.",
-                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요."
+                "괜찮으신가요? 주변에 도움을 청하는 것을 두려워하지 마세요.", // #1
+                "당신이 걱정되요. 가까운 곳에서 도와줄 사람을 찾아보세요.", // #2
+                "혼자 모든것을 감당할 필요는 없어요. 도움을 청하세요.", // #3
+                "괜찮으신가요? 주변에 도움을 청하는 것을 두려워하지 마세요.", // #4
+                "당신은 혼자가 아닙니다. 주변에 도움을 청하세요.", // #5
+                "혼자 모든것을 감당할 필요는 없어요. 도움을 청하세요.", // #6
+                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요." // #7
                 ]
             default: fatalError()}
         }()
         self.msgMoodBadMsgs = {
             switch currentLanguageId {
             case LanguageId.eng: return [
-                "Sometimes it's good to be bad.",
-                "Sometimes it's okay to feel sad.",
-                "Bad mood will get better over time.",
-                "Find out what affects your mood."
+                "Sometimes it's good to be bad.", // #1
+                "Sometimes it's okay to feel sad.", // #2
+                "Bad mood will get better over time.", // #3
+                "If you need help, don't be afraid to ask.", // #4
+                "I'm worried about you. Find someone to help you.", // #5
+                "You don't have to handle everything alone. Ask for help.", // #6
+                "Find out what affects your mood." // #7
                 ]
             case LanguageId.kor: return [
-                "가끔은 나쁜기분을 갖는 것도 좋을 수 있어요.",
-                "가끔은 슬픈 기분을 느끼는 것도 좋아요.",
-                "나쁜 기분은 시간이 지나면 나아질 거에요.",
-                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요."]
+                "가끔은 나쁜기분을 갖는 것도 좋을 수 있어요.", // #1
+                "가끔은 슬픈 기분을 느끼는 것도 좋아요.", // #2
+                "나쁜 기분은 시간이 지나면 나아질 거에요.", // #3
+                "괜찮으신가요? 주변에 도움을 청하는 것을 두려워하지 마세요.", // #4
+                "당신이 걱정되요. 가까운 곳에서 도와줄 사람을 찾아보세요.", // #5
+                "혼자 모든것을 감당할 필요는 없어요. 도움을 청하세요.", // #6
+                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요." // #7
+                ]
             default: fatalError()}
         }()
         self.msgMoodSosoMsgs = {
             switch currentLanguageId {
             case LanguageId.eng: return [
-                "If you try a little more, a good day will come.",
-                "It's okay to get better slowly.",
-                "Find out what affects your mood.",
-                ""
+                "If you try a little more, a good day will come.", // #1
+                "It's okay to get better slowly.", // #2
+                "Sometimes it's good to be bad.", // #3
+                "Sometimes it's okay to feel sad.", // #4
+                "Bad mood will get better over time.", // #5
+                "Find out what affects your mood.", // #6
+                "Find out what affects your mood." // #7
                 ]
             case LanguageId.kor: return [
-                "조금더 노력하면 좋은 날이 올거에요.",
-                "천천히 좋아지는 것도 괜찮아요.",
-                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요.",
-                ""
+                "조금더 노력하면 좋은 날이 올거에요.", // #1
+                "천천히 좋아지는 것도 괜찮아요.", // #2
+                "가끔은 나쁜기분을 갖는 것도 좋을 수 있어요.", // #3
+                "가끔은 슬픈 기분을 느끼는 것도 좋아요.", // #4
+                "나쁜 기분은 시간이 지나면 나아질 거에요.", // #5
+                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요.", // #6
+                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요." // #7
                 ]
             default: fatalError()}
         }()
         self.msgMoodGoodMsgs = {
             switch currentLanguageId {
             case LanguageId.eng: return [
-                "You're balancing your life.",
-                "Try to stay mood now.",
-                "I wish you a good day every day.",
-                "Find out what affects your mood."
+                "You're balancing your life.", // #1
+                "Try to stay mood now.", // #2
+                "I wish you a good day every day.", // #3
+                "Sometimes it's good to be bad.", // #4
+                "Sometimes it's okay to feel sad.", // #5
+                "Find out what affects your mood.", // #6
+                "Find out what affects your mood." // #7
                 ]
             case LanguageId.kor: return [
-                "당신은 삶에 균형을 유지하고 있어요.",
-                "지금 기분을 유지하기 위해 노력해 봐요.",
-                "당신에게 매일 좋은 날이 함께하길 바래요.",
-                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요."
+                "당신은 삶에 균형을 유지하고 있어요.", // #1
+                "지금 기분을 유지하기 위해 노력해 봐요.", // #2
+                "당신에게 매일 좋은 날이 함께하길 바래요.", // #3
+                "가끔은 나쁜기분을 갖는 것도 좋을 수 있어요.", // #4
+                "가끔은 슬픈 기분을 느끼는 것도 좋아요.", // #5
+                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요.", // #6
+                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요." // #7
                 ]
             default: fatalError()}
         }()
         self.msgMoodExcellentMsgs = {
             switch currentLanguageId {
             case LanguageId.eng: return [
-                "If you keep it this way, you will see the future.",
-                "You are having the best time in life.",
-                "I admire you for maintaining the best mood.",
-                ""
+                "If you keep it this way, you will see the future.", // #1
+                "You are having the best time in life.", // #2
+                "I admire you for maintaining the best mood.", // #3
+                "You're balancing your life.", // #4
+                "Try to stay mood now.", // #5
+                "I wish you a good day every day.", // #6
+                "Find out what affects your mood." // #7
                 ]
             case LanguageId.kor: return [
-                "이대로 계속 유지한다면 당신은 미래를 볼 거예요.",
-                "당신은 삶에서 최고의 시간을 보내고 있어요.",
-                "최고의 기분을 유지하는 당신을 존경합니다.",
-                ""
+                "이대로 계속 유지한다면 당신은 미래를 볼 거예요.", // #1
+                "당신은 삶에서 최고의 시간을 보내고 있어요.", // #2
+                "최고의 기분을 유지하는 당신을 존경합니다.", // #3
+                "당신은 삶에 균형을 유지하고 있어요.", // #4
+                "지금 기분을 유지하기 위해 노력해 봐요.", // #5
+                "당신에게 매일 좋은 날이 함께하길 바래요.", // #6
+                "어떤 것들이 당신의 기분에 영향을 주는지 찾아보세요." // #7
                 ]
             default: fatalError()}
         }()

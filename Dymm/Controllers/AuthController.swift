@@ -62,6 +62,7 @@ class AuthViewController: UIViewController {
     var isCodeCorrect = true
     var fbParams: Parameters?
     var gParams: Parameters?
+    var receiptString: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -767,6 +768,8 @@ extension AuthViewController {
                 UserDefaults.standard.setIsFreeTrial(value: false)
             }
             
+            self.loadReceipt()
+            
             _ = self.navigationController?.popViewController(animated: true)
         }
     }
@@ -788,6 +791,8 @@ extension AuthViewController {
         } else {
             UserDefaults.standard.setIsFreeTrial(value: false)
         }
+        
+        loadReceipt()
         
         _ = self.navigationController?.popViewController(animated: true)
     }
@@ -1009,6 +1014,37 @@ extension AuthViewController {
             self.alertError(message)
         }) { (auth) in
             self.afterSignUp(auth)
+        }
+    }
+    
+    private func loadReceipt() {
+        if let appStoreReceiptURL = Bundle.main.appStoreReceiptURL,
+            FileManager.default.fileExists(atPath: appStoreReceiptURL.path) {
+            do {
+                let receiptData = try Data(contentsOf: appStoreReceiptURL, options: .alwaysMapped)
+                receiptString = receiptData.base64EncodedString(options: [])
+                verifyReceipt()
+            }
+            catch { print("Couldn't read receipt data with error: " + error.localizedDescription) }
+        }
+    }
+    
+    private func verifyReceipt() {
+        let params: Parameters = [
+            "receipt_data": receiptString!
+        ]
+        let service = Service(lang: lang)
+        service.verifyReceipt(params: params, popoverAlert: { (message) in
+            self.retryFunction = self.verifyReceipt
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.verifyReceipt()
+        }) { (isReceiptVerified) in
+            if isReceiptVerified {
+                UserDefaults.standard.setIsPurchased(value: true)
+            } else {
+                UserDefaults.standard.setIsPurchased(value: false)
+            }
         }
     }
 }

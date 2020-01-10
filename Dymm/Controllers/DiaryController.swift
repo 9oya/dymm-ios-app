@@ -1616,7 +1616,7 @@ extension DiaryViewController {
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             _button.backgroundColor = .white
             _button.layer.cornerRadius = 10.0
-            _button.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _button.addShadowView(offset: CGSize(width: 4, height: 2), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.isHidden = true
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(presentFoodCategory), for: .touchUpInside)
@@ -1631,7 +1631,7 @@ extension DiaryViewController {
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             _button.backgroundColor = .white
             _button.layer.cornerRadius = 10.0
-            _button.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _button.addShadowView(offset: CGSize(width: 4, height: 2), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.isHidden = true
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(presentPillCategory), for: .touchUpInside)
@@ -1646,7 +1646,7 @@ extension DiaryViewController {
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             _button.backgroundColor = .white
             _button.layer.cornerRadius = 10.0
-            _button.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _button.addShadowView(offset: CGSize(width: 4, height: 2), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.isHidden = true
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(presentActivityCategory), for: .touchUpInside)
@@ -1661,7 +1661,7 @@ extension DiaryViewController {
             _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             _button.backgroundColor = .white
             _button.layer.cornerRadius = 10.0
-            _button.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _button.addShadowView(offset: CGSize(width: 4, height: 2), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.isHidden = true
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(presentDiseaseCategory), for: .touchUpInside)
@@ -1673,7 +1673,7 @@ extension DiaryViewController {
             _button.setImage(UIImage.itemBtnPlusTrans.withRenderingMode(.alwaysOriginal), for: .normal)
             _button.backgroundColor = UIColor.purple_921BEA.withAlphaComponent(0.8)
             _button.layer.cornerRadius = 13.0
-            _button.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _button.addShadowView(offset: CGSize(width: 3, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.isHidden = true
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(plusBtnTapped), for: .touchUpInside)
