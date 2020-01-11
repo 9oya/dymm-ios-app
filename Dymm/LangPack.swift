@@ -554,14 +554,14 @@ struct LangPack {
         }()
         self.titleNotes = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Notes"
-            case LanguageId.kor: return "메모"
+            case LanguageId.eng: return "Notebook"
+            case LanguageId.kor: return "메모장"
             default: fatalError()}
         }()
         self.titleFeedback = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Send your feedback to Dymm."
-            case LanguageId.kor: return "딤에게 피드백을 보내주세요."
+            case LanguageId.eng: return "Send a correction"
+            case LanguageId.kor: return "고쳐주세요"
             default: fatalError()}
         }()
         self.titlePassword = {

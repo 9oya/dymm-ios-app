@@ -32,6 +32,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var pickerContainerView: UIView!
     var pickerGrayLineView: UIView!
     var diseaseContainer: UIView!
+    var calendarBottomCap: UIView!
     
     // FSCalendar
     var calendarView: FSCalendar!
@@ -50,7 +51,6 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     // UILabel
     var pickerDateLabel: UILabel!
     var diseaseTitleLabel: UILabel!
-    var guideLabel: UILabel!
     var pullToRefreshLabel: UILabel!
     
     // UIButton
@@ -63,10 +63,6 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var diseaseLeftBtn: UIButton!
     var diseaseRightBtn: UIButton!
     var diseaseRefreshBtn: UIButton!
-    var foodBtn: UIButton!
-    var pillBtn: UIButton!
-    var activityBtn: UIButton!
-    var diseaseBtn: UIButton!
     var plusBtn: UIButton!
     var foodPlusBtn: UIButton!
     var pillPlusBtn: UIButton!
@@ -74,12 +70,14 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var diseasePlusBtn: UIButton!
     var historyPlusBtn: UIButton!
     var plusBtns: [UIButton]!
+    var profileButton: UIButton!
     
     // UIStackView
     var plusBtnStackView: UIStackView!
     
     // UIImageView
-    var guideIllustImgView: UIImageView!
+    var titleImgView: UIImageView!
+    var profileImgView: UIImageView!
     var medicalCrossImgView: UIImageView!
     
     // NSLayoutConstraint
@@ -143,11 +141,14 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var isPlusBtnTapped: Bool = false
     var isDiseaseHistoyPoped: Bool = false
     var superTag: BaseModel.Tag?
+    var receiptString: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
-        loadLogGroups()
+        if UserDefaults.standard.isSignIn() {
+            loadLogGroups()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -163,9 +164,34 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             loadLogGroups()
             UserDefaults.standard.setIsCreateNewLog(value: false)
         }
-        if isFirstAppear && diaryMode == DiaryMode.editor {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.plusBtnTapped()
+        if diaryMode == DiaryMode.editor {
+            if isFirstAppear {
+                isFirstAppear = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.plusBtnTapped()
+                }
+            }
+            
+            if UserDefaults.standard.isSignIn() {
+                loadAvatar()
+                loadLogGroups()
+                loadReceipt()
+            } else {
+                selectedOnceCellIdxPath = nil
+                selectedTableSection = nil
+                selectedTableRow = nil
+                logGroupSectTwoDimArr = [[CustomModel.LogGroupSection]]()
+                logGroupDictTwoDimArr = [Int:[Int:BaseModel.LogGroup]]()
+                logGroupTable.reloadData()
+                
+                UIView.transition(with: self.profileButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
+                    self.profileButton.setTitleColor(.clear, for: .normal)
+                    self.profileButton.backgroundColor = .clear
+                    self.profileButton.setBackgroundImage(.itemProfileDef, for: .normal)
+                    
+                    self.pullToRefreshLabel.isHidden = false
+                })
+                self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: self.profileButton)]
             }
         }
     }
@@ -183,9 +209,27 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             }
             self.retryFunction!()
         })
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
+    
+    @objc func alertUnauthError(_ message: String) {
+        let alertController = UIAlertController(title: lang.titleAccountInvalid, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: lang.titleDone, style: .cancel) { _ in
+            UserDefaults.standard.setIsSignIn(value: false)
+            UserDefaults.standard.setAvatarId(value: 0)
+            UIView.transition(with: self.profileButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
+                self.profileButton.setTitleColor(.clear, for: .normal)
+                self.profileButton.backgroundColor = .clear
+                self.profileButton.setBackgroundImage(.itemProfileDef, for: .normal)
+            })
+            self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: self.profileButton)]
+        })
+        alertController.view.tintColor = .purple_DB8BFF
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    
     
     @objc func alertCompl(_ title: String, _ message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -197,7 +241,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             let controller = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 3]
             self.navigationController?.popToViewController(controller!, animated: true)
         })
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -216,7 +260,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             self.updateLogGroupCondScore()
         })
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil )
     }
     
@@ -227,15 +271,14 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             message = "\(lang.getLogGroupTypeName(selectedLogGroup!.group_type)) \(LangHelper.getEngNameOfMM(monthNumber: selectedLogGroup!.month_number))/\(selectedLogGroup!.day_number)/\(selectedLogGroup!.year_number)"
         case LanguageId.kor:
             message = "\(lang.getLogGroupTypeName(selectedLogGroup!.group_type)) \(LangHelper.getKorNameOfMonth(monthNumber: selectedLogGroup!.month_number, engMMM: nil))/\(selectedLogGroup!.day_number)/\(selectedLogGroup!.year_number)"
-        case LanguageId.jpn:
-            // TODO
-            print("")
         default: fatalError() }
         let alert = UIAlertController(title: lang.titleNote, message: message, preferredStyle: .alert)
         let noteTextView: UITextView = {
             let _textView = UITextView()
-            _textView.backgroundColor = .green_00E9CC
-            _textView.font = .systemFont(ofSize: 16, weight: .light)
+            _textView.backgroundColor = .purple_921BEA
+            _textView.font = .systemFont(ofSize: 16, weight: .medium)
+            _textView.tintColor = .green_27D054
+            _textView.textColor = .green_27D054
             _textView.translatesAutoresizingMaskIntoConstraints = false
             return _textView
         }()
@@ -262,7 +305,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             }
         })
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -399,7 +442,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         let height = NSLayoutConstraint(item: alert.view!, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: CGFloat(heightInt))
         alert.view.addConstraint(height)
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in })
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -414,13 +457,21 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             selectedCalScope = CalScope.week
             selectedWeekOfYear = Calendar.current.component(.weekOfYear, from: calendarView.currentPage)
             yearForWeekOfYear = Calendar.current.component(.yearForWeekOfYear, from: calendarView.currentPage)
-            loadLogGroups()
+            if UserDefaults.standard.isSignIn() {
+                loadLogGroups()
+            } else {
+                return
+            }
         } else {
             calendarView.setScope(.month, animated: true)
             toggleBtn.setImage(UIImage.itemArrowMinimize.withRenderingMode(.alwaysOriginal), for: .normal)
             selectedCalScope = CalScope.month
             selectedWeekOfYear = nil
-            loadLogGroups()
+            if UserDefaults.standard.isSignIn() {
+                loadLogGroups()
+            } else {
+                return
+            }
         }
         updateLogGroupTable()
     }
@@ -453,7 +504,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         if isCondEditBtnTapped {
             isCondEditBtnTapped = false
             diseaseRightBtn.setTitle(lang.titleEdit, for: .normal)
-            diseaseRightBtn.setTitleColor(.purple_B847FF, for: .normal)
+            diseaseRightBtn.setTitleColor(.purple_DB8BFF, for: .normal)
             UIView.animate(withDuration: 0.5) {
                 self.diseaseCollection.reloadData()
             }
@@ -475,7 +526,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             self.diseaseLeftBtn.isHidden = true
             self.isCondEditBtnTapped = false
             self.diseaseRightBtn.setTitle(self.lang.titleEdit, for: .normal)
-            self.diseaseRightBtn.setTitleColor(.purple_B847FF, for: .normal)
+            self.diseaseRightBtn.setTitleColor(.purple_DB8BFF, for: .normal)
             self.isDiseaseHistoyPoped = false
         })
     }
@@ -499,7 +550,11 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     @objc func diseaseHistoryBtnTapped() {
-        loadAvatarDiseasHistory()
+        if UserDefaults.standard.isSignIn() {
+            loadAvatarDiseasHistory()
+        } else {
+            presentAuthController()
+        }
     }
     
     @objc func removeAvatarCondBtnTapped() {
@@ -537,16 +592,20 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     @objc func presentHistoryCategory() {
-        let vc = CategoryViewController()
-        vc.superTagId = TagId.history
-        self.navigationController?.pushViewController(vc, animated: true)
+        if UserDefaults.standard.isSignIn() {
+            let vc = CategoryViewController()
+            vc.superTagId = TagId.history
+            self.navigationController?.pushViewController(vc, animated: true)
+        } else {
+            presentAuthController()
+        }
     }
     
     @objc func plusBtnTapped() {
         UIView.animate(withDuration: 0.3, animations: {
             if self.isPlusBtnTapped {
                 self.plusBtn.transform = CGAffineTransform(rotationAngle: 0)
-                self.plusBtn.backgroundColor = UIColor.purple_921BEA.withAlphaComponent(0.8)
+                self.plusBtn.backgroundColor = UIColor(hex: "#1E6CFF").withAlphaComponent(0.8)
                 self.isPlusBtnTapped = false
             } else {
                 self.plusBtn.transform = CGAffineTransform(rotationAngle: (.pi / 2))
@@ -558,6 +617,26 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
                 self.view.layoutIfNeeded()
             }
         })
+    }
+    
+    @objc func presentAuthController() {
+        let vc = AuthViewController()
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc func presentProfileController() {
+        let vc = ProfileViewController()
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc func profileButtonTapped() {
+        if UserDefaults.standard.isSignIn() {
+            presentProfileController()
+        } else {
+            presentAuthController()
+        }
     }
     
     // MARK: - UIGestureRecognizerDelegate
@@ -607,11 +686,19 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
         if calendar.scope == .week {
             selectedCalScope = CalScope.week
             selectedWeekOfYear = weekOfYear
-            loadLogGroups()
+            if UserDefaults.standard.isSignIn() {
+                loadLogGroups()
+            } else {
+                return
+            }
         } else {
             selectedCalScope = CalScope.month
             selectedWeekOfYear = nil
-            loadLogGroups()
+            if UserDefaults.standard.isSignIn() {
+                loadLogGroups()
+            } else {
+                return
+            }
         }
         updateLogGroupTable()
     }
@@ -1000,7 +1087,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if diaryMode == DiaryMode.editor && isPullToRefresh {
+        if diaryMode == DiaryMode.editor && isPullToRefresh && UserDefaults.standard.isSignIn() {
             loadLogGroups()
         }
     }
@@ -1386,15 +1473,18 @@ extension DiaryViewController {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         
+        navigationController?.navigationBar.barTintColor = UIColor(hex: "#007FFF")
+        navigationController?.navigationBar.tintColor = .white
+        
         if diaryMode == DiaryMode.editor {
             switch lang.currentLanguageId {
             case LanguageId.eng: navigationItem.title = superTag?.eng_name
             case LanguageId.kor: navigationItem.title = superTag?.kor_name
             case LanguageId.jpn: navigationItem.title = superTag?.jpn_name
             default: return }
-            navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16, weight: .medium)]
+            navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16, weight: .medium), NSAttributedString.Key.foregroundColor : UIColor.white]
         } else {
-            navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15, weight: .regular)]
+            navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15, weight: .regular), NSAttributedString.Key.foregroundColor : UIColor.white]
             navigationItem.title = lang.msgDiarySelect
         }
         view.backgroundColor = .whiteSmoke
@@ -1420,13 +1510,24 @@ extension DiaryViewController {
         }()
         calendarView = {
             let _calendar = FSCalendar()
-            _calendar.appearance.headerTitleColor = .black
-            _calendar.appearance.weekdayTextColor = .black
+            _calendar.calendarHeaderView.backgroundColor = .dodgerBlue
+            _calendar.calendarWeekdayView.backgroundColor = .dodgerBlue
+            _calendar.collectionView.backgroundColor = .dodgerBlue
+            _calendar.contentView.backgroundColor = .dodgerBlue
+            
+            _calendar.appearance.headerTitleColor = .white
+            _calendar.appearance.headerTitleFont = .systemFont(ofSize: 20, weight: .bold)
+            _calendar.appearance.weekdayTextColor = .white
+            _calendar.appearance.weekdayFont = .systemFont(ofSize: 17, weight: .medium)
+            
             _calendar.appearance.titleDefaultColor = .green_3ED6A7
-            _calendar.appearance.titlePlaceholderColor = .lightGray
-            _calendar.appearance.eventDefaultColor = .red_FF7187
-            _calendar.appearance.eventSelectionColor = .red_FF7187
-            _calendar.appearance.selectionColor = .red_FF7187
+            _calendar.appearance.titleFont = .systemFont(ofSize: 16, weight: .medium)
+            _calendar.appearance.titlePlaceholderColor = .silver
+            
+            _calendar.appearance.eventDefaultColor = .green_27D054
+            _calendar.appearance.eventSelectionColor = .green_27D054
+            _calendar.appearance.selectionColor = .green_27D054
+            _calendar.appearance.todayColor = .green_00A792
             _calendar.appearance.headerDateFormat = lang.calendarHeaderDateFormat
             _calendar.appearance.caseOptions = FSCalendarCaseOptions.weekdayUsesUpperCase
             _calendar.scope = .week
@@ -1436,6 +1537,15 @@ extension DiaryViewController {
             _calendar.clipsToBounds = true
             _calendar.translatesAutoresizingMaskIntoConstraints = false
             return _calendar
+        }()
+        calendarBottomCap = {
+            let _view = UIView()
+            _view.clipsToBounds =  true
+            _view.backgroundColor = .dodgerBlue
+            _view.layer.cornerRadius = 30.0
+            _view.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
         }()
         dateFormatter = {
             let formatter = DateFormatter()
@@ -1597,81 +1707,10 @@ extension DiaryViewController {
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
-        guideLabel = {
-            let _label = UILabel()
-            _label.font = .systemFont(ofSize: 18, weight: .bold)
-            _label.textAlignment = .center
-            _label.textColor = .magenta
-            _label.text = lang.msgGuideDiary
-            _label.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
-            _label.isHidden = true
-            _label.translatesAutoresizingMaskIntoConstraints = false
-            return _label
-        }()
-        foodBtn = {
-            let _button = UIButton(type: .system)
-            _button.setImage(UIImage.itemDefFood.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.setTitle(lang.titleTagFood, for: .normal)
-            _button.tintColor = .red_FF7187
-            _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
-            _button.backgroundColor = .white
-            _button.layer.cornerRadius = 10.0
-            _button.addShadowView(offset: CGSize(width: 4, height: 2), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
-            _button.isHidden = true
-            _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(presentFoodCategory), for: .touchUpInside)
-            _button.translatesAutoresizingMaskIntoConstraints = false
-            return _button
-        }()
-        pillBtn = {
-            let _button = UIButton(type: .system)
-            _button.setImage(UIImage.itemDefPill.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.setTitle(lang.titleTagPill, for: .normal)
-            _button.tintColor = .blue_81E4FC
-            _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
-            _button.backgroundColor = .white
-            _button.layer.cornerRadius = 10.0
-            _button.addShadowView(offset: CGSize(width: 4, height: 2), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
-            _button.isHidden = true
-            _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(presentPillCategory), for: .touchUpInside)
-            _button.translatesAutoresizingMaskIntoConstraints = false
-            return _button
-        }()
-        activityBtn = {
-            let _button = UIButton(type: .system)
-            _button.setImage(UIImage.itemDefActivity.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.setTitle(lang.titleTagActivity, for: .normal)
-            _button.tintColor = .green_3ED6A7
-            _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
-            _button.backgroundColor = .white
-            _button.layer.cornerRadius = 10.0
-            _button.addShadowView(offset: CGSize(width: 4, height: 2), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
-            _button.isHidden = true
-            _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(presentActivityCategory), for: .touchUpInside)
-            _button.translatesAutoresizingMaskIntoConstraints = false
-            return _button
-        }()
-        diseaseBtn = {
-            let _button = UIButton(type: .system)
-            _button.setImage(UIImage.itemDefDisease.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.setTitle(lang.titleTagDisease, for: .normal)
-            _button.tintColor = .purple_DB8BFF
-            _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
-            _button.backgroundColor = .white
-            _button.layer.cornerRadius = 10.0
-            _button.addShadowView(offset: CGSize(width: 4, height: 2), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
-            _button.isHidden = true
-            _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(presentDiseaseCategory), for: .touchUpInside)
-            _button.translatesAutoresizingMaskIntoConstraints = false
-            return _button
-        }()
         plusBtn = {
             let _button = UIButton(type: .system)
             _button.setImage(UIImage.itemBtnPlusTrans.withRenderingMode(.alwaysOriginal), for: .normal)
-            _button.backgroundColor = UIColor.purple_921BEA.withAlphaComponent(0.8)
+            _button.backgroundColor = UIColor(hex: "#1E6CFF").withAlphaComponent(0.8)
             _button.layer.cornerRadius = 13.0
             _button.addShadowView(offset: CGSize(width: 3, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.isHidden = true
@@ -1739,14 +1778,6 @@ extension DiaryViewController {
             stackView.translatesAutoresizingMaskIntoConstraints = false
             return stackView
         }()
-        guideIllustImgView = {
-            let _imageView = UIImageView()
-            _imageView.image = .itemIllustGirl2
-            _imageView.contentMode = .scaleAspectFit
-            _imageView.isHidden = true
-            _imageView.translatesAutoresizingMaskIntoConstraints = false
-            return _imageView
-        }()
         medicalCrossImgView = {
             let _imageView = UIImageView()
             _imageView.image = .itemMedicalCross
@@ -1754,10 +1785,39 @@ extension DiaryViewController {
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
+        titleImgView = {
+            let _imageView = UIImageView(image: .itemLogoS)
+            _imageView.frame = CGRect(x: 0, y: 0, width: 26, height: 26)
+            _imageView.contentMode = .scaleAspectFit
+            return _imageView
+        }()
+        profileImgView = {
+            let _imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 31, height: 31))
+            _imageView.layer.cornerRadius = 31 / 2
+            _imageView.contentMode = .scaleAspectFill
+            _imageView.clipsToBounds = true
+            _imageView.image = .itemProfileDef
+            _imageView.isUserInteractionEnabled = true
+            _imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileButtonTapped)))
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        profileButton = {
+            let _button = UIButton(type: .system)
+            _button.setImage(UIImage.itemProfileDef.withRenderingMode(.alwaysOriginal), for: .normal)
+            _button.frame = CGRect(x: 0, y: 0, width: 31, height: 31)
+            _button.layer.cornerRadius = _button.frame.height / 2
+            _button.showsTouchWhenHighlighted = true
+            _button.addTarget(self, action: #selector(profileButtonTapped), for: .touchUpInside)
+            _button.translatesAutoresizingMaskIntoConstraints = false
+            return _button
+        }()
         
         if diaryMode == DiaryMode.editor {
-            navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: notesBtn), UIBarButtonItem(customView: avgScoreBtn)]
-            calendarView.appearance.titleDefaultColor = UIColor.black
+            navigationItem.titleView = titleImgView
+            navigationItem.leftBarButtonItems = [UIBarButtonItem(customView: notesBtn), UIBarButtonItem(customView: avgScoreBtn)]
+            navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: profileImgView)]
+            calendarView.appearance.titleDefaultColor = UIColor.white
             diseaseHistoryBtn.isHidden = false
             plusBtn.isHidden = false
             plusBtns = [diseasePlusBtn, activityPlusBtn, pillPlusBtn, foodPlusBtn, historyPlusBtn]
@@ -1790,13 +1850,8 @@ extension DiaryViewController {
         
         // Setup subviews
         view.addSubview(logGroupTable)
-        view.addSubview(guideLabel)
-        view.addSubview(foodBtn)
-        view.addSubview(pillBtn)
-        view.addSubview(activityBtn)
-        view.addSubview(diseaseBtn)
-        view.addSubview(guideIllustImgView)
         view.addSubview(pullToRefreshLabel)
+        view.addSubview(calendarBottomCap)
         view.addSubview(calendarView)
         view.addSubview(diseaseHistoryBtn)
         view.addSubview(toggleBtn)
@@ -1911,13 +1966,18 @@ extension DiaryViewController {
         calendarViewHeight.priority = UILayoutPriority(rawValue: 999)
         calendarViewHeight.isActive = true
         
-        diseaseHistoryBtn.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
+        calendarBottomCap.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: -10).isActive = true
+        calendarBottomCap.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: -5).isActive = true
+        calendarBottomCap.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 5).isActive = true
+        calendarBottomCap.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        
+        diseaseHistoryBtn.topAnchor.constraint(equalTo: calendarBottomCap.bottomAnchor, constant: 0).isActive = true
         diseaseHistoryBtn.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         
-        toggleBtn.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
+        toggleBtn.topAnchor.constraint(equalTo: calendarBottomCap.bottomAnchor, constant: 0).isActive = true
         toggleBtn.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
         
-        logGroupTable.topAnchor.constraint(equalTo: calendarView.bottomAnchor, constant: 0).isActive = true
+        logGroupTable.topAnchor.constraint(equalTo: calendarBottomCap.bottomAnchor, constant: 0).isActive = true
         logGroupTable.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
         logGroupTable.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: CGFloat(-marginInt)).isActive = true
         logGroupTable.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
@@ -1925,32 +1985,6 @@ extension DiaryViewController {
         
         pullToRefreshLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 120).isActive = true
         pullToRefreshLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        
-        guideLabel.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: -(view.frame.height * 0.16)).isActive = true
-        guideLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        
-        foodBtn.topAnchor.constraint(equalTo: guideLabel.bottomAnchor, constant: 20).isActive = true
-        foodBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        foodBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 2.5).isActive = true
-        foodBtn.heightAnchor.constraint(equalToConstant: view.frame.height / 13).isActive = true
-        
-        pillBtn.topAnchor.constraint(equalTo: foodBtn.bottomAnchor, constant: 10).isActive = true
-        pillBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        pillBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 2.5).isActive = true
-        pillBtn.heightAnchor.constraint(equalToConstant: view.frame.height / 13).isActive = true
-        
-        activityBtn.topAnchor.constraint(equalTo: pillBtn.bottomAnchor, constant: 10).isActive = true
-        activityBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        activityBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 2.5).isActive = true
-        activityBtn.heightAnchor.constraint(equalToConstant: view.frame.height / 13).isActive = true
-        
-        diseaseBtn.topAnchor.constraint(equalTo: activityBtn.bottomAnchor, constant: 10).isActive = true
-        diseaseBtn.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
-        diseaseBtn.widthAnchor.constraint(equalToConstant: view.frame.width / 2.5).isActive = true
-        diseaseBtn.heightAnchor.constraint(equalToConstant: view.frame.height / 13).isActive = true
-        
-        guideIllustImgView.topAnchor.constraint(equalTo: diseaseBtn.bottomAnchor, constant: -15).isActive = true
-        guideIllustImgView.leadingAnchor.constraint(equalTo: diseaseBtn.trailingAnchor, constant: 2).isActive = true
     }
     
     private func updateLogGroupTable(completion: (() -> Void)? = nil) {
@@ -2014,7 +2048,8 @@ extension DiaryViewController {
         let selectedDateArr = dateFormatter.string(from: calendarView.currentPage).components(separatedBy: "-")
         let service = Service(lang: lang)
         service.getLogGroups(yearNumber: Int(selectedDateArr[0])!, yearForWeekOfYear: yearForWeekOfYear!, monthNumber: Int(selectedDateArr[1])!, weekOfYear: selectedWeekOfYear, popoverAlert: { message in
-            self.retryFunction = self.loadLogGroups
+//            self.retryFunction = self.loadLogGroups
+            self.retryFunction = self.retryFunctionSet
             self.alertError(message)
         }, tokenRefreshCompletion: {
             self.loadLogGroups()
@@ -2085,20 +2120,8 @@ extension DiaryViewController {
                 UIView.animate(withDuration: 0.5) {
                     if logGroups.count <= 0 {
                         self.pullToRefreshLabel.isHidden = false
-                        self.guideLabel.isHidden = false
-                        self.foodBtn.isHidden = false
-                        self.pillBtn.isHidden = false
-                        self.activityBtn.isHidden = false
-                        self.diseaseBtn.isHidden = false
-                        self.guideIllustImgView.isHidden = false
                     } else {
                         self.pullToRefreshLabel.isHidden = true
-                        self.guideLabel.isHidden = true
-                        self.foodBtn.isHidden = true
-                        self.pillBtn.isHidden = true
-                        self.activityBtn.isHidden = true
-                        self.diseaseBtn.isHidden = true
-                        self.guideIllustImgView.isHidden = true
                     }
                 }
             }
@@ -2323,6 +2346,86 @@ extension DiaryViewController {
             self.thisAvgScore = formatter.number(from: avgScoreSet.this_avg_score)!.floatValue
             self.lastAvgScore = formatter.number(from: avgScoreSet.last_avg_score!)!.floatValue
             self.alertAvgCondScore()
+        }
+    }
+    
+    private func retryFunctionSet() {
+        if UserDefaults.standard.isSignIn() {
+            loadAvatar()
+            loadLogGroups()
+        }
+    }
+    
+    private func loadAvatar() {
+        let service = Service(lang: lang)
+        service.getAvatar(unauthorized: { (errorCode) in
+            self.alertUnauthError(self.lang.msgAccountInvalid)
+        }, popoverAlert: { (message) in
+            self.retryFunction = self.retryFunctionSet
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.loadAvatar()
+        }) { (auth) in
+//            self.avatar = auth.avatar
+            UserDefaults.standard.setCurrentLanguageId(value: auth.language_id)
+            UIView.animate(withDuration: 0.5, animations: {
+                if auth.avatar.photo_name != nil && auth.avatar.color_code == 0 {
+                    let url = "\(URI.host)\(URI.avatar)/\(auth.avatar.id)/profile/photo/\(auth.avatar.photo_name!)"
+                    Alamofire.request(url).responseImage { response in
+                        if let data = response.data {
+                            self.profileImgView.image = UIImage(data: data)
+                            self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: self.profileImgView)]
+                        }
+                    }
+                } else {
+                    let firstName = auth.avatar.first_name
+                    let index = firstName.index(firstName.startIndex, offsetBy: 0)
+                    self.profileButton.setImage(nil, for: .normal)
+                    self.profileButton.setTitle(String(firstName[index].uppercased()), for: .normal)
+                    self.profileButton.setTitleColor(.white, for: .normal)
+                    self.profileButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
+                    self.profileButton.backgroundColor = getProfileUIColor(key: auth.avatar.color_code)
+                    self.profileButton.setBackgroundImage(nil, for: .normal)
+                    self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: self.profileButton)]
+                }
+            })
+            
+            if auth.avatar.is_free_trial {
+                UserDefaults.standard.setIsFreeTrial(value: true)
+            } else {
+                UserDefaults.standard.setIsFreeTrial(value: false)
+            }
+        }
+    }
+    
+    private func loadReceipt() {
+        if let appStoreReceiptURL = Bundle.main.appStoreReceiptURL,
+            FileManager.default.fileExists(atPath: appStoreReceiptURL.path) {
+            do {
+                let receiptData = try Data(contentsOf: appStoreReceiptURL, options: .alwaysMapped)
+                receiptString = receiptData.base64EncodedString(options: [])
+                verifyReceipt()
+            }
+            catch { print("Couldn't read receipt data with error: " + error.localizedDescription) }
+        }
+    }
+    
+    private func verifyReceipt() {
+        let params: Parameters = [
+            "receipt_data": receiptString!
+        ]
+        let service = Service(lang: lang)
+        service.verifyReceipt(params: params, popoverAlert: { (message) in
+            self.retryFunction = self.verifyReceipt
+            self.alertError(message)
+        }, tokenRefreshCompletion: {
+            self.verifyReceipt()
+        }) { (isReceiptVerified) in
+            if isReceiptVerified {
+                UserDefaults.standard.setIsPurchased(value: true)
+            } else {
+                UserDefaults.standard.setIsPurchased(value: false)
+            }
         }
     }
 }

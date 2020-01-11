@@ -103,7 +103,7 @@ class ProfileViewController: UIViewController {
                 self.retryFunction!()
             })
         alert.addAction(UIAlertAction(title: lang.titleClose, style: .cancel) { _ in })
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         present(alert, animated: true, completion: nil)
     }
     
@@ -118,7 +118,7 @@ class ProfileViewController: UIViewController {
         })
         let height:NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 260)
         alert.view.addConstraint(height)
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil )
     }
     
@@ -146,7 +146,7 @@ class ProfileViewController: UIViewController {
             self.updateAvatarInfo()
         }))
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel, handler: nil))
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         present(alert, animated: true, completion:{})
     }
     
@@ -192,7 +192,7 @@ class ProfileViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         present(alert, animated: true, completion: nil)
     }
     
@@ -226,7 +226,7 @@ class ProfileViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -277,7 +277,7 @@ class ProfileViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -303,7 +303,7 @@ class ProfileViewController: UIViewController {
             }
         })
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -314,7 +314,7 @@ class ProfileViewController: UIViewController {
             self.dismiss(animated: true, completion: nil)
             return
         })
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -404,7 +404,7 @@ class ProfileViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -413,7 +413,7 @@ class ProfileViewController: UIViewController {
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
         alert.addAction(UIAlertAction(title: lang.titleChooseColor, style: .default) { _ in
-            self.colorLeftButton.setTitleColor(.purple_B847FF, for: .normal)
+            self.colorLeftButton.setTitleColor(.purple_DB8BFF, for: .normal)
             UIView.transition(with: self.colorLeftButton, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.colorLeftButton.isHidden = false
             })
@@ -435,14 +435,14 @@ class ProfileViewController: UIViewController {
             self.present(imagePickerController, animated: true, completion: nil)
         })
         alert.addAction(UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in })
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
     @objc func alertCameraError() {
         let alert = UIAlertController(title: lang.titleSorry, message: lang.msgCameraDisable, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .cancel) { _ in })
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         present(alert, animated: true, completion: nil)
     }
     
@@ -728,7 +728,7 @@ extension ProfileViewController {
         // Initialize super view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = UIColor.whiteSmoke
-        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16, weight: .medium)]
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16, weight: .medium), NSAttributedString.Key.foregroundColor : UIColor.white]
         view.showSpinner()
         
         // Initialize subveiw properties
@@ -875,8 +875,10 @@ extension ProfileViewController {
         }()
         introTextView = {
             let _textView = UITextView()
-            _textView.backgroundColor = .green_00E9CC
-            _textView.font = .systemFont(ofSize: 16, weight: .regular)
+            _textView.backgroundColor = .purple_921BEA
+            _textView.tintColor = .green_27D054
+            _textView.textColor = .green_27D054
+            _textView.font = .systemFont(ofSize: 16, weight: .medium)
             _textView.translatesAutoresizingMaskIntoConstraints = false
             return _textView
         }()
@@ -904,7 +906,7 @@ extension ProfileViewController {
             let _button = UIButton(type: .system)
             _button.setTitle(lang.titleDone, for: .normal)
             _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-            _button.setTitleColor(.purple_B847FF, for: .normal)
+            _button.setTitleColor(.purple_DB8BFF, for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(colorRightButtonTapped), for: .touchUpInside)
             _button.translatesAutoresizingMaskIntoConstraints = false

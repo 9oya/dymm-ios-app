@@ -80,7 +80,7 @@ class AuthViewController: UIViewController {
         let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         present(alert, animated: true, completion: nil)
     }
     
@@ -110,7 +110,7 @@ class AuthViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -122,7 +122,7 @@ class AuthViewController: UIViewController {
         let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -152,7 +152,7 @@ class AuthViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -194,7 +194,7 @@ class AuthViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -205,7 +205,7 @@ class AuthViewController: UIViewController {
             return
         }
         alert.addAction(confirmAction)
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     

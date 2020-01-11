@@ -252,6 +252,7 @@ extension LogGroupTableCell {
             _button.addShadowView()
             _button.adjustsImageSizeForAccessibilityContentSizeCategory = true
             _button.showsTouchWhenHighlighted = true
+            _button.addShadowView(offset: CGSize(width: 2, height: 2), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.isHidden = true
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button

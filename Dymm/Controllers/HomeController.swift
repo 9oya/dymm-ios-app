@@ -126,7 +126,7 @@ class HomeViewController: UIViewController {
         let cancelAction = UIAlertAction(title: lang.titleClose, style: .cancel) { _ in }
         alertController.addAction(confirmAction)
         alertController.addAction(cancelAction)
-        alertController.view.tintColor = .purple_B847FF
+        alertController.view.tintColor = .purple_DB8BFF
         present(alertController, animated: true, completion: nil)
     }
     
@@ -137,7 +137,7 @@ class HomeViewController: UIViewController {
             UserDefaults.standard.setAvatarId(value: 0)
             self.showGuestScene()
         })
-        alertController.view.tintColor = .purple_B847FF
+        alertController.view.tintColor = .purple_DB8BFF
         present(alertController, animated: true, completion: nil)
     }
     

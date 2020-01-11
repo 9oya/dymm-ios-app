@@ -121,7 +121,7 @@ class CategoryViewController: UIViewController {
             self.retryFunction!()
         })
         alert.addAction(UIAlertAction(title: lang.titleNo, style: .cancel) { _ in })
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -178,7 +178,7 @@ class CategoryViewController: UIViewController {
         })
         let height:NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 260)
         alert.view.addConstraint(height)
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil )
     }
     
@@ -193,7 +193,7 @@ class CategoryViewController: UIViewController {
         }
         alert.addAction(confirmAction)
         alert.addAction(cancelAction)
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -203,7 +203,7 @@ class CategoryViewController: UIViewController {
             return
         }
         alert.addAction(confirmAction)
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -233,7 +233,7 @@ class CategoryViewController: UIViewController {
         let confirmAction = UIAlertAction(title: lang.titleSubmit, style: .default) { _ in
             if let text = textView.text {
                 self.opinion = text
-                if self.opinion == "" || self.opinion!.count < 8 {
+                if self.opinion == "" || self.opinion!.count < 5 {
                     return
                 }
                 self.submitFeedback()
@@ -242,7 +242,7 @@ class CategoryViewController: UIViewController {
         let cancelAction = UIAlertAction(title: lang.titleCancel, style: .cancel) { _ in }
         alert.addAction(cancelAction)
         alert.addAction(confirmAction)
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -780,7 +780,7 @@ extension CategoryViewController {
         // Initialize view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         view.backgroundColor = .whiteSmoke
-        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16, weight: .medium)]
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16, weight: .medium), NSAttributedString.Key.foregroundColor : UIColor.white]
         
         // Initialize subveiw properties
         detailContainer = {

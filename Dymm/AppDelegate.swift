@@ -19,7 +19,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow(frame:UIScreen.main.bounds)
-        window?.rootViewController = UINavigationController(rootViewController: HomeViewController())
+//        window?.rootViewController = UINavigationController(rootViewController: HomeViewController())
+        window?.rootViewController = UINavigationController(rootViewController: DiaryViewController())
         window?.makeKeyAndVisible()
         setNavigationBar()
         
@@ -65,8 +66,8 @@ extension AppDelegate {
     
     private func setNavigationBar() {
         let navigationBarAppearance = UINavigationBar.appearance()
-        navigationBarAppearance.tintColor = UIColor.black
-        navigationBarAppearance.barTintColor = UIColor.white
+//        navigationBarAppearance.tintColor = UIColor.black
+//        navigationBarAppearance.barTintColor = UIColor.white
         navigationBarAppearance.backIndicatorImage = .itemArrowLeft
         navigationBarAppearance.backIndicatorTransitionMaskImage = .itemArrowLeft
         navigationBarAppearance.shadowImage = UIImage()

@@ -29,16 +29,18 @@ extension NoteTableCell {
         
         titleLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 15, weight: .regular)
+            _label.font = .systemFont(ofSize: 15, weight: .medium)
             _label.textAlignment = .left
             _label.numberOfLines = 1
+            _label.textColor = .green_27D054
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
         subTitleLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 14, weight: .light)
+            _label.font = .systemFont(ofSize: 14, weight: .medium)
             _label.textAlignment = .left
+            _label.textColor = .green_27D054
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -46,7 +48,6 @@ extension NoteTableCell {
         addSubview(titleLabel)
         addSubview(subTitleLabel)
         
-//        titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: CGFloat(marginInt)).isActive = true
         titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -10).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 25).isActive = true
         titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -25).isActive = true

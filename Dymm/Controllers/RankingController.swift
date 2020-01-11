@@ -78,7 +78,7 @@ class RankingViewController: UIViewController {
             self.retryFunction!()
         })
         alert.addAction(UIAlertAction(title: lang.titleNo, style: .cancel) { _ in })
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -97,7 +97,7 @@ class RankingViewController: UIViewController {
             self.lastContentOffset = 0.0
             self.loadRankings()
         })
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil )
     }
     
@@ -122,7 +122,7 @@ class RankingViewController: UIViewController {
             self.lastContentOffset = 0.0
             self.loadRankings()
         })
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil )
     }
 }

@@ -32,6 +32,7 @@ class IAPController: UIViewController {
     
     // UIImageView
     var logoImageView: UIImageView!
+    var bgImgView: UIImageView!
     
     // Non-view properties
     var PRODUCT_ID = "dymm_premium_plan1"
@@ -68,7 +69,7 @@ class IAPController: UIViewController {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let confirmAction = UIAlertAction(title: lang.titleDone, style: .default) { _ in }
         alert.addAction(confirmAction)
-        alert.view.tintColor = .purple_B847FF
+        alert.view.tintColor = .purple_DB8BFF
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -136,7 +137,6 @@ extension IAPController: SKProductsRequestDelegate, SKPaymentTransactionObserver
                     self.privacyPolicyLink.setTitle(self.lang.titlePrivaryPolocy, for: .normal)
                     self.termsLink.setTitle(self.lang.titleTerms, for: .normal)
                     self.productDsc2Label.text = self.lang.msgProductDesc2_2
-                    self.descScrollView.backgroundColor = .white
                     self.view.hideSpinner()
                 }
             } else {
@@ -149,7 +149,6 @@ extension IAPController: SKProductsRequestDelegate, SKPaymentTransactionObserver
                     self.privacyPolicyLink.setTitle(self.lang.titlePrivaryPolocy, for: .normal)
                     self.termsLink.setTitle(self.lang.titleTerms, for: .normal)
                     self.productDsc2Label.text = self.lang.msgProductDesc2_1
-                    self.descScrollView.backgroundColor = .white
                     self.view.hideSpinner()
                 }
             }
@@ -195,13 +194,27 @@ extension IAPController {
     private func setupLayout() {
         // Initialize super view
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
-        view.backgroundColor = .green_00E9CC
+//        view.backgroundColor = UIColor(hex: "#ACF6D1")
+        view.backgroundColor = .clear
         
-        topBarView = getAddtionalTopBarView()
+        topBarView = {
+            let _view = UIView()
+            _view.backgroundColor = UIColor.white.withAlphaComponent(0.5)
+            _view.translatesAutoresizingMaskIntoConstraints = false
+            return _view
+        }()
         logoImageView = {
             let _imageView = UIImageView()
             _imageView.image = .itemLogoMPurple
             _imageView.contentMode = .scaleAspectFit
+            _imageView.clipsToBounds = true
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
+        }()
+        bgImgView = {
+            let _imageView = UIImageView()
+            _imageView.image = .itemBgIap
+            _imageView.contentMode = .scaleToFill
             _imageView.clipsToBounds = true
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
@@ -216,7 +229,7 @@ extension IAPController {
         }()
         purchaseBtn = {
             let _button = UIButton(type: .system)
-            _button.setTitleColor(.green_00E9CC, for: .normal)
+            _button.setTitleColor(UIColor(hex: "#ACF6D1"), for: .normal)
             _button.backgroundColor = .purple_921BEA
             _button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
             _button.layer.cornerRadius = 10.0
@@ -236,7 +249,7 @@ extension IAPController {
         }()
         descScrollView = {
             let _scrollView = UIScrollView()
-            _scrollView.backgroundColor = .clear
+            _scrollView.backgroundColor = UIColor.white.withAlphaComponent(0.7)
             _scrollView.translatesAutoresizingMaskIntoConstraints = false
             return _scrollView
         }()
@@ -260,8 +273,8 @@ extension IAPController {
         }()
         restoreBtn = {
             let _button = UIButton(type: .system)
-            _button.setTitleColor(.black, for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 16)
+            _button.setTitleColor(.purple_7671FF, for: .normal)
+            _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .heavy)
             _button.setTitle(lang.titleRestoreProduct, for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(restoreButtonTapped), for: .touchUpInside)
@@ -295,6 +308,7 @@ extension IAPController {
         }()
         
         
+        view.addSubview(bgImgView)
         view.addSubview(logoImageView)
         view.addSubview(purchaseBtn)
         view.addSubview(productPriceDscLabel)
@@ -309,6 +323,12 @@ extension IAPController {
         descScrollView.addSubview(productDsc2Label)
         descScrollView.addSubview(privacyPolicyLink)
         descScrollView.addSubview(termsLink)
+        
+        
+        bgImgView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+        bgImgView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+        bgImgView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
+        bgImgView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
         
         topBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         topBarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
