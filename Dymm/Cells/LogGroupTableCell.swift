@@ -262,13 +262,14 @@ extension LogGroupTableCell {
             _button.setImage(.itemNoteGray, for: .normal)
             _button.adjustsImageSizeForAccessibilityContentSizeCategory = true
             _button.showsTouchWhenHighlighted = true
+            _button.addShadowView(offset: CGSize(width: 2, height: 2), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _button.isHidden = true
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
         nameLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 15, weight: .bold)
+            _label.font = .systemFont(ofSize: 20, weight: .heavy)
             _label.textAlignment = .left
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
@@ -355,7 +356,7 @@ extension LogGroupTableCell {
         groupTypeImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 0).isActive = true
         groupTypeImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: frame.width / 5.5).isActive = true
         
-        nameLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 15).isActive = true
+        nameLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12).isActive = true
         nameLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor, constant: 0).isActive = true
         
         moodScoreImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12).isActive = true

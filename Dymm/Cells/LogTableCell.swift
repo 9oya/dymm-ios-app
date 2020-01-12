@@ -37,7 +37,7 @@ extension LogTableCell {
         }()
         nameLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 14)
+            _label.font = .systemFont(ofSize: 17)
             _label.textAlignment = .left
             _label.addShadowView()
             _label.numberOfLines = 2
@@ -49,7 +49,7 @@ extension LogTableCell {
         }()
         quantityLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 14)
+            _label.font = .systemFont(ofSize: 16)
             _label.textColor = UIColor(hex: "#9A9A9A")
             _label.textAlignment = .right
             _label.addShadowView()

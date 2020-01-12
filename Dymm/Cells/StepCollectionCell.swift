@@ -26,7 +26,8 @@ extension StepCollectionCell {
         
         label = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 14)
+            _label.font = .systemFont(ofSize: 15, weight: .bold)
+            _label.textColor = .webOrange
             _label.textAlignment = .center
             _label.numberOfLines = 2
             _label.translatesAutoresizingMaskIntoConstraints = false

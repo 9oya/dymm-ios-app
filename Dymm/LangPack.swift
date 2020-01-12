@@ -165,6 +165,7 @@ struct LangPack {
     var msgRestoreCompl: String!
     var msgShortPassword: String!
     var msgSignUpYet: String!
+    var msgSlideToChoose: String!
     var msgUnauthDuplicatedEmail: String!
     var msgUnauthInvalidEmail: String!
     var msgUnauthInvalidPassword: String!
@@ -1296,6 +1297,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "I can't find a signed in account."
             case LanguageId.kor: return "로그인된 계정을 찾지 못했어요."
+            default: fatalError()}
+        }()
+        self.msgSlideToChoose = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Slide to choose\n\u{021C4}"
+            case LanguageId.kor: return "밀어서 시간을 선택\n\u{021C4}"
             default: fatalError()}
         }()
         self.msgUnauthDuplicatedEmail = {

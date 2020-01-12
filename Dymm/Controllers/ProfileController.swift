@@ -530,7 +530,6 @@ extension ProfileViewController: UICollectionViewDataSource, UICollectionViewDel
                     cell.label.textColor = .lightGray
                     return cell
                 }
-                cell.label.font = .systemFont(ofSize: 14, weight: .regular)
                 cell.label.textColor = .black
             }
             return cell
@@ -1119,10 +1118,10 @@ extension ProfileViewController {
             self.notConfirmedEmail = email
             UIView.transition(with: self.verifMailContainer, duration: 0.7, options: .transitionCrossDissolve, animations: {
                 self.infoContainer.isHidden = true
-                self.notConfirmedEmailButton.setTitle(self.lang.titleEdit + ": " + email, for: .normal)
                 self.notConfirmedEmailButton.addUnderline()
                 self.verifMailContainer.isHidden = false
                 self.sendVerifMailBtn.isHidden = false
+                self.notConfirmedEmailButton.setTitle(self.lang.titleEdit + ": " + email, for: .normal)
                 self.view.hideSpinner()
             })
         }, tokenRefreshCompletion: {

@@ -40,7 +40,7 @@ extension TagCollectionCell {
         }()
         label = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 14)
+            _label.font = .systemFont(ofSize: 16, weight: .medium)
             _label.textAlignment = .center
             _label.numberOfLines = 3
             _label.adjustsFontSizeToFitWidth = true

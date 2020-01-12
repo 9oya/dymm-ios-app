@@ -415,7 +415,6 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
                 case LanguageId.kor: cell.label.text = tag.kor_name!
                 default: fatalError()}
                 cell.label.textColor = .white
-                cell.label.font = .systemFont(ofSize: 14, weight: .bold)
                 cell.imageView.image = .itemStarWhite
             } else if tag.id == TagId.history {
                 switch lang.currentLanguageId {
@@ -424,7 +423,6 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
                 default: fatalError()}
                 cell.backgroundColor = .dodgerBlue
                 cell.label.textColor = .white
-                cell.label.font = .systemFont(ofSize: 14, weight: .bold)
                 cell.imageView.image = UIImage(named: "tag-\(tag.id)")
             } else if tag.tag_type == TagType.bookmark {
                 switch lang.currentLanguageId {
@@ -433,11 +431,9 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
                 default: fatalError()}
                 cell.backgroundColor = .white
                 cell.label.textColor = .yellow_FFD067
-                cell.label.font = .systemFont(ofSize: 14, weight: .bold)
                 cell.imageView.image = UIImage(named: "tag-\(tag.id)")
             } else if superTag!.id == TagId.history || superTag!.tag_type == TagType.bookmark {
                 cell.backgroundColor = .white
-                cell.label.font = .systemFont(ofSize: 14, weight: .regular)
                 cell.label.textColor = .black
                 switch lang.currentLanguageId {
                 case LanguageId.eng: cell.label.text = tag.eng_name
@@ -454,7 +450,6 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
                 }
             } else {
                 cell.backgroundColor = .white
-                cell.label.font = .systemFont(ofSize: 14, weight: .regular)
                 var _text = ""
                 switch lang.currentLanguageId {
                 case LanguageId.eng: _text = tag.eng_name
@@ -470,10 +465,8 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
                     switch tag.id {
                     case TagId.supplements:
                         cell.label.textColor = .red_FF71EF
-                        cell.label.font = .systemFont(ofSize: 14, weight: .bold)
                     default:
                         cell.label.textColor = .black
-                        cell.label.font = .systemFont(ofSize: 14, weight: .regular)
                     }
                 }
                 if let tagImage = UIImage(named: "tag-\(tag.id)") {
@@ -492,7 +485,6 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
                     }
                 }
             }
-            
             return cell
         } else if collectionView == stepCollection {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: stepCellId, for: indexPath) as? StepCollectionCell else {
@@ -500,8 +492,8 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
             }
             let tag = stepTags[indexPath.row]
             switch lang.currentLanguageId {
-            case LanguageId.eng: cell.label.text = tag.eng_name
-            case LanguageId.kor: cell.label.text = tag.kor_name
+            case LanguageId.eng: cell.label.text = "\u{02198}\(tag.eng_name)"
+            case LanguageId.kor: cell.label.text = "\u{02198}\(tag.kor_name!)"
             default: fatalError()}
             return cell
         } else {
@@ -577,11 +569,11 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
             case LanguageId.kor: txtCnt = tag.kor_name!.count
             case LanguageId.jpn: txtCnt = tag.jpn_name!.count
             default: fatalError()}
-            var width = 50
+            var width = 55
             if txtCnt <= 3 {
-                width = 50
+                width = 55
             } else if txtCnt <= 5 {
-                width = 70
+                width = 75
             } else if txtCnt <= 8 {
                 width = 90
             } else if txtCnt >= 9 {

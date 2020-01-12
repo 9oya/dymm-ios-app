@@ -52,6 +52,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var pickerDateLabel: UILabel!
     var diseaseTitleLabel: UILabel!
     var pullToRefreshLabel: UILabel!
+    var groupTypePickGuideLabel: UILabel!
     
     // UIButton
     var toggleBtn: UIButton!
@@ -152,6 +153,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         if isDiseaseHistoyPoped {
             diseaseRefreshButtonTapped()
         } else {
@@ -176,6 +178,8 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
                 loadAvatar()
                 loadLogGroups()
                 loadReceipt()
+                calendarView.appearance.headerDateFormat = lang.calendarHeaderDateFormat
+                diseaseTitleLabel.text = lang.titleMyAvtCond
             } else {
                 selectedOnceCellIdxPath = nil
                 selectedTableSection = nil
@@ -310,6 +314,10 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     @objc func alertAvgCondScore() {
+        if !UserDefaults.standard.isSignIn() {
+            presentAuthController()
+            return
+        }
         var message = ""
         var month = ""
         var heightInt = 0
@@ -544,9 +552,13 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     @objc func presentNotesNavigation() {
-        let vc = NoteController()
-        let nc = UINavigationController(rootViewController: vc)
-        present(nc, animated: true, completion: nil)
+        if UserDefaults.standard.isSignIn() {
+            let vc = NoteController()
+            let nc = UINavigationController(rootViewController: vc)
+            present(nc, animated: true, completion: nil)
+        } else {
+            presentAuthController()
+        }
     }
     
     @objc func diseaseHistoryBtnTapped() {
@@ -750,8 +762,8 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
             label.textAlignment = .center
             label.frame = CGRect(x: 0, y: -30, width: 100, height: 45)
             label.sizeToFit()
-            label.font = .systemFont(ofSize: 16, weight: .regular)
-            label.textColor = UIColor.darkGray
+            label.font = .systemFont(ofSize: 20, weight: .bold)
+            label.textColor = .gray
             return label
         }
     }
@@ -1596,18 +1608,30 @@ extension DiaryViewController {
         }()
         pickerDateLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 18, weight: .regular)
-            _label.textColor = .black
+            _label.font = .systemFont(ofSize: 25, weight: .bold)
+            _label.textColor = .dodgerBlue
             _label.textAlignment = .center
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
         diseaseTitleLabel = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 18, weight: .regular)
+            _label.font = .systemFont(ofSize: 20, weight: .bold)
             _label.textColor = .black
             _label.textAlignment = .left
             _label.text = lang.titleMyAvtCond
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
+        groupTypePickGuideLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 17, weight: .bold)
+            _label.textColor = .magenta
+            _label.textAlignment = .center
+            _label.numberOfLines = 2
+            _label.text = lang.msgSlideToChoose
+            _label.transform = CGAffineTransform(rotationAngle: CGFloat.pi / 2)
+            _label.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -1866,6 +1890,7 @@ extension DiaryViewController {
         blindView.addSubview(pickerContainerView)
         blindView.addSubview(diseaseContainer)
         
+        pickerContainerView.addSubview(groupTypePickGuideLabel)
         pickerContainerView.addSubview(pickerDateLabel)
         pickerContainerView.addSubview(groupTypePicker)
         pickerContainerView.addSubview(groupOfLogsCollection)
@@ -1903,6 +1928,9 @@ extension DiaryViewController {
         
         pickerDateLabel.topAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: 10).isActive = true
         pickerDateLabel.leadingAnchor.constraint(equalTo: pickerContainerView.leadingAnchor, constant: 20).isActive = true
+        
+        groupTypePickGuideLabel.topAnchor.constraint(equalTo: pickerContainerView.topAnchor, constant: 53).isActive = true
+        groupTypePickGuideLabel.trailingAnchor.constraint(equalTo: pickerContainerView.trailingAnchor, constant: 43).isActive = true
         
         medicalCrossImgView.topAnchor.constraint(equalTo: diseaseContainer.topAnchor, constant: 5).isActive = true
         medicalCrossImgView.leadingAnchor.constraint(equalTo: diseaseContainer.leadingAnchor, constant: 10).isActive = true
