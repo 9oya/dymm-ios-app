@@ -396,11 +396,11 @@ struct Service {
     func getAvgCondScore(yearNumber: Int, yearForWeekOfYear: Int, monthNumber: Int?, weekOfYear: Int?, popoverAlert: @escaping (_ message: String) -> Void, tokenRefreshCompletion: @escaping () -> Void, completion: @escaping (CustomModel.AvgCondScoreSet) -> Void) {
         guard let accessToken = UserDefaults.standard.getAccessToken() else {
             UserDefaults.standard.setIsSignIn(value: false)
-            fatalError()
+            return
         }
         guard let avatarId = UserDefaults.standard.getAvatarId() else {
             UserDefaults.standard.setIsSignIn(value: false)
-            fatalError()
+            return
         }
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(accessToken)",

@@ -264,7 +264,7 @@ extension IAPController {
         }()
         productDsc2Label = {
             let _label = UILabel()
-            _label.font = .systemFont(ofSize: 12, weight: .regular)
+            _label.font = .systemFont(ofSize: 16, weight: .bold)
             _label.textColor = .purple_7671FF
             _label.textAlignment = .center
             _label.numberOfLines = 10
@@ -274,7 +274,7 @@ extension IAPController {
         restoreBtn = {
             let _button = UIButton(type: .system)
             _button.setTitleColor(.purple_7671FF, for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .heavy)
+            _button.titleLabel?.font = .systemFont(ofSize: 17, weight: .bold)
             _button.setTitle(lang.titleRestoreProduct, for: .normal)
             _button.showsTouchWhenHighlighted = true
             _button.addTarget(self, action: #selector(restoreButtonTapped), for: .touchUpInside)

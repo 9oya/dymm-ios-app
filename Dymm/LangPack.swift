@@ -1230,18 +1230,16 @@ struct LangPack {
         self.msgProductDesc2_1 = {
             switch currentLanguageId {
             case LanguageId.eng: return """
-                * After 7 days of free trial, service usage will be limited.
-                * You can still browse your diary.
+                **After +1 month of free trial, payment will be automatically initiated for the next subscription period.
                 
-                * Get your membership and enjoy all the features. We will always try to reward you with the best service.
+                **This membership unlocks premium features like Tracking items (Foods, Pills, Activities, Disease, Mood Score)
                 
                 Dymm ©
             """
             case LanguageId.kor: return """
-                * 무료체험기간 7일이 종료 후 서비스이용이 제한됩니다.
-                * 일기장은 여전히 이용가능합니다.
+                **무료체험 +1개월 사용 후 다음 구독기간 동안 결제가 자동으로 시작됩니다.
                 
-                * 멤버쉽을 등록하고 모든 서비스를 자유롭게 이용하세요. 최고의 서비스로 보답하도록 항상 노력하겠습니다.
+                **이 멤버쉽은 프리미엄 기능 '추적하기' (음식, 제약, 활동, 질병, 기분점수) 를 사용할 수 있게 합니다.
 
                 딤 ©
             """
@@ -1250,14 +1248,12 @@ struct LangPack {
         self.msgProductDesc2_2 = {
             switch currentLanguageId {
             case LanguageId.eng: return """
-                * You are currently subscribed to a premium membership.
-                * All the features and services of Dymm are available.
+                You are currently subscribed to a premium membership. All the features and services of Dymm are available.
                 
                 Dymm ©
             """
             case LanguageId.kor: return """
-                * 현재 프리미엄 멤버쉽에 가입되어 있습니다.
-                * 딤의 모든 기능과 서비스 이용이 가능합니다.
+                현재 프리미엄 멤버쉽에 가입되어 있습니다. 딤의 모든 기능과 서비스 이용이 가능합니다.
 
                 딤 ©
             """

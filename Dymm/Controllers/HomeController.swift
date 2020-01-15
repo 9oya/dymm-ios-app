@@ -73,6 +73,7 @@ class HomeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
         UIView.transition(with: tagCollectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
             self.monthPicker.reloadAllComponents()
             self.tagCollectionView.reloadData()
@@ -144,32 +145,32 @@ class HomeViewController: UIViewController {
     @objc func presentDiaryNavigation() {
         let vc = DiaryViewController()
         vc.superTag = self.selectedTag!
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+//        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
         navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentCategoryNavigation() {
         let vc = CategoryViewController()
         vc.superTag = self.selectedTag!
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+//        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
         navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentAuthNavigation() {
         let vc = AuthViewController()
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+//        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
         navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentProfileNavigation() {
         let vc = ProfileViewController()
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+//        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
         navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentRankingNavigation() {
         let vc = RankingViewController()
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
+//        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
         navigationController?.pushViewController(vc, animated: true)
     }
     

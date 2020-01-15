@@ -220,8 +220,8 @@ class CategoryViewController: UIViewController {
         let alert = UIAlertController(title: lang.titleFeedback, message: message, preferredStyle: .alert)
         let textView: UITextView = {
             let _textView = UITextView()
-            _textView.backgroundColor = .green_00E9CC
-            _textView.font = .systemFont(ofSize: 15, weight: .light)
+            _textView.backgroundColor = .yellow_FFD667
+            _textView.font = .systemFont(ofSize: 15, weight: .regular)
             _textView.translatesAutoresizingMaskIntoConstraints = false
             return _textView
         }()

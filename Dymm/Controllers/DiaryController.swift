@@ -154,6 +154,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     override func viewWillAppear(_ animated: Bool) {
         lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
         if isDiseaseHistoyPoped {
             diseaseRefreshButtonTapped()
         } else {
@@ -167,13 +168,6 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             UserDefaults.standard.setIsCreateNewLog(value: false)
         }
         if diaryMode == DiaryMode.editor {
-            if isFirstAppear {
-                isFirstAppear = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.plusBtnTapped()
-                }
-            }
-            
             if UserDefaults.standard.isSignIn() {
                 loadAvatar()
                 loadLogGroups()
@@ -314,10 +308,6 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     @objc func alertAvgCondScore() {
-        if !UserDefaults.standard.isSignIn() {
-            presentAuthController()
-            return
-        }
         var message = ""
         var month = ""
         var heightInt = 0
@@ -548,6 +538,10 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     }
     
     @objc func avgScoreButtonTapped() {
+        if !UserDefaults.standard.isSignIn() {
+            presentAuthController()
+            return
+        }
         loadAvgCondScore()
     }
     
@@ -633,13 +627,11 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     
     @objc func presentAuthController() {
         let vc = AuthViewController()
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
         navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func presentProfileController() {
         let vc = ProfileViewController()
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: lang.titleHome, style: .plain, target: self, action: nil)
         navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -1840,6 +1832,8 @@ extension DiaryViewController {
         if diaryMode == DiaryMode.editor {
             navigationItem.titleView = titleImgView
             navigationItem.leftBarButtonItems = [UIBarButtonItem(customView: notesBtn), UIBarButtonItem(customView: avgScoreBtn)]
+            profileImgView.widthAnchor.constraint(equalToConstant: 31).isActive = true
+            profileImgView.heightAnchor.constraint(equalToConstant: 31).isActive = true
             navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: profileImgView)]
             calendarView.appearance.titleDefaultColor = UIColor.white
             diseaseHistoryBtn.isHidden = false
