@@ -664,7 +664,7 @@ extension HomeViewController {
         UIView.transition(with: profileButton, duration: 0.7, options: .transitionCrossDissolve, animations: {
             self.scoreboardView.isHidden = false
             self.aiBoardView.isHidden = false
-            self.scoreEmoImgView.image = getCondScoreImageLarge(0)
+            self.scoreEmoImgView.image = getMoodScoreImageLarge(0)
             self.scoreTitleLabel.text = self.lang.getMoodScoreName(0)
             self.scoreNumberLabel.text = String(format: "%.1f", 0.0)
             self.scoreMessageLabel.text = self.lang.titleMyCondScore
@@ -692,7 +692,7 @@ extension HomeViewController {
             let formatter = NumberFormatter()
             self.thisAvgScore = formatter.number(from: scoreBoardSet.avg_score)!.floatValue
             UIView.animate(withDuration: 0.5) {
-                self.scoreEmoImgView.image = getCondScoreImageLarge(self.thisAvgScore)
+                self.scoreEmoImgView.image = getMoodScoreImageLarge(self.thisAvgScore)
                 self.scoreTitleLabel.text = self.lang.getMoodScoreName(self.thisAvgScore)
                 self.scoreNumberLabel.text = String(format: "%.1f", self.thisAvgScore)
                 self.scoreMessageLabel.text = self.lang.titleMyCondScore

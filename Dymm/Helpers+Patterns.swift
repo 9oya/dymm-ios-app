@@ -176,7 +176,7 @@ func getLogGroupTypeColor(_ groupType: Int) -> UIColor? {
     }
 }
 
-func getCondScoreImageSmall(_ condScore: Int) -> UIImage? {
+func getMoodScoreImageSmall(_ condScore: Int) -> UIImage? {
     if condScore < 3 {
         return .itemScoreAwful
     } else if condScore < 5 {
@@ -190,7 +190,21 @@ func getCondScoreImageSmall(_ condScore: Int) -> UIImage? {
     }
 }
 
-func getCondScoreImageLarge(_ condScore: Float) -> UIImage? {
+func getMoodScoreImageMedium(_ condScore: Int) -> UIImage? {
+    if condScore < 3 {
+        return .itemScoreAwfulM
+    } else if condScore < 5 {
+        return .itemScoreBadM
+    } else if condScore < 7 {
+        return .itemScoreSosoM
+    } else if condScore < 9 {
+        return .itemScoreGoodM
+    } else {
+        return .itemScoreExcellentM
+    }
+}
+
+func getMoodScoreImageLarge(_ condScore: Float) -> UIImage? {
     if condScore < 1 {
         return .itemScoreNoneL
     } else if condScore < 2.5 {
@@ -206,7 +220,7 @@ func getCondScoreImageLarge(_ condScore: Float) -> UIImage? {
     }
 }
 
-func getCondScoreColor(_ condScore: Float) -> UIColor? {
+func getMoodScoreColor(_ condScore: Float) -> UIColor? {
     if condScore < 1 {
         return .dimGray
     } else if condScore < 2.5 {

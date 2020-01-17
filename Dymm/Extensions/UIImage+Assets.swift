@@ -45,6 +45,7 @@ extension UIImage {
     static let itemArrowMaximize = UIImage(named: "item-arrow-maximize")!
     static let itemArrowMinimize = UIImage(named: "item-arrow-minimize")!
     static let itemArrowRight = UIImage(named: "item-arrow-right")!
+    static let itemBgIap = UIImage(named: "item-bg-iap")!
     static let itemBgWave = UIImage(named: "item-bg-wave")!
     static let itemBtnPlusTrans = UIImage(named: "item-btn-plus-trans")!
     static let itemBtnPlus = UIImage(named: "item-btn-plus")!
@@ -76,8 +77,10 @@ extension UIImage {
     static let itemLogoM = UIImage(named: "item-logo-m")!
     static let itemLogoS = UIImage(named: "item-logo-s")!
     static let itemMedicalCross = UIImage(named: "item-medical-cross")!
+    static let itemNoteGrayM = UIImage(named: "item-note-gray-m")!
     static let itemNoteGray = UIImage(named: "item-note-gray")!
-    static let itemNoteYellow = UIImage(named: "item-note-yellow")!
+    static let itemNoteGreenM = UIImage(named: "item-note-green-m")!
+    static let itemNoteGreen = UIImage(named: "item-note-green")!
     static let itemNotes = UIImage(named: "item-notes")!
     static let itemOpinion = UIImage(named: "item-opinion")!
     static let itemPlusActivity = UIImage(named: "item-plus-activity")!
@@ -90,16 +93,22 @@ extension UIImage {
     static let itemRemove = UIImage(named: "item-remove")!
     static let itemScoreAvg = UIImage(named: "item-score-avg")!
     static let itemScoreAwfulL = UIImage(named: "item-score-awful-l")!
+    static let itemScoreAwfulM = UIImage(named: "item-score-awful-m")!
     static let itemScoreAwful = UIImage(named: "item-score-awful")!
     static let itemScoreBadL = UIImage(named: "item-score-bad-l")!
+    static let itemScoreBadM = UIImage(named: "item-score-bad-m")!
     static let itemScoreBad = UIImage(named: "item-score-bad")!
     static let itemScoreExcellentL = UIImage(named: "item-score-excellent-l")!
+    static let itemScoreExcellentM = UIImage(named: "item-score-excellent-m")!
     static let itemScoreExcellent = UIImage(named: "item-score-excellent")!
     static let itemScoreGoodL = UIImage(named: "item-score-good-l")!
+    static let itemScoreGoodM = UIImage(named: "item-score-good-m")!
     static let itemScoreGood = UIImage(named: "item-score-good")!
     static let itemScoreNoneL = UIImage(named: "item-score-none-l")!
+    static let itemScoreNoneM = UIImage(named: "item-score-none-m")!
     static let itemScoreNone = UIImage(named: "item-score-none")!
     static let itemScoreSosoL = UIImage(named: "item-score-soso-l")!
+    static let itemScoreSosoM = UIImage(named: "item-score-soso-m")!
     static let itemScoreSoso = UIImage(named: "item-score-soso")!
     static let itemSearch = UIImage(named: "item-search")!
     static let itemStarEmpty = UIImage(named: "item-star-empty")!
@@ -109,6 +118,4 @@ extension UIImage {
     static let itemTrendUpGray = UIImage(named: "item-trend-up-gray")!
     static let itemTrendUp = UIImage(named: "item-trend-up")!
     static let itemTriangleDown = UIImage(named: "item-triangle-down")!
-    
-    static let itemBgIap = UIImage(named: "item-bg-iap")!
 }

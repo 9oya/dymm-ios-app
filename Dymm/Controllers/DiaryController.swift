@@ -53,6 +53,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
     var diseaseTitleLabel: UILabel!
     var pullToRefreshLabel: UILabel!
     var groupTypePickGuideLabel: UILabel!
+    var plusBtnGuideLabel: UILabel!
     
     // UIButton
     var toggleBtn: UIButton!
@@ -612,10 +613,12 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
             if self.isPlusBtnTapped {
                 self.plusBtn.transform = CGAffineTransform(rotationAngle: 0)
                 self.plusBtn.backgroundColor = UIColor(hex: "#1E6CFF").withAlphaComponent(0.8)
+                self.plusBtnGuideLabel.isHidden = false
                 self.isPlusBtnTapped = false
             } else {
                 self.plusBtn.transform = CGAffineTransform(rotationAngle: (.pi / 2))
                 self.plusBtn.backgroundColor = UIColor.green_3ED6A7.withAlphaComponent(0.9)
+                self.plusBtnGuideLabel.isHidden = true
                 self.isPlusBtnTapped = true
             }
             self.plusBtns.forEach { (button) in
@@ -782,20 +785,20 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.drugLogBulletView.isHidden = false
             }
             if let condScore = logGroup.cond_score {
-                cell.moodScoreImageView.image = getCondScoreImageSmall(condScore)
-                cell.moodScoreButton.setImage(getCondScoreImageSmall(condScore), for: .normal)
+                cell.moodScoreImageView.image = getMoodScoreImageSmall(condScore)
+                cell.moodScoreButton.setImage(getMoodScoreImageMedium(condScore), for: .normal)
                 cell.moodBtnGuideLabel.textColor = .clear
             } else {
                 cell.moodScoreImageView.image = .itemScoreNone
-                cell.moodScoreButton.setImage(.itemScoreNone, for: .normal)
+                cell.moodScoreButton.setImage(.itemScoreNoneM, for: .normal)
                 cell.moodBtnGuideLabel.textColor = .magenta
             }
             if logGroup.note != nil {
                 cell.noteImageView.isHidden = false
-                cell.noteButton.setImage(.itemNoteYellow, for: .normal)
+                cell.noteButton.setImage(.itemNoteGreenM, for: .normal)
             } else {
                 cell.noteImageView.isHidden = true
-                cell.noteButton.setImage(.itemNoteGray, for: .normal)
+                cell.noteButton.setImage(.itemNoteGrayM, for: .normal)
             }
             cell.moodScoreButton.addTarget(self, action: #selector(alertCondScorePicker), for: .touchUpInside)
             cell.noteButton.addTarget(self, action: #selector(alertNoteTextView(_:)), for: .touchUpInside)
@@ -1828,6 +1831,18 @@ extension DiaryViewController {
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
         }()
+        plusBtnGuideLabel = {
+            let _label = UILabel()
+            _label.font = .systemFont(ofSize: 17, weight: .bold)
+            _label.textColor = .magenta
+            _label.textAlignment = .center
+            _label.numberOfLines = 1
+            _label.text = lang.titleHello
+            _label.transform = CGAffineTransform(rotationAngle: -(CGFloat.pi / 2))
+            _label.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _label.translatesAutoresizingMaskIntoConstraints = false
+            return _label
+        }()
         
         if diaryMode == DiaryMode.editor {
             navigationItem.titleView = titleImgView
@@ -1874,6 +1889,7 @@ extension DiaryViewController {
         view.addSubview(diseaseHistoryBtn)
         view.addSubview(toggleBtn)
         view.addSubview(plusBtnStackView)
+        view.addSubview(plusBtnGuideLabel)
         view.addSubview(blindView)
         view.addSubview(diseaseLeftBtn)
         view.addGestureRecognizer(scopeGesture)
@@ -1972,6 +1988,9 @@ extension DiaryViewController {
         
         plusBtnStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -15).isActive = true
         plusBtnStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -15).isActive = true
+        
+        plusBtnGuideLabel.trailingAnchor.constraint(equalTo: plusBtnStackView.leadingAnchor, constant: 7).isActive = true
+        plusBtnGuideLabel.bottomAnchor.constraint(equalTo: plusBtnStackView.bottomAnchor, constant: -15).isActive = true
         
         diseaseRightBtn.trailingAnchor.constraint(equalTo: diseaseContainer.trailingAnchor, constant: 0).isActive = true
         diseaseRightBtn.bottomAnchor.constraint(equalTo: diseaseContainer.bottomAnchor, constant: -5).isActive = true

@@ -50,6 +50,7 @@ struct LangPack {
     var titleFreeTrial: String!
     var titleGender: String!
     var titleGuest: String!
+    var titleHello: String!
     var titleHome: String!
     var titleIncorrectEmailCode: String!
     var titleIncorrectOldPassword: String!
@@ -301,8 +302,8 @@ struct LangPack {
         }()
         self.titleClick = {
             switch currentLanguageId {
-            case LanguageId.eng: return "\u{02196} Click to Score Mood!"
-            case LanguageId.kor: return "\u{02196} 클릭해서 기분점수 매기기!"
+            case LanguageId.eng: return "\u{02196} Click to Score!"
+            case LanguageId.kor: return "\u{02196} 클릭해서 점수매기기!"
             default: fatalError()}
         }()
         self.titleClose = {
@@ -465,6 +466,12 @@ struct LangPack {
             switch currentLanguageId {
             case LanguageId.eng: return "Guest"
             case LanguageId.kor: return "게스트"
+            default: fatalError()}
+        }()
+        self.titleHello = {
+            switch currentLanguageId {
+            case LanguageId.eng: return "Unfold"
+            case LanguageId.kor: return "펼쳐요"
             default: fatalError()}
         }()
         self.titleHome = {
