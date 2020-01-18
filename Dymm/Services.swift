@@ -750,8 +750,8 @@ struct Service {
     }
     
     func createNewAvatar(params: Parameters, unauthorized: @escaping (_ pattern: Int) -> Void, popoverAlert: @escaping (_ message: String) -> Void, completion: @escaping (_ auth: CustomModel.Auth) -> Void) {
-        // TODO: Remove /new
-        Alamofire.request("\(URI.host)\(URI.avatar)/new/create", method: .post, parameters: params, encoding: JSONEncoding.default)
+        // TODO: Remove /new2
+        Alamofire.request("\(URI.host)\(URI.avatar)/new2/create", method: .post, parameters: params, encoding: JSONEncoding.default)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -782,7 +782,7 @@ struct Service {
     }
     
     func authWithFacebook(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, completion: @escaping (_ auth: CustomModel.Auth) -> Void) {
-        Alamofire.request("\(URI.host)\(URI.avatar)/fb-auth", method: .post, parameters: params, encoding: JSONEncoding.default)
+        Alamofire.request("\(URI.host)\(URI.avatar)/fb-auth2", method: .post, parameters: params, encoding: JSONEncoding.default)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {
@@ -805,7 +805,7 @@ struct Service {
     }
     
     func authWithGoogle(params: Parameters, popoverAlert: @escaping (_ message: String) -> Void, completion: @escaping (_ auth: CustomModel.Auth) -> Void) {
-        Alamofire.request("\(URI.host)\(URI.avatar)/g-auth", method: .post, parameters: params, encoding: JSONEncoding.default)
+        Alamofire.request("\(URI.host)\(URI.avatar)/g-auth2", method: .post, parameters: params, encoding: JSONEncoding.default)
             .validate(contentType: ["application/json"])
             .responseData { response in
                 guard let responseData = response.result.value, let statusCode = response.response?.statusCode else {

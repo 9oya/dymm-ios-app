@@ -123,6 +123,7 @@ struct TagId {
     static let password = 14642
     static let ranking = 14644
     static let supplements = 1040
+    static let emptyTag = 117333
 }
 
 struct CountryId {

@@ -12,7 +12,7 @@ import Alamofire
 private let stepCellId = "StepCell"
 
 private let stepBarHeightInt = 40
-private let searchBarHeightInt = 40
+private let searchBarHeightInt = 45
 private let detailBoxAHeightInt = 312
 private let detailBoxBHeightInt = 312
 private let detailBoxCHeightInt = 265
@@ -39,6 +39,7 @@ class CategoryViewController: UIViewController {
     var downArrowImgView: UIImageView!
     var photoImgView: UIImageView!
     var searchImgView: UIImageView!
+    var bookmarkImgView: UIImageView!
     
     // UITextField
     var searchTextField: UITextField!
@@ -55,7 +56,7 @@ class CategoryViewController: UIViewController {
     var logSizeBtn: UIButton!
     var startDateBtn: UIButton!
     var endDateBtn: UIButton!
-    var langPickBtn: UIButton!
+    var bookmarkBtn: UIButton!
     var sendOpinionBtn: UIButton!
     
     // NSLayoutConstraints
@@ -98,6 +99,7 @@ class CategoryViewController: UIViewController {
     var minimumCntInt = 40
     var minimumCnt: Int = 40
     var opinion: String?
+    var bookmarkId: Int?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -164,13 +166,13 @@ class CategoryViewController: UIViewController {
         alert.addAction(UIAlertAction(title: lang.titleDone, style: .default) { _ in
             if let langId = self.selectedLangTag?.id {
                 self.lang = LangPack(langId)
-                UIView.transition(with: self.langPickBtn, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                    self.langPickBtn.setTitle(LangHelper.getLanguageName(langId), for: .normal)
+                UIView.transition(with: self.bookmarkBtn, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                    self.bookmarkBtn.setTitle(LangHelper.getLanguageName(langId), for: .normal)
                 })
             } else {
                 self.lang = LangPack(LanguageId.eng)
-                UIView.transition(with: self.langPickBtn, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                    self.langPickBtn.setTitle(LangHelper.getLanguageName(LanguageId.eng), for: .normal)
+                UIView.transition(with: self.bookmarkBtn, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                    self.bookmarkBtn.setTitle(LangHelper.getLanguageName(LanguageId.eng), for: .normal)
                 })
             }
             self.tagCollection.reloadData()
@@ -221,6 +223,7 @@ class CategoryViewController: UIViewController {
         let textView: UITextView = {
             let _textView = UITextView()
             _textView.backgroundColor = .yellow_FFD667
+            _textView.textColor = .purple_DB8BFF
             _textView.font = .systemFont(ofSize: 15, weight: .regular)
             _textView.translatesAutoresizingMaskIntoConstraints = false
             return _textView
@@ -379,6 +382,21 @@ class CategoryViewController: UIViewController {
     @objc func langPickBtnTapped() {
         loadLangTagsOnPicker()
     }
+    
+    @objc func bookmarkBtnTapped() {
+        if !UserDefaults.standard.isSignIn() {
+            presentAuthNavigation()
+            return
+        } else {
+            stepTags.append(superTag!)
+            UIView.transition(with: stepCollection, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.stepCollection.reloadData()
+            })
+            superTagId = bookmarkId!
+            superTag = nil
+            loadCategories()
+        }
+    }
 }
 
 extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
@@ -519,8 +537,7 @@ extension CategoryViewController: UICollectionViewDataSource, UICollectionViewDe
                     return
                 }
             }
-            if selected_tag.id == 117333 {
-                // Empty tag
+            if selected_tag.id == TagId.emptyTag {
                 return
             }
             stepTags.append(superTag!)
@@ -811,19 +828,29 @@ extension CategoryViewController {
             _imageView.translatesAutoresizingMaskIntoConstraints = false
             return _imageView
         }()
-        langPickBtn = {
+        bookmarkBtn = {
             let _button = UIButton(type: .system)
-            _button.setTitleColor(.green_3ED6A7, for: .normal)
-            _button.setTitle(LangHelper.getLanguageName(lang.currentLanguageId), for: .normal)
-            _button.titleLabel?.font = .systemFont(ofSize: 15)
+            _button.setTitleColor(.white, for: .normal)
+            _button.backgroundColor = .yellow_FFD067
+            _button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+//            _button.setTitle(LangHelper.getLanguageName(lang.currentLanguageId), for: .normal)
+            _button.setTitle(lang.titleBookmarks, for: .normal)
             _button.showsTouchWhenHighlighted = true
-            _button.addTarget(self, action: #selector(langPickBtnTapped), for: .touchUpInside)
-            _button.backgroundColor = .white
+//            _button.addTarget(self, action: #selector(langPickBtnTapped), for: .touchUpInside)
+            _button.addTarget(self, action: #selector(bookmarkBtnTapped), for: .touchUpInside)
             _button.layer.cornerRadius = 10.0
             _button.addShadowView()
             _button.isHidden = true
             _button.translatesAutoresizingMaskIntoConstraints = false
             return _button
+        }()
+        bookmarkImgView = {
+            let _imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
+            _imageView.contentMode = .scaleAspectFit
+            _imageView.image = .itemStarWhiteSPill
+            _imageView.isHidden = true
+            _imageView.translatesAutoresizingMaskIntoConstraints = false
+            return _imageView
         }()
         sizePickerContainer = {
             let _view = UIView()
@@ -1005,7 +1032,8 @@ extension CategoryViewController {
         view.addSubview(stepCollection)
         view.addSubview(searchTextField)
         view.addSubview(searchImgView)
-        view.addSubview(langPickBtn)
+        view.addSubview(bookmarkBtn)
+        view.addSubview(bookmarkImgView)
         view.addSubview(detailContainer)
         view.addSubview(tagCollection)
         
@@ -1039,10 +1067,13 @@ extension CategoryViewController {
         searchImgView.centerYAnchor.constraint(equalTo: searchTextField.centerYAnchor, constant: 0).isActive = true
         searchImgView.leadingAnchor.constraint(equalTo: searchTextField.leadingAnchor, constant: 10).isActive = true
         
-        langPickBtn.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
-        langPickBtn.leadingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
-        langPickBtn.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - (7 * 5)).isActive = true
-        langPickBtn.heightAnchor.constraint(equalTo: searchTextField.heightAnchor, constant: 0).isActive = true
+        bookmarkBtn.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
+        bookmarkBtn.leadingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: CGFloat(marginInt)).isActive = true
+        bookmarkBtn.widthAnchor.constraint(equalToConstant: (view.frame.width / 2) - (7 * 5)).isActive = true
+        bookmarkBtn.heightAnchor.constraint(equalTo: searchTextField.heightAnchor, constant: 0).isActive = true
+        
+        bookmarkImgView.centerYAnchor.constraint(equalTo: bookmarkBtn.centerYAnchor, constant: 0).isActive = true
+        bookmarkImgView.leadingAnchor.constraint(equalTo: bookmarkBtn.leadingAnchor, constant: 10).isActive = true
         
         detailContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: CGFloat(stepBarHeightInt + marginInt)).isActive = true
         detailContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: CGFloat(marginInt)).isActive = true
@@ -1243,12 +1274,14 @@ extension CategoryViewController {
                 if _superTag.id == TagId.bookmarks {
                     self.searchTextField.isHidden = true
                     self.searchImgView.isHidden = true
-                    self.langPickBtn.isHidden = true
+                    self.bookmarkBtn.isHidden = true
+                    self.bookmarkImgView.isHidden = true
                     self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt)
                 } else {
                     self.searchTextField.isHidden = false
                     self.searchImgView.isHidden = false
-                    self.langPickBtn.isHidden = false
+                    self.bookmarkBtn.isHidden = false
+                    self.bookmarkImgView.isHidden = false
                     self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + searchBarHeightInt + marginInt)
                 }
             }
@@ -1264,7 +1297,8 @@ extension CategoryViewController {
             UIView.animate(withDuration: 0.5) {
                 self.searchTextField.isHidden = true
                 self.searchImgView.isHidden = true
-                self.langPickBtn.isHidden = true
+                self.bookmarkBtn.isHidden = true
+                self.bookmarkImgView.isHidden = true
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt)
             }
         } else if _superTag.tag_type == TagType.food || _superTag.tag_type == TagType.drug {
@@ -1275,7 +1309,8 @@ extension CategoryViewController {
                 self.detailContainer.isHidden = false
                 self.searchTextField.isHidden = true
                 self.searchImgView.isHidden = true
-                self.langPickBtn.isHidden = true
+                self.bookmarkBtn.isHidden = true
+                self.bookmarkImgView.isHidden = true
                 self.detailContainerHeight.constant = CGFloat(detailBoxAHeightInt)
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxAHeightInt + marginInt)
                 
@@ -1312,7 +1347,8 @@ extension CategoryViewController {
                 self.detailContainer.isHidden = false
                 self.searchTextField.isHidden = true
                 self.searchImgView.isHidden = true
-                self.langPickBtn.isHidden = true
+                self.bookmarkBtn.isHidden = true
+                self.bookmarkImgView.isHidden = true
                 self.detailContainerHeight.constant = CGFloat(detailBoxBHeightInt)
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxBHeightInt + marginInt)
                 
@@ -1336,7 +1372,8 @@ extension CategoryViewController {
                 self.detailContainer.isHidden = false
                 self.searchTextField.isHidden = true
                 self.searchImgView.isHidden = true
-                self.langPickBtn.isHidden = true
+                self.bookmarkBtn.isHidden = true
+                self.bookmarkImgView.isHidden = true
                 self.detailContainerHeight.constant = CGFloat(detailBoxCHeightInt)
                 self.tagCollectionTop.constant = CGFloat(stepBarHeightInt + marginInt + detailBoxCHeightInt + marginInt)
                 
@@ -1384,11 +1421,21 @@ extension CategoryViewController {
                 self.tagCollection.isHidden = true
                 self.searchTextField.isHidden = true
                 self.searchImgView.isHidden = true
-                self.langPickBtn.isHidden = true
+                self.bookmarkBtn.isHidden = true
+                self.bookmarkImgView.isHidden = true
             })
         }
         if superTag != nil {
             superTagId = superTag!.id
+        }
+        if superTagId! == TagId.food {
+            bookmarkId = TagId.bookFood
+        } else if superTagId! == TagId.pill {
+            bookmarkId = TagId.bookPill
+        } else if superTagId! == TagId.activity {
+            bookmarkId = TagId.bookActivity
+        } else if superTagId! == TagId.disease {
+            bookmarkId = TagId.bookDisease
         }
         let service = Service(lang: lang)
         service.getTagSetList(tagId: superTagId!, sortType: SortType.priority, pageNum: currPageNum, perPage: minimumCntInt, langId: lang.currentLanguageId,popoverAlert: { (message) in

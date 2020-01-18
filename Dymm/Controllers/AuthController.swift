@@ -48,10 +48,13 @@ class AuthViewController: UIViewController {
     var formContainerTop: NSLayoutConstraint!
     var formContainerHeight: NSLayoutConstraint!
     var emailTextFieldTop: NSLayoutConstraint!
-
-    // Non-view properties
+    
+    // Helpers
     var lang: LangPack!
     var retryFunction: (() -> Void)?
+    var dateFormatter: DateFormatter!
+
+    // Non-view properties
     var isSignUpForm = false
     var lastEditedTxtField = 0
     var emailToFind: String?
@@ -396,11 +399,19 @@ extension AuthViewController: GIDSignInDelegate {
             print("\(error.localizedDescription)")
         } else {
             // Perform any operations on signed in user here.
+            let date = Date()
             self.gParams = [
                 "email": user.profile.email!,
                 "first_name": user.profile.givenName ?? "Noob",
                 "last_name": user.profile.familyName ?? user.profile.givenName!,
-                "language_id": getDeviceLanguage()
+                "language_id": getDeviceLanguage(),
+                "year_number": Calendar.current.component(.year, from: date),
+                "year_forweekofyear": Calendar.current.component(.yearForWeekOfYear, from: date),
+                "month_number": Calendar.current.component(.month, from: date),
+                "week_of_year": Calendar.current.component(.weekOfYear, from: date),
+                "day_of_year": Calendar.current.ordinality(of: .day, in: .year, for: date)!,
+                "group_type": LogGroupType.morning,
+                "log_date": dateFormatter.string(from: date)
             ]
             self.signWithGoogle()
         }
@@ -421,6 +432,12 @@ extension AuthViewController {
         view.backgroundColor = UIColor.whiteSmoke
         
         // Initialize subveiw properties
+        dateFormatter = {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: getUserCountryCode())
+            formatter.dateFormat = "yyyy-MM-dd"
+            return formatter
+        }()
         topBarView = getAddtionalTopBarView()
         forgotButton = getBasicTextButton()
         forgotButton.setTitle(lang.titleForgotPassword, for: .normal)
@@ -829,12 +846,27 @@ extension AuthViewController {
             displayErrorMessage(lang.msgMismatchConfirmPassword)
             return
         }
+//        let params: Parameters = [
+//            "first_name": first_name,
+//            "last_name": last_name,
+//            "email": email,
+//            "password": password,
+//            "language_id": getDeviceLanguage()
+//        ]
+        let date = Date()
         let params: Parameters = [
             "first_name": first_name,
             "last_name": last_name,
             "email": email,
             "password": password,
-            "language_id": getDeviceLanguage()
+            "language_id": getDeviceLanguage(),
+            "year_number": Calendar.current.component(.year, from: date),
+            "year_forweekofyear": Calendar.current.component(.yearForWeekOfYear, from: date),
+            "month_number": Calendar.current.component(.month, from: date),
+            "week_of_year": Calendar.current.component(.weekOfYear, from: date),
+            "day_of_year": Calendar.current.ordinality(of: .day, in: .year, for: date)!,
+            "group_type": LogGroupType.morning,
+            "log_date": dateFormatter.string(from: date)
         ]
         self.view.showSpinner()
         UIView.transition(with: formContainerView, duration: 0.5, options: .transitionCrossDissolve, animations: {
@@ -970,11 +1002,19 @@ extension AuthViewController {
                     print("error \(error)")
                 } else {
                     let jsonResult = result! as! Dictionary<String, AnyObject>
+                    let date = Date()
                     self.fbParams = [
                         "fb_id": jsonResult["id"]!,
                         "first_name": jsonResult["first_name"]!,
                         "last_name": jsonResult["last_name"]!,
-                        "language_id": getDeviceLanguage()
+                        "language_id": getDeviceLanguage(),
+                        "year_number": Calendar.current.component(.year, from: date),
+                        "year_forweekofyear": Calendar.current.component(.yearForWeekOfYear, from: date),
+                        "month_number": Calendar.current.component(.month, from: date),
+                        "week_of_year": Calendar.current.component(.weekOfYear, from: date),
+                        "day_of_year": Calendar.current.ordinality(of: .day, in: .year, for: date)!,
+                        "group_type": LogGroupType.morning,
+                        "log_date": self.dateFormatter.string(from: date)
                     ]
                     if let email = jsonResult["email"] {
                         self.fbParams!["email"] = email

@@ -175,6 +175,7 @@ class DiaryViewController: UIViewController, FSCalendarDataSource, FSCalendarDel
                 loadReceipt()
                 calendarView.appearance.headerDateFormat = lang.calendarHeaderDateFormat
                 diseaseTitleLabel.text = lang.titleMyAvtCond
+                plusBtnGuideLabel.text = lang.titleHello
             } else {
                 selectedOnceCellIdxPath = nil
                 selectedTableSection = nil
@@ -767,6 +768,7 @@ extension DiaryViewController: UITableViewDelegate, UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: logGroupTableCellId, for: indexPath) as? LogGroupTableCell else {
             fatalError()
         }
+        cell.lang = LangPack(UserDefaults.standard.getCurrentLanguageId()!)
         switch diaryMode {
         case DiaryMode.editor:
             let logGroup = logGroupSectTwoDimArr[indexPath.section][indexPath.row].logGroup
@@ -1838,8 +1840,8 @@ extension DiaryViewController {
             _label.textAlignment = .center
             _label.numberOfLines = 1
             _label.text = lang.titleHello
-            _label.transform = CGAffineTransform(rotationAngle: -(CGFloat.pi / 2))
             _label.addShadowView(offset: CGSize(width: 4, height: 4), opacity: 1.0, radius: 6, color: UIColor.green_00E9CC.cgColor)
+            _label.isHidden = true
             _label.translatesAutoresizingMaskIntoConstraints = false
             return _label
         }()
@@ -1853,6 +1855,7 @@ extension DiaryViewController {
             calendarView.appearance.titleDefaultColor = UIColor.white
             diseaseHistoryBtn.isHidden = false
             plusBtn.isHidden = false
+            plusBtnGuideLabel.isHidden = false
             plusBtns = [diseasePlusBtn, activityPlusBtn, pillPlusBtn, foodPlusBtn, historyPlusBtn]
             plusBtnStackView.addArrangedSubview(historyPlusBtn)
             plusBtnStackView.addArrangedSubview(foodPlusBtn)
@@ -1989,8 +1992,8 @@ extension DiaryViewController {
         plusBtnStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -15).isActive = true
         plusBtnStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -15).isActive = true
         
-        plusBtnGuideLabel.trailingAnchor.constraint(equalTo: plusBtnStackView.leadingAnchor, constant: 7).isActive = true
-        plusBtnGuideLabel.bottomAnchor.constraint(equalTo: plusBtnStackView.bottomAnchor, constant: -15).isActive = true
+        plusBtnGuideLabel.centerXAnchor.constraint(equalTo: plusBtnStackView.centerXAnchor, constant: 0).isActive = true
+        plusBtnGuideLabel.bottomAnchor.constraint(equalTo: plusBtnStackView.topAnchor, constant: -3).isActive = true
         
         diseaseRightBtn.trailingAnchor.constraint(equalTo: diseaseContainer.trailingAnchor, constant: 0).isActive = true
         diseaseRightBtn.bottomAnchor.constraint(equalTo: diseaseContainer.bottomAnchor, constant: -5).isActive = true

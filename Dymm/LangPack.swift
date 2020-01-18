@@ -470,7 +470,7 @@ struct LangPack {
         }()
         self.titleHello = {
             switch currentLanguageId {
-            case LanguageId.eng: return "Unfold"
+            case LanguageId.eng: return "Hello!"
             case LanguageId.kor: return "펼쳐요"
             default: fatalError()}
         }()
